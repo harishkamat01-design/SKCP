@@ -1,0 +1,1 @@
+docs: establish SKCP project vision and architecture planning
