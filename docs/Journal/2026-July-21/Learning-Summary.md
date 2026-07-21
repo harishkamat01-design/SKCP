@@ -236,4 +236,45 @@ IDE-generated files
 ---
 
 ## 11. Important Git Lesson Learned
-```
+Always create `.gitignore` BEFORE running:
+
+npm install
+
+This prevents Git from tracking unnecessary files.
+
+
+## 12. Project Information
+
+Project Name:
+SKCP (Shree Kundodari Cement Products)
+
+GitHub Repository:
+https://github.com/harishkamat01-design/SKCP
+
+Current Module:
+Module 0 – Environment Setup
+
+Status:
+Completed ✅
+
+## 13. Key Takeaways
+
+✓ Always verify `git status` before committing.
+
+✓ Never commit `node_modules`.
+
+✓ Commit both `package.json` and `package-lock.json`.
+
+✓ Use meaningful commit messages.
+
+✓ Keep the repository clean and organized.
+
+✓ Understand every command before executing it.
+
+---
+
+Today's Achievement
+
+Successfully initialized the SKCP Git repository using professional Git practices and understood the importance of repository hygiene.
+
+
