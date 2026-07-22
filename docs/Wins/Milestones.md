@@ -17,3 +17,13 @@
 
 ## 01-Sep-2026
 ✅ First production deployment.
+
+A small rule we can follow
+Let's use these prefixes:
+🟢 Quick Question
+A short clarification.
+🟡 Review
+Check my code, UI, or design.
+🔴 Architect
+We need to make an important design or implementation decision.
+That helps us stay focused.

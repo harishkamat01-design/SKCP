@@ -9,3 +9,5 @@ Building this habit early will prevent many common repository issues in future p
 Remember:
 
 "Don't memorize Git commands. Understand what Git is doing."
+
+https://chatgpt.com/share/6a601e4c-4bcc-83ee-97ce-4d931a11113b
