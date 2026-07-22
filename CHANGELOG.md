@@ -1,13 +1,17 @@
-# Changelog 
+# Changelog
 
-## v0.1.0
+## 2026-07-22
 
-- Environment setup completed.
-- Project architecture defined.
-- Development standards established.
+### Added
+- Completed Business Analysis
+- Defined Product Workflow
+- Defined Customer Workflow
+- Updated README
 
-## v0.2.0
+## 2026-07-21
 
-- Frontend initialized.
-- Routing configured.
-- Layout created.
+### Added
+- Initialized project
+- Created documentation structure
+- Configured Git
+
