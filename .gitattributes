@@ -1,0 +1,41 @@
+# ---------------------------------------
+# SKCP Git Attributes
+# ---------------------------------------
+
+# Automatically detect text files and normalize line endings
+* text=auto
+
+# Markdown
+*.md text
+
+# Java
+*.java text
+
+# JavaScript
+*.js text
+
+# JSX
+*.jsx text
+
+# TypeScript
+*.ts text
+*.tsx text
+
+# JSON
+*.json text
+
+# HTML
+*.html text
+
+# CSS
+*.css text
+
+# YAML
+*.yml text
+*.yaml text
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
