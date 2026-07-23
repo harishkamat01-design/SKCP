@@ -125,17 +125,26 @@ Future AI capabilities include:
 
 ---
 
-# 🏗 Project Architecture
+# 🏗 Project Structure
 
-```
+```text
 SKCP/
 
 ├── frontend/
 ├── backend/
 ├── database/
+
 ├── docs/
-│
+│   ├── Architecture/
+│   ├── Journal/
+│   ├── Learning/
+│   ├── Planning/
+│   ├── Templates/
+│   └── Wins/
+
 ├── README.md
+├── CHANGELOG.md
+├── LICENSE
 └── .gitignore
 ```
 
@@ -154,6 +163,16 @@ Learning/
 Planning/
 Templates/
 Wins/
+
+Current documentation is maintained under the `docs/` directory.
+
+- System Architecture
+- Business Workflow (Business Requirements)
+- Software Engineering Glossary
+- Architecture Decision Records (ADR)
+- Daily Development Journal
+- Learning Notes
+- Project Milestones
 ```
 
 Daily development progress is documented.
@@ -185,10 +204,30 @@ Daily development progress is documented.
 - Vercel
 - Render
 - Neon PostgreSQL
-
+    
 ---
 
 # 📊 Project Status
+
+## ✅ Completed (Module 0)
+
+- Development Environment Setup
+- VS Code Installation and Configuration
+- Git Installation and Configuration
+- GitHub Repository Creation
+- Local Git Repository Initialization
+- Git Workflow Setup
+- Project Folder Structure
+- Initial React Frontend Setup
+- Vercel Frontend Deployment
+- Project Documentation Structure
+- README.md Creation
+- CHANGELOG.md Creation
+- .gitignore Configuration
+- MIT License Setup
+- Daily Development Journal Structure
+
+---
 
 ## ✅ Completed (Module 1)
 
@@ -198,8 +237,17 @@ Daily development progress is documented.
 - Customer Workflow
 - Manufacturing Workflow
 - Payment Workflow
+- Delivery Workflow
+- Stock Management Workflow
+- Business Rules
+- Business Constraints
+- Business Risks
+- Functional Requirements
+- Non-Functional Requirements
 - Product Analysis
 - Documentation Structure
+- Software Engineering Glossary
+- Architecture Decision Records (ADR)
 - Git Repository
 - GitHub Repository
 - Development Journal
@@ -207,13 +255,9 @@ Daily development progress is documented.
 
 ---
 
-## 🔄 Current Module
+## 🚧 Current Module
 
-**Module 2**
-
-Database Design
-
----
+**Module 2 – Software Architecture**
 
 # 📅 Development Workflow
 
@@ -230,6 +274,7 @@ Every development day follows:
 
 ---
 
+
 # 📂 Repository
 
 GitHub Repository
@@ -240,16 +285,14 @@ https://github.com/harishkamat01-design/SKCP
 
 # 📈 Roadmap
 
+- ✅ Module 0 – Environment Setup
 - ✅ Module 1 – Business Analysis
-- ⏳ Module 2 – Database Design
-- ⏳ Module 3 – Backend Development
-- ⏳ Module 4 – Frontend Integration
-- ⏳ Module 5 – Authentication
+- 🚧 Module 2 – Software Architecture
+- ⏳ Module 3 – Database Design
+- ⏳ Module 4 – Backend Development
+- ⏳ Module 5 – Frontend Integration
 - ⏳ Module 6 – AI Features
 - ⏳ Module 7 – Deployment
-- ⏳ Module 8 – Production Release
-
----
 
 # 🎯 Long-Term Goal
 
@@ -265,8 +308,11 @@ See the LICENSE file for details.
 
 ---
 
-## Developed By
+## 👨‍💻 Developed By
 
-Harish Kamat
+**Harish Kamat**
 
-with architectural guidance from ChatGPT.
+Developed as a real-world software engineering project following an architecture-first approach.
+
+With architectural guidance from ChatGPT.
+
