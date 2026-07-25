@@ -213,6 +213,92 @@ The factory should never be forced to change simply because software was designe
 
 ---
 
+## 11. Factory Layout as Software Architecture
+
+A major realization was that the physical layout of the factory already represents the business workflow.
+
+Factory Layout:
+
+Raw Material Yard
+
+↓
+
+Mixers
+
+↓
+
+Production Area
+
+↓
+
+Curing Area
+
+↓
+
+Selling Area
+
+↓
+
+Loading Point
+
+↓
+
+Factory Gate
+
+Instead of inventing a new workflow, the software should mirror this natural flow.
+
+---
+
+## 12. Business Vocabulary
+
+The language used inside the factory is part of the business itself.
+
+Examples include:
+
+- Ettangi Kallu
+- Reti
+- Cement Cheela
+- Mould
+- Current Gone
+- Dina
+- Trip
+
+These terms were documented in the Business Dictionary so that developers, testers, and future AI systems understand the same business language as the factory.
+
+---
+
+## 13. Business Growth Philosophy
+
+Business growth should never compromise quality or customer trust.
+
+The software should always encourage:
+
+- Quality before quantity
+- Honest delivery commitments
+- Transparent payment tracking
+- Long-term customer relationships
+
+The architecture should reinforce these values in every future module.
+
+---
+
+## 14. Documentation as an Engineering Asset
+
+Another important learning was that documentation is not an afterthought.
+
+Professional documentation:
+
+- Preserves business knowledge
+- Reduces future confusion
+- Improves maintainability
+- Helps onboard future developers
+- Acts as long-term project memory
+
+The documentation created during Module 2 will become the foundation for all future development.
+
+---
+
+
 # Important Real Business Knowledge Captured
 
 Today's discussions captured several important operational realities:
@@ -241,6 +327,21 @@ This keeps the repository clean, meaningful, and maintainable.
 
 ---
 
+# Architecture Documents Completed
+
+By the end of today's session, the following architecture documents were completed or significantly improved:
+
+- System Architecture
+- Business Workflow
+- Architecture Summary
+- Architecture Principles
+- Architecture Roadmap
+- Architecture Decision Records (ADR)
+
+These documents collectively establish the architectural foundation of SKCP before beginning database design.
+
+---
+
 # Key Quotes From Today
 
 > Business First.
@@ -254,6 +355,24 @@ This keeps the repository clean, meaningful, and maintainable.
 > Preserve founder knowledge before it disappears.
 
 > Great software engineers first become good business thinkers.
+
+---
+
+# Biggest Takeaway
+
+The biggest lesson from today's work was that software architecture begins long before technology.
+
+It begins with understanding:
+
+- People
+- Business
+- Relationships
+- Factory Operations
+- Business Rules
+- Business Principles
+- Founder Knowledge
+
+Only after understanding these should databases, APIs, and user interfaces be designed.
 
 ---
 

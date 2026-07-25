@@ -1,12 +1,12 @@
 # SKCP Architecture Decision Log (ADR)
 
 **Project:** SKCP (Shree Kundodari Cement Products)  
-**Version:** 1.0  
+**Version:** 1.1
 **Status:** Active  
 **Author:** Harish Kamat  
 **Reviewer:** Architect  
 **Created:** 2026-07-21  
-**Last Updated:** 2026-07-23
+**Last Updated:** 2026-07-24
 
 ---
 
@@ -291,6 +291,185 @@ Introduce a `.gitattributes` file to normalize line endings.
 | Proposed | Under discussion |
 | Deprecated | No longer used |
 | Superseded | Replaced by another ADR |
+
+---
+
+---
+
+# ADR-011 : Business-First Architecture
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+During Module 2, it became clear that the factory already follows a well-established business workflow developed through years of practical experience.
+
+## Decision
+
+The software architecture will always be designed around the business workflow rather than forcing the business to adapt to the software.
+
+## Reason
+
+- Preserves existing business practices
+- Reduces user resistance
+- Ensures the software reflects real factory operations
+- Creates a business-driven architecture
+
+---
+
+# ADR-012 : Organize the System into Three Core Business Domains
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+Business analysis identified that every factory activity naturally belongs to one of three operational areas.
+
+## Decision
+
+The SKCP system will be organized into three primary business domains:
+
+- Raw Materials
+- Production
+- Sales
+
+## Reason
+
+- Reflects the physical factory layout
+- Provides clear module boundaries
+- Improves maintainability
+- Simplifies future expansion
+
+---
+
+# ADR-013 : Preserve Founder Knowledge
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+The founder has over twelve years of practical experience in cement block manufacturing and makes many business decisions based on this knowledge.
+
+## Decision
+
+Business knowledge gained through years of practical experience will be documented and gradually incorporated into the software.
+
+## Reason
+
+- Preserves valuable business expertise
+- Reduces dependency on a single individual
+- Enables future AI-assisted recommendations
+- Supports long-term business continuity
+
+---
+
+# ADR-014 : Business Rules and Principles are Permanent
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+During business analysis, it was observed that while business operations may grow and technology may change, the core business rules and principles remain stable.
+
+## Decision
+
+Business Rules and Business Principles will serve as the permanent foundation for all future software development.
+
+## Reason
+
+- Maintains consistency as the business grows
+- Protects business integrity
+- Ensures software remains aligned with the organization's vision
+- Reduces unnecessary architectural changes
+
+---
+
+# ADR-015 : Information Should Support Business Decisions
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+The primary objective of SKCP extends beyond storing business data.
+
+The system should assist the owner in making better operational decisions by converting information into actionable insights.
+
+## Decision
+
+SKCP will evolve as a Decision Support System by transforming operational data into meaningful business information and recommendations.
+
+## Reason
+
+- Improves business decision-making
+- Enables proactive management
+- Forms the foundation for future AI capabilities
+- Increases overall business efficiency
+
+---
+
+# ADR-016 : Design the Architecture for Future Business Growth
+
+## Date
+2026-07-24
+
+## Status
+Accepted
+
+## Context
+
+The current business is expected to expand in the future with additional products, customers, suppliers, machines, labour, and possibly multiple factory locations.
+
+## Decision
+
+The software architecture will be designed to support future business growth without requiring major architectural redesign.
+
+## Reason
+
+- Supports long-term scalability
+- Reduces future redevelopment effort
+- Protects the initial architectural investment
+- Allows the business to expand confidently
+
+---
+
+# Decision Status Legend
+
+| Status | Meaning |
+|---------|---------|
+| Accepted | Official project decision |
+| Proposed | Under discussion |
+| Deprecated | No longer used |
+| Superseded | Replaced by another ADR |
+
+---
+
+## Summary
+
+As of the completion of Module 2, these Architecture Decision Records establish the permanent architectural foundation of SKCP.
+
+All future decisions related to Database Design, Backend Development, Frontend Development, Deployment, and AI Implementation should remain aligned with these accepted architectural decisions.
+
+The Architecture Decision Records will continue to grow as the project evolves, providing a complete history of the technical and business decisions made throughout the development lifecycle.
 
 ---
 

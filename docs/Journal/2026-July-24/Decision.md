@@ -155,3 +155,133 @@ The glossary will be updated only after concepts are fully understood and can be
 ### Reason
 
 The glossary should become a practical learning reference rather than a collection of copied definitions.
+
+---
+
+# Decision 9
+
+## Title
+
+Factory Layout Mirrors Business Flow
+
+### Decision
+
+The software architecture should reflect the physical layout of the factory.
+
+Factory Flow:
+
+Raw Material Yard
+
+↓
+
+Mixers
+
+↓
+
+Production Area
+
+↓
+
+Curing Area
+
+↓
+
+Selling Area
+
+↓
+
+Loading Point
+
+↓
+
+Factory Gate
+
+### Reason
+
+The existing factory layout has evolved through years of operational experience. Designing software around this natural workflow makes the system intuitive and easier to use.
+
+---
+
+# Decision 10
+
+## Title
+
+Business Vocabulary Standardization
+
+### Decision
+
+The actual words used inside the factory will become the official business vocabulary of SKCP.
+
+Examples include:
+
+- Ettangi Kallu
+- Reti
+- Cement Cheela
+- Mould
+- Current Gone
+- Dina
+- Trip
+
+These terms will be maintained in the Business Dictionary.
+
+### Reason
+
+Using the same language as the business improves communication between users, developers, testers, and future AI components.
+
+---
+
+# Decision 11
+
+## Title
+
+Customer Trust Before Business Growth
+
+### Decision
+
+Every software feature should strengthen customer trust before attempting to optimize business growth or automation.
+
+Examples include:
+
+- Deliver only fully cured products
+- Provide realistic delivery commitments
+- Maintain accurate payment records
+- Preserve transparency with customers
+
+### Reason
+
+The long-term success of SKCP is built on customer trust rather than short-term sales.
+
+---
+
+# Decision 12
+
+## Title
+
+Software Should Evolve with the Business
+
+### Decision
+
+The architecture should remain flexible so that future business growth can be accommodated without major redesign.
+
+Future expansion may include:
+
+- Multiple products
+- Multiple factories
+- Additional machines
+- AI-assisted decision support
+- Customer Portal
+- Supplier Portal
+
+### Reason
+
+Building for scalability today reduces redevelopment effort and protects the long-term investment in SKCP.
+
+---
+
+# End of Day Summary
+
+Today's decisions established the business and architectural foundation of SKCP.
+
+These decisions will guide future database design, backend development, frontend implementation, AI integration, and overall project evolution.
+
+The focus remained on understanding and preserving the real business before writing software.

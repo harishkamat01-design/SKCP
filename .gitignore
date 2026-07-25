@@ -1,12 +1,58 @@
+# ============================================
+# Node.js Dependencies
+# Installed automatically using npm install.
+# Can always be recreated from package.json.
+# ============================================
 node_modules/
+
+# ============================================
+# Environment Variables
+# Stores secrets like API keys and passwords.
+# Never commit these to GitHub.
+# ============================================
 .env
 .env.local
+
+# ============================================
+# Build Output
+# Generated automatically during production build.
+# No need to store generated files in Git.
+# ============================================
 dist/
 build/
+
+# ============================================
+# Test Coverage Reports
+# Generated after running automated tests.
+# Can always be regenerated.
+# ============================================
 coverage/
+
+# ============================================
+# VS Code Workspace Settings
+# Personal editor settings specific to one developer.
+# ============================================
 .vscode/settings.json
 
+# ============================================
+# Operating System Files
+# Automatically created by Windows/macOS.
+# Not related to the project.
+# ============================================
 .DS_Store
 Thumbs.db
 
+# ============================================
+# CommandCode Workspace
+# Local AI coding assistant configuration.
+# Developer-specific files.
+# ============================================
 .commandcode/
+
+# ============================================
+# HTTP Forge Workspace
+# Stores HTTP request collections, suites,
+# and AI agent workspace files.
+# Not required for the SKCP application.
+# ============================================
+.http-forge/
