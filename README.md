@@ -290,6 +290,54 @@ Completed Today:
 - Business Learning Repository
 - Repository Documentation Refinement
 
+
+## 🟢 In Progress (Module 3 – Database Design)
+
+Module 3 officially started with a Business-First approach to Database Design.
+
+Completed So Far:
+
+- Introduction to Database Design Philosophy
+- Understanding Why Databases Exist
+- Business Objects vs Database Entities
+- SKCP Learning Bridge™ introduced
+- Mapping Business Questions to Database Concepts
+- Identifying Core Business Objects
+  - Customer
+  - Product
+  - Order
+  - Payment
+  - Inventory
+  - Supplier
+  - Labour
+  - Production
+- Introduction to Entity Thinking
+- Understanding Attributes using SKCP examples
+- Introduction to Primary Keys
+- Unique Identifier Strategy for Business Objects
+- Database Design Philosophy
+  - Business First
+  - Database Second
+- Business-Driven Database Modeling
+- Interview-Oriented Database Learning Started
+- Learning Repository Expanded
+  - Database Learning
+  - Interview Preparation
+- Documentation Workflow Refinement
+- GitHub as Source of Truth Workflow Established
+
+### Current Focus
+
+- Discovering Entities from the Business
+- Identifying Attributes
+- Designing Primary Keys
+- Understanding Relationships
+- Preparing for Entity Relationship Diagram (ERD)
+
+### Next Milestone
+
+Transform the complete SKCP business into a normalized relational database before beginning backend development.
+
 # 📅 Development Workflow
 
 Every development day follows:

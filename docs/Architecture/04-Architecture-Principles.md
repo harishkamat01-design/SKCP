@@ -156,3 +156,22 @@ Technology should always follow business understanding.
 # One-Line Memory
 
 A strong architecture is built on stable principles, not changing technologies.
+
+---
+
+## Principle 11 — Learn the Business Before Designing the Database
+
+A database should never be designed by looking at screens or forms.
+
+It should be designed by understanding:
+
+- Business Objects
+- Business Relationships
+- Business Rules
+- Business Processes
+
+Only after understanding the business should entities, attributes, keys, and relationships be identified.
+
+Reason:
+
+A business-driven database remains stable even when the application changes, while a screen-driven database quickly becomes difficult to maintain.

@@ -22,6 +22,24 @@ The goal is not only to build software, but also to become a better Software Eng
 - Architect Notes
 
 ---
+## Current Learning Progress
+
+Completed
+
+- Business Analysis
+- Software Architecture
+
+In Progress
+
+- Database Design
+- Interview Preparation
+
+Upcoming
+
+- Backend Development
+- Frontend Development
+- AI Integration
+---
 
 ## Rule
 
