@@ -1,6 +1,80 @@
 # Changelog
   All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 
+
+## [2026-07-28]
+
+### Added
+
+- Introduced Relational Database concepts
+- Documented One-to-Many relationships using SKCP
+- Documented Many-to-Many relationships using SKCP
+- Added Junction Table design principles
+- Added Data Ownership principle
+- Expanded Module 3 learning documentation
+- Updated Daily Journal, Learning Summary, Decision Log, Progress and Tomorrow's Plan
+
+### Improved
+
+- Strengthened business-first database design approach
+- Reinforced interview-oriented learning using SKCP examples
+
+### Added
+
+- Introduced Relational Database concepts
+- Documented One-to-Many relationships using SKCP
+- Documented Many-to-Many relationships using SKCP
+- Added Junction Table design principles
+- Added Data Ownership principle
+- Expanded Module 3 learning documentation
+- Updated Daily Journal, Learning Summary, Decision Log, Progress and Tomorrow's Plan
+
+### Improved
+
+- Strengthened business-first database design approach
+- Reinforced interview-oriented learning using SKCP examples
+
+## [2026-07-26]
+
+### Added
+
+- Started Module 3 – Database Design
+- Introduced Database Thinking using SKCP business examples
+- Identified Business Objects as future Database Entities
+- Documented Entity identification methodology
+- Established SKCP Learning Bridge™ methodology for database learning
+- Introduced interview-oriented learning approach alongside practical implementation
+- Connected business analysis directly with future database design
+- Expanded documentation with entity discovery examples
+
+### Improved
+
+- Strengthened business-first approach for database design
+- Improved conceptual understanding using factory analogies instead of theoretical examples
+- Enhanced learning workflow to connect Business → Database → Interview Preparation
+
+## [2026-07-25]
+
+### Added
+
+- Expanded Module 2 – Software Architecture documentation
+- Documented Information Flow across the business
+- Documented Material Flow across factory operations
+- Documented Money Flow across the complete business lifecycle
+- Added Architecture Principles for Business-Driven Design
+- Expanded Business Architecture understanding using SKCP examples
+- Refined Architecture Roadmap for future modules
+- Improved Architecture Decision Records (ADR)
+- Updated Learning Repository with architecture concepts
+- Strengthened Business-First software engineering philosophy
+
+### Improved
+
+- Improved documentation consistency across the repository
+- Refined architecture documents to better reflect real factory operations
+- Enhanced repository structure for long-term maintainability
+- Improved learning-first documentation approach
+
 ## 2026-07-24
 ### Module 2 – System Architecture
 

@@ -326,6 +326,25 @@ Completed So Far:
 - Documentation Workflow Refinement
 - GitHub as Source of Truth Workflow Established
 
+## 🚧 In Progress (Module 3)
+
+Completed:
+
+- Introduction to Relational Databases
+- Business Relationships
+- One-to-Many Relationships
+- Many-to-Many Relationships
+- Junction (Bridge) Tables
+- Data Ownership Principles
+- Orders → Order Items → Products Design
+
+Current Focus:
+
+- Normalization
+- Master Data
+- Transaction Data
+- ER Diagram Design
+
 ### Current Focus
 
 - Discovering Entities from the Business
