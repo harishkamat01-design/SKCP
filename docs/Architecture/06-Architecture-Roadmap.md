@@ -36,20 +36,37 @@ A complete understanding of the business before writing code.
 
 # Phase 2 – Data Foundation
 
-Module 3
+**Status:** In Progress (~80%)
 
-Focus Areas:
+Completed:
 
-- Database Design
-- Entity Relationships
+- Business Entities
+- Entity Attributes
+- Primary Keys
+- Foreign Keys
+- Relationships
+- Data Ownership
 - Normalization
-- Master Data
-- Transaction Data
-- Database Standards
+- Master Data vs Transaction Data
+- Customer Table
+- Product Table
+- Order Table
+- Order Item Table
+- Payment Table
+- Inventory Design (Concept)
 
-Outcome:
+Remaining:
 
-A scalable database that accurately represents the business.
+- Supplier Table
+- Labour Table
+- Machine Table
+- Production Table
+- Complete ER Diagram
+- PostgreSQL Schema Mapping
+
+Expected Outcome:
+
+A production-ready, normalized relational database that accurately represents the SKCP business and serves as the foundation for backend API development.
 
 ---
 

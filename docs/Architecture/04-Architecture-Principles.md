@@ -175,3 +175,55 @@ Only after understanding the business should entities, attributes, keys, and rel
 Reason:
 
 A business-driven database remains stable even when the application changes, while a screen-driven database quickly becomes difficult to maintain.
+
+# Principle 12
+
+## Design Databases Around Business Events
+
+### Statement
+
+Database transaction tables should represent actual business events rather than simply storing related information.
+
+### Explanation
+
+Every transaction table must answer the question:
+
+"What happened in the business?"
+
+Examples:
+
+- Order Created
+- Payment Received
+- Delivery Completed
+- Production Batch Completed
+
+This ensures that the database naturally mirrors business operations and remains easy to extend.
+
+### SKCP Example
+
+Customer
+
+↓
+
+Order Created
+
+↓
+
+Order Item Added
+
+↓
+
+Payment Received
+
+↓
+
+Delivery Completed
+
+Instead of storing duplicated information, each business event becomes its own transaction record.
+
+### Benefit
+
+- Better scalability
+- Better traceability
+- Easier reporting
+- Cleaner architecture

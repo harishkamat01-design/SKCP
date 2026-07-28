@@ -472,5 +472,63 @@ All future decisions related to Database Design, Backend Development, Frontend D
 The Architecture Decision Records will continue to grow as the project evolves, providing a complete history of the technical and business decisions made throughout the development lifecycle.
 
 ---
+---
+
+# ADR-017 : Represent Business Events as Transaction Tables
+
+## Date
+
+2026-07-28
+
+## Status
+
+Accepted
+
+## Context
+
+During Module 3 (Database Design), it became evident that the SKCP database should model real business activities instead of merely storing related information.
+
+Business analysis showed that operations such as placing an order, receiving a payment, completing production, and delivering products are independent business events that occur over time.
+
+Representing each event as a separate transaction table creates a database that accurately reflects real factory operations.
+
+## Decision
+
+All transaction tables within SKCP will represent individual business events rather than storing duplicated business information.
+
+Examples include:
+
+- Order
+- Order Item
+- Payment
+- Production
+- Delivery
+
+Each transaction will be linked to the appropriate master data using Primary Keys and Foreign Keys.
+
+## Reason
+
+- Represents real business operations accurately
+- Preserves complete business history
+- Supports proper normalization
+- Eliminates duplicate information
+- Simplifies future reporting and analytics
+- Provides a scalable foundation for Backend APIs and AI-driven business insights
+
+## Impact
+
+Positive:
+
+- Clear business traceability
+- Better normalization
+- Easier reporting
+- Simpler backend API development
+- Strong foundation for future ERP capabilities
+
+Consideration:
+
+- Reports require joining multiple transaction and master tables, which is the standard approach in normalized relational database systems.
+
+---
 
 **End of Architecture Decision Log**

@@ -126,3 +126,32 @@ Interview Answer
 - Many-to-Many requires a Junction Table.
 - Good database design mirrors real business operations.
 - Data belongs where the business says it belongs.
+
+One-to-One
+One-to-Many
+Many-to-Many
+Foreign Keys
+Customer → Order
+Order → Order Item
+Product → Order Item
+Order → Payment
+Why Order Item exists.
+Relationship flow.
+
+Customer
+
+↓
+
+Order
+
+↓
+
+Order Item
+
+↑
+
+Product
+
+↓
+
+Payment

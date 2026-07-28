@@ -202,3 +202,42 @@ Address
 WhatsApp Number
 
 ---
+
+Section 1
+Database Fundamentals
+
+Q1
+What is a database?
+
+Q2
+Why do we need a database?
+
+...
+
+Section 2
+Business Objects
+
+...
+
+Section 3
+Primary Keys
+
+...
+
+Section 4
+Relationships
+
+...
+
+Section 5
+Normalization
+
+...
+
+Section 6
+SKCP Case Study
+
+...
+
+Section 7
+Real Interview Questions

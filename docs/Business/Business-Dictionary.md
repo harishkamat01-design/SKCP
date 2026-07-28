@@ -221,6 +221,107 @@ This knowledge forms the foundation of future AI recommendations.
 
 ---
 
+# Database & Operations
+
+## SKU (Stock Keeping Unit)
+
+A unique code used to identify each product variant.
+
+Examples:
+
+- SB-4816 (4-inch Solid Block)
+- SB-6816 (6-inch Solid Block)
+- SB-8816 (8-inch Solid Block)
+
+SKU uniquely identifies a product throughout inventory, sales, and reporting.
+
+---
+
+## Inventory
+
+The current quantity of finished cement blocks available for sale.
+
+Inventory increases through production and decreases through customer sales.
+
+---
+
+## Reserved Stock
+
+Blocks that have already been committed to confirmed customer orders but have not yet been delivered.
+
+Reserved Stock is not available for new customer orders.
+
+---
+
+## Minimum Stock
+
+The minimum quantity of finished blocks that should always be available.
+
+When stock falls below this level, production should be scheduled.
+
+---
+
+# Sales & Payments
+
+## Advance Payment
+
+A payment received before the complete order amount is settled.
+
+Advance payments reduce the customer's pending balance.
+
+---
+
+## Partial Payment
+
+A payment received for only part of the total order value.
+
+Customers may make multiple partial payments until the order is fully paid.
+
+---
+
+## Final Settlement
+
+The payment that clears the remaining outstanding balance of an order.
+
+After the final settlement, the customer's pending payment becomes zero.
+
+---
+
+# Production Planning
+
+## Available Stock
+
+Finished blocks currently ready for immediate sale and delivery.
+
+Available Stock excludes blocks that are reserved for existing customer orders.
+
+---
+
+## Production Batch
+
+A group of cement blocks manufactured together during one production cycle.
+
+Each production batch uses the same raw materials, mould, labour, and production date.
+
+---
+
+# Business Intelligence
+
+## Business Event
+
+An activity that changes the business state.
+
+Examples:
+
+- Customer places an Order
+- Factory completes Production
+- Customer makes a Payment
+- Products are Delivered
+
+These events become transaction records in the software system while accurately reflecting real factory operations.
+
+---
+
 # One-Line Memory
 
 If someone uses these words inside the factory, SKCP should understand exactly what they mean.

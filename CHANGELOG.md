@@ -1,8 +1,92 @@
 # Changelog
   All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 
-
 ## [2026-07-28]
+
+### Added
+
+#### Module 3 – Database Design
+
+- Introduced Database Fundamentals using SKCP business examples.
+- Introduced Master Data vs Transaction Data concepts.
+- Introduced Data Ownership as the foundation of database design.
+- Introduced Database Normalization using real SKCP scenarios.
+- Documented how Business Objects naturally become Database Entities.
+- Documented how Business Events naturally become Transaction Tables.
+- Established the Business → Database → Backend → Frontend → AI development flow.
+
+#### Database Tables Designed
+
+- Customer
+- Product
+- Inventory
+- Order
+- Order Item
+- Payment
+
+#### Database Design Concepts
+
+- Primary Keys
+- Foreign Keys
+- One-to-Many Relationships
+- Many-to-Many Relationships
+- Junction Table Design
+- Entity Relationships
+- Data Ownership
+- Normalization
+- Master Data
+- Transaction Data
+
+#### Business Engineering
+
+- Distinguished between Customer Address and Delivery Address ownership.
+- Established Pending Amount as a calculated value rather than stored data.
+- Defined ownership of Total Amount, Quantity, Product Information and Payment Information.
+- Connected database design directly with real business workflows.
+- Validated business rules through database design.
+
+#### Documentation
+
+- Updated Architecture documents.
+- Updated Business documents.
+- Updated Architecture Decision Records (ADR).
+- Updated Business Dictionary.
+- Updated Learning Repository.
+- Updated Requirements Traceability Matrix (RTM).
+- Updated Daily Journal.
+- Updated Learning Summary.
+- Updated Progress.
+- Updated Tomorrow's Plan.
+- Updated README.
+- Updated Milestones.
+
+#### Learning Repository
+
+- Expanded Software Engineering Interview Handbook.
+- Added interview-focused lessons on:
+  - Data Ownership
+  - Normalization
+  - Master Data vs Transaction Data
+  - Business Events
+  - Database Thinking
+- Strengthened Software Engineering knowledge using SKCP as the primary learning example.
+
+### Improved
+
+- Strengthened Business-First Database Design methodology.
+- Reinforced Architecture-First thinking before implementation.
+- Improved long-term repository organization.
+- Improved documentation consistency across Architecture, Business and Database modules.
+- Connected Business Analysis directly with Database Design.
+- Established a stronger foundation for Module 4 – Backend Development.
+
+### Status
+
+- Module 3 – Database Design is approximately 90% complete.
+- Core database design for SKCP has been established.
+- Project is ready to transition into Backend Development after completing the remaining database entities.
+
+## [2026-07-27]
 
 ### Added
 
@@ -75,7 +159,7 @@
 - Enhanced repository structure for long-term maintainability
 - Improved learning-first documentation approach
 
-## 2026-07-24
+## [  2026-07-24]
 ### Module 2 – System Architecture
 
 #### Added

@@ -307,3 +307,27 @@ The business has been analyzed, workflows documented, principles defined, and th
 This architecture will serve as the blueprint for all future modules, beginning with Module 3 – Database Design.
 
 The next phase focuses on converting business objects into database entities while preserving the business-first philosophy established during Module 2.
+
+---
+
+# Architecture Evolution (2026-07-27 & 2026-07-28)
+
+The architecture has evolved from identifying business entities to designing a normalized relational database.
+
+The following architectural principles were applied while designing the database:
+
+- Business Rules drive database design.
+- Data Ownership determines where information belongs.
+- Normalization eliminates duplicate information.
+- Master Data and Transaction Data are separated.
+- Transaction tables represent business events.
+- Foreign Keys connect business entities while preserving normalization.
+- Derived values are calculated rather than stored.
+
+Core transactional entities designed:
+
+- Order
+- Order Item
+- Payment
+
+These entities establish the foundation for the upcoming PostgreSQL implementation and Backend API development.

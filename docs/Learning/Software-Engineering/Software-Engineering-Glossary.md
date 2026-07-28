@@ -242,4 +242,174 @@ Non-Functional Requirements define the quality of the software and influence its
 - Security
 - Scalability
 
+---
+
+# Database
+
+A structured collection of organized information used to store, retrieve, and manage business data.
+
+SKCP Example:
+Stores customers, products, orders, inventory, payments, suppliers, and production records.
+
+---
+
+# Entity
+
+A real-world business object represented as a database table.
+
+SKCP Examples:
+
+- Customer
+- Product
+- Order
+- Payment
+
+---
+
+# Attribute
+
+A property that belongs to an entity.
+
+SKCP Example:
+
+Customer
+
+- Name
+- Phone
+- Address
+
+---
+
+# Primary Key (PK)
+
+A unique identifier for every record in a table.
+
+Example:
+
+CustomerID
+
+---
+
+# Foreign Key (FK)
+
+A reference to the Primary Key of another table.
+
+Example:
+
+CustomerID inside the Order table.
+
+---
+
+# Relationship
+
+A connection between two entities.
+
+Examples:
+
+Customer → Order
+
+Order → Order Item
+
+Product → Order Item
+
+---
+
+# Business Object
+
+A real-world object that exists in the business before software is built.
+
+Examples:
+
+Customer
+
+Product
+
+Order
+
+Supplier
+
+---
+
+# Master Data
+
+Business information that changes very rarely.
+
+Examples:
+
+Customer
+
+Product
+
+Supplier
+
+---
+
+# Transaction Data
+
+Business information created whenever a business event occurs.
+
+Examples:
+
+Order
+
+Payment
+
+Delivery
+
+Production
+
+---
+
+# Data Ownership
+
+The principle that every piece of information has exactly one owner.
+
+Example:
+
+Customer owns customer details.
+
+Order Item owns Quantity.
+
+Payment owns Amount Paid.
+
+---
+
+# Normalization
+
+The process of organizing data so every table stores only the information it owns.
+
+Goal:
+
+Reduce duplication.
+
+Improve consistency.
+
+---
+
+# Derived Data
+
+Information calculated from existing data instead of stored.
+
+Example:
+
+Pending Amount
+
+= Order Total − Total Payments
+
+---
+
+# Business Event
+
+An action that occurs during business operations.
+
+Examples:
+
+Customer places an Order.
+
+Payment received.
+
+Goods delivered.
+
+Production completed.
+
 

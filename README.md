@@ -136,6 +136,9 @@ SKCP/
 
 ├── docs/
 │   ├── Architecture/
+│   ├── Business/
+│   ├── Database/
+│   ├── Diagrams/
 │   ├── Journal/
 │   ├── Learning/
 │   ├── Planning/
@@ -145,39 +148,57 @@ SKCP/
 ├── README.md
 ├── CHANGELOG.md
 ├── LICENSE
-└── .gitignore
+├── .gitignore
+└── .gitattributes
 ```
-
----
 
 # 📚 Documentation
 
-Project documentation is maintained under:
+Project documentation is maintained under the `docs/` directory.
 
-```
-docs/
+Current documentation includes:
 
-Architecture/
-Journal/
-Learning/
-Planning/
-Templates/
-Wins/
-
-Current documentation is maintained under the `docs/` directory.
+### Architecture
 
 - System Architecture
-- Business Workflow (Business Requirements)
-- Software Engineering Glossary
+- Business Domains
+- Business Value Stream
+- Business Objects
+- Business Workflows
+- Business Rules
+- Business Principles
+- Decision Support
 - Architecture Decision Records (ADR)
-- Daily Development Journal
-- Learning Notes
+- Architecture Lessons Learned
+
+### Business
+
+- Business Dictionary
+- Business Analysis
+- Functional Requirements
+- Non-Functional Requirements
+- Requirements Traceability Matrix (RTM)
+
+### Database
+
+- Database Fundamentals
+- Database Tables
+- Data Ownership
+- Normalization
+- Master Data vs Transaction Data
+- Entity Relationships
+- ER Diagram (In Progress)
+
+### Learning Repository
+
+- Software Engineering Interview Handbook
+- Learning Summaries
+- Daily Journal
 - Project Milestones
-```
 
-Daily development progress is documented.
-
+Documentation grows together with the project and serves as both project documentation and a Software Engineering knowledge base.
 ---
+
 
 # 🛠 Tech Stack (Planned)
 
@@ -326,36 +347,59 @@ Completed So Far:
 - Documentation Workflow Refinement
 - GitHub as Source of Truth Workflow Established
 
-## 🚧 In Progress (Module 3)
+## 🚧 In Progress (Module 3 – Database Design)
 
-Completed:
+Module 3 follows a Business-First Database Design approach.
 
-- Introduction to Relational Databases
+### Completed
+
+#### Database Fundamentals
+
+- Database Thinking
+- Business Objects → Database Entities
+- Master Data
+- Transaction Data
+- Data Ownership
+- Database Normalization
+- Primary Keys
+- Foreign Keys
 - Business Relationships
 - One-to-Many Relationships
 - Many-to-Many Relationships
-- Junction (Bridge) Tables
-- Data Ownership Principles
-- Orders → Order Items → Products Design
+- Junction Tables
 
-Current Focus:
+#### Database Tables Designed
 
-- Normalization
-- Master Data
-- Transaction Data
-- ER Diagram Design
+- Customer
+- Product
+- Inventory
+- Order
+- Order Item
+- Payment
+
+#### Software Engineering Learning
+
+- Business Events become Transaction Tables
+- Every piece of data has exactly one owner
+- Business workflows drive database design
+- Normalization reflects business thinking
+- Database design connected directly to backend architecture
 
 ### Current Focus
 
-- Discovering Entities from the Business
-- Identifying Attributes
-- Designing Primary Keys
-- Understanding Relationships
-- Preparing for Entity Relationship Diagram (ERD)
+- Remaining Database Tables
+  - Delivery
+  - Production
+  - Supplier
+  - Raw Material
+  - Labour
+  - Machine
+
+- Complete Entity Relationship Diagram (ERD)
 
 ### Next Milestone
 
-Transform the complete SKCP business into a normalized relational database before beginning backend development.
+Complete the normalized SKCP database and begin Module 4 – Backend Development.
 
 # 📅 Development Workflow
 
@@ -385,12 +429,79 @@ https://github.com/harishkamat01-design/SKCP
 
 - ✅ Module 0 – Environment Setup
 - ✅ Module 1 – Business Analysis
-- 🚧 Module 2 – Software Architecture
-- ⏳ Module 3 – Database Design
-- ⏳ Module 4 – Backend Development
+- ✅ Module 2 – Software Architecture
+- 🚧 Module 3 – Database Design (≈90% Complete)
+- ⏳ Module 4 – Backend Development (Spring Boot + PostgreSQL)
 - ⏳ Module 5 – Frontend Integration
-- ⏳ Module 6 – AI Features
+- ⏳ Module 6 – AI Decision Support
 - ⏳ Module 7 – Deployment
+
+---
+
+# 🧠 Learning Philosophy
+
+SKCP is more than a software project.
+
+It is also a Software Engineering learning journey where every concept is first understood through the real business before being implemented in code.
+
+The project follows the learning flow:
+
+Business
+
+↓
+
+Architecture
+
+↓
+
+Database
+
+↓
+
+Backend
+
+↓
+
+Frontend
+
+↓
+
+AI
+
+↓
+
+Deployment
+
+Every major topic is documented with:
+
+- Business Context
+- Software Engineering Concepts
+- Real SKCP Examples
+- Visual Diagrams
+- Interview Takeaways
+
+---
+
+# 📊 Visual Documentation
+
+The project includes diagram-driven documentation to simplify understanding.
+
+Current and planned diagrams include:
+
+- Business Workflow Diagrams
+- Value Stream Diagrams
+- Entity Relationship Diagram (ERD)
+- Database Relationship Diagrams
+- Backend Architecture
+- System Architecture
+- AI Architecture
+
+All diagrams are maintained under:
+
+docs/Diagrams/
+
+---
+
 
 # 🎯 Long-Term Goal
 

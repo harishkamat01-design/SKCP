@@ -227,3 +227,303 @@ Only then design.
 The long-term vision of SKCP is to become the digital operating system of the business.
 
 Every feature should contribute toward helping the business operate more effectively.
+
+---
+
+# Lesson 016
+
+## Data Ownership Is an Architectural Principle
+
+A well-designed system begins by identifying who owns each piece of business information.
+
+Before adding any column, ask:
+
+- Who owns this information?
+- Should it be stored here?
+- Can it be calculated instead?
+
+**SKCP Example**
+
+| Information | Owner |
+|-------------|-------|
+| Customer Name | Customer |
+| Product Size | Product |
+| Delivery Address | Order |
+| Quantity | Order Item |
+| Amount Paid | Payment |
+
+---
+
+# Lesson 017
+
+## Normalization Protects Business Truth
+
+Normalization is more than a database concept.
+
+It is an architectural principle that ensures every piece of information exists in only one place.
+
+Duplicate information eventually creates inconsistent information.
+
+**SKCP Example**
+
+Pending Amount is never stored.
+
+It is calculated from:
+
+Order Total
+
+−
+
+Total Payments Received
+
+---
+
+# Lesson 018
+
+## Master Data Defines the Business
+
+Master Data represents the long-term identity of the business.
+
+Examples:
+
+- Customer
+- Product
+- Supplier
+- Labour
+- Machine
+
+Master Data changes rarely.
+
+A stable system depends on well-designed master data.
+
+---
+
+# Lesson 019
+
+## Transaction Data Records Business Events
+
+Businesses do not operate by updating records.
+
+Businesses operate through events.
+
+Every important event becomes a transaction.
+
+Examples:
+
+- Order Created
+- Payment Received
+- Production Completed
+- Delivery Completed
+
+The database should record these events rather than duplicate information.
+
+---
+
+# Lesson 020
+
+## Business Events Become Transaction Tables
+
+Every important business event should have its own transaction table.
+
+SKCP Examples:
+
+Customer
+
+↓
+
+Order
+
+↓
+
+Order Item
+
+↓
+
+Payment
+
+↓
+
+Delivery
+
+↓
+
+Production
+
+This creates a complete operational history of the business.
+
+---
+
+# Lesson 021
+
+## Foreign Keys Preserve Relationships
+
+Foreign Keys connect business entities without duplicating information.
+
+Examples:
+
+CustomerID
+
+↓
+
+Order
+
+OrderID
+
+↓
+
+Order Item
+
+ProductID
+
+↓
+
+Order Item
+
+OrderID
+
+↓
+
+Payment
+
+Relationships preserve business integrity while keeping the database normalized.
+
+---
+
+# Lesson 022
+
+## Build Around Business Responsibilities
+
+Database tables should represent responsibilities rather than collections of related information.
+
+Examples:
+
+Customer owns customer information.
+
+Product owns product information.
+
+Order owns customer orders.
+
+Payment owns payment history.
+
+Each table should have a single responsibility.
+
+---
+
+# Lesson 023
+
+## Every Layer Builds Upon the Previous Layer
+
+Software should never be built from the top down.
+
+The correct order is:
+
+Business
+
+↓
+
+Business Rules
+
+↓
+
+Architecture
+
+↓
+
+Database
+
+↓
+
+Backend APIs
+
+↓
+
+Frontend
+
+↓
+
+Artificial Intelligence
+
+Skipping a layer introduces technical debt.
+
+---
+
+# Lesson 024
+
+## Questions Create Better Architecture
+
+Every important architectural improvement during Module 3 came from asking questions rather than accepting the first solution.
+
+Examples:
+
+- Who owns this information?
+- Can this value be calculated?
+- Why should this be stored?
+- Is this Master Data or Transaction Data?
+- Is this a business event?
+
+Architecture improves through curiosity.
+
+---
+
+# Lesson 025
+
+## Think Like an Architect, Not Like a Programmer
+
+Earlier, the focus was:
+
+"What table should I create?"
+
+Now, the thinking process is:
+
+- What business object am I modelling?
+- What business event is occurring?
+- Who owns this information?
+- Can it be calculated?
+- Should it be stored?
+
+This shift represents the transition from database design to software architecture.
+
+---
+
+# Lesson 026
+
+## Great Software Mirrors Real Business Operations
+
+The best software is not designed around technology.
+
+It is designed around how people actually work.
+
+The SKCP database was created by observing:
+
+- Factory operations
+- Customer interactions
+- Payments
+- Production
+- Deliveries
+
+The software now mirrors the business instead of forcing the business to adapt to the software.
+
+---
+
+# Lesson 027
+
+## Architecture Is About Understanding Before Designing
+
+Good architects spend more time understanding the business than drawing diagrams.
+
+Observation
+
+↓
+
+Understanding
+
+↓
+
+Architecture
+
+↓
+
+Implementation
+
+The quality of the software depends on the quality of the understanding.
+
