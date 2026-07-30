@@ -2,174 +2,227 @@
 
 ---
 
+# 🚀 Project Timeline
+
+---
+
 ## 21-Jul-2026
 
-✅ Project officially started.
+### 🚀 Project Kickoff
 
-Achievements
+#### Achievements
 
 - Repository created
-- Initial project structure
-- Vision established
-- Learning-first development approach adopted
+- Initial project structure established
+- Git configured
+- Documentation structure created
+- README initialized
+- CHANGELOG initialized
+- Development workflow established
+- Vision defined
+- Learning-first development philosophy adopted
+
+#### Status
+
+✅ Project Started
 
 ---
 
-## 22-Jul-2026
+## 23-Jul-2026
 
-✅ Software Architecture completed.
+### 📊 Module 1 – Business Analysis Completed
 
-Achievements
+#### Achievements
 
-- System Architecture
-- Business Workflow
-- Architecture Principles
-- Architecture Decision Records (ADR)
-- Long-term project roadmap
-
-Status
-
-✅ Module 2 – Software Architecture Completed
-
----
-
-## 24-Jul-2026
-
-✅ Business Analysis completed.
-
-Achievements
-
-- Business Workflow documentation
+- Business Analysis completed
 - Functional Requirements
 - Non-Functional Requirements
 - Business Rules
 - Business Constraints
 - Business Risks
 - Business Dictionary
+- Business Workflows
 - Software Engineering Glossary
-- Documentation Review
-- GitHub-ready documentation
+- Requirements Traceability Matrix (RTM)
+- Documentation foundation established
 
-Status
+#### Status
 
-✅ Module 1 – Business Analysis Completed
+✅ Module 1 Completed
 
 ---
 
-## 28-Jul-2026
+## 24-Jul-2026
 
-🚧 Major progress in Module 3 – Database Design
+### 🏛 Module 2 – Software Architecture Completed
 
-Achievements
+#### Achievements
 
-- Understood Database Fundamentals from a business perspective
+- System Architecture
+- Business Domains
+- Business Value Stream
+- Business Objects
+- Business Principles
+- Business Processes
+- Architecture Decision Records (ADR)
+- Business Operating System (BOS) vision
+- AI Decision Support vision
+- Long-term architecture roadmap
+
+#### Status
+
+✅ Module 2 Completed
+
+---
+
+## 29-Jul-2026
+
+### 🗄 Module 3 – Database Design Foundation Completed
+
+#### Achievements
+
+##### Business-Driven Database Design
+
 - Business Objects → Database Entities
-- Entity Attributes
-- Primary Keys
-- Relationships
-- Normalization
-- Data Ownership
 - Master Data vs Transaction Data
-- Designed core SKCP database tables:
-  - Customer
-  - Product
-  - Inventory
-  - Order
-  - Order Item
-  - Payment
-- Business Rules refined through database design
-- Business Principles strengthened
-- AI Decision Support foundation established
-- Connected Business → Database → Backend → Frontend → AI
-- Improved architecture, business, and database documentation
-- Strengthened Software Engineering Interview Handbook
+- Data Ownership
+- Database Normalization
+- Primary Keys
+- Foreign Keys
+- One-to-Many Relationships
+- Many-to-Many Relationships
+- Junction Tables
 
-Status
+##### Core Database Tables Designed
 
-🚧 Module 3 – Approximately 85–90% Complete
+- Customer
+- Product
+- Inventory
+- Order
+- Order Item
+- Payment
 
-Next Milestone
+##### Business Discoveries
+
+- Inventory is the heartbeat of the factory.
+- Production transforms inventory but does not own inventory.
+- Only two inventories exist:
+  - Raw Material Inventory
+  - Finished Goods Inventory
+- Pending Amount is calculated, never stored.
+- Database design should always follow business responsibilities.
+
+##### Documentation Completed
+
+- Business Fundamentals
+- Business Domains
+- Business Value Stream
+- Business Objects
+- Business Workflows
+- Business Rules
+- Business Principles
+- Decision Support
+- Business Lessons Learned
+
+#### Status
+
+🚧 Module 3 ~80% Complete
+
+#### Remaining Work
+
+- Supplier
+- Purchase
+- Purchase Item
+- Raw Material
+- Production
+- Labour
+- Machine
+- Complete ER Diagram
+- PostgreSQL Physical Design
+
+#### Next Milestone
 
 🎯 Complete Module 3 and begin Module 4 – Backend Development
 
 ---
 
-# Milestone Philosophy
+# 📖 Milestone Philosophy
 
-Every milestone should represent a meaningful improvement in:
+A milestone represents a significant improvement in one or more of the following:
 
 - Business Understanding
 - Software Engineering
-- System Architecture
+- Software Architecture
 - Database Design
-- Project Quality
-- Long-Term Maintainability
+- Documentation Quality
+- Project Maintainability
+- AI Readiness
 
-SKCP is growing as both a production application and a Software Engineering portfolio.
+Every milestone should move SKCP closer to becoming both:
 
-# Communication Prefixes
-
-To keep discussions focused during SKCP development, the following prefixes will be used.
+- A production-ready Manufacturing ERP
+- A professional Software Engineering portfolio
 
 ---
 
-🟢 Quick Question
+# 💬 Communication Prefixes
 
-A short clarification or concept explanation.
+To keep project discussions organized, the following prefixes are used.
+
+---
+
+## 🟢 Quick Question
+
+Used for short clarifications.
 
 Example:
 
-🟢 Quick Question
-
-Why does Quantity belong to Order Item?
+> 🟢 Quick Question  
+> Why does Quantity belong to Order Item?
 
 ---
 
-🟡 Review
+## 🟡 Review
 
-Review code, documentation, UI, database design, or architecture.
+Used when reviewing code, documentation, architecture, database design, or UI.
 
 Example:
 
-🟡 Review
-
-Please review the Payment table.
+> 🟡 Review  
+> Review the Payment table.
 
 ---
 
-🔴 Architect
+## 🔴 Architect
 
-An important design or implementation decision that may affect the long-term project.
+Used for long-term design decisions that affect the system architecture.
 
 Example:
 
-🔴 Architect
-
-Should Inventory store Current Stock or should it be calculated?
+> 🔴 Architect  
+> Should Pending Amount be stored or calculated?
 
 ---
 
-🔵 Build
+## 🔵 Build
 
-Meaning:
-We are implementing now.
+Used when implementation begins.
 
 Examples:
-🔵 Build Customer API
-🔵 Build Payment Screen
-🔵 Build Inventory Module
-So our communication becomes:
-🟢 Quick Question → Clarification
-🟡 Review → Review existing work
-🔴 Architect → Make a long-term design decision
-🔵 Build → Start implementation
 
-Purpose
+- 🔵 Build Customer API
+- 🔵 Build Payment Module
+- 🔵 Build Inventory Screen
 
-These prefixes help distinguish between:
+---
+
+# Purpose of Communication Prefixes
+
+These prefixes clearly distinguish between:
 
 - Small clarifications
-- Review requests
-- Long-term architectural decisions
+- Review activities
+- Architectural decisions
+- Implementation work
 
-This keeps discussions organized and improves communication throughout the project.
+This keeps discussions structured throughout the development of SKCP.

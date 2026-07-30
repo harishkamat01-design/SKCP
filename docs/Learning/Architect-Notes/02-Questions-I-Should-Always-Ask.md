@@ -41,3 +41,17 @@ Calculate it.
 ---
 
 Every software decision should start with business, not technology.
+
+---
+
+Before creating a table:
+
+- Who owns this data?
+- What business event creates it?
+- What process changes it?
+- What information should not be stored here?
+- Can this be calculated instead of stored?
+- Will this scale in the future?
+
+---
+

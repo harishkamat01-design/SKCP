@@ -55,3 +55,30 @@ Master Data defines the business.
 Transaction Data records what happens in the business.
 
 This understanding makes database design much simpler.
+
+## Observation 4
+
+A software architect does not start with tables or code.
+
+The architect starts with:
+
+Business
+
+↓
+
+Processes
+
+↓
+
+Ownership
+
+↓
+
+Data
+
+↓
+
+Technology
+
+
+

@@ -223,12 +223,90 @@ For SKCP, these values include:
 
 ---
 
+# Principle 17
 
+Transparency Builds Customer Trust
 
-## Updated One-Line Memory
+SKCP should always maintain accurate and understandable business information.
 
-Business Rules define what the business must do.
-Business Principles define why the business chooses to do it that way.
+Customers should receive:
+
+- Correct quantities
+- Correct pricing
+- Clear payment status
+- Reliable delivery information
+
+The software should increase transparency between:
+
+- Owner
+- Customer
+- Business Operations
+
+Trust is created through accurate information.
+
+---
+
+## Principle 18
+
+Quality Is a Long-Term Investment
+
+Production speed should never compromise product quality.
+
+Examples:
+
+- Proper curing time must be followed.
+- Quality checks must happen before dispatch.
+- Customer satisfaction is more important than short-term production numbers.
+
+A strong reputation creates long-term business growth.
+
+---
+
+## Principle 19
+
+Practical Knowledge Is Business Intelligence
+
+Years of experience gained by the owner and workers are valuable business assets.
+
+The software should capture:
+
+- Operational knowledge
+- Business decisions
+- Patterns
+- Lessons learned
+
+The goal is not to replace human experience.
+
+The goal is to preserve and enhance it.
+
+---
+
+## Principle 20
+
+Automate Problems, Not Everything
+
+Automation should be introduced only where it creates real business value.
+
+The system should focus on:
+
+- Reducing repetitive work
+- Improving accuracy
+- Providing visibility
+- Supporting decisions
+
+Technology should simplify the business, not complicate it.
+
+---
+
+## One-Line Memory
+
+Principles define the identity of the business.
+
+Processes may improve.
+
+Technology may change.
+
+But the values that guide decisions should remain constant.
 
 ## One-Line Memory
 

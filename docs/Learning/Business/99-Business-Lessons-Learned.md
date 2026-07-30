@@ -251,6 +251,116 @@ The goal is to create a Business Operating System that:
 
 ---
 
+## Lesson 017
+
+### Processes Transform Inventory, They Do Not Own Inventory
+
+One of the biggest discoveries during Module 3 was understanding inventory ownership.
+
+Production does not own inventory.
+
+Production transforms inventory.
+
+Example:
+
+Raw Material Stock
+↓
+Production Process
+↓
+Finished Goods Stock
+
+This principle prevents incorrect database ownership and creates cleaner software architecture.
+---
+## Lesson 018
+
+### A Table Is Not the Starting Point of Database Design
+
+Initially, database design appears to be about creating tables.
+
+However, the correct sequence is:
+
+Business Understanding
+↓
+Business Objects
+↓
+Business Events
+↓
+Business Rules
+↓
+Database Tables
+
+Tables are the result of understanding the business.
+
+They are not the starting point.
+
+---
+## Lesson 019
+
+### Ownership Creates Simplicity
+
+The question:
+
+"Who owns this information?"
+
+became one of the most powerful design questions.
+
+Examples:
+
+- Customer owns customer details.
+- Product owns product details.
+- Order Item owns quantity.
+- Payment owns payment history.
+
+Clear ownership reduces duplication, confusion, and future maintenance problems.
+
+---
+## Lesson 020
+
+### The Database Becomes the Memory of the Business
+
+A small business often depends on the owner's memory.
+
+SKCP transforms that personal knowledge into organizational memory.
+
+The database preserves:
+
+- Business events
+- Customer history
+- Payment history
+- Production history
+- Inventory history
+
+The software does not replace experience.
+
+It preserves and extends it.
+
+---
+## Lesson 021
+
+### AI Is the Final Layer, Not the First Layer
+
+AI should not be introduced before business understanding and accurate data.
+
+The correct evolution is:
+
+Manual Notebook
+↓
+Digital Records
+↓
+Database
+↓
+Reports
+↓
+Insights
+↓
+AI Recommendations
+
+Good AI requires good business foundations.
+
+
+
+---
+
 # Reflection (Module 3)
 
 Module 3 taught that designing a database is not primarily about tables or SQL.
@@ -263,3 +373,9 @@ It is about understanding:
 - How decisions are made
 
 Once the business is understood correctly, the database design becomes a natural outcome rather than a technical exercise.
+
+The biggest learning from SKCP is:
+
+Software engineering starts with understanding reality.
+
+Technology is only the tool used to represent and improve that reality.

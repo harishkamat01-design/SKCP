@@ -53,3 +53,42 @@ Normalization is required.
 Whenever ownership is unclear,
 
 Data Ownership must be reconsidered.
+
+---
+
+Pattern 4
+
+# Business Flow Pattern
+
+Supplier
+
+↓
+
+Purchase
+
+↓
+
+Purchase Item
+
+↓
+
+Raw Material
+
+
+Customer
+
+↓
+
+Order
+
+↓
+
+Order Item
+
+↓
+
+Product
+
+----
+
+Pattern 5

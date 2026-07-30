@@ -170,31 +170,23 @@ Move to Finished Inventory
 ## Business Flow
 
 ```
-Production Completed
-
+Raw Material Received
 ↓
-
-Increase Stock
-
+Raw Material Stock Increased
 ↓
-
+Production Consumes Materials
+↓
+Finished Goods Created
+↓
+Finished Goods Stock Increased
+↓
 Customer Order
-
 ↓
-
-Reduce Available Stock
-
+Stock Reserved
 ↓
-
-Update Inventory Status
-```
-
-## Database Tables Involved
-
-- Inventory
-- Production Batch
-- Order Item
-
+Delivery Completed
+↓
+Stock Reduced
 ---
 
 # Workflow Relationships
@@ -233,6 +225,54 @@ Each completed workflow becomes the input for the next workflow.
 
 ---
 
+# Workflow Ownership
+
+Every workflow has a primary business owner.
+
+| Workflow | Primary Owner |
+|----------|---------------|
+| Customer Order | Sales Domain |
+| Payment Collection | Sales / Finance Domain |
+| Product Delivery | Sales Domain |
+| Production | Production Domain |
+| Inventory Management | Inventory Responsibility |
+
+Ownership helps define:
+
+- Database responsibility
+- Backend service boundaries
+- API ownership
+- Future scalability
+
+---
+
+# Workflow State Transition Thinking
+
+Business workflows change the state of business objects.
+
+Example:
+
+## Order Lifecycle
+
+Order Created
+↓
+Order Confirmed
+↓
+Production Planned
+↓
+Ready For Delivery
+↓
+Delivered
+↓
+Payment Completed
+
+Each state change represents a business event.
+
+Future backend services should manage these transitions.
+
+
+---
+
 # Business Workflow Principles
 
 Every workflow should answer:
@@ -242,6 +282,86 @@ Every workflow should answer:
 - Which business objects participate?
 - Which database tables change?
 - What business value is created?
+
+---
+
+# Workflow Exception Scenarios
+
+Real businesses also contain exceptions.
+
+Examples:
+
+## Order Workflow
+
+Normal:
+
+Customer Order
+
+↓
+
+Stock Available
+
+↓
+
+Delivery
+
+
+Exception:
+
+Customer Order
+
+↓
+
+Stock Shortage
+
+↓
+
+Production Required
+
+
+---
+
+## Payment Workflow
+
+Normal:
+
+Payment Received
+
+↓
+
+Payment Recorded
+
+
+Exception:
+
+Payment Pending
+
+↓
+
+Follow-up Required
+
+
+---
+
+## Production Workflow
+
+Normal:
+
+Raw Material Available
+
+↓
+
+Production
+
+
+Exception:
+
+Material Shortage
+
+↓
+
+Purchase Required
+
 
 ---
 
@@ -270,6 +390,20 @@ Business Reports
 ```
 
 This ensures that the software reflects the actual business operations.
+
+---
+
+# Architect Lesson
+
+A workflow represents business behavior.
+
+Tables store the result of business behavior.
+
+Backend services execute workflow rules.
+
+Therefore:
+
+Workflow understanding should come before API design.
 
 ---
 

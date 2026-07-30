@@ -1,21 +1,63 @@
 # Changelog
-  All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 
-## [2026-07-28]
+All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
+
+---
+
+# [2026-07-29]
+
+## Module 3 – Database Design Progress
 
 ### Added
 
-#### Module 3 – Database Design
+#### Business Understanding Foundation
 
-- Introduced Database Fundamentals using SKCP business examples.
-- Introduced Master Data vs Transaction Data concepts.
-- Introduced Data Ownership as the foundation of database design.
-- Introduced Database Normalization using real SKCP scenarios.
-- Documented how Business Objects naturally become Database Entities.
-- Documented how Business Events naturally become Transaction Tables.
-- Established the Business → Database → Backend → Frontend → AI development flow.
+- Completed Business Learning documentation.
+- Finalized SKCP Business Fundamentals.
+- Documented Business Domains:
+  - Raw Materials
+  - Production
+  - Sales
+
+- Documented:
+  - Business Value Stream
+  - Business Objects
+  - Business Workflows
+  - Business Rules
+  - Business Principles
+  - Decision Support Vision
+  - Business Lessons Learned
+
+
+#### Database Design Foundation
+
+Completed database design learning foundation:
+
+- Database Fundamentals
+- Business Objects vs Database Entities
+- Primary Keys
+- Foreign Keys
+- Relationships
+- Normalization
+- Data Ownership
+- Master Data vs Transaction Data
+
+
+#### Database Design Decisions
+
+Established key database principles:
+
+- Business objects become database entities.
+- Business events become transaction records.
+- Every piece of information has one owner.
+- Pending Amount is calculated, not stored.
+- Inventory represents current business truth.
+- Processes transform inventory but do not own inventory.
+
 
 #### Database Tables Designed
+
+Current core tables:
 
 - Customer
 - Product
@@ -24,356 +66,279 @@
 - Order Item
 - Payment
 
-#### Database Design Concepts
+
+#### Repository Documentation
+
+Updated:
+
+- README.md
+- Business Documentation
+- Database Documentation
+- Learning Repository
+- Daily Journal
+- Decision Log
+- Learning Summary
+- Progress
+- Tomorrow Plan
+
+
+---
+
+## Improved
+
+- Strengthened Business-First Database Design approach.
+- Improved connection between business workflows and database entities.
+- Reduced technical-first thinking and increased domain-driven thinking.
+- Established SKCP as a Business Operating System foundation.
+- Improved repository documentation organization.
+
+
+---
+
+## Current Status
+
+Module 3 – Database Design:
+████████████████░░░░ 80%
+
+
+Completed:
+
+✅ Business-driven database foundation  
+✅ Core transaction design  
+✅ Database learning framework  
+✅ Database documentation structure  
+
+
+Remaining:
+
+- Supplier Table
+- Purchase Table
+- Purchase Item Table
+- Raw Material Table
+- Production Table
+- Labour Table
+- Machine Table
+- Complete ER Diagram
+- PostgreSQL Mapping
+
+
+---
+
+# [2026-07-28]
+
+## Module 3 – Database Design
+
+### Added
+
+Introduced:
+
+- Database Fundamentals using SKCP examples.
+- Master Data vs Transaction Data.
+- Data Ownership principles.
+- Database Normalization concepts.
+- Business Objects → Database Entities mapping.
+- Business Events → Transaction Tables mapping.
+
+
+### Database Tables Designed
+
+Created initial database entities:
+
+- Customer
+- Product
+- Inventory
+- Order
+- Order Item
+- Payment
+
+
+### Database Concepts Covered
 
 - Primary Keys
 - Foreign Keys
 - One-to-Many Relationships
 - Many-to-Many Relationships
-- Junction Table Design
+- Junction Tables
 - Entity Relationships
-- Data Ownership
-- Normalization
-- Master Data
-- Transaction Data
 
-#### Business Engineering
 
-- Distinguished between Customer Address and Delivery Address ownership.
-- Established Pending Amount as a calculated value rather than stored data.
-- Defined ownership of Total Amount, Quantity, Product Information and Payment Information.
-- Connected database design directly with real business workflows.
-- Validated business rules through database design.
+### Business Engineering Decisions
 
-#### Documentation
+Established:
 
-- Updated Architecture documents.
-- Updated Business documents.
-- Updated Architecture Decision Records (ADR).
-- Updated Business Dictionary.
-- Updated Learning Repository.
-- Updated Requirements Traceability Matrix (RTM).
-- Updated Daily Journal.
-- Updated Learning Summary.
-- Updated Progress.
-- Updated Tomorrow's Plan.
-- Updated README.
-- Updated Milestones.
+- Customer owns customer information.
+- Product owns product information.
+- Order owns delivery information.
+- Order Item owns quantity.
+- Payment owns payment records.
+- Pending amount is calculated.
 
-#### Learning Repository
-
-- Expanded Software Engineering Interview Handbook.
-- Added interview-focused lessons on:
-  - Data Ownership
-  - Normalization
-  - Master Data vs Transaction Data
-  - Business Events
-  - Database Thinking
-- Strengthened Software Engineering knowledge using SKCP as the primary learning example.
 
 ### Improved
 
-- Strengthened Business-First Database Design methodology.
-- Reinforced Architecture-First thinking before implementation.
-- Improved long-term repository organization.
-- Improved documentation consistency across Architecture, Business and Database modules.
-- Connected Business Analysis directly with Database Design.
-- Established a stronger foundation for Module 4 – Backend Development.
+- Connected Business Analysis with Database Design.
+- Improved understanding of database responsibilities.
+- Established foundation for Backend Development.
+
+
+---
+
+# [2026-07-27]
+
+## Module 3 – Database Design Started
+
+### Added
+
+- Introduced relational database concepts.
+- Documented relationships using SKCP examples.
+- Introduced Junction Tables.
+- Expanded database learning repository.
+- Added interview-focused database concepts.
+
+
+### Improved
+
+- Strengthened business-first database thinking.
+- Connected real factory workflows with database design.
+
+
+---
+
+# [2026-07-26]
+
+## Module 3 – Database Design Initiated
+
+### Added
+
+- Started Database Design Module.
+- Introduced Database Thinking.
+- Identified Business Objects.
+- Started Business Object → Entity mapping.
+- Introduced SKCP Learning Bridge methodology.
+- Established interview-oriented learning approach.
+
+
+### Improved
+
+- Shifted database learning from textbook examples to real business scenarios.
+- Connected Business Analysis with future database implementation.
+
+
+---
+
+# [2026-07-25]
+
+## Module 2 – Software Architecture Expansion
+
+### Added
+
+- Documented Information Flow.
+- Documented Material Flow.
+- Documented Money Flow.
+- Expanded Business Architecture.
+- Added Architecture Principles.
+- Improved Architecture Decision Records.
+
+
+### Improved
+
+- Strengthened Business-First Architecture approach.
+- Improved repository organization.
+- Connected architecture decisions with real factory operations.
+
+
+---
+
+# [2026-07-24]
+
+## Module 2 – System Architecture
+
+### Added
+
+Completed architecture foundation:
+
+- System Architecture Document.
+- Business Domains.
+- Factory Value Stream.
+- Business Principles.
+- Business Rules.
+- Business Processes.
+- Business Vocabulary.
+- Customer Journey Analysis.
+- Decision Support Vision.
+
+
+### Key Architecture Discoveries
+
+- Software should mirror business operations.
+- Architecture should follow value streams.
+- Founder knowledge is a business asset.
+- Business language should become software language.
+
 
 ### Status
 
-- Module 3 – Database Design is approximately 90% complete.
-- Core database design for SKCP has been established.
-- Project is ready to transition into Backend Development after completing the remaining database entities.
+Module 2 completed.
 
-## [2026-07-27]
+Project moved to:
+Module 3 – Database Design
+
+
+
+---
+
+# [2026-07-23]
+
+## Module 1 – Business Analysis Completed
 
 ### Added
 
-- Introduced Relational Database concepts
-- Documented One-to-Many relationships using SKCP
-- Documented Many-to-Many relationships using SKCP
-- Added Junction Table design principles
-- Added Data Ownership principle
-- Expanded Module 3 learning documentation
-- Updated Daily Journal, Learning Summary, Decision Log, Progress and Tomorrow's Plan
+Completed:
+
+- Business Workflows.
+- Customer Workflow.
+- Manufacturing Workflow.
+- Payment Workflow.
+- Delivery Workflow.
+- Stock Management Workflow.
+- Business Rules.
+- Business Constraints.
+- Business Risks.
+- Functional Requirements.
+- Non-Functional Requirements.
+- Software Engineering Glossary.
+- Architecture Decision Records.
+
 
 ### Improved
 
-- Strengthened business-first database design approach
-- Reinforced interview-oriented learning using SKCP examples
+- Standardized documentation format.
+- Established documentation workflow.
+- Created project roadmap.
+
+
+---
+
+# [2026-07-22]
 
 ### Added
 
-- Introduced Relational Database concepts
-- Documented One-to-Many relationships using SKCP
-- Documented Many-to-Many relationships using SKCP
-- Added Junction Table design principles
-- Added Data Ownership principle
-- Expanded Module 3 learning documentation
-- Updated Daily Journal, Learning Summary, Decision Log, Progress and Tomorrow's Plan
+- Completed initial business analysis.
+- Defined product workflow.
+- Defined customer workflow.
+- Updated project README.
 
-### Improved
 
-- Strengthened business-first database design approach
-- Reinforced interview-oriented learning using SKCP examples
+---
 
-## [2026-07-26]
+# [2026-07-21]
 
 ### Added
 
-- Started Module 3 – Database Design
-- Introduced Database Thinking using SKCP business examples
-- Identified Business Objects as future Database Entities
-- Documented Entity identification methodology
-- Established SKCP Learning Bridge™ methodology for database learning
-- Introduced interview-oriented learning approach alongside practical implementation
-- Connected business analysis directly with future database design
-- Expanded documentation with entity discovery examples
+- Initialized SKCP project.
+- Created repository structure.
+- Configured Git workflow.
+- Created documentation foundation.
 
-### Improved
 
-- Strengthened business-first approach for database design
-- Improved conceptual understanding using factory analogies instead of theoretical examples
-- Enhanced learning workflow to connect Business → Database → Interview Preparation
-
-## [2026-07-25]
-
-### Added
-
-- Expanded Module 2 – Software Architecture documentation
-- Documented Information Flow across the business
-- Documented Material Flow across factory operations
-- Documented Money Flow across the complete business lifecycle
-- Added Architecture Principles for Business-Driven Design
-- Expanded Business Architecture understanding using SKCP examples
-- Refined Architecture Roadmap for future modules
-- Improved Architecture Decision Records (ADR)
-- Updated Learning Repository with architecture concepts
-- Strengthened Business-First software engineering philosophy
-
-### Improved
-
-- Improved documentation consistency across the repository
-- Refined architecture documents to better reflect real factory operations
-- Enhanced repository structure for long-term maintainability
-- Improved learning-first documentation approach
-
-## [  2026-07-24]
-### Module 2 – System Architecture
-
-#### Added
-
-- Continued development of the SKCP System Architecture.
-- Expanded the architecture from a software-centric view to a business-centric architecture.
-- Identified the three primary business domains:
-  - Raw Materials
-  - Production
-  - Sales
-- Established the concept of SKCP as a Business Operating System (BOS).
-- Identified the physical factory workflow as the foundation for the software architecture.
-- Defined the factory Value Stream from Raw Materials to Customer Delivery.
-
----
-
-### Business Architecture
-
-#### Added
-
-- Distinguished between:
-  - Business Principles
-  - Business Processes
-  - Business Rules
-- Documented how information, material, and money flow through the business.
-- Introduced the concept that software should mirror the real factory workflow.
-- Identified Customer Trust as a core business objective.
-- Identified Quality Before Quantity as a key architectural principle.
-- Recognized Founder Knowledge as a long-term business asset to be preserved within the system.
-
----
-
-### Business Domain Analysis
-
-#### Added
-
-##### Raw Materials Domain
-
-- Cement
-- Sand
-- Jelly
-- Water
-- Suppliers
-- Purchases
-- Material Stock
-
-##### Production Domain
-
-- Machine
-- Mould Configuration
-- Labour
-- Production Planning
-- Daily Production
-- Curing
-- Finished Inventory
-- Quality
-
-##### Sales Domain
-
-- Customer
-- Orders
-- Dispatch
-- Vehicle
-- Receipt
-- Payments
-- Reports
-
----
-
-### Business Workflow Analysis
-
-#### Added
-
-- Analysed the complete customer journey from enquiry to payment.
-- Studied production planning based on inventory availability.
-- Documented the curing lifecycle before products become saleable.
-- Identified dispatch as a separate business event from order placement.
-- Documented payment collection as an independent business workflow.
-
----
-
-### Business Resilience
-
-#### Added
-
-Documented how the business adapts to operational disruptions including:
-
-- Continuous rainfall
-- Machine breakdowns
-- Delayed raw material deliveries
-- Labour shortages
-- Planned weekly power outages
-
-Documented the corresponding business responses and operational decision-making process.
-
----
-
-### Weekly Operations
-
-#### Added
-
-Documented the factory's planned Wednesday operational strategy including:
-
-- Machine maintenance
-- Mould replacement
-- Production area cleanup
-- Customer vehicle loading
-- Preventive maintenance activities
-
----
-
-### Decision Support Vision
-
-#### Added
-
-Defined the long-term vision of SKCP as a Decision Support System capable of assisting with:
-
-- Pending payment prioritisation
-- Production planning
-- Preventive maintenance reminders
-- Material purchase reminders
-- Business risk identification
-- Operational recommendations
-
----
-
-### Business Vocabulary
-
-#### Added
-
-Started the SKCP Business Dictionary with commonly used factory terminology including:
-
-- Ettangi Kallu
-- Reti
-- Cement Cheela
-- Current Gone
-- Mould
-- Dina
-- Trip
-
----
-
-### Architecture Learnings
-
-#### Added
-
-Key architectural discoveries documented during Module 2:
-
-- Software should mirror the business rather than the database.
-- A software architecture should follow the business value stream.
-- Technology should preserve business knowledge.
-- Customer relationships are more valuable than individual transactions.
-- Every disruption can become an opportunity for another productive business activity.
-- Great software learns the language of its users.
-- Decision support creates greater business value than simple record keeping.
-
----
-
-### Documentation
-
-#### Updated
-
-- System Architecture document
-- Business Architecture understanding
-- Architecture lessons
-- Business lessons
-- Project roadmap alignment
-
-#### Status
-
-- Module 2 completed
-- Project ready to begin Module 3 – Database Design
-
-## 2026-07-23 [1.1.0] 
-
-### Added
-
-- Completed Module 1 – Business Analysis.
-- Created Business Workflow document.
-- Documented Manufacturing Workflow.
-- Documented Customer Order Workflow.
-- Documented Payment Workflow.
-- Documented Delivery Workflow.
-- Documented Stock Management Workflow.
-- Added Business Rules.
-- Added Business Constraints.
-- Added Business Risks.
-- Added Functional Requirements (FR).
-- Added Non-Functional Requirements (NFR).
-- Added Software Engineering Glossary.
-- Added Architecture Decision Records (ADR).
-- Improved README.md with project progress and roadmap.
-- Added MIT License.
-- Updated project documentation structure.
-
-### Improved
-
-- Standardized documentation format across all business documents.
-- Introduced document versioning.
-- Improved project folder organization.
-- Established architecture-first documentation approach.
-
-## 2026-07-22
-
-### Added
-- Completed Business Analysis
-- Defined Product Workflow
-- Defined Customer Workflow
-- Updated README
-
-## 2026-07-21
-
-### Added
-- Initialized project
-- Created documentation structure
-- Configured Git
-
+--- 

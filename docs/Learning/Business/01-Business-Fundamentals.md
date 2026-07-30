@@ -48,27 +48,31 @@ Supplier
 
 ↓
 
-Raw Materials
+Purchase
 
 ↓
 
-Production
+Raw Material Stock
 
 ↓
 
-Inventory
+Production Process
 
 ↓
 
-Sales
+Finished Goods Stock
 
 ↓
 
-Customer
+Customer Order
 
 ↓
 
-Payment
+Delivery
+
+↓
+
+Payment Collection
 
 ---
 
@@ -203,6 +207,40 @@ Recognizing this distinction improves both business understanding and software d
 
 ---
 
+# Inventory Is Business Truth
+
+In manufacturing systems, inventory represents the current truth of the factory.
+
+SKCP has two important inventory states:
+
+## Raw Material Stock
+
+Represents available production inputs.
+
+Example:
+
+- Cement
+- Sand
+- Stone dust
+
+---
+
+## Finished Goods Stock
+
+Represents products ready for customers.
+
+Example:
+
+- Solid Blocks
+
+---
+
+# Production Role
+
+Production does not own inventory.
+
+Production transforms inventory.
+
 # Information Is a Business Asset
 
 Products generate revenue.
@@ -238,11 +276,62 @@ Technology
 Technology should always support the business rather than drive it.
 
 ---
+# Business Ownership Principle
 
-# Updated One-Line Memory
+Every piece of business information must have a clear owner.
+
+Examples:
+
+| Business Information | Owner |
+|----------------------|-------|
+| Supplier relationship | Supplier |
+| Purchase activity | Purchase |
+| Raw material availability | Raw Material Stock |
+| Manufacturing activity | Production |
+| Finished goods availability | Finished Goods Stock |
+| Customer commitment | Order |
+| Money received | Payment |
+
+---
+
+A clear ownership model prevents incorrect database design.
+
+Before creating a table, always ask:
+
+"Who owns this information?"
+
+---
+
+# Business Rules Drive Software Design
+
+Software should not invent business behavior.
+
+Business rules should define:
+
+- Valid operations
+- Data relationships
+- Calculations
+- Restrictions
+- Decision-making
+
+Examples from SKCP:
+
+- Pending payment should be calculated, not manually stored.
+- Quality of curing is more important than production speed.
+- Customer trust is more important than short-term profit.
+- Transport cost is separate from product pricing.
+
+---
+
+
+# One-Line Memory
 
 A successful software system begins by understanding how the business actually works before designing how the software will work.
 
-## One-Line Memory
+## Architect Memory
 
-Great software engineers first become good business thinkers.
+Business understanding is the first database design activity.
+
+Tables come later.
+
+Understanding comes first.

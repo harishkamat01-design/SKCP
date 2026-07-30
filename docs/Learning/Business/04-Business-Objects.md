@@ -23,6 +23,41 @@ These objects define the business.
 
 Master Business Objects change rarely.
 
+
+# Inventory Business Object Clarification
+
+Inventory represents the current truth of the business.
+
+SKCP has two important inventory states:
+
+## Raw Material Stock
+
+Purpose:
+
+Tracks available production materials.
+
+Examples:
+
+- Cement
+- Sand
+- Jelly
+- Water
+
+
+## Finished Goods Stock
+
+Purpose:
+
+Tracks manufactured products ready for sale.
+
+Examples:
+
+- 4 inch Solid Blocks
+- 6 inch Solid Blocks
+- 8 inch Solid Blocks
+
+
+Production transforms one inventory state into another.
 ---
 
 # Transaction Business Objects
@@ -38,6 +73,21 @@ These objects represent business activities.
 | Production Batch | Blocks manufactured during production |
 
 Transaction Business Objects change every day.
+
+---
+
+# Business Objects by Domain
+
+Business objects naturally belong to business domains.
+
+| Domain | Business Objects |
+|--------|------------------|
+| Raw Materials | Supplier, Purchase, Purchase Item, Raw Material |
+| Production | Production, Production Item, Curing, Machine, Labour |
+| Sales | Customer, Product, Order, Order Item, Delivery |
+| Finance | Payment, Payment Allocation |
+
+This domain ownership helps create clear software boundaries.
 
 ---
 
@@ -92,6 +142,58 @@ Every business object owns specific information.
 
 No information should belong to more than one business object.
 
+# Ownership and Calculation Principle
+
+Not every value should be stored.
+
+Some values should be calculated from business events.
+
+Example:
+
+Pending Amount
+
+Should be:
+
+Total Order Amount
+
+-
+
+Payments Received
+
+
+Instead of storing a separate Pending Amount field.
+
+This prevents data inconsistency.
+---
+
+# Business Objects vs Business Processes
+
+A business object represents "what exists".
+
+A business process represents "what happens".
+
+Examples:
+
+## Business Objects
+
+- Customer
+- Product
+- Inventory
+- Order
+
+
+## Business Processes
+
+- Purchasing
+- Production
+- Delivery
+- Payment Collection
+
+
+Processes create changes in business objects.
+
+Objects store the current business truth.
+
 ---
 
 # Business Objects Become Database Tables
@@ -99,16 +201,20 @@ No information should belong to more than one business object.
 One of the biggest discoveries during Module 3 was that business objects naturally become database tables.
 
 ```
+# Complete Transformation Flow
+
 Business Object
-
-↓
-
+    ↓
 Database Entity
+    ↓
+Backend Entity Class
+    ↓
+API Model
+    ↓
+Frontend Representation 
 
-↓
 
-Database Table
-```
+The same business concept travels through the complete software system.
 
 Examples:
 
@@ -135,6 +241,20 @@ Then ask:
 - How does it interact with other business objects?
 
 Only then should the database table be designed.
+
+---
+
+# Architect Lesson
+
+The quality of software design depends on the quality of business object identification.
+
+If business objects are unclear:
+
+- Database becomes confusing
+- APIs become inconsistent
+- Business logic becomes difficult to maintain
+
+Clear business objects create clear software architecture.
 
 ---
 

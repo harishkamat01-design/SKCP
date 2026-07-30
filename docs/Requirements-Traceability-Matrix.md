@@ -44,20 +44,20 @@ This guarantees that no requirement is forgotten during development.
 
 | Requirement ID | Business Requirement | Business Object | Database Table | Backend API | Frontend Screen | Test Case | Status |
 |----------------|----------------------|-----------------|----------------|-------------|-----------------|-----------|--------|
-| BR-001 | Manage Customers | Customer | Customer | Pending | Pending | Pending | ✅ Database Designed |
-| BR-002 | Manage Products | Product | Product | Pending | Pending | Pending | ✅ Database Designed |
-| BR-003 | Manage Inventory | Inventory | Inventory | Pending | Pending | Pending | ✅ Database Designed |
-| BR-004 | Create Customer Orders | Order | Order | Pending | Pending | Pending | ✅ Database Designed |
-| BR-005 | Support Multiple Products in One Order | Order Item | Order Item | Pending | Pending | Pending | ✅ Database Designed |
-| BR-006 | Track Customer Payments | Payment | Payment | Pending | Pending | Pending | ✅ Database Designed |
-| BR-007 | Manage Deliveries | Delivery | Delivery | Pending | Pending | Pending | ⏳ Planned |
-| BR-008 | Track Production | Production | Production | Pending | Pending | Pending | ⏳ Planned |
-| BR-009 | Manage Suppliers | Supplier | Supplier | Pending | Pending | Pending | ⏳ Planned |
-| BR-010 | Manage Raw Materials | Raw Material | Raw Material | Pending | Pending | Pending | ⏳ Planned |
-| BR-011 | Manage Labour | Labour | Labour | Pending | Pending | Pending | ⏳ Planned |
-| BR-012 | Manage Machines | Machine | Machine | Pending | Pending | Pending | ⏳ Planned |
-| BR-013 | Generate Reports | Reports | Multiple Tables | Pending | Pending | Pending | ⏳ Planned |
-| BR-014 | AI Decision Support | AI | Multiple Tables | Future | Future | Future | ⏳ Future Module |
+| BR-001 | Manage Customers | Customer | Customer | Planned | Planned | Planned | ✅ Designed |
+| BR-002 | Manage Products | Product | Product | Planned | Planned | Planned | ✅ Designed |
+| BR-003 | Manage Inventory | Inventory | Inventory | Planned | Planned | Planned | ✅ Designed |
+| BR-004 | Create Customer Orders | Order | Order | Planned | Planned | Planned | ✅ Designed |
+| BR-005 | Multiple Products per Order | Order Item | Order Item | Planned | Planned | Planned | ✅ Designed |
+| BR-006 | Track Customer Payments | Payment | Payment | Planned | Planned | Planned | ✅ Designed |
+| BR-007 | Manage Deliveries | Delivery | Delivery | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-008 | Track Production | Production | Production | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-009 | Manage Suppliers | Supplier | Supplier | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-010 | Manage Raw Materials | Raw Material | Raw Material | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-011 | Manage Labour | Labour | Labour | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-012 | Manage Machines | Machine | Machine | Planned | Planned | Planned | ⏳ Pending Design |
+| BR-013 | Business Reports | Multiple | Multiple | Planned | Planned | Planned | ⏳ Future |
+| BR-014 | AI Decision Support | Multiple | Multiple | Future | Future | Future | ⏳ Module 6 |
 
 ---
 
@@ -92,19 +92,23 @@ Completed
 
 ## 🚧 Module 3 – Database Design
 
-Completed
+### Database Foundation Completed
 
-- Database Fundamentals
-- Business Objects → Entities
-- Entity Attributes
+- Business Objects vs Database Entities
+- Master Data vs Transaction Data
 - Primary Keys
 - Foreign Keys
-- Relationships
-- Normalization
+- One-to-Many Relationships
+- Many-to-Many Relationships
+- Junction Tables
 - Data Ownership
-- Master Data vs Transaction Data
+- Database Normalization
+- Business Rules
+- Business Principles
+- Business Workflows
+- Database Learning Repository
 
-Database Tables Designed
+### Database Tables Designed
 
 - Customer
 - Product
@@ -113,14 +117,21 @@ Database Tables Designed
 - Order Item
 - Payment
 
-Remaining Database Tables
+### Remaining Tables
 
-- Delivery
-- Production
 - Supplier
+- Purchase
+- Purchase Item
 - Raw Material
+- Production
 - Labour
 - Machine
+
+### Remaining Module Work
+
+- Complete ER Diagram
+- PostgreSQL Physical Database Design
+- Final Database Review
 
 ---
 
@@ -237,14 +248,14 @@ No requirement should ever be lost during development.
 
 ---
 
-# Current Project Status
+## Current Project Status
 
 | Module | Status |
 |---------|--------|
 | Module 0 – Environment Setup | ✅ Completed |
 | Module 1 – Business Analysis | ✅ Completed |
 | Module 2 – Software Architecture | ✅ Completed |
-| Module 3 – Database Design | 🚧 Approximately 90% Complete |
+| Module 3 – Database Design | 🚧 80% Complete |
 | Module 4 – Backend Development | ⏳ Planned |
 | Module 5 – Frontend Development | ⏳ Planned |
 | Module 6 – AI Integration | ⏳ Planned |
@@ -254,4 +265,4 @@ No requirement should ever be lost during development.
 
 ## One-Line Memory
 
-A Requirement Traceability Matrix ensures that every business requirement can be followed from business analysis all the way to the deployed software, ensuring nothing is forgotten during development.
+Every business requirement must remain traceable from business analysis through architecture, database design, backend implementation, frontend development, testing, and deployment so that no requirement is ever lost during the software development lifecycle.

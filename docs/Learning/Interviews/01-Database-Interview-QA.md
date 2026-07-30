@@ -241,3 +241,28 @@ SKCP Case Study
 
 Section 7
 Real Interview Questions
+
+
+
+## Interview Takeaway
+If an interviewer asks:
+"How do you identify database tables?"
+
+A strong answer is:
+"I first identify the business workflow and the business events. Stable business objects become master tables, while business events become transaction tables. This naturally led me to patterns like Customer → Order → Order Item → Product and Supplier → Purchase → Purchase Item → Raw Material."
+
+That's a much stronger answer than saying, "I create tables based on requirements."
+
+## 🎯 Interview Takeaway
+If an interviewer asks:
+"What is the difference between a business event and a business consequence?"
+
+You can answer:
+A business event is something that actually occurs in the business and is recorded as a transaction (such as an Order or a Purchase). A business consequence is the effect of that event, such as inventory changing, production planning updating, or payment status changing. The database stores the event, while the consequences are either calculated or reflected through business processes.
+
+## 🎯 Today's Interview Question
+Interviewer:
+Why is Quantity stored in Purchase Item instead of Purchase?
+
+Your Answer:
+Because a single Purchase can contain multiple raw materials, each with its own quantity, unit price, and line total. Quantity belongs to each purchased item, not to the overall Purchase transaction. Storing it in the Purchase Item table follows Data Ownership, avoids repeating columns for every material type, and keeps the database normalized and scalable.

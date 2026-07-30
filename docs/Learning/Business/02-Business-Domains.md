@@ -111,7 +111,64 @@ Produce high-quality blocks while maintaining proper curing and stock availabili
 
 ---
 
+# Inventory Ownership Model
+
+SKCP has two primary inventory states.
+
+## 1. Raw Material Stock
+
+Owned by:
+
+Raw Materials Domain
+
+Purpose:
+
+Track available production inputs.
+
+Examples:
+
+- Cement
+- Sand
+- Jelly
+- Water
+
+
+---
+
+## 2. Finished Goods Stock
+
+Owned by:
+
+Production Domain
+
+Purpose:
+
+Track manufactured products available for sale.
+
+Examples:
+
+- Solid Blocks
+
+
+---
+
+# Production Transformation Principle
+
+Production creates movement between inventory states.
+
+Raw Material Stock
+    ↓
+
+ Production
+
+    ↓
+Finished Goods Stock
+
+Production is the transformation process, not the inventory owner.
+
+
 # Sales Domain
+
 
 ## Purpose
 
@@ -124,10 +181,12 @@ Sell finished products and manage customer relationships.
 
 ## Outputs
 
-- Orders
-- Payments
-- Deliveries
-- Business Reports
+- Customer Relationship
+- Product Offering
+- Order Management
+- Delivery Coordination
+- Payment Collection
+- Business Reporting
 
 ## Business Goal
 
@@ -183,6 +242,40 @@ Each domain owns its own business processes while collaborating with the others.
 
 ---
 
+# Domain Boundary Principle
+
+Each business domain should own its own responsibilities.
+
+A domain can share information with other domains, but it should not control another domain's internal decisions.
+
+Example:
+
+Production can consume Raw Material Stock.
+
+Production cannot own Raw Material Stock.
+
+Sales can request Finished Goods.
+
+Sales cannot directly modify Production data.
+
+Clear boundaries prevent tightly coupled systems.
+
+---
+
+# Business Domain to Database Mapping
+
+Business domains become the foundation for database modules.
+
+| Business Domain | Database Entities |
+|----------------|------------------|
+| Raw Materials | Supplier, Purchase, Purchase Item, Raw Material |
+| Production | Production, Production Item, Curing, Finished Goods Stock |
+| Sales | Customer, Product, Order, Order Item, Delivery, Payment |
+
+This mapping ensures database design follows business structure.
+
+
+---
 # Future Expansion
 
 The current three-domain architecture is designed to support future growth.
@@ -206,8 +299,24 @@ The current architecture can accommodate these domains without requiring major r
 Every new feature developed for SKCP should belong to one clearly defined business domain.
 
 If a feature spans multiple domains, its responsibilities should be carefully separated to preserve modularity and maintainability.
+---
+
+# Future ERP Domain Vision
+
+As SKCP grows, additional domains can be introduced:
+
+- Procurement Management
+- Finance Management
+- Human Resource Management
+- Equipment Maintenance
+- Quality Management
+- Analytics
+- AI Decision Support
+
+New domains should be added only when business complexity requires them.
 
 ---
+
 
 # Updated One-Line Memory
 

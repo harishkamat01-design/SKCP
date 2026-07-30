@@ -10,6 +10,62 @@ It should help the business make better decisions.
 
 ---
 
+# Decision Support Maturity Levels
+
+SKCP decision support will evolve gradually.
+
+## Level 1 – Digital Records
+
+Replace notebooks with accurate digital records.
+
+Examples:
+
+- Orders
+- Payments
+- Inventory
+- Production
+
+
+## Level 2 – Business Reports
+
+Answer:
+
+"What happened?"
+
+Examples:
+
+- Monthly sales
+- Pending payments
+- Production quantity
+- Stock position
+
+
+## Level 3 – Business Insights
+
+Answer:
+
+"Why did it happen?"
+
+Examples:
+
+- Sales increased because of a specific product.
+- Stock reduced because demand increased.
+
+
+## Level 4 – AI Recommendations
+
+Answer:
+
+"What should we do next?"
+
+Examples:
+
+- Produce more 6 inch blocks.
+- Contact customers with pending payments.
+- Purchase raw materials before shortage occurs.
+
+---
+
 ## Production
 
 Suggest:
@@ -113,6 +169,23 @@ The quality of AI recommendations depends directly on:
 Garbage In → Garbage Out
 
 Good Data → Good AI
+
+---
+
+# Data Foundation Principle
+
+AI quality depends on business data quality.
+
+SKCP must first capture:
+
+- Correct business events
+- Correct ownership
+- Correct relationships
+- Complete transaction history
+
+AI cannot fix incorrect business data.
+
+The database is the foundation of intelligence.
 
 ---
 
@@ -290,6 +363,88 @@ The future AI should always follow these principles.
 - Base recommendations on business data.
 - Support decision-making, not decision-taking.
 - Preserve founder knowledge while learning from new data.
+- Every recommendation should explain the reason behind it.
+
+Example:
+
+Bad AI:
+
+"Produce more 6 inch blocks."
+
+
+Good AI:
+
+"Produce 200 more 6 inch blocks because:
+- Demand increased by 30% in the last 3 months.
+- Current ready stock is below normal level.
+- Customers requested this variant frequently."
+
+---
+
+# AI Ownership Principle
+
+AI provides recommendations.
+
+The owner remains responsible for decisions.
+
+The final decision always belongs to the business owner.
+
+Example:
+
+AI Recommendation:
+
+"Increase production of 6 inch blocks based on demand."
+
+
+Owner Decision:
+
+Consider:
+
+- Customer relationships
+- Factory capacity
+- Labour availability
+- Quality requirements
+
+Then decide.
+
+---
+
+# Future AI Agent Vision
+
+Future SKCP AI capabilities may work as business assistants.
+
+Examples:
+
+## Production Assistant
+
+Helps answer:
+
+- What should we produce today?
+- Is raw material sufficient?
+
+
+## Sales Assistant
+
+Helps answer:
+
+- Which customers need follow-up?
+- Which payments are pending?
+
+
+## Inventory Assistant
+
+Helps answer:
+
+- Which stock is reducing?
+- When should we purchase materials?
+
+
+## Business Advisor
+
+Helps answer:
+
+- How is the business performing?
+- What should the owner focus on next?
 
 ---
 
@@ -321,8 +476,17 @@ Intelligent Business Operating System
 
 ---
 
+## Architect Memory
+
+The database is the memory of the business.
+
+AI is the intelligence built on top of that memory.
+
+Without accurate memory, intelligence cannot exist.
+
 # Updated One-Line Memory
 
 The goal of AI is not to replace the owner.
 
 The goal of AI is to help the owner make faster, smarter, and more confident business decisions using accurate business information.
+

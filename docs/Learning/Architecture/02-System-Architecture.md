@@ -318,3 +318,23 @@ AI assists the business.
 
 A business owns the system.
 The system owns the applications.
+
+# SKCP System Architecture
+
+Frontend
+
+↓
+
+Backend API
+
+↓
+
+Business Services
+
+↓
+
+Database
+
+↓
+
+AI Services

@@ -527,3 +527,17 @@ Implementation
 
 The quality of the software depends on the quality of the understanding.
 
+# Lesso 028
+
+## Database Foundation Milestone
+
+Date: 29 July 2026
+
+Learning:
+
+A system architecture is stronger when database design comes from business reality.
+
+The database is not the starting point.
+
+The business is the starting point.
+

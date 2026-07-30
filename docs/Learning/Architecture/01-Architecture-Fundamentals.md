@@ -273,3 +273,30 @@ Good architecture begins with understanding the business.
 ## One-Line Memory
 
 Good architecture makes coding easier.
+
+# SKCP Architecture Learning
+
+Architecture starts from:
+
+Business
+
+↓
+
+Processes
+
+↓
+
+Responsibilities
+
+↓
+
+Data
+
+↓
+
+Technology
+
+
+The architect does not start with frameworks.
+
+The architect starts with understanding the business.

@@ -89,17 +89,39 @@ Curing
 
 ↓
 
-Finished Stock
-
+Quality Check
 ↓
+Finished Goods Stock
 
-Customer
 ```
 
 This represents the movement of materials inside the factory.
 
 ---
 
+# Inventory Transformation Principle
+
+Inventory does not disappear during business operations.
+
+It changes state.
+
+SKCP has two important inventory states:
+
+Raw Material Stock
+↓
+Production Process
+↓
+Finished Goods Stock
+
+Production is the transformation bridge between these two states.
+
+Important principle:
+
+Processes transform inventory.
+
+Processes do not own inventory.
+
+---
 # Information Flow
 
 While materials move physically, information moves through the business.
@@ -137,6 +159,24 @@ Owner's Decision
 ```
 
 The software primarily manages this flow of information.
+
+---
+
+# Business Events Create Information
+
+Every business activity creates an event.
+
+Examples:
+
+| Business Event | Information Created |
+|----------------|--------------------|
+| Supplier Purchase | Purchase Record |
+| Customer Order | Order Record |
+| Production Activity | Production Record |
+| Delivery | Delivery Record |
+| Customer Payment | Payment Record |
+
+The database stores the history of business events.
 
 ---
 
@@ -237,28 +277,70 @@ Each domain creates value for the next.
 The software mirrors the business value stream.
 
 ```
-Business Activity
+# Complete Software Value Chain
 
+Business Event
 ↓
-
 Database Transaction
-
 ↓
-
-Backend Processing
-
+Backend Business Logic
 ↓
-
-Frontend Display
-
+API
 ↓
-
+Frontend View
+↓
+Report
+↓
+AI Recommendation
+↓
 Business Decision
-```
+---
 
 This ensures that the software reflects the actual factory operations.
 
 ---
+
+# Four Core Business Flows
+
+A manufacturing ERP system manages four interconnected flows:
+
+## 1. Material Flow
+
+Represents physical movement.
+
+Example:
+
+Raw Materials → Production → Finished Goods
+
+
+## 2. Information Flow
+
+Represents business knowledge.
+
+Example:
+
+Customer → Order → Payment → Reports
+
+
+## 3. Money Flow
+
+Represents financial movement.
+
+Example:
+
+Order → Delivery → Payment Collection
+
+
+## 4. Decision Flow
+
+Represents management intelligence.
+
+Example:
+
+Data → Reports → Insights → Decisions
+
+---
+
 
 # Key Observation
 
@@ -273,6 +355,18 @@ Therefore,
 The real value of SKCP is not only automation.
 
 The real value is transforming operational data into business intelligence.
+
+---
+# Architect Lesson
+
+The best software architecture follows the natural value stream of the business.
+
+When software mirrors business flow:
+
+- Data ownership becomes clear
+- Database design becomes simpler
+- Backend services become meaningful
+- Future AI capabilities become possible
 
 ---
 

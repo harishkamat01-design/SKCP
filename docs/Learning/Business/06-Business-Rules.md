@@ -265,3 +265,120 @@ Technology may change.
 Programming languages may change.
 
 However, core business rules remain stable and should guide every future database design, backend validation, frontend workflow, and AI recommendation.
+
+## Rule 21 – Production Transforms Inventory, It Does Not Own Inventory
+
+Production is a business process.
+
+It consumes raw material inventory and creates finished goods inventory.
+
+Production should not directly own inventory records.
+
+Relationship:
+
+Raw Material Stock
+↓
+Production Process
+↓
+Finished Goods Stock
+
+This separation keeps inventory ownership clear.
+
+## Rule 22 – Inventory Moves Through Business States
+
+Inventory is not just a number.
+
+It represents the current state of business assets.
+
+Example:
+
+Raw Material Available
+↓
+Consumed in Production
+↓
+Fresh Product
+↓
+Curing
+↓
+Ready Stock
+↓
+Reserved
+↓
+Delivered
+
+Each state transition represents a business event.
+
+## Rule 23 – Quality Gates Cannot Be Skipped
+
+Business processes must respect quality checkpoints.
+
+Example:
+
+Production Complete
+↓
+Curing Complete
+↓
+Quality Approved
+↓
+Available For Sale
+
+No workflow should bypass quality validation.
+
+Quality has higher priority than speed.
+
+## Rule 24 – Business History Should Be Preserved
+
+Completed business events should maintain historical accuracy.
+
+Examples:
+
+- Completed Orders
+- Completed Payments
+- Completed Deliveries
+- Completed Production Records
+
+Corrections should be recorded as new events instead of deleting history.
+
+This maintains business trust.
+
+## Rule 25 – Business Events Create Transaction Records
+
+Every important business event should create a permanent transaction record.
+
+Examples:
+
+Customer places order:
+
+↓
+
+Order Transaction
+
+
+Customer pays:
+
+↓
+
+Payment Transaction
+
+
+Factory produces blocks:
+
+↓
+
+Production Transaction
+
+
+Transactions represent business history.
+
+
+# Architect Summary
+
+Business rules are the foundation of:
+
+- Database constraints
+- Backend validations
+- API behavior
+- Frontend workflows
+- AI recommendations
+
+If business rules are unclear, software design will also become unclear.
