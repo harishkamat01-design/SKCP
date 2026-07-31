@@ -4,9 +4,11 @@
 
 **Module:** 2 – Software Architecture
 
-**Version:** 1.0
+**Version:** 1.1
 
-**Status:** Completed
+**Status:** Draft
+
+**Last Updated:** 2026-07-30
 
 ---
 
@@ -101,11 +103,14 @@ Each business domain should remain independent while collaborating with other do
 
 Core business domains:
 
-- Raw Materials
+- Master Data
+- Procurement
 - Production
+- Inventory
 - Sales
+- Finance
 
-Each module should have clear responsibilities.
+Each domain owns its own business responsibilities while collaborating through well-defined relationships.
 
 ---
 
@@ -227,3 +232,161 @@ Instead of storing duplicated information, each business event becomes its own t
 - Better traceability
 - Easier reporting
 - Cleaner architecture
+
+---
+
+# Principle 13
+
+## Every Table Has One Responsibility
+
+### Statement
+
+Every database table should represent exactly one business responsibility.
+
+### Explanation
+
+A table should never attempt to manage multiple business concepts.
+
+Examples:
+
+- Customer stores customer information.
+- Order stores order information.
+- Payment stores payment information.
+- FinishedGoodsStock stores only the current finished goods position.
+
+Mixing responsibilities makes maintenance difficult and introduces duplicate information.
+
+### Benefit
+
+- Easier maintenance
+- Better normalization
+- Simpler reporting
+- Better scalability
+
+
+---
+
+# Principle 14
+
+## Every Attribute Has One Owner
+
+### Statement
+
+Every piece of business information must have exactly one authoritative owner.
+
+### Explanation
+
+Information should never be duplicated across multiple tables.
+
+Examples:
+
+- Customer Name belongs only to Customer.
+- Product Price belongs only to Product (or Order Item when negotiated).
+- Payment Amount belongs only to Payment.
+- Current Stock belongs only to the appropriate Stock table.
+
+Other tables should reference the owner instead of copying the information.
+
+### Benefit
+
+- Eliminates data inconsistency
+- Prevents update anomalies
+- Improves data integrity
+
+---
+
+# Principle 15
+
+## Current Position + Historical Transactions
+
+### Statement
+
+Inventory should be represented using two complementary concepts:
+
+- Current Position
+- Historical Transactions
+
+### Explanation
+
+Current stock tables represent the latest available quantity.
+
+Historical transaction tables explain how that quantity was reached.
+
+Example:
+
+Purchase
+
+↓
+
+Production
+
+↓
+
+Delivery
+
+↓
+
+Finished Goods Stock (Current Position)
+
+This avoids storing duplicate movement history in stock tables.
+
+### Benefit
+
+- Faster reporting
+- Simpler inventory calculations
+- Clear audit trail
+
+---
+
+# Principle 16
+
+## Future-Ready Without Overengineering
+
+### Statement
+
+Design today's solution while leaving clean extension points for tomorrow.
+
+### Explanation
+
+Version 1 should solve today's business problems without introducing unnecessary complexity.
+
+However, the architecture should make it easy to support future enhancements such as:
+
+- Machine maintenance
+- Batch traceability
+- Delivery confirmation
+- AI recommendations
+- Multiple factories
+
+The goal is to prepare for growth without building unused features.
+
+### Benefit
+
+- Faster development
+- Cleaner architecture
+- Easier future expansion
+
+
+---
+
+# Principle 17
+
+## Documentation Is a Living Asset
+
+### Statement
+
+Architecture documentation should evolve with the project.
+
+### Explanation
+
+Documents should not be rewritten every day.
+
+Instead, they should be continuously refined as business understanding improves.
+
+Every approved architectural decision should eventually be reflected in the relevant documentation.
+
+### Benefit
+
+- Documentation stays current
+- Knowledge is preserved
+- New contributors understand the project faster

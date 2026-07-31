@@ -251,6 +251,8 @@ Blocks that have already been committed to confirmed customer orders but have no
 
 Reserved Stock is not available for new customer orders.
 
+> **Note:** Reserved Stock is planned for a future version and is **not implemented in Version 1**.
+
 ---
 
 ## Minimum Stock
@@ -322,6 +324,133 @@ These events become transaction records in the software system while accurately 
 
 ---
 
+# Module 3 Database Terms
+
+## Raw Material Stock
+
+Represents the current quantity of each raw material available for production.
+
+It increases through purchases and decreases through production.
+
+---
+
+## Curing Stock
+
+Represents blocks that have been produced but are still undergoing curing.
+
+These blocks are **not ready for sale**.
+
+The system recommends when they are ready, but the business owner confirms the movement to the Sales Yard.
+
+---
+
+## Finished Goods Stock
+
+Represents blocks that are fully cured and available for sale.
+
+This stock is maintained as a single combined quantity for each product variant.
+
+When dispatching products, the business follows a practical **FIFO (First Cured, First Sold)** approach even though individual production batches are not tracked in Version 1.
+
+---
+
+## Production / Curing Yard
+
+The covered shed where newly manufactured blocks remain for approximately 3–5 days while curing.
+
+---
+
+## Sales Yard
+
+The open storage area where cured blocks are transferred after the curing period and become available for customer orders.
+
+---
+
+## Trip Number
+
+Identifies the sequence of deliveries for a customer order.
+
+Examples:
+
+- Trip 1 of 3
+- Trip 2 of 3
+- Trip 3 of 3
+
+This helps track partial deliveries for large orders.
+
+---
+
+## Asset
+
+A production resource owned by the factory.
+
+Examples:
+
+- Block Making Machine
+- Mixer
+- Vibrator
+- Water Tank
+
+Assets support production operations and maintenance planning.
+
+---
+
+## Attendance
+
+Daily record showing whether each labourer was present or absent for work.
+
+Attendance supports labour management and future productivity reporting.
+
+---
+
+## Payment Allocation
+
+The process of distributing one customer payment across one or more outstanding customer orders.
+
+This enables:
+
+- Partial payments
+- Installment payments
+- Multiple orders paid using one payment
+
+---
+
+## Current Position Table
+
+A table that always stores only the latest business state.
+
+Examples:
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+Historical movements are recorded in transaction tables.
+
+---
+
+## Transaction Table
+
+A table that records a business event.
+
+Examples:
+
+- Purchase
+- Production
+- Order
+- Delivery
+- Payment
+
+Transaction tables preserve business history.
+
+---
+
 # One-Line Memory
 
 If someone uses these words inside the factory, SKCP should understand exactly what they mean.
+
+---
+
+**Current Version:** 1.2  
+**Created On:** 24-Jul-2026  
+**Last Updated:** 30-Jul-2026

@@ -10,12 +10,12 @@ The primary objective of SKCP is to digitize the daily operations of Shree Kundo
 |-------|-------|
 | Project | SKCP – Shree Kundodari Cement Products |
 | Document | Business Workflow |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Harish Kamat |
-| Reviewer | Architect |
+| Reviewer | Architect |        
 | Created On | 2026-07-24 |
-| Last Updated | 2026-07-24 |
+| Last Updated | 2026-07-30 |
 
 ---
 
@@ -56,7 +56,16 @@ The business currently offers one product category with three block size variant
 - Solid Block 6" × 8" × 16"
 - Solid Block 8" × 8" × 16"
 
-Products are manufactured daily and stored as inventory before customer orders are received.
+Products are manufactured daily and pass through a curing process before becoming available for sale.
+
+The business follows four inventory stages:
+
+- Raw Material Stock
+- Production / Curing Yard
+- Finished Goods (Sales Yard)
+- Customer Delivery
+
+Products are manufactured based on mould size and are moved from the curing yard to the sales yard only after the father confirms that curing is complete.
 
 The business is currently managed manually using notebooks.
 
@@ -80,7 +89,12 @@ The manufacturing process is carried out every day to maintain sufficient stock 
 
 1. Cement blocks are manufactured daily, irrespective of customer orders.
 2. The quantity of manufactured blocks is recorded manually in the business notebook.
-3. Each batch undergoes a quality check before being added to stock.
+3. Cement bags consumed during production are recorded.
+4. Every production batch is moved to the curing yard.
+5. Blocks remain under curing for approximately 3–5 days.
+6. The father confirms when the curing batch is ready.
+7. Ready blocks are moved to the finished goods (sales yard).
+8. Available stock is updated.
 4. Approved blocks are categorized by block size.
 5. Available stock is updated manually.
 6. The updated stock is used to fulfill future customer orders.
@@ -91,6 +105,10 @@ The manufacturing process is carried out every day to maintain sufficient stock 
 - Production records are maintained in a notebook.
 - Stock counting is done manually.
 - Quality is verified before stock is updated.
+- Labour attendance is recorded weekly.
+- Cement consumption is recorded daily.
+- Blocks remain in the curing yard before moving to the sales yard.
+- Finished goods are maintained separately from curing stock.
 
 ### Future SKCP System
 
@@ -100,6 +118,16 @@ The SKCP application will digitally record:
 - Available stock
 - Production history
 - Quality status (if required)
+
+The system will also:
+
+- Manage labour master information.
+- Record daily attendance.
+- Automatically calculate weekly salary.
+- Manage production assets.
+- Track raw material consumption.
+- Maintain curing stock.
+- Maintain finished goods stock.
 
 ## 7. Customer Order Workflow
 
@@ -193,9 +221,17 @@ Transport Vehicle Contacted
         ↓
 Products Loaded
         ↓
+Cutomer Confirms Order
+        ↓
+Products Picked from Sales Yard
+        ↓
+Transport Arrange
+        ↓
 Products Delivered
         ↓
-Delivery Completed
+Finished Goods Stock Updated
+        ↓
+Customer Payment
 
 ### Current Process
 
@@ -218,11 +254,17 @@ Stock management ensures sufficient inventory is available before accepting cust
 
 ### Workflow
 
-Daily Manufacturing
+Raw Material Stock
         ↓
-Quality Verification
+Production
         ↓
-Stock Updated
+Curing Yard
+        ↓
+Finished Goods Stock
+        ↓
+Customer Delivery
+        ↓
+Finished Goods Updated
         ↓
 Customer Order
         ↓
@@ -277,6 +319,10 @@ The SKCP application will enforce the following business rules automatically:
 | BR-007 | Discounts may be provided for large quantity orders. |
 | BR-008 | Daily production records shall be maintained. |ty orders. |
 | BR-008 | Daily production is recorded manually. |
+| BR-009 | Products must complete curing before becoming available for sale. |
+| BR-010 | Finished goods stock reduces immediately after delivery. |
+| BR-011 | Weekly labour salary is calculated based on attendance. |
+| BR-012 | Production is associated with the machine (asset) used. |
 
 ## 12. Business Constraints
 
@@ -351,6 +397,13 @@ Functional Requirements describe what the SKCP application must do to support th
 | FR-008 | The system shall calculate pending balances automatically. |
 | FR-009 | The system shall generate monthly and yearly business reports. |
 | FR-010 | The system shall maintain daily production records. |
+| FR-011 | The system shall manage labour information. |
+| FR-012 | The system shall maintain daily labour attendance. |
+| FR-013 | The system shall manage production assets and machines. |
+| FR-014 | The system shall maintain raw material stock. |
+| FR-015 | The system shall maintain curing stock. |
+| FR-016 | The system shall maintain finished goods stock. |
+| FR-017 | The system shall calculate weekly labour salary automatically. |
 
 ### Current Process
 
@@ -414,9 +467,11 @@ The SKCP application will:
 - Support additional features and business growth without major redesign.
 
 
-
 ## Architecture Quality Checklist
 
-- [ ] A new developer can understand this document without asking questions.
-- [ ] The document describes the business, not the implementation.
-- [ ] The document can be easily updated if the business changes.
+- [x] A new developer can understand this document without asking questions.
+- [x] The document describes the business, not the implementation.
+- [x] The document can be easily updated if the business changes.
+- [x] Manufacturing lifecycle includes Production → Curing → Finished Goods.
+- [x] Labour management workflow documented.
+- [x] Inventory lifecycle documented.

@@ -4,7 +4,11 @@
 
 **Module:** 2 – Software Architecture
 
-**Version:** 1.0
+**Version:** 1.1
+
+**Status:** Draft
+
+**Last Updated:** 2026-07-30
 
 **Status:** Completed
 
@@ -12,9 +16,18 @@
 
 # Purpose
 
-This document provides a high-level overview of the complete software architecture for SKCP.
+This document provides a consolidated architectural overview of the SKCP Management System.
 
-It summarizes the business understanding, architectural decisions, system structure, and long-term vision established during Module 2.
+It summarizes:
+
+- Business Understanding
+- Software Architecture
+- Database Architecture
+- Architectural Decisions
+- Business Domains
+- Long-Term Vision
+
+This document evolves throughout the project and serves as the central architectural reference.
 
 ---
 
@@ -62,41 +75,66 @@ Application defines **HOW**.
 
 # Core Business Domains
 
-The complete business is divided into three primary domains.
+The SKCP ERP system is organized into six core business domains.
 
-## Raw Materials
+## 1. Master Data
 
-- Cement
-- Sand
-- Jelly
-- Water
-- Suppliers
-- Purchase
-- Stock
-
----
-
-## Production
-
-- Production Planning
-- Machine
-- Mould
-- Labour
-- Curing
-- Inventory
-- Quality
-
----
-
-## Sales
+Stores all permanent business entities.
 
 - Customer
-- Orders
-- Dispatch
-- Vehicle
-- Receipt
+- Supplier
+- Product
+- Raw Material
+- Labour
+- Asset
+
+---
+
+## 2. Procurement
+
+Manages raw material purchasing.
+
+- Purchase
+- Purchase Item
+
+---
+
+## 3. Production
+
+Manages manufacturing activities.
+
+- Production
+- Attendance
+
+---
+
+## 4. Inventory
+
+Tracks inventory throughout its lifecycle.
+
+- Raw Material Stock
+- Curing Stock
+- Finished Goods Stock
+
+---
+
+## 5. Sales
+
+Manages customer fulfilment.
+
+- Order
+- Order Item
+- Delivery
+- Delivery Item
+
+---
+
+## 6. Finance
+
+Manages customer payments.
+
 - Payment
-- Reports
+- Payment Allocation
 
 ---
 
@@ -106,7 +144,11 @@ Supplier
 
 ↓
 
-Raw Materials
+Raw Material Purchase
+
+↓
+
+Raw Material Stock
 
 ↓
 
@@ -114,27 +156,27 @@ Production
 
 ↓
 
-Curing
+Curing Yard
 
 ↓
 
-Inventory
+Finished Goods (Sales Yard)
 
 ↓
 
-Sales
+Customer Order
 
 ↓
 
-Dispatch
-
-↓
-
-Receipt
+Delivery
 
 ↓
 
 Payment
+
+↓
+
+Reports
 
 ↓
 
@@ -148,39 +190,31 @@ Customer Enquiry
 
 ↓
 
-Customer Details
+Quotation
 
 ↓
 
-Requirement
+Order
 
 ↓
 
-Business Evaluation
+Stock Verification
 
 ↓
 
-Business Commitment
+Production (If Required)
 
 ↓
 
-Order Confirmation
+Curing
 
 ↓
 
-Stock Check
+Finished Goods
 
 ↓
 
-Production Planning
-
-↓
-
-Dispatch Planning
-
-↓
-
-Receipt
+Delivery
 
 ↓
 
@@ -188,7 +222,11 @@ Payment
 
 ↓
 
-Reports
+Business Reports
+
+↓
+
+AI Insights (Future)
 
 ---
 
@@ -212,9 +250,13 @@ Only after successful evaluation does the order become a confirmed business comm
 Examples include:
 
 - Products must complete curing before sale.
-- Inventory reduces only after dispatch.
-- One receipt is generated for each delivery.
-- Payments correspond to delivered quantity.
+- Finished goods reduce immediately after delivery.
+- One customer can have multiple orders.
+- One order can contain multiple products.
+- One delivery can contain multiple products.
+- Weekly labour salary is calculated from attendance.
+- Production is associated with the machine used.
+- Outstanding payment is calculated automatically.
 - Quality is never compromised.
 
 ---
@@ -264,33 +306,49 @@ Examples:
 
 # Scalability
 
-The architecture should support future growth including:
+The architecture is designed to support future growth, including:
 
 - Multiple production machines
+- Multiple moulds
 - Multiple factory locations
 - Additional products
 - More suppliers
 - More labour
 - Higher order volumes
+- Machine maintenance management
+- AI-assisted production planning
+- AI payment reminders
+- Predictive inventory management
 
-while preserving the same business rules and principles.
+while preserving the same business rules and architectural principles.
 
 ---
 
 # Module Outcome
 
-At the completion of Module 2:
+## Module 1
 
-- Business Architecture defined
-- System Architecture established
-- Core Business Domains identified
-- Business Rules documented
-- Business Principles documented
-- Information Flow documented
-- Decision Support vision established
+- Business Analysis Completed
 
-The project is now ready to transition into **Module 3 – Database Design**.
+## Module 2
 
+- Software Architecture Completed
+
+## Module 3
+
+- Logical Database Design Completed
+- 19 Version 1 Database Tables Finalized
+- Six Business Domains Modeled
+- Relationship Architecture Completed
+
+The project is now preparing for:
+
+- Architecture Review
+- Relationship Validation
+- Master ER Diagram
+- PostgreSQL Physical Schema
+
+After successful completion, development will proceed to **Module 4 – Spring Boot Backend Development**.
 ---
 
 # One-Line Memory
@@ -310,24 +368,45 @@ The next phase focuses on converting business objects into database entities whi
 
 ---
 
-# Architecture Evolution (2026-07-27 & 2026-07-28)
+# Architecture Evolution
 
-The architecture has evolved from identifying business entities to designing a normalized relational database.
+The architecture has evolved through three major phases.
 
-The following architectural principles were applied while designing the database:
+### Phase 1 — Business Understanding
 
-- Business Rules drive database design.
-- Data Ownership determines where information belongs.
-- Normalization eliminates duplicate information.
-- Master Data and Transaction Data are separated.
-- Transaction tables represent business events.
-- Foreign Keys connect business entities while preserving normalization.
-- Derived values are calculated rather than stored.
+The real business workflow was documented before any technical design began.
 
-Core transactional entities designed:
+### Phase 2 — Software Architecture
 
-- Order
-- Order Item
-- Payment
+Business workflows were converted into a modular software architecture following a Business-First philosophy.
 
-These entities establish the foundation for the upcoming PostgreSQL implementation and Backend API development.
+### Phase 3 — Database Architecture
+
+The business architecture was translated into a normalized relational database consisting of 19 Version 1 tables across six business domains.
+
+The following architectural principles guided the database design:
+
+- Business Rules drive Database Design.
+- Every table has a single responsibility.
+- Every attribute has one owner.
+- Master Data and Transaction Data remain separated.
+- Inventory follows the Current Position + Historical Transaction model.
+- Foreign Keys preserve business relationships.
+- Derived values are calculated instead of stored.
+
+The architecture is now stable and ready for physical database implementation.
+
+---
+
+# Current Project Status
+
+| Module | Status |
+|---------|--------|
+| Module 0 – Environment Setup | ✅ Completed |
+| Module 1 – Business Analysis | ✅ Completed |
+| Module 2 – Software Architecture | ✅ Completed |
+| Module 3 – Database Design | 🟡 Final Review Pending |
+| Module 4 – Backend Development | ⏳ Not Started |
+| Module 5 – Frontend Integration | ⏳ Not Started |
+| Module 6 – AI Features | ⏳ Not Started |
+| Module 7 – Deployment | ⏳ Not Started |

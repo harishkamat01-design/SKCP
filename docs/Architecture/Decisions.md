@@ -1,12 +1,18 @@
 # SKCP Architecture Decision Log (ADR)
 
-**Project:** SKCP (Shree Kundodari Cement Products)  
-**Version:** 1.1
-**Status:** Active  
-**Author:** Harish Kamat  
-**Reviewer:** Architect  
-**Created:** 2026-07-21  
-**Last Updated:** 2026-07-24
+**Project:** SKCP (Shree Kundodari Cement Products) 
+
+**Version:** 1.2
+
+**Status:** Active
+
+**Author:** Harish Kamat
+
+**Reviewer:** Architect
+
+**Created On:** 2026-07-21
+
+**Last Updated:** 2026-07-30
 
 ---
 
@@ -528,6 +534,294 @@ Positive:
 Consideration:
 
 - Reports require joining multiple transaction and master tables, which is the standard approach in normalized relational database systems.
+
+---
+
+# ADR-018 : Every Table Must Have a Single Responsibility
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+During the logical database design, several discussions revealed that combining multiple business concepts into a single table would complicate maintenance and violate normalization principles.
+
+## Decision
+
+Every table shall represent one and only one business responsibility.
+
+Examples:
+
+- Customer stores customer information.
+- Payment stores payment information.
+- Production stores production information.
+- FinishedGoodsStock stores only the current finished goods position.
+
+## Reason
+
+- Simplifies maintenance
+- Improves normalization
+- Prevents duplicated business logic
+- Makes reporting easier
+
+## Impact
+
+Positive:
+
+- Cleaner architecture
+- Better scalability
+- Easier backend development
+
+---
+# ADR-019 : Every Business Attribute Has One Owner
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+While reviewing all Version 1 tables, it became clear that every business attribute should exist in only one authoritative location.
+
+## Decision
+
+Every business attribute shall have exactly one owning table.
+
+Other tables shall reference that information instead of duplicating it.
+
+Examples:
+
+- Customer Name belongs only to Customer.
+- Product Name belongs only to Product.
+- Payment Amount belongs only to Payment.
+
+## Reason
+
+- Eliminates duplicate information
+- Prevents update anomalies
+- Maintains data integrity
+
+## Impact
+
+Positive:
+
+- Consistent data
+- Simpler maintenance
+- Reliable reporting
+
+---
+
+# ADR-020 : Inventory Will Follow Current Position + Historical Transactions
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+During inventory modelling, several alternatives were considered for storing stock movement history.
+
+## Decision
+
+Inventory tables shall represent only the current stock position.
+
+Historical movement shall be represented through transaction tables.
+
+Examples:
+
+- Purchase
+- Production
+- Delivery
+
+Current stock will be maintained in:
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+## Reason
+
+- Faster reporting
+- Simpler stock calculations
+- Clear separation of responsibilities
+
+## Impact
+
+Positive:
+
+- Better performance
+- Easier reconciliation
+- ERP-aligned inventory design
+
+---
+# ADR-021 : Production Must Record the Asset Used
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+Although the business currently does not analyse production machine-wise, discussions identified significant future value in knowing which asset produced each production batch.
+
+## Decision
+
+Every Production record shall reference the Asset used during manufacturing.
+
+## Reason
+
+This enables future capabilities such as:
+
+- Machine-wise production
+- Maintenance planning
+- Capacity analysis
+- Equipment utilization
+- AI-based production insights
+
+while adding almost no complexity to the current workflow.
+
+## Impact
+
+Positive:
+
+- Future-ready architecture
+- Better operational analytics
+- Improved maintenance support
+
+---
+# ADR-022 : Business Domains Shall Organize the Entire ERP
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+As the database matured, organizing tables purely by technical categories became less meaningful than grouping them according to business responsibilities.
+
+## Decision
+
+The SKCP ERP shall be organized into six business domains:
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+All future modules shall follow this domain structure.
+
+## Reason
+
+- Mirrors the real business
+- Improves modularity
+- Simplifies navigation
+- Supports future expansion
+
+## Impact
+
+Positive:
+
+- Cleaner architecture
+- Better documentation
+- Easier onboarding
+- Clear module ownership
+
+---
+
+# ADR-023 : Version 1 Will Prefer Simplicity Over Premature Complexity
+
+## Date
+
+2026-07-30
+
+## Status
+
+Accepted
+
+## Context
+
+Several advanced features were identified during Module 3, including:
+
+- Batch traceability
+- Reserved stock
+- Delivery confirmation
+- Damage tracking
+- Machine utilization analytics
+
+These features were valuable but not immediately required.
+
+## Decision
+
+Version 1 shall implement only the functionality required for today's business while designing clean extension points for future versions.
+
+## Reason
+
+- Faster delivery
+- Lower complexity
+- Easier adoption
+- Better maintainability
+
+## Impact
+
+Positive:
+
+- Stable Version 1
+- Controlled project scope
+- Clear future roadmap
+---
+
+## Current Status
+
+As of **30 July 2026**, the Architecture Decision Log contains **23 accepted Architecture Decision Records (ADRs)** covering:
+
+- Business Architecture
+- Software Architecture
+- Database Architecture
+- Inventory Philosophy
+- Normalization Principles
+- Business Domains
+- Future Scalability
+
+These ADRs collectively form the architectural foundation of the SKCP ERP and shall guide all future development activities.
+
+---
+
+## Current Status
+
+As of **30 July 2026**, the Architecture Decision Log contains **23 accepted Architecture Decision Records (ADRs)** covering:
+
+- Business Architecture
+- Software Architecture
+- Database Architecture
+- Inventory Philosophy
+- Normalization Principles
+- Business Domains
+- Future Scalability
+
+These ADRs collectively form the architectural foundation of the SKCP ERP and shall guide all future development activities.
 
 ---
 

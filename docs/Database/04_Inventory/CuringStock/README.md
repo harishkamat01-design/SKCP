@@ -1,6 +1,169 @@
 # 🏭 Curing Stock
 
+# Curing Stock (Transaction Table)
+
 ---
+
+# Purpose
+
+The Curing Stock table stores production batches that are currently undergoing curing and are not yet available for sale.
+
+It represents the temporary inventory located in the Production/Curing Yard.
+
+---
+
+# Business Responsibility
+
+The Curing Stock table answers:
+
+- Which batches are currently curing?
+- How many blocks remain under curing?
+- Which batches are ready for transfer?
+- Which batches have already been partially transferred?
+
+---
+
+# Table Structure
+
+| Column | Type | Description |
+|----------|------|-------------|
+| CuringStockID (PK) | UUID / INT | Unique curing batch |
+| ProductionID (FK) | FK | Production batch reference |
+| ProductID (FK) | FK | Product produced |
+| ProductionDate | DATE | Date produced |
+| QuantityProduced | INT | Total quantity produced |
+| QuantityRemaining | INT | Quantity still under curing |
+| ExpectedReadyDate | DATE | System calculated suggested ready date |
+| TransferStatus | ENUM | Curing / Partially Transferred / Fully Transferred |
+| OwnerConfirmation | BOOLEAN | Owner confirms batch is ready |
+| Notes | TEXT | Remarks |
+
+---
+
+# Primary Key
+
+CuringStockID
+
+---
+
+# Foreign Keys
+
+ProductionID → Production
+
+ProductID → Product
+
+---
+
+# Business Rules
+
+## Rule 1
+
+Every Production record creates one Curing Stock record.
+
+---
+
+## Rule 2
+
+Blocks under curing cannot be sold.
+
+---
+
+## Rule 3
+
+ExpectedReadyDate is calculated by the system using the normal curing period (3–5 days).
+
+The owner decides when the batch is actually ready.
+
+---
+
+## Rule 4
+
+A curing batch may be transferred partially.
+
+Example:
+
+Produced = 400
+
+Transferred = 250
+
+Remaining = 150
+
+---
+
+## Rule 5
+
+When QuantityRemaining becomes zero,
+
+TransferStatus automatically becomes:
+
+Fully Transferred
+
+---
+
+# Business Workflow
+
+Production
+
+↓
+
+Curing Stock
+
+↓
+
+Owner Inspection
+
+↓
+
+Transfer to Finished Goods
+
+↓
+
+Sales
+
+---
+
+# Example
+
+| Production Date | Product | Produced | Remaining | Status |
+|----------------|---------|---------:|----------:|--------|
+| 30-Jul-2026 | 6" Block | 420 | 420 | Curing |
+| 27-Jul-2026 | 4" Block | 600 | 150 | Partially Transferred |
+
+---
+
+# Why This Design?
+
+This design reflects the real factory workflow.
+
+The production yard acts as temporary inventory.
+
+Only after curing and owner approval are blocks moved into Finished Goods inventory.
+
+---
+
+# Future Scope
+
+Future versions may include:
+
+- Quality Inspection
+- Curing Duration Tracking
+- Weather Impact
+- Batch-wise Quality Rating
+- Automatic Ready Suggestions
+
+---
+
+# Status
+
+✅ Frozen (Version 1)
+
+The table accurately models the temporary production inventory used during the curing process before products become available for sale.
+
+
+
+
+---
+## OLD VERSION
 
 ## Purpose
 

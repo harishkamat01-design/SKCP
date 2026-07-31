@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SKCP Labour Salary Chart</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue: #0052CC;
+    --blue-dark: #253858;
+    --blue-light: #DEEBFF;
+    --green-bg: #E3FCEF; --green-br: #36B37E; --green-tx: #006644;
+    --red-bg: #FFEBE6;   --red-br: #DE350B;   --red-tx: #BF2600;
+    --gold-bg: #FFF0B3;  --gold-br: #FF991F;  --gold-tx: #974F0C;
+    --grey-bg: #F4F5F7;  --grey-br: #DFE1E6;  --grey-tx: #B3BAC5;
+    --text-dark: #172B4D;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#F4F5F7;
+    font-family:'Inter', sans-serif;
+    color:var(--text-dark);
+    padding:32px 16px 80px;
+  }
+  .kn, .kn * { font-family:'Noto Sans Kannada','Inter',sans-serif !important; }
+
+  .app{ max-width:1100px; margin:0 auto; }
+
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
+    background:white; border:1px solid var(--grey-br); border-radius:8px;
+    padding:16px 18px; margin-bottom:20px;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; }
+  .field label{ font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#5E6C84; font-weight:600; }
+  .field input, .field select{
+    border:1px solid var(--grey-br); border-radius:4px; padding:7px 10px; font-size:14px;
+    font-family:inherit; color:var(--text-dark); min-width:100px;
+  }
+  .spacer{ flex:1; }
+  .btn{
+    border:none; border-radius:4px; padding:9px 16px; font-size:13px; font-weight:600;
+    cursor:pointer; font-family:inherit;
+  }
+  .btn-primary{ background:var(--blue); color:white; }
+  .btn-primary:hover{ background:#0747A6; }
+  .btn-ghost{ background:white; color:var(--blue); border:1px solid var(--blue); }
+  .btn-ghost:hover{ background:var(--blue-light); }
+  .lang-toggle{ display:flex; border:1px solid var(--blue); border-radius:4px; overflow:hidden; }
+  .lang-toggle button{
+    border:none; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+    background:white; color:var(--blue);
+  }
+  .lang-toggle button.active{ background:var(--blue); color:white; }
+
+  .header-card{
+    background:var(--blue); border-radius:10px; padding:22px 20px; text-align:center; margin-bottom:18px;
+  }
+  .header-card h1{ margin:0; font-size:26px; font-weight:800; color:white; }
+  .header-card .sub{ margin-top:6px; font-size:16px; font-weight:700; color:#B3D4FF; letter-spacing:0.04em; }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:8px;
+  }
+  .daylabel{
+    background:var(--blue-dark); color:white; text-align:center; font-weight:700;
+    font-size:12.5px; letter-spacing:0.03em; padding:9px 0; border-radius:6px;
+  }
+  .daylabel.sun{ color:#FFC400; }
+
+  .cell{
+    border-radius:8px; border:1.6px solid var(--grey-br); background:var(--grey-bg);
+    min-height:118px; padding:9px 8px; position:relative; display:flex; flex-direction:column;
+  }
+  .cell.present{ background:var(--green-bg); border-color:var(--green-br); }
+  .cell.absent{ background:var(--red-bg); border-color:var(--red-br); }
+  .cell.holiday{ background:var(--gold-bg); border-color:var(--gold-br); }
+  .cell.outmonth{ opacity:0.55; }
+  .cell.clickable{ cursor:pointer; }
+  .cell.clickable:hover{ filter:brightness(0.97); }
+
+  .date-num{ font-size:19px; font-weight:800; }
+  .cell.present .date-num{ color:var(--green-tx); }
+  .cell.absent .date-num{ color:var(--red-tx); }
+  .cell.holiday .date-num{ color:var(--gold-tx); }
+  .cell.outmonth .date-num{ color:var(--grey-tx); }
+
+  .status-label{ font-size:11.5px; font-weight:700; margin-top:auto; }
+  .status-amount{ font-size:12.5px; margin-top:2px; }
+  .cell.present .status-label, .cell.present .status-amount{ color:var(--green-tx); }
+  .cell.absent .status-label, .cell.absent .status-amount{ color:var(--red-tx); }
+  .cell.holiday .status-label, .cell.holiday .status-amount{ color:var(--gold-tx); }
+
+  .total-badge{
+    margin-top:6px; background:var(--blue-light); border:1px solid var(--blue);
+    border-radius:5px; padding:3px 5px; font-size:10.5px; font-weight:700; color:var(--blue); text-align:center;
+  }
+
+  .footer{
+    margin-top:18px; display:flex; flex-wrap:wrap; gap:18px; align-items:center;
+    font-size:13px; color:#5E6C84;
+  }
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; }
+  .legend-item{ display:flex; align-items:center; gap:6px; }
+  .swatch{ width:16px; height:16px; border-radius:4px; border:1.5px solid; display:inline-block; }
+
+  .summary-strip{
+    display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;
+  }
+  .summary-card{
+    flex:1; min-width:150px; background:white; border:1px solid var(--grey-br); border-radius:8px;
+    padding:12px 14px;
+  }
+  .summary-card .label{ font-size:11px; color:#5E6C84; font-weight:600; text-transform:uppercase; }
+  .summary-card .value{ font-size:20px; font-weight:800; color:var(--blue); margin-top:2px; }
+
+  @media print{
+    .toolbar{ display:none; }
+    body{ background:white; padding:8px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+const STRINGS = {
+  en: {
+    dayNames: ["SUN","MON","TUE","WED","THU","FRI","SAT"],
+    monthNames: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    present: "Present", absent: "Absent", holiday: "Factory Holiday", total: "Total",
+    labourName: "Labour Name", month: "Month", year: "Year", dailyWage: "Daily Wage (Rs.)",
+    print: "Print / Save as PDF", reset: "Reset Attendance",
+    legendPresent: "Present", legendAbsent: "Absent", legendHoliday: "Holiday", legendTotal: "Weekly Total",
+    totalDays: "Total Present Days", totalSalary: "Total Salary", monthLabel: "Month Total",
+    hint: "Click any working day to toggle Present / Absent.",
+    rupee: "Rs."
+  },
+  kn: {
+    dayNames: ["ಭಾನು","ಸೋಮ","ಮಂಗಳ","ಬುಧ","ಗುರು","ಶುಕ್ರ","ಶನಿ"],
+    monthNames: ["ಜನವರಿ","ಫೆಬ್ರವರಿ","ಮಾರ್ಚ್","ಏಪ್ರಿಲ್","ಮೇ","ಜೂನ್","ಜುಲೈ","ಆಗಸ್ಟ್","ಸೆಪ್ಟೆಂಬರ್","ಅಕ್ಟೋಬರ್","ನವೆಂಬರ್","ಡಿಸೆಂಬರ್"],
+    present: "ಹಾಜರು", absent: "ಗೈರು", holiday: "ಕಾರ್ಖಾನೆ ರಜೆ", total: "ಒಟ್ಟು",
+    labourName: "ಕಾರ್ಮಿಕ ಹೆಸರು", month: "ತಿಂಗಳು", year: "ವರ್ಷ", dailyWage: "ದಿನದ ಕೂಲಿ (₹)",
+    print: "ಮುದ್ರಿಸಿ / PDF ಆಗಿ ಉಳಿಸಿ", reset: "ಹಾಜರಾತಿ ಮರುಹೊಂದಿಸಿ",
+    legendPresent: "ಹಾಜರು", legendAbsent: "ಗೈರು", legendHoliday: "ರಜೆ", legendTotal: "ವಾರದ ಒಟ್ಟು",
+    totalDays: "ಒಟ್ಟು ಹಾಜರಾದ ದಿನಗಳು", totalSalary: "ಒಟ್ಟು ಸಂಬಳ", monthLabel: "ತಿಂಗಳ ಒಟ್ಟು",
+    hint: "ಹಾಜರು / ಗೈರು ಬದಲಾಯಿಸಲು ಯಾವುದೇ ಕೆಲಸದ ದಿನವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.",
+    rupee: "₹"
+  }
+};
+
+function buildWeeks(year, month) {
+  // month: 1-12. Returns array of weeks (Sun..Sat), each day is {day, inMonth}
+  const firstOfMonth = new Date(year, month - 1, 1);
+  const startOffset = firstOfMonth.getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const daysInPrevMonth = new Date(year, month - 1, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) {
+    cells.push({ day: daysInPrevMonth - startOffset + 1 + i, inMonth: false });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, inMonth: true });
+  }
+  let nextDay = 1;
+  while (cells.length % 7 !== 0) {
+    cells.push({ day: nextDay, inMonth: false });
+    nextDay++;
+  }
+  const weeks = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
+function App() {
+  const [lang, setLang] = useState("en");
+  const [labourName, setLabourName] = useState("Ramesh");
+  const [year, setYear] = useState(2026);
+  const [month, setMonth] = useState(7);
+  const [wage, setWage] = useState(400);
+  const [attendance, setAttendance] = useState({}); // key "d-m-y" -> "present" | "absent"
+
+  const t = STRINGS[lang];
+  const weeks = useMemo(() => buildWeeks(year, month), [year, month]);
+
+  const keyFor = (day) => `${day}-${month}-${year}`;
+
+  const toggleDay = (day, weekdayIdx) => {
+    if (weekdayIdx === 0) return; // Sunday fixed holiday
+    const key = keyFor(day);
+    setAttendance(prev => {
+      const cur = prev[key] || "present";
+      return { ...prev, [key]: cur === "present" ? "absent" : "present" };
+    });
+  };
+
+  const getStatus = (day, weekdayIdx) => {
+    if (weekdayIdx === 0) return "holiday";
+    const key = keyFor(day);
+    return attendance[key] || "present";
+  };
+
+  let monthPresentDays = 0;
+
+  const weekRows = weeks.map((week) => {
+    let weeklyTotal = 0;
+    let lastInMonthIdx = null;
+    week.forEach((cell, idx) => {
+      if (cell.inMonth) {
+        lastInMonthIdx = idx;
+        if (idx !== 0) {
+          const status = getStatus(cell.day, idx);
+          if (status === "present") { weeklyTotal += wage; monthPresentDays++; }
+        }
+      }
+    });
+    return { week, weeklyTotal, lastInMonthIdx };
+  });
+
+  const monthTotal = weekRows.reduce((s, w) => s + w.weeklyTotal, 0);
+  const monthNameDisplay = t.monthNames[month - 1];
+
+  return (
+    <div className={`app ${lang === "kn" ? "kn" : ""}`}>
+      <div className="toolbar">
+        <div className="field">
+          <label>{t.labourName}</label>
+          <input value={labourName} onChange={e => setLabourName(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>{t.month}</label>
+          <select value={month} onChange={e => setMonth(Number(e.target.value))}>
+            {t.monthNames.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label>{t.year}</label>
+          <input type="number" value={year} onChange={e => setYear(Number(e.target.value))} style={{width:90}} />
+        </div>
+        <div className="field">
+          <label>{t.dailyWage}</label>
+          <input type="number" value={wage} onChange={e => setWage(Number(e.target.value))} style={{width:100}} />
+        </div>
+        <div className="spacer"></div>
+        <div className="lang-toggle">
+          <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>EN</button>
+          <button className={lang === "kn" ? "active" : ""} onClick={() => setLang("kn")}>ಕನ್ನಡ</button>
+        </div>
+        <button className="btn btn-ghost" onClick={() => setAttendance({})}>{t.reset}</button>
+        <button className="btn btn-primary" onClick={() => window.print()}>{t.print}</button>
+      </div>
+
+      <div className="header-card">
+        <h1>{`SKCP_${lang === "kn" ? "ಕಾರ್ಮಿಕ ಹೆಸರು" : "Labour Name"}(${labourName})_${lang === "kn" ? "ಸಂಬಳ" : "Salary"}`}</h1>
+        <div className="sub">{monthNameDisplay.toUpperCase()} {year}</div>
+      </div>
+
+      <div className="grid" style={{marginBottom:8}}>
+        {t.dayNames.map((d, i) => (
+          <div key={i} className={`daylabel ${i === 0 ? "sun" : ""}`}>{d}</div>
+        ))}
+      </div>
+
+      {weekRows.map((row, ri) => (
+        <div className="grid" key={ri} style={{marginBottom:8}}>
+          {row.week.map((cell, idx) => {
+            if (!cell.inMonth) {
+              return <div key={idx} className="cell outmonth"><div className="date-num">{cell.day}</div></div>;
+            }
+            const status = getStatus(cell.day, idx);
+            const amount = status === "present" ? `${t.rupee}${wage}` : `${t.rupee}0`;
+            const label = status === "holiday" ? t.holiday : (status === "present" ? t.present : t.absent);
+            const isTotalCell = idx === row.lastInMonthIdx;
+            return (
+              <div
+                key={idx}
+                className={`cell ${status} ${idx !== 0 ? "clickable" : ""}`}
+                onClick={() => toggleDay(cell.day, idx)}
+                title={idx !== 0 ? t.hint : ""}
+              >
+                <div className="date-num">{cell.day}</div>
+                <div className="status-label">{label}</div>
+                <div className="status-amount">{amount}</div>
+                {isTotalCell && (
+                  <div className="total-badge">{t.total}: {t.rupee}{row.weeklyTotal}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      <div className="footer">
+        <div className="legend">
+          <span className="legend-item"><span className="swatch" style={{background:"var(--green-bg)", borderColor:"var(--green-br)"}}></span>{t.legendPresent}</span>
+          <span className="legend-item"><span className="swatch" style={{background:"var(--red-bg)", borderColor:"var(--red-br)"}}></span>{t.legendAbsent}</span>
+          <span className="legend-item"><span className="swatch" style={{background:"var(--gold-bg)", borderColor:"var(--gold-br)"}}></span>{t.legendHoliday}</span>
+          <span className="legend-item"><span className="swatch" style={{background:"var(--blue-light)", borderColor:"var(--blue)"}}></span>{t.legendTotal}</span>
+        </div>
+        <div>{t.hint}</div>
+      </div>
+
+      <div className="summary-strip">
+        <div className="summary-card">
+          <div className="label">{t.totalDays}</div>
+          <div className="value">{monthPresentDays}</div>
+        </div>
+        <div className="summary-card">
+          <div className="label">{t.monthLabel}</div>
+          <div className="value">{t.rupee}{monthTotal}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

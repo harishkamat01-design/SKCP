@@ -2,150 +2,271 @@
 
 ---
 
+# Purpose
+
+This document defines the naming conventions used throughout the SKCP database.
+
+Following consistent naming standards improves readability, maintainability, and reduces ambiguity across the database, backend APIs, and frontend application.
+
+---
+
 # Table Naming
 
-- Singular Names
-- Pascal Case
+## Rules
 
-Example
+- Use **Singular** table names.
+- Use **PascalCase**.
+- Use meaningful business terminology.
+- Avoid abbreviations.
 
+### Examples
+
+```
 Customer
-
+Supplier
+RawMaterial
 Purchase
-
-OrderItem
+PurchaseItem
+Production
+Attendance
+FinishedGoodsStock
+```
 
 ---
 
-# Primary Key
+# Primary Keys
 
-<Table>NameID
+## Rule
 
-Examples
+Every table has a single primary key.
 
+Format:
+
+```
+<TableName>ID
+```
+
+### Examples
+
+```
 CustomerID
-
+SupplierID
 ProductID
-
+PurchaseID
 PaymentID
+AttendanceID
+AssetID
+```
 
 ---
 
-# Foreign Key
+# Foreign Keys
 
-Referenced Table + ID
+## Rule
 
-Examples
+Foreign Keys use the referenced table name followed by **ID**.
 
+Format:
+
+```
+ReferencedTableID
+```
+
+### Examples
+
+```
 CustomerID
-
-OrderID
-
+SupplierID
 ProductID
+OrderID
+DeliveryID
+RawMaterialID
+LabourID
+```
 
 ---
 
 # Boolean Fields
 
-Prefix
+## Rule
 
-Is
+Boolean fields begin with **Is**.
 
-Examples
+### Examples
 
+```
 IsActive
-
-IsDeleted
-
-IsPaid
+IsAvailable
+IsCompleted
+```
 
 ---
 
 # Date Fields
 
-Suffix
+## Rule
 
-Date
+Date columns end with **Date**.
 
-Examples
+### Examples
 
+```
 OrderDate
-
-PaymentDate
-
+PurchaseDate
 DeliveryDate
+JoiningDate
+AttendanceDate
+MaintenanceDate
+NextMaintenanceDate
+CreatedDate
+```
 
 ---
 
 # Quantity Fields
 
-Suffix
+## Rule
 
-Quantity
+Physical quantities end with **Quantity**.
 
-Examples
+### Examples
 
+```
 OrderedQuantity
-
-DeliveredQuantity
-
+PurchasedQuantity
 ProducedQuantity
+DeliveredQuantity
+CurrentQuantity
+MinimumQuantity
+```
 
 ---
 
 # Amount Fields
 
-Suffix
+## Rule
 
-Amount
+Financial values end with **Amount**.
 
-Examples
+### Examples
 
+```
 TotalAmount
-
-PendingAmount
-
 PaidAmount
+RemainingAmount
+AllocatedAmount
+TransportAmount
+```
+
+> **Note**
+>
+> Derived values (for example, Pending Amount) should not be stored unless there is a business requirement. They should be calculated whenever possible.
 
 ---
 
 # Status Fields
 
-Suffix
+## Rule
 
-Status
+Status fields end with **Status**.
 
-Examples
+### Examples
 
+```
 OrderStatus
-
-PaymentStatus
-
 DeliveryStatus
+PaymentStatus
+ConfirmationStatus
+AssetStatus
+```
+
+---
+
+# Text Fields
+
+## Rule
+
+Use descriptive names.
+
+### Examples
+
+```
+CustomerName
+SupplierName
+ProductName
+SkillType
+Remarks
+Address
+Phone
+GSTNumber
+```
 
 ---
 
 # Audit Fields
 
-CreatedAt
+Every master and transaction table should include:
 
-UpdatedAt
+```
+CreatedDate
+```
 
+Future versions may introduce:
+
+```
+UpdatedDate
 CreatedBy
-
 UpdatedBy
+```
 
 ---
 
 # General Principles
 
-- No abbreviations
-- Meaningful names
-- Business terminology only
-- Consistent naming across modules
+- Use business terminology.
+- Use full words instead of abbreviations.
+- Avoid duplicate information.
+- Every attribute has exactly one owner.
+- Store facts, calculate derived values.
+- Design tables around real business processes.
+- Follow Business-First Database Design.
 
 ---
 
-Status
+# Naming Philosophy
 
-Approved
+Business
+
+↓
+
+Business Objects
+
+↓
+
+Database Tables
+
+↓
+
+Backend Entities
+
+↓
+
+REST APIs
+
+↓
+
+Frontend Screens
+
+The same terminology should be used across every layer of the application.
+
+---
+
+# Status
+
+| Item | Status |
+|------|--------|
+| Module | Module 3 – Database Design |
+| Version | 1.0 |
+| Status | ✅ Approved |
+| Last Updated | 30-Jul-2026 |
+| Author | Harish Kamat |

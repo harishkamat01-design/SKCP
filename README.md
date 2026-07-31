@@ -337,6 +337,91 @@ Current focus:
 
 ---
 
+
+# Journal
+
+This folder contains the day-by-day development journal for the **SKCP (Shree Kundodari Cement Products)** project.
+
+The journal captures the complete learning journey, business discussions, architecture decisions, database design progress, implementation milestones, challenges, and lessons learned.
+
+Each daily journal serves as a historical record of how the project evolved from business analysis to a production-ready software architecture.
+
+---
+
+# Journal Entries
+
+| Date | Module | Focus | Status |
+|------|---------|-------|--------|
+| 24-Jul-2026 | Module 1 | Business Analysis | ✅ Completed |
+| 25-Jul-2026 | Module 2 | Software Architecture | ✅ Completed |
+| 26-Jul-2026 | Module 3 | Database Design (Foundation) | ✅ Completed |
+| 27-Jul-2026 | Module 3 | Manufacturing & Sales Database Design | ✅ Completed |
+| 28-Jul-2026 | Module 3 | Database Documentation & Refinement | ✅ Completed |
+| 29-Jul-2026 | Module 3 | Database Tables Finalization | ✅ Completed |
+| **30-Jul-2026** | **Module 3** | **Database Relationship Architecture & Module 3 Milestone** | **🏆 Major Milestone** |
+
+---
+
+# 30 July 2026 Highlights
+
+This was one of the biggest milestones in the SKCP project.
+
+Major accomplishments include:
+
+- Finalized all **19 Version 1 database tables**
+- Completed the relationship design for all six business domains:
+  - Master Data
+  - Procurement
+  - Production
+  - Inventory
+  - Sales
+  - Finance
+- Added the architectural decision to link **Asset → Production** using `AssetID`
+- Created the **Database Relationship Summary** document covering all business domains
+- Confirmed Version 1 business scope and identified future enhancements for later releases
+- Prepared Module 3 for architecture review and ER diagram generation
+
+At the end of the day, the logical database architecture reached a stable and implementation-ready state.
+
+---
+
+# Current Project Status
+
+| Module | Status |
+|---------|--------|
+| Module 0 – Environment Setup | ✅ Completed |
+| Module 1 – Business Analysis | ✅ Completed |
+| Module 2 – Software Architecture | ✅ Completed |
+| Module 3 – Database Design | 🟡 Final Review Pending |
+| Module 4 – Backend Development | ⏳ Not Started |
+| Module 5 – Frontend Integration | ⏳ Not Started |
+| Module 6 – AI Features | ⏳ Not Started |
+| Module 7 – Deployment | ⏳ Not Started |
+
+---
+
+# Next Planned Activities
+
+Before starting backend development, the following activities will complete Module 3:
+
+1. Repository Audit
+2. Database Architecture Review
+3. Relationship Validation
+4. Master ER Diagram
+5. PostgreSQL Physical Schema
+6. Documentation Cleanup
+7. Module 3 Freeze
+8. Git Commit & GitHub Push
+
+After completing these activities, development will continue with **Module 4 – Spring Boot Backend Development**.
+
+---
+
+# Purpose
+
+The Journal folder acts as the official historical record of the SKCP project's evolution and serves as a reference for future learning, maintenance, and project reviews.
+---
+
 # 📅 Development Workflow
 
 Every development session follows:
