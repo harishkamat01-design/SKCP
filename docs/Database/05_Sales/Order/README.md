@@ -189,9 +189,11 @@ These enhancements are intentionally deferred until required by the business.
 | Item | Status |
 |------|--------|
 | Domain | Sales |
+| Data Classification | Transaction Data |
+| Owner | Sales Domain |
 | Table Status | ✅ Approved |
 | Sprint | Sprint 2 – Business Domain & Database Design |
-| Last Updated | 29 July 2026 |
+| Last Updated | 30 July 2026 |
 | Architect | Harish Kamat & ChatGPT |
 
 ---

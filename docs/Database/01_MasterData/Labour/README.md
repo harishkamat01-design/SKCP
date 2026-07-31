@@ -108,11 +108,31 @@ Monthly Salary (Calculated)
 
 Reports
 ```
+# Business Questions Answered
+
+This table helps answer:
+
+- Who works in SKCP?
+- What skill does each worker have?
+- What is the standard labour rate?
+- Which workers are currently active?
+---
+
+## Status
+
+| Item | Status |
+|------|--------|
+| Domain | Production |
+| Owner | Factory Operations |
+| Table Status | ✅ Approved |
+| Sprint | Sprint 2 – Business Domain & Database Design |
+| Last Updated | 29 July 2026 |
+| Architect | Harish Kamat & ChatGPT |
 
 ---
 
-# Current Status
+## Version History
 
-**Status:** ✅ Frozen
-
-This table is finalized and should not change unless the business introduces new permanent information about labour.
+| Version | Date | Description | Author |
+|---------|------|-------------|--------|
+| 1.0 | 29-Jul-2026 | Initial approved design | Harish Kamat & ChatGPT |

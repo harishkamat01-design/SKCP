@@ -134,6 +134,20 @@ Possible future tables:
 These will reference AssetID.
 
 ---
+## Status
+
+Domain:
+Production
+
+Data Classification:
+Master Data
+
+Owner:
+Factory Operations
+
+Status:
+✅ Frozen
+---
 
 # One-Line Memory
 

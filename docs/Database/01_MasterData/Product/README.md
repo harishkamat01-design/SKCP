@@ -128,7 +128,8 @@ These enhancements are intentionally deferred until required by the business.
 
 | Item | Status |
 |------|--------|
-| Domain | Master Data |
+| Domain | Procurement |
+| Owner | Procurement Management|
 | Table Status | ✅ Approved |
 | Sprint | Sprint 2 – Business Domain & Database Design |
 | Last Updated | 29 July 2026 |

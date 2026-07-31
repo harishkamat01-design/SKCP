@@ -82,7 +82,8 @@ This creates a **many-to-many relationship**, resolved through Payment Allocatio
 - Every Payment Allocation belongs to one Order.
 - A payment may be split across multiple orders.
 - An order may receive payments over multiple installments.
-- The **sum of all allocations must always equal the TotalAmountReceived** before the payment is saved.
+- The total allocated amount for a payment must never exceed the TotalAmountReceived.
+  A payment may remain partially unallocated until allocation is completed.
 - Allocations are generated automatically by the system.
 
 ---
@@ -183,14 +184,18 @@ These enhancements are intentionally deferred until required by the business.
 
 ## Status
 
-| Item | Status |
-|------|--------|
-| Domain | Payment |
-| Table Status | ✅ Approved |
-| Sprint | Sprint 2 – Business Domain & Database Design |
-| Last Updated | 29 July 2026 |
-| Architect | Harish Kamat & ChatGPT |
+**Status:** ✅ Frozen
 
+**Domain:** Finance
+
+**Data Classification:** Transaction Data
+
+**Owner:** Finance & Accounts
+
+**Related Tables:**
+
+- Payment
+- Order
 ---
 
 ## Version History

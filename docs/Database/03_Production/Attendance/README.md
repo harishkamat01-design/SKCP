@@ -244,13 +244,22 @@ The database should always store business facts and calculate business results.
 
 ---
 
-# Current Status
+## Status
 
-**Status:** ✅ Frozen
+Domain:
+Production
 
-**Domain:** Production
+Data Classification:
+Transaction Data
 
-**Owner:** Workforce Management
+Owner:
+Workforce Management
+
+Status:
+✅ Frozen
+
+Date:
+30th July 2026
 
 **Related Tables**
 
@@ -259,181 +268,4 @@ The database should always store business facts and calculate business results.
 - Monthly Salary (Calculated)
 - Future Payroll Reports
 
-
-
-
 ---
-
-## OLD Version
-
-# Attendance
-
-## Purpose
-
-Stores the daily attendance record of each labourer.
-
-Each record represents one labourer's attendance for one working day.
-
-Attendance is the foundation for weekly salary calculation, attendance reports, and labour analysis.
-
----
-
-# Table Structure
-
-| Column | Type | Description |
-|---------|------|-------------|
-| AttendanceID (PK) | UUID / INT | Unique attendance record |
-| LabourID (FK) | UUID / INT | References Labour |
-| AttendanceDate | DATE | Attendance date |
-| AttendanceStatus | ENUM | Present / Absent / Holiday |
-| LeaveReason | VARCHAR | Personal Leave / Sick Leave / Festival Leave (NULL if Present or Holiday) |
-| DailySalaryRate | DECIMAL | Salary rate applicable on that day (snapshot) |
-| SalaryEarned | DECIMAL | Amount earned for the day (0 if Absent or Holiday) |
-| Remarks | TEXT | Optional notes |
-| CreatedDate | DATETIME | Record creation timestamp |
-| UpdatedDate | DATETIME | Last modification timestamp |
-
----
-
-# Primary Key
-
-AttendanceID
-
----
-
-# Foreign Key
-
-LabourID → Labour.LabourID
-
----
-
-# Relationships
-
-```
-Labour (1)
-
-    │
-
-    ▼
-
-Attendance (Many)
-```
-
-One Labour can have many Attendance records.
-
-Each Attendance record belongs to exactly one Labour.
-
----
-
-# Business Rules
-
-## Rule 1
-
-Only one attendance record can exist for one labour on one date.
-
-Unique Constraint:
-
-(LabourID + AttendanceDate)
-
----
-
-## Rule 2
-
-If AttendanceStatus = Present
-
-SalaryEarned = DailySalaryRate
-
----
-
-## Rule 3
-
-If AttendanceStatus = Absent
-
-SalaryEarned = 0
-
----
-
-## Rule 4
-
-If AttendanceStatus = Holiday
-
-SalaryEarned = 0
-
----
-
-## Rule 5
-
-LeaveReason is mandatory only when AttendanceStatus = Absent.
-
-Examples:
-
-- Personal Leave
-- Sick Leave
-- Festival Leave
-
----
-
-## Rule 6
-
-Attendance cannot exist before the Labour Joining Date.
-
----
-
-## Rule 7
-
-Attendance cannot be recorded for an Inactive Labour.
-
----
-
-## Rule 8
-
-WeekEndingDate is not stored.
-
-Weekly salary is calculated dynamically because every salary week ends on Saturday.
-
-This avoids redundant data and keeps the table normalized.
-
----
-
-# Why DailySalaryRate is Stored
-
-Daily salary may change over time.
-
-Example:
-
-2026 → ₹400/day
-
-2027 → ₹500/day
-
-Old attendance records should continue calculating historical salaries correctly.
-
-Therefore DailySalaryRate is stored as a snapshot.
-
----
-
-# Business Questions Answered
-
-- Was Ramesh present yesterday?
-- Why was Suresh absent?
-- How many days did Ganesh work this week?
-- What salary did Ramesh earn this week?
-- Which workers were absent most frequently?
-- What are the common leave reasons?
-
----
-
-# Used By
-
-- Weekly Salary Calculation
-- Monthly Salary Reports
-- Labour Performance Reports
-- Attendance Reports
-- Future Payroll Module
-
----
-
-# Status
-
-✅ Frozen
-
-No further structural changes unless business requirements change.

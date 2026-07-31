@@ -324,13 +324,20 @@ These enhancements are intentionally deferred until required by the business.
 
 ## Status
 
-| Item | Status |
-|------|--------|
-| Domain | Inventory |
-| Table Status | ✅ Approved |
-| Sprint | Sprint 2 – Business Domain & Database Design |
-| Last Updated | 29 July 2026 |
-| Architect | Harish Kamat & ChatGPT |
+Domain:
+Inventory
+
+Data Classification:
+Transaction Data
+
+Owner:
+Inventory Management
+
+Status:
+✅ Frozen
+
+Date:
+30th July 2026
 
 ---
 

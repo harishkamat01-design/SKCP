@@ -683,7 +683,25 @@ Although the business currently does not analyse production machine-wise, discus
 
 ## Decision
 
-Every Production record shall reference the Asset used during manufacturing.
+The inventory subsystem shall maintain only the current stock position in dedicated stock tables.
+
+Historical inventory movement shall be preserved through transaction tables.
+
+Current stock tables:
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+Historical movement tables:
+
+- Purchase
+- PurchaseItem
+- Production
+- Delivery
+- DeliveryItem
+
+Inventory quantities shall never be manually recalculated from historical transactions during daily operations.
 
 ## Reason
 
@@ -823,6 +841,268 @@ As of **30 July 2026**, the Architecture Decision Log contains **23 accepted Arc
 
 These ADRs collectively form the architectural foundation of the SKCP ERP and shall guide all future development activities.
 
+---
+
+# ADR-024 : Header–Detail Pattern Shall Be Used for Business Transactions
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Business transactions such as Purchases, Orders, Deliveries and Payments naturally contain multiple line items.
+
+## Decision
+
+SKCP shall use the Header–Detail pattern for all major transaction modules.
+
+Examples:
+
+Purchase → PurchaseItem
+
+Order → OrderItem
+
+Delivery → DeliveryItem
+
+Payment → PaymentAllocation
+
+## Reason
+
+- Eliminates duplicated information
+- Supports multi-item transactions
+- Simplifies reporting
+- Matches ERP industry standards
+
+## Impact
+
+Positive
+
+- Better normalization
+- Flexible transactions
+- Easier backend implementation
+
+---
+# ADR-025 : Payment Allocation Shall Resolve Many-to-Many Relationships
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Customers may pay one order through multiple payments, or one payment may settle multiple orders.
+
+## Decision
+
+PaymentAllocation shall act as the bridge table between Payment and Order.
+
+## Reason
+
+Supports:
+
+- Partial Payments
+- Installment Payments
+- One payment across multiple orders
+
+## Impact
+
+Positive
+
+- Flexible finance module
+- Accurate outstanding balance
+- Complete payment history
+---
+# ADR-026 : Current Stock Shall Not Store Historical Transactions
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Inventory queries are frequent while historical transaction reports are occasional.
+
+## Decision
+
+Current stock tables shall only store the latest inventory position.
+
+Historical movement remains in transaction tables.
+
+## Reason
+
+Improves:
+
+- Performance
+- Simplicity
+- Inventory lookup
+
+## Impact
+
+Positive
+
+Real-time inventory becomes extremely fast.
+---
+# ADR-026 : Current Stock Shall Not Store Historical Transactions
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Inventory queries are frequent while historical transaction reports are occasional.
+
+## Decision
+
+Current stock tables shall only store the latest inventory position.
+
+Historical movement remains in transaction tables.
+
+## Reason
+
+Improves:
+
+- Performance
+- Simplicity
+- Inventory lookup
+
+## Impact
+
+Positive
+
+Real-time inventory becomes extremely fast.
+---
+# ADR-027 : Curing Shall Be Modeled as an Independent Inventory Stage
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Manufactured blocks remain unavailable for sale until curing is complete.
+
+## Decision
+
+A dedicated CuringStock table shall represent products under curing.
+
+FinishedGoodsStock shall only contain saleable inventory.
+
+## Reason
+
+Represents the real manufacturing lifecycle.
+
+## Impact
+
+Positive
+
+Supports:
+
+- Production tracking
+- Inventory accuracy
+- Future batch traceability
+---
+# ADR-028 : Database Shall Be Organized Around Business Domains
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+The finalized database consists of multiple functional areas.
+
+## Decision
+
+All tables shall belong to one business domain.
+
+Domains:
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+## Reason
+
+Improves modularity and documentation.
+
+## Impact
+
+Positive
+
+Better scalability and maintainability.
+---
+# ADR-029 : Business Terminology Shall Be Used Across Every Layer
+
+## Date
+
+2026-07-31
+
+## Status
+
+Accepted
+
+## Context
+
+Inconsistent terminology increases confusion between database, backend and frontend.
+
+## Decision
+
+Database, Backend, APIs, Frontend and Documentation shall use identical business terminology.
+
+Example:
+
+Customer
+
+↓
+
+Customer Entity
+
+↓
+
+Customer API
+
+↓
+
+Customer Screen
+
+## Reason
+
+Maintains consistency throughout the application.
+
+## Impact
+
+Positive
+
+Simpler maintenance and onboarding.
 ---
 
 **End of Architecture Decision Log**

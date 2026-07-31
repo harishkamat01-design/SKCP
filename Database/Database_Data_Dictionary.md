@@ -4,35 +4,50 @@
 
 ## Purpose
 
-The Database Data Dictionary provides a high-level catalog of every database table used in SKCP.
+The Database Data Dictionary provides the official catalog of all Version 1 SKCP database entities.
 
-It serves as the first reference point before reading detailed table documentation.
+It acts as the entry point for understanding:
+
+- Database tables
+- Table classification
+- Business ownership
+- Domain responsibility
+- Database scope
+
+Detailed table structures, relationships, and business rules are documented separately.
+
+This document is the first reference before reviewing:
+
+- Database Relationship Summary
+- Master ER Diagram
+- PostgreSQL Physical Schema
+- Backend Entity Design
 
 ---
 
 # Database Tables
 
-| Table | Category | Purpose |
-|--------|----------|----------|
-| Asset | Master | Stores factory assets, machines, vehicles, utilities and equipment |
-| Customer | Master | Stores customer information |
-| Labour | Master | Stores labour master information |
-| Product | Master | Stores finished product catalog |
-| RawMaterial | Master | Stores raw material master information |
-| Supplier | Master | Stores supplier information |
-| Purchase | Transaction | Purchase invoice header |
-| PurchaseItem | Transaction | Purchased raw material details |
-| Production | Transaction | Daily production record |
-| Attendance | Transaction | Daily labour attendance |
-| Order | Transaction | Customer order header |
-| OrderItem | Transaction | Ordered product details |
-| Delivery | Transaction | Delivery header |
-| DeliveryItem | Transaction | Delivered product details |
-| Payment | Transaction | Customer payment transactions |
-| PaymentAllocation | Transaction | Allocates payments to customer orders |
-| RawMaterialStock | Inventory | Current stock of raw materials |
-| CuringStock | Inventory | Current curing yard stock |
-| FinishedGoodsStock | Inventory | Current finished goods stock |
+    | Table | Domain | Category | Purpose |
+    |-|-|-|-|
+    | Asset | Master Data | Master | Factory assets, machines, vehicles, utilities and equipment |
+    | Customer | Master Data | Master | Customer information |
+    | Labour | Master Data | Master | Labour information |
+    | Product | Master Data | Master | Finished product catalog |
+    | RawMaterial | Master Data | Master | Raw material information |
+    | Supplier | Master Data | Master | Supplier information |
+    | Purchase | Procurement | Transaction | Purchase invoice header |
+    | PurchaseItem | Procurement | Transaction | Purchased raw material details |
+    | Production | Production | Transaction | Daily manufacturing record |
+    | Attendance | Production | Transaction | Daily labour attendance |
+    | RawMaterialStock | Inventory | Transaction | Current raw material stock |
+    | CuringStock | Inventory | Transaction | Blocks under curing |
+    | FinishedGoodsStock | Inventory | Transaction | Saleable finished products |
+    | Order | Sales | Transaction | Customer order header |
+    | OrderItem | Sales | Transaction | Ordered product details |
+    | Delivery | Sales | Transaction | Delivery transaction header |
+    | DeliveryItem | Sales | Transaction | Delivered product details |
+    | Payment | Finance | Transaction | Customer payment transaction |
+    | PaymentAllocation | Finance | Transaction | Payment allocation against orders |
 
 ---
 
@@ -49,6 +64,45 @@ The following tables have been intentionally deferred to future versions.
 
 ---
 
+# Business Domain Summary
+
+SKCP Version 1 database is organized into six business domains.
+
+| Domain | Responsibility |
+|---------|---------------|
+| Master Data | Stores stable business identities |
+| Procurement | Manages supplier purchases and raw material acquisition |
+| Production | Manages manufacturing activities and workforce tracking |
+| Inventory | Manages current stock positions |
+| Sales | Manages customer orders and deliveries |
+| Finance | Manages payments and outstanding balances |
+
+---
+
+# Inventory Lifecycle Principle
+
+SKCP separates:
+
+Historical Transactions
+
+↓
+Purchase
+Production
+Delivery
+
+
+Current Inventory Position
+
+↓
+RawMaterialStock
+CuringStock
+FinishedGoodsStock
+
+
+This prevents repeated calculation of stock balances and improves system performance.
+
+---
+
 # Statistics
 
 | Category | Count |
@@ -57,6 +111,15 @@ The following tables have been intentionally deferred to future versions.
 | Transaction Tables | 10 |
 | Inventory Tables | 3 |
 | Total Version 1 Tables | 19 |
+---
+
+# Relationship Statistics
+
+| Relationship Type | Count |
+|---|---:|
+| One-to-Many Relationships | 16 |
+| One-to-One Relationships | 3 |
+| Total Validated Relationships | 19 |
 
 ---
 
@@ -64,27 +127,27 @@ The following tables have been intentionally deferred to future versions.
 
 The SKCP database follows a Business-First design.
 
-Business
+    Business
 
-↓
+    ↓
 
-Master Data
+    Master Data
 
-↓
+    ↓
 
-Transactions
+    Transactions
 
-↓
+    ↓
 
-Inventory
+    Inventory
 
-↓
+    ↓
 
-Reports
+    Reports
 
-↓
+    ↓
 
-AI
+    AI
 
 Each table exists because it represents a real business object or business event.
 
@@ -98,45 +161,8 @@ No table is created unless it reflects an actual business process.
 |------|--------|
 | Module | Module 3 – Database Design |
 | Version | 1.0 |
-| Status | ✅ Active |
-| Last Updated | 30-Jul-2026 |
+| Status | ✅ Approved for Phase 5 |
+| Last Updated | 31-Jul-2026 |
 | Author | Harish Kamat |
 
-
 ---
-
-# OLD version of Database Data Dictionary
-
----
-
-| Table | Category | Purpose |
-|--------|----------|----------|
-| Supplier | Master | Stores supplier information |
-| RawMaterial | Master | Stores raw material master |
-| Purchase | Transaction | Purchase header |
-| PurchaseItem | Transaction | Purchased material details |
-| Customer | Master | Customer information |
-| Product | Master | Product catalog |
-| Production | Transaction | Production header |
-| ProductionItem | Transaction | Production details |
-| Curing | Transaction | Curing process tracking |
-| FinishedGoodsStock | Inventory | Available finished goods |
-| Order | Transaction | Customer order |
-| OrderItem | Transaction | Ordered products |
-| Delivery | Transaction | Delivery header |
-| DeliveryItem | Transaction | Delivered products |
-| DeliveryConfirmation | Transaction | Delivery acknowledgment |
-| Payment | Transaction | Customer payments |
-| PaymentAllocation | Transaction | Allocates payment to orders |
-
----
-
-# Statistics
-
-Master Tables : 4
-
-Transaction Tables : 12
-
-Inventory Tables : 1
-
-Total Tables : 16

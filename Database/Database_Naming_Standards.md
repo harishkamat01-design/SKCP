@@ -34,6 +34,154 @@ FinishedGoodsStock
 
 ---
 
+# Database Object Naming
+
+## Primary Key Constraint
+
+PK_<TableName>
+
+Example
+
+PK_Customer
+PK_Order
+
+---
+
+## Foreign Key Constraint
+
+FK_<ChildTable>_<ParentTable>
+
+Examples
+
+FK_Order_Customer
+FK_Purchase_Supplier
+FK_OrderItem_Product
+
+---
+
+## Unique Constraint
+
+UQ_<TableName>_<Column>
+
+Example
+
+UQ_Customer_Phone
+UQ_Supplier_GSTNumber
+
+---
+
+## Index
+
+IX_<TableName>_<Column>
+
+Examples
+
+IX_Order_OrderDate
+IX_Customer_CustomerName
+IX_Payment_PaymentDate
+
+---
+
+# ENUM Naming
+
+Use meaningful business values.
+
+Examples
+
+OrderStatus
+
+Pending
+Partially Delivered
+Completed
+Cancelled
+
+DeliveryStatus
+
+Pending
+In Transit
+Delivered
+
+PaymentMode
+
+Cash
+UPI
+Bank Transfer
+Cheque
+
+TransportMode
+
+Customer Arranged
+Factory Arranged
+Third Party
+
+---
+
+# NULL Standards
+
+Business-critical fields
+
+NOT NULL
+
+Examples
+
+CustomerName
+OrderDate
+CurrentQuantity
+
+Optional fields
+
+NULL
+
+Examples
+
+Remarks
+ReferenceNumber
+MinimumQuantity
+Notes
+
+---
+
+
+# Reserved Words
+
+Avoid SQL reserved keywords.
+
+Avoid names like
+
+User
+Group
+Date
+Order
+
+Instead use
+
+Customer
+CustomerOrder
+OrderDate
+CreatedDate
+
+---
+
+# Documentation Rule
+
+Every table must have:
+
+- Purpose
+- Business Responsibility
+- Primary Key
+- Foreign Keys
+- Business Rules
+- Example
+- Future Scope
+- Version History
+
+This keeps documentation consistent across all database objects.
+---
+
+
+
+---
+
 # Primary Keys
 
 ## Rule
@@ -209,14 +357,16 @@ Every master and transaction table should include:
 
 ```
 CreatedDate
+UpdatedDate
 ```
 
 Future versions may introduce:
 
 ```
-UpdatedDate
 CreatedBy
 UpdatedBy
+DeletedDate
+DeletedBy
 ```
 
 ---
@@ -267,6 +417,6 @@ The same terminology should be used across every layer of the application.
 |------|--------|
 | Module | Module 3 – Database Design |
 | Version | 1.0 |
-| Status | ✅ Approved |
+| Status | ✅ Frozen (Version 1) |
 | Last Updated | 30-Jul-2026 |
 | Author | Harish Kamat |

@@ -172,8 +172,19 @@ Future versions may include:
 
 ---
 
-# Status
+## Status
 
-✅ Frozen (Version 1)
+Domain:
+Inventory
 
-This table accurately represents the current finished goods inventory available for customer sales while remaining scalable for future enhancements.
+Data Classification:
+Transaction Data
+
+Owner:
+Inventory Management
+
+Status:
+✅ Frozen
+
+Date:
+30th July 2026

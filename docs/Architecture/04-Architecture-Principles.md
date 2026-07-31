@@ -4,11 +4,11 @@
 
 **Module:** 2 – Software Architecture
 
-**Version:** 1.1
+**Version:** 1.2
 
-**Status:** Draft
+**Status:** Updated
 
-**Last Updated:** 2026-07-30
+**Last Updated:** 2026-07-31
 
 ---
 
@@ -82,10 +82,11 @@ Examples include:
 
 - More customers
 - More products
-- More factories
-- More machines
-- More labour
+- Multiple factories
+- Multiple production machines
+- Additional labour
 - Higher order volumes
+- AI-assisted decision support
 
 ---
 
@@ -110,15 +111,25 @@ Core business domains:
 - Sales
 - Finance
 
-Each domain owns its own business responsibilities while collaborating through well-defined relationships.
+Each domain owns its own business responsibilities while collaborating through validated foreign-key relationships.
 
+The six business domains are:
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
 ---
 
 # Principle 9 – Documentation Before Implementation
 
 Important architectural decisions should be documented before implementation.
 
-Good documentation reduces future confusion and improves maintainability.
+Approved architectural decisions are preserved using Architecture Decision Records (ADR) to provide long-term traceability.
+
+Good documentation reduces future confusion, simplifies onboarding, and improves maintainability.
 
 ---
 
@@ -156,11 +167,6 @@ AI
 
 Technology should always follow business understanding.
 
----
-
-# One-Line Memory
-
-A strong architecture is built on stable principles, not changing technologies.
 
 ---
 
@@ -318,17 +324,23 @@ Purchase
 
 ↓
 
+RawMaterialStock
+
+↓
+
 Production
 
 ↓
 
-Delivery
+CuringStock
 
 ↓
 
-Finished Goods Stock (Current Position)
+FinishedGoodsStock
 
-This avoids storing duplicate movement history in stock tables.
+↓
+
+Delivery
 
 ### Benefit
 
@@ -358,7 +370,9 @@ However, the architecture should make it easy to support future enhancements suc
 - AI recommendations
 - Multiple factories
 
-The goal is to prepare for growth without building unused features.
+The goal is to prepare for future growth without introducing unnecessary complexity into Version 1.
+
+Future capabilities are planned through architecture, not premature implementation.
 
 ### Benefit
 
@@ -390,3 +404,45 @@ Every approved architectural decision should eventually be reflected in the rele
 - Documentation stays current
 - Knowledge is preserved
 - New contributors understand the project faster
+---
+---
+
+# Principle 18
+
+## Architecture Decisions Must Be Traceable
+
+### Statement
+
+Major architectural decisions should never exist only in conversations.
+
+### Explanation
+
+Every significant decision should be documented as an Architecture Decision Record (ADR).
+
+Examples include:
+
+- Production references Asset
+- Payment Allocation bridge table
+- Current Inventory Model
+- Master–Transaction Separation
+
+Each ADR records:
+
+- Decision
+- Reason
+- Impact
+- Status
+- Decision Owner
+
+### Benefit
+
+- Preserves architectural knowledge
+- Explains why decisions were made
+- Simplifies future maintenance
+- Improves long-term consistency
+
+---
+
+# One-Line Memory
+
+A strong architecture is built on stable principles, not changing technologies.

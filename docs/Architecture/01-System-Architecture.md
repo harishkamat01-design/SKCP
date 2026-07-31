@@ -8,12 +8,12 @@
 |--------|-------|
 | Project | SKCP – Shree Kundodari Cement Products |
 | Document | System Architecture |
-| Version | 1.1 |
-| Status | Draft |
+| Version | 2.0 |
+| Status | Approved |
 | Author | Harish Kamat |
 | Reviewer | Architect |
 | Created On | 2026-07-24 |
-| Last Updated | 2026-07-30 |
+| Last Updated | 2026-07-31 |
 
 ---
 
@@ -21,128 +21,244 @@
 
 To define the overall architecture of the **SKCP Management System** and ensure that the software is scalable, maintainable, and aligned with the business needs of **Shree Kundodari Cement Products**.
 
-This document provides the high-level architectural blueprint that guides all implementation activities throughout the project lifecycle.
+This document acts as the master architectural blueprint for the entire project and guides all future implementation activities.
 
 ---
 
 # 3. Scope
 
-This document covers the overall software architecture for the SKCP Management System.
+This document defines the complete software architecture of the SKCP ERP system.
 
 It includes:
 
-- Frontend Application
-- Backend Services
+- Business Architecture
+- Software Architecture
 - Database Architecture
-- AI Components
+- Backend Architecture
+- Frontend Architecture
+- AI Architecture
+- Deployment Architecture
 - External Integrations
-- High-Level Communication between Modules
 
-Detailed database schemas, API specifications, business rules, and implementation details are maintained in their respective architecture documents.
+Detailed implementation specifications are maintained in their respective documents.
 
 ---
 
-# 4. High-Level Components
+# 4. System Overview
+
+SKCP is designed as a Business-First Manufacturing ERP.
+
+The architecture mirrors the real business workflow rather than technical layers.
+
+Business
+
+↓
+
+Business Domains
+
+↓
+
+Database
+
+↓
+
+Backend APIs
+
+↓
+
+Frontend
+
+↓
+
+AI Decision Support
+
+---
+
+# 5. High-Level Components
 
 | Component | Responsibility |
 |------------|----------------|
-| Frontend | User Interface for Admin |
-| Backend | Business Logic, REST APIs, Authentication |
-| Database | Stores all business data and relationships |
-| AI Engine | Business Insights, Stock Prediction, Pending Payment Analysis (Future) |
-| External Services | Vercel, PostgreSQL, Email, WhatsApp (Future) |
+| React Frontend | User Interface for Admin |
+| Spring Boot Backend | Business Logic, Authentication, REST APIs |
+| PostgreSQL Database | Stores business master data, transactions and inventory |
+| AI Layer (Future) | Business insights, forecasting, decision support |
+| External Services | Vercel, Neon PostgreSQL, Email, WhatsApp (Future) |
 
 ---
 
-# 5. Technology Stack
+# 6. Technology Stack
 
 | Layer | Technology |
 |--------|------------|
-| Frontend | React |
-| Backend | Spring Boot *(Planned)* |
+| Frontend | React + Vite |
+| Backend | Spring Boot |
 | Database | PostgreSQL |
+| ORM | Spring Data JPA |
+| Authentication | JWT |
 | AI | OpenAI APIs *(Future)* |
-| Hosting | Vercel |
+| Hosting | Vercel + Render |
+| Database Hosting | Neon PostgreSQL |
 | Version Control | GitHub |
 
 ---
 
-# 6. Primary Users
+# 7. Primary Users
 
 | User | Responsibilities |
 |------|------------------|
-| Admin | Manage raw materials, production, inventory, customers, sales, payments, reports and AI insights |
-| Customer | View quotations, orders and payment status *(Future)* |
-| Transport Provider | Receive delivery information *(Future)* |
+| Admin | Manage complete business operations |
+| Customer *(Future)* | View quotations, orders and payment status |
+| Transport Provider *(Future)* | Receive delivery details |
 
 ---
 
-# 7. High-Level Business Domains
+# 8. Business Domains
 
-The SKCP ERP system is organized into six core business domains.
+The entire ERP is organized into six core business domains.
 
 | Domain | Description |
 |---------|-------------|
-| Master Data | Stores business master information |
-| Procurement | Raw material purchasing process |
+| Master Data | Business master information |
+| Procurement | Supplier purchases and raw materials |
 | Production | Manufacturing operations |
-| Inventory | Stock management throughout production lifecycle |
-| Sales | Customer orders and deliveries |
-| Finance | Customer payments and outstanding balances |
+| Inventory | Raw material, curing and finished goods stock |
+| Sales | Orders and deliveries |
+| Finance | Payments and outstanding balances |
 
 ---
 
-# 8. High-Level System Flow
+# 9. High-Level System Architecture
 
 ```text
-Admin
+                    Admin
 
-↓
+                      │
 
-React Frontend
+                      ▼
 
-↓
+             React Frontend (Vite)
 
-Spring Boot Backend
+                      │
 
-↓
+                REST API (HTTPS)
 
-PostgreSQL Database
+                      │
 
-↓
+                      ▼
 
-AI Services (Future)
+          Spring Boot Backend (Java)
+
+                      │
+
+         Business Services & Validation
+
+                      │
+
+                      ▼
+
+            PostgreSQL Database
+
+        (19 Business Tables / 19 Relationships)
+
+                      │
+
+        ┌─────────────┴─────────────┐
+
+        ▼                           ▼
+
+ Reports & Dashboard          AI Layer (Future)
+
+                               │
+
+                      Business Insights
+
+                      Stock Forecasting
+
+                      Payment Prediction
+
+                      Demand Forecast
 ```
 
 ---
 
-# 9. Current Architecture Status
+# 10. Database Architecture
+
+The database follows a Business-First normalized design.
+
+### Current Statistics
+
+| Item | Count |
+|------|------:|
+| Master Tables | 6 |
+| Transaction Tables | 10 |
+| Inventory Tables | 3 |
+| Total Tables | **19** |
+| Validated Relationships | **19** |
+
+Database artifacts completed:
+
+- Database Data Dictionary
+- Database Naming Standards
+- Database Relationship Summary
+- Master ER Diagram
+- Architecture Decision Records (ADR)
+
+---
+
+# 11. Architecture Principles
+
+The SKCP system follows these principles:
+
+- Business-First Design
+- Architecture-First Development
+- Separation of Concerns
+- Single Responsibility Principle
+- Master–Transaction Separation
+- Current Position + Historical Transactions Inventory Model
+- Header–Detail Pattern
+- Database Normalization
+- Low Coupling
+- High Cohesion
+- AI-Ready Architecture
+- Future Scalability
+
+---
+
+# 12. Current Project Status
 
 | Module | Status |
 |---------|--------|
 | Module 0 – Environment Setup | ✅ Completed |
 | Module 1 – Business Analysis | ✅ Completed |
 | Module 2 – Software Architecture | ✅ Completed |
-| Module 3 – Logical Database Design | 🟡 Final Review Pending |
-| Module 4 – Backend Development | ⏳ Not Started |
-| Module 5 – Frontend Integration | ⏳ Not Started |
-| Module 6 – AI Features | ⏳ Not Started |
-| Module 7 – Deployment | ⏳ Not Started |
+| Module 3 – Database Design | ✅ Completed |
+| Module 4 – Backend Development | 🚀 Next Phase |
+| Module 5 – Frontend Integration | ⏳ Planned |
+| Module 6 – AI Features | ⏳ Planned |
+| Module 7 – Deployment | ⏳ Planned |
 
 ---
 
-# 10. Architecture Principles
+# 13. Next Phase
 
-The SKCP system is designed around the following principles:
+With the completion of Module 3, the project is now ready to begin:
 
-- Business-first architecture
-- Separation of concerns
-- Single responsibility for every database table
-- Current Position + Historical Transactions inventory model
-- Scalable modular design
-- Future AI readiness
-- Minimal data duplication
-- Maintainable and extensible architecture
+## Phase 5 – PostgreSQL Physical Database Schema
+
+Followed by
+
+## Module 4 – Backend Development
+
+Planned deliverables:
+
+- PostgreSQL Physical Schema
+- Spring Boot Project Setup
+- JPA Entity Classes
+- Repository Layer
+- Service Layer
+- REST APIs
+- Authentication
+- Database Integration
 
 ---
 
@@ -150,9 +266,13 @@ The SKCP system is designed around the following principles:
 
 - [x] Purpose defined
 - [x] Scope defined
-- [x] Components identified
+- [x] System Overview completed
+- [x] High-Level Components identified
 - [x] Technology Stack documented
-- [x] Business Domains identified
-- [x] High-Level System Flow documented
-- [ ] Reviewed after Module 3
-- [ ] Approved for implementation
+- [x] Business Domains finalized
+- [x] High-Level Architecture completed
+- [x] Database Architecture documented
+- [x] Architecture Principles finalized
+- [x] Module 3 completed
+- [ ] Backend implementation review pending
+- [ ] Final architecture approval

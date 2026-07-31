@@ -1,6 +1,190 @@
 # Changelog
 
 All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
+---
+
+# [2026-07-31] – Module 3 Major Milestone
+
+## 🎯 Summary
+
+Reached the biggest milestone of Module 3 by completing the logical database architecture for Version 1 of the SKCP ERP system.
+
+This milestone includes:
+
+- Phase 3 – Database Relationship Design
+- Phase 4 – Production-Quality ER Diagram Design
+
+The complete conceptual database is now finalized and ready for physical implementation.
+
+---
+
+## Added
+
+### Database Relationship Design
+
+Validated all **19 database relationships** across the six business domains.
+
+Relationships documented for:
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+### ER Diagram
+
+Completed the production-quality Logical ER Diagram including:
+
+- Entity Identification
+- Master vs Transaction classification
+- Entity Placement
+- Relationship Connections
+- Crow's Foot Cardinality
+- Final Architecture Validation
+
+### Documentation
+
+Added and completed:
+
+- Database Relationship Summary
+- Master ER Diagram
+- Relationship documentation for all domains
+- Cardinality validation
+- Foreign Key ownership documentation
+
+---
+
+## Changed
+
+### Database Architecture
+
+- Finalized all foreign key relationships.
+- Validated parent-child ownership for every table.
+- Standardized Header–Detail design across Procurement, Sales, and Finance modules.
+- Finalized Inventory lifecycle architecture:
+  - Raw Material Stock
+  - Production
+  - Curing Stock
+  - Finished Goods Stock
+- Confirmed Payment Allocation as the bridge table resolving the many-to-many relationship between Payment and Order.
+
+### ER Diagram
+
+- Positioned all 19 Version 1 entities.
+- Applied Crow's Foot notation to every relationship.
+- Validated relationship cardinality against business rules.
+- Completed production-ready logical ER model.
+
+---
+
+## Improved
+
+- Improved overall database normalization.
+- Refined business ownership of every table.
+- Improved foreign key documentation.
+- Standardized relationship descriptions across all domains.
+- Improved documentation consistency.
+- Validated the logical flow between Procurement, Production, Inventory, Sales, and Finance.
+- Prepared the database architecture for PostgreSQL implementation.
+
+---
+
+## Decisions
+
+Confirmed the complete Version 1 logical database architecture.
+
+### Business Domains
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+### Database Tables
+
+Confirmed all **19 Version 1 tables**:
+
+- Asset
+- Customer
+- Labour
+- Product
+- RawMaterial
+- Supplier
+- Purchase
+- PurchaseItem
+- Attendance
+- Production
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+- Order
+- OrderItem
+- Delivery
+- DeliveryItem
+- Payment
+- PaymentAllocation
+
+### Architecture Decisions
+
+Confirmed:
+
+- Business-first database design
+- Fully normalized schema
+- Header–Detail architecture
+- Current Stock + Historical Transaction model
+- Automatic payment allocation architecture
+- Production linked to Asset
+- Inventory lifecycle:
+  Purchase → Raw Material Stock → Production → Curing → Finished Goods → Delivery
+
+Deferred future enhancements including:
+
+- Batch Traceability
+- Reserved Stock
+- Warehouse Locations
+- GPS Delivery Tracking
+- Production Scheduling
+- Machine Maintenance History
+- AI Demand Forecasting
+- Inventory Forecasting
+- Payroll Module
+- Advanced Analytics
+
+These remain outside Version 1 scope.
+
+---
+
+## Milestone Achieved
+
+✅ Phase 3 – Database Relationship Design Completed
+
+✅ Phase 4 – ER Diagram Design Completed
+
+The project now has:
+
+- Complete logical database architecture
+- 19 validated relationships
+- Production-quality ER Diagram
+- Business rules documented
+- Foreign keys finalized
+- Cardinality validated
+- Business domains finalized
+- Inventory flow finalized
+- Sales flow finalized
+- Finance flow finalized
+
+Module 3 is now ready for:
+
+- PostgreSQL Physical Database Schema
+- Spring Boot Entity Design
+- JPA Relationship Mapping
+- Backend Development
+- Module 3 Freeze
+
 
 ---
 

@@ -177,16 +177,20 @@ Possible future additions:
 These enhancements are intentionally deferred until required by the business.
 
 ---
-
 ## Status
 
-| Item | Status |
-|------|--------|
-| Domain | Payment |
-| Table Status | ✅ Approved |
-| Sprint | Sprint 2 – Business Domain & Database Design |
-| Last Updated | 29 July 2026 |
-| Architect | Harish Kamat & ChatGPT |
+**Status:** ✅ Frozen
+
+**Domain:** Finance
+
+**Data Classification:** Transaction Data
+
+**Owner:** Finance & Accounts
+
+**Related Tables:**
+
+- Customer
+- Payment Allocation
 
 ---
 

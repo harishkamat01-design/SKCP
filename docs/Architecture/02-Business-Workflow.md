@@ -10,12 +10,12 @@ The primary objective of SKCP is to digitize the daily operations of Shree Kundo
 |-------|-------|
 | Project | SKCP – Shree Kundodari Cement Products |
 | Document | Business Workflow |
-| Version | 1.1 |
-| Status | Draft |
+| Version | 1.2 |
+| Status | Final Review |
 | Author | Harish Kamat |
 | Reviewer | Architect |        
 | Created On | 2026-07-24 |
-| Last Updated | 2026-07-30 |
+| Last Updated | 2026-07-31 |
 
 ---
 
@@ -90,14 +90,12 @@ The manufacturing process is carried out every day to maintain sufficient stock 
 1. Cement blocks are manufactured daily, irrespective of customer orders.
 2. The quantity of manufactured blocks is recorded manually in the business notebook.
 3. Cement bags consumed during production are recorded.
-4. Every production batch is moved to the curing yard.
-5. Blocks remain under curing for approximately 3–5 days.
-6. The father confirms when the curing batch is ready.
-7. Ready blocks are moved to the finished goods (sales yard).
-8. Available stock is updated.
-4. Approved blocks are categorized by block size.
-5. Available stock is updated manually.
-6. The updated stock is used to fulfill future customer orders.
+4. Production is recorded against the machine (Asset) used.
+5. Every production batch enters the curing yard.
+6. Products remain under curing for approximately 3–5 days.
+7. The father confirms when the curing batch is ready.
+8. Ready products are transferred to Finished Goods Stock.
+9. Available stock is updated automatically.
 
 ### Current Process
 
@@ -110,6 +108,15 @@ The manufacturing process is carried out every day to maintain sufficient stock 
 - Blocks remain in the curing yard before moving to the sales yard.
 - Finished goods are maintained separately from curing stock.
 
+The business also maintains:
+
+- Raw material inventory
+- Labour attendance
+- Production machine (asset) information
+- Customer payment allocation against multiple orders
+
+These business objects are represented in the Version 1 database architecture.
+
 ### Future SKCP System
 
 The SKCP application will digitally record:
@@ -119,7 +126,7 @@ The SKCP application will digitally record:
 - Production history
 - Quality status (if required)
 
-The system will also:
+The system will additionally::
 
 - Manage labour master information.
 - Record daily attendance.
@@ -141,9 +148,13 @@ Initial Stock Verification
         ↓
 Quotation Prepared
         ↓
-Customer Confirms Order
+Customer Confits Order
         ↓
-Final Stock Confirmation
+Sales Order Created
+        ↓
+Stock Reserved (Future)
+        ↓
+Delivery Planned
         ↓
 Transport Arranged
         ↓
@@ -190,6 +201,10 @@ Customer Pays
         │
         └── Partial Payment
                 ↓
+        Payment Received
+                ↓
+        Payment Allocation
+                ↓
         Pending Balance Updated
                 ↓
         Future Reminder
@@ -223,9 +238,9 @@ Products Loaded
         ↓
 Cutomer Confirms Order
         ↓
-Products Picked from Sales Yard
-        ↓
-Transport Arrange
+Products Picked from Finished Goods Stock
+↓
+Transport Arranged
         ↓
 Products Delivered
         ↓
@@ -258,7 +273,7 @@ Raw Material Stock
         ↓
 Production
         ↓
-Curing Yard
+Curing Stock
         ↓
 Finished Goods Stock
         ↓
@@ -286,6 +301,39 @@ The application will:
 - Track stock movement.
 - Generate stock reports.
 - Notify low stock levels (Future Enhancement).
+
+        Supplier
+        │
+        ▼
+        Purchase
+        │
+        ▼
+        Raw Material Stock
+        │
+        ▼
+        Production (Asset)
+        │
+        ▼
+        Curing Stock
+        │
+        ▼
+        Finished Goods Stock
+        │
+        ▼
+        Customer Order
+        │
+        ▼
+        Delivery
+        │
+        ▼
+        Payment
+        │
+        ▼
+        Payment Allocation
+        │
+        ▼
+        Business Reports
+
 
 ## 11. Business Rules
 
@@ -323,6 +371,9 @@ The SKCP application will enforce the following business rules automatically:
 | BR-010 | Finished goods stock reduces immediately after delivery. |
 | BR-011 | Weekly labour salary is calculated based on attendance. |
 | BR-012 | Production is associated with the machine (asset) used. |
+| BR-013 | Every production record shall reference exactly one production asset (machine). |
+| BR-014 | Every production batch shall create a curing stock record. |
+| BR-015 | Customer payments shall be allocated to one or more customer orders. |
 
 ## 12. Business Constraints
 
@@ -404,6 +455,9 @@ Functional Requirements describe what the SKCP application must do to support th
 | FR-015 | The system shall maintain curing stock. |
 | FR-016 | The system shall maintain finished goods stock. |
 | FR-017 | The system shall calculate weekly labour salary automatically. |
+| FR-018 | The system shall allocate customer payments to customer orders. |
+| FR-019 | The system shall maintain curing stock separately from finished goods stock. |
+| FR-020 | The system shall associate every production record with a production asset. |
 
 ### Current Process
 
@@ -475,3 +529,8 @@ The SKCP application will:
 - [x] Manufacturing lifecycle includes Production → Curing → Finished Goods.
 - [x] Labour management workflow documented.
 - [x] Inventory lifecycle documented.
+- [x] Production Asset workflow documented.
+- [x] Curing Stock workflow documented.
+- [x] Payment Allocation workflow documented.
+- [x] Database architecture aligned with business workflow.
+- [x] Module 3 logical database design synchronized.

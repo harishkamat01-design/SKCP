@@ -24,7 +24,7 @@ This mirrors the current factory notebook maintained by the business.
 | Notes | TEXT | Remarks such as rain, machine issue, mould change, etc. |
 | CreatedDate | DATE | Record creation date |
 | Status | ENUM | Completed / Cancelled |
-|AssetID | (FK)UUID / INT    | Block-making machine used for this production record
+| AssetID | (FK)UUID / INT    | Block-making machine used for this production record
 ---
 
 ## Primary Key
@@ -145,6 +145,17 @@ These can be added without changing the current table structure.
 
 ## Status
 
-✅ Frozen (Version 1)
+Domain:
+Production
 
-This table accurately represents the current production process followed by SKCP and serves as the foundation for future production tracking.
+Data Classification:
+Transaction Data
+
+Owner:
+Production Management
+
+Status:
+✅ Frozen
+
+Date:
+30th July 2026

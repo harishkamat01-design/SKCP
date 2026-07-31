@@ -1,10 +1,28 @@
-# Database Relationship Summary
+# Database Relationship Summary 
 
 # Module
-**Module 3 – Database Design**
-**Document:** Database Relationship Summary
-**Version:** 1.0
-**Status:** 🚧 In Progress
+Module 3 – Database Design
+
+Document
+Database Relationship Summary
+
+Version
+2.1
+
+Status
+✅ Module 3 Frozen
+
+Owner
+Database Architecture
+
+Reviewer
+Harish Kamat
+
+Phase
+Phase 3 – Database Relationship Design
+
+Last Updated
+31 July 2026
 
 ---
 
@@ -58,6 +76,44 @@ The SKCP database is organized into six business domains.
 Each domain owns a specific set of tables.
 
 ---
+## Database Relationship Statistics
+
+Total Tables: 19
+
+Master Tables: 6
+
+Transaction Tables: 10
+
+Inventory Tables: 3
+
+Validated Relationships: 19
+
+Relationship Types
+
+• One-to-One Relationships : 2
+• One-to-Many Relationships : 17
+
+Many-to-Many Relationships
+
+Resolved using bridge tables:
+• Payment ↔ Order → PaymentAllocation
+
+---
+# Relationship Design Principles
+
+The SKCP database follows these principles:
+
+• Every relationship is derived from a real business process.
+• Master tables own business identities.
+• Transaction tables reference masters through foreign keys.
+• Business facts are stored once.
+• Derived values are calculated, not duplicated.
+• Bridge tables resolve many-to-many relationships.
+• Historical transactions are preserved.
+• Current stock is maintained separately from transaction history.
+
+---
+
 
                                                         # 1. Master Data
 
@@ -292,7 +348,7 @@ This domain provides real-time inventory visibility while preserving historical 
 |---------------|-------------|-------------|-------------|-----------------|
 | RawMaterial | RawMaterialStock | 1 : 1 | RawMaterialID | Every raw material maintains one current stock record. |
 | Product | CuringStock | 1 : Many | ProductID | One product can have multiple curing batches over time. |
-| Production | CuringStock | 1 : Many | ProductionID | Every production record creates one curing batch. |
+| Production | CuringStock | 1 : Many | ProductionID | Every production record creates exactly one initial curing batch. That batch may later be partially transferred to Finished Goods Stock. |
 | Product | FinishedGoodsStock | 1 : 1 | ProductID | Every finished product maintains one current stock record. |
 
 ---
@@ -303,7 +359,7 @@ This domain provides real-time inventory visibility while preserving historical 
 - RawMaterialStock stores only the latest available quantity.
 - Purchase history is maintained in Purchase and PurchaseItem.
 - Production reduces RawMaterialStock through business processing.
-- Every Production record creates one curing batch.
+- Every production record creates exactly one initial curing batch. That batch may later be partially transferred to Finished Goods Stock.
 - Products remain in CuringStock until the father confirms they are ready.
 - Partial transfer from CuringStock to FinishedGoodsStock is allowed.
 - FinishedGoodsStock stores only the current available quantity in the sales yard.
@@ -542,9 +598,76 @@ This design allows:
 - One order to be paid through multiple installments.
 - Accurate outstanding balance calculation without data duplication.
 
-PaymentAllocation acts as the bridge between commercial transactions (Orders) and financial transactions (Payments), ensuring flexibility while maintaining a complete audit trail.
+PaymentAllocation acts as the bridge table that resolves the many-to-many relationship between Orders and Payments.
+
+It enables:
+
+• Installment payments
+• One payment settling multiple orders
+• Multiple payments settling one order
+• Complete financial traceability
 
 This structure follows the same **Header–Detail** design philosophy used throughout the SKCP database.
+
+---
+
+# Complete Relationship Matrix
+
+This is the master checklist.
+
+| # | Parent | Child | Cardinality | FK |
+|---|---------|--------|-------------|----|
+|1|Customer|Order|1 : N|CustomerID|
+|2|Supplier|Purchase|1 : N|SupplierID|
+|3|RawMaterial|PurchaseItem|1 : N|RawMaterialID|
+|4|Purchase|PurchaseItem|1 : N|PurchaseID|
+|5|Labour|Attendance|1 : N|LabourID|
+|6|Asset|Production|1 : N|AssetID|
+|7|Product|Production|1 : N|ProductID|
+|8|Production|CuringStock|1 : 1|ProductionID|
+|9|Product|CuringStock|1 : N|ProductID|
+|10|Product|FinishedGoodsStock|1 : 1|ProductID|
+|11|RawMaterial|RawMaterialStock|1 :1|RawMaterialID|
+|12|Order|OrderItem|1 : N|OrderID|
+|13|Product|OrderItem|1 : N|ProductID|
+|14|Order|Delivery|1 : N|OrderID|
+|15|Delivery|DeliveryItem|1 : N|DeliveryID|
+|16|Product|DeliveryItem|1 : N|ProductID|
+|17|Customer|Payment|1 : N|CustomerID|
+|18|Payment|PaymentAllocation|1 : N|PaymentID|
+|19|Order|PaymentAllocation|1 : N|OrderID|
+
+---
+
+## Final Architect Summary
+
+The SKCP database relationship architecture was designed directly from real-world business operations rather than technical assumptions.
+
+Every foreign key exists because a genuine business dependency exists.
+
+The database follows:
+
+• Business-First Design
+• Third Normal Form (3NF)
+• Header–Detail Pattern
+• Master–Transaction Separation
+• Current-State Inventory Model
+• Historical Transaction Preservation
+
+The validated relationship model now becomes the foundation for:
+
+• Phase 4 – Entity Relationship Diagram (ERD)
+• Phase 5 – PostgreSQL Physical Database Schema
+• Spring Boot JPA Entity Design
+• Repository Layer
+• REST APIs
+• Future AI Features
+
+---
+
+
+
+
 
 ---
 
