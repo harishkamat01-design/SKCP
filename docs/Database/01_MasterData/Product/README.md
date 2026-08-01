@@ -31,12 +31,13 @@ This table helps answer:
 
 | Column | Description | Why it belongs here |
 |---------|-------------|---------------------|
-| ProductID (PK) | Unique product identifier | Identifies each product |
+| ProductID (PK) | Unique product identifier (PID4, PID6, PID8)| Identifies each product |
+| ProductCode | Short unique product code (SB4, SB6, SB8) | Easier identification in invoices, reports and stock |
 | ProductName | Product name | Business identification |
-| Size | Product size (4", 6", 8") | Product specification |
-| Length | Standard length | Product dimension |
-| Width | Standard width | Product dimension |
-| Height | Standard height | Product dimension |
+| Size | Product size (4", 6", 8") | Business size classification |
+| Length | Standard length (16")| Product dimension |
+| Width | Standard width (4"/ 6"/ 8") | Product dimension |
+| Height | Standard height (6") | Product dimension |
 | Unit | Standard measurement unit | Common measurement |
 | Description | Optional notes | Additional business information |
 | Status | Active / Inactive | Indicates product availability |

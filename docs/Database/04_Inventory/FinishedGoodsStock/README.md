@@ -21,17 +21,17 @@ The Finished Goods Stock table answers:
 
 ---
 
-# Table Structure
+    # Table Structure
 
-| Column | Type | Description |
-|----------|------|-------------|
-| FinishedGoodsStockID (PK) | UUID / INT | Unique stock record |
-| ProductID (FK) | FK | Product reference |
-| CurrentQuantity | INT | Current saleable quantity |
-| MinimumQuantity | INT | Minimum stock level |
-| LastUpdatedDate | DATE | Last inventory update |
-| Status | ENUM | Normal / Low Stock / Out of Stock |
-| Notes | TEXT | Additional remarks |
+    | Column | Type | Description |
+    |----------|------|-------------|
+    | FinishedGoodsStockID (PK) | UUID / INT | Unique stock record |
+    | ProductID (FK) | FK | Product reference |
+    | CurrentQuantity | INT | Current saleable quantity |
+    | MinimumQuantity | INT | Minimum stock level |
+    | LastUpdatedDate | DATE | Last inventory update |
+    | Status | ENUM | Normal / Low Stock / Out of Stock |
+    | Notes | TEXT | Additional remarks |
 
 ---
 

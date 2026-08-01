@@ -1,6 +1,5 @@
 # Database Data Dictionary
 
----
 
 ## Purpose
 

@@ -56,3 +56,19 @@ Thumbs.db
 # Not required for the SKCP application.
 # ============================================
 .http-forge/
+
+# Spring Boot
+target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Maven Wrapper Logs
+.mvn/wrapper/maven-wrapper.jar

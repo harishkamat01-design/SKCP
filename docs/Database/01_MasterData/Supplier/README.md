@@ -16,12 +16,12 @@ The Supplier table contains only supplier-related information and is reused acro
 |---------|------|-------------|
 | SupplierID (PK) | UUID / INT | Unique supplier identifier |
 | SupplierName | VARCHAR(100) | Supplier name |
-| ContactPerson | VARCHAR(100) | Contact person's name |
-| Phone | VARCHAR(20) | Mobile number |
-| WhatsApp | VARCHAR(20) | WhatsApp number |
+| ContactPerson | VARCHAR(100) | Contact person's name MobileNumber |
+| Phone | VARCHAR(20) | Primary contact number |
+| WhatsApp | VARCHAR(20) | Optional secondary contact AlternateMobile|
 | Address | TEXT | Supplier address |
 | GSTNumber | VARCHAR(30) | GST registration number |
-| CreatedDate | DATE | Date supplier was added |
+| CreatedAt | DATE | Date supplier was added |
 | Status | ENUM | Active / Inactive |
 
 ---

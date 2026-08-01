@@ -1,7 +1,5 @@
 # Database Master Index
 
----
-
 # Module
 
 **Module 3 – Database Design**
