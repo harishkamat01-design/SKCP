@@ -1,4 +1,4 @@
-# Table Review 19 — Payment
+# Table Review 19 — Payment Allocation
 
 ---
 
@@ -10,7 +10,7 @@ Module 3 – Physical PostgreSQL Database Design
 
 ## Table Name
 
-Payment
+Payment Allocation
 
 ---
 
@@ -24,25 +24,23 @@ Payment
 
 ## Business Purpose
 
-The Payment table stores every payment received from customers.
+The Payment Allocation table records how customer payments are distributed across customer orders.
 
-This is a **Transaction Header Table**.
+This is a **Transaction Detail Table**.
 
 It represents the business event:
 
-**Customer made a payment.**
+**Payment allocated to one specific order.**
 
-It acts as the parent for:
+It belongs to:
 
-- Payment Allocation
+- Payment
 
 It references:
 
-- Customer
+- Order
 
-The Payment table stores only payment-level information.
-
-Which orders are settled by this payment will be recorded in **Payment Allocation**.
+Each record represents **one allocation of money from one payment to one order.**
 
 ---
 
@@ -54,33 +52,47 @@ Finance Domain
 
 ## Table Type
 
-Transaction Header Table
+Transaction Detail Table
 
 ---
 
 ## Primary Key
 
-PaymentID
+PaymentAllocationID
 
 ### Purpose
 
-Uniquely identifies every payment transaction.
+Uniquely identifies every payment allocation.
 
 ---
 
-## Foreign Key
+## Foreign Keys
 
-### CustomerID
+### PaymentID
 
-References the Customer table.
+References the parent Payment.
 
 Relationship:
 
-Customer
+Payment
 
 ↓
 
-Payment
+Payment Allocation
+
+---
+
+### OrderID
+
+References the Order table.
+
+Relationship:
+
+Order
+
+↓
+
+Payment Allocation
 
 ---
 
@@ -106,39 +118,24 @@ Approved without structural changes.
 
 ```sql
 -- ==========================================================
--- Table : payment
+-- Table : payment_allocation
 -- Domain: Finance
--- Purpose: Stores customer payment transactions
+-- Purpose: Stores payment allocation against customer orders
 -- ==========================================================
 
-CREATE TABLE payment
+CREATE TABLE payment_allocation
 (
-    payment_id SERIAL PRIMARY KEY,
+    payment_allocation_id SERIAL PRIMARY KEY,
 
-    customer_id INT NOT NULL,
+    payment_id INT NOT NULL,
 
-    payment_date DATE NOT NULL,
+    order_id INT NOT NULL,
 
-    total_amount_received DECIMAL(12,2)
+    allocated_amount DECIMAL(12,2)
         NOT NULL
-        CHECK (total_amount_received > 0),
+        CHECK (allocated_amount > 0),
 
-    payment_mode VARCHAR(20)
-        NOT NULL
-        CHECK
-        (
-            payment_mode IN
-            (
-                'CASH',
-                'UPI',
-                'BANK_TRANSFER',
-                'CHEQUE'
-            )
-        ),
-
-    reference_number VARCHAR(100),
-
-    received_by VARCHAR(100) NOT NULL,
+    allocation_date DATE NOT NULL,
 
     remarks TEXT,
 
@@ -146,9 +143,13 @@ CREATE TABLE payment
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_payment_customer
-        FOREIGN KEY (customer_id)
-        REFERENCES customer(customer_id)
+    CONSTRAINT fk_paymentallocation_payment
+        FOREIGN KEY (payment_id)
+        REFERENCES payment(payment_id),
+
+    CONSTRAINT fk_paymentallocation_order
+        FOREIGN KEY (order_id)
+        REFERENCES orders(order_id)
 );
 ```
 
@@ -159,52 +160,52 @@ CREATE TABLE payment
 ## Line 1
 
 ```sql
-CREATE TABLE payment
+CREATE TABLE payment_allocation
 ```
 
 ### SQL Syntax
 
-Creates a table named **payment**.
+Creates a table named **payment_allocation**.
 
 ### Database Concept
 
-Stores payment transactions.
+Stores detailed allocation records.
 
 ### SKCP Context
 
-Stores every payment received from customers.
+Stores how customer payments are distributed across orders.
 
 ---
 
 ## Line 2
 
 ```sql
-payment_id SERIAL PRIMARY KEY
+payment_allocation_id SERIAL PRIMARY KEY
 ```
 
 ### SQL Syntax
 
-Automatically generates a unique Payment ID.
+Automatically generates a unique Allocation ID.
 
 ### Database Concept
 
-Every payment transaction requires a unique identifier.
+Every allocation record requires a unique identifier.
 
 ### SKCP Context
 
-Each payment receives its own Payment ID.
+Each allocation receives its own ID.
 
 ---
 
 ## Line 3
 
 ```sql
-customer_id INT NOT NULL
+payment_id INT NOT NULL
 ```
 
 ### SQL Syntax
 
-Stores Customer ID.
+Stores Payment ID.
 
 ### Database Concept
 
@@ -212,28 +213,69 @@ Foreign Key reference.
 
 ### SKCP Context
 
-Every payment belongs to one customer.
+Every allocation belongs to one payment.
 
 Relationship:
 
-Customer
+Payment
 
 ↓
 
-Payment
+Payment Allocation
 
 ---
 
 ### Foreign Key
 
 ```sql
-FOREIGN KEY (customer_id)
-REFERENCES customer(customer_id)
+FOREIGN KEY (payment_id)
+REFERENCES payment(payment_id)
 ```
 
 ### SQL Syntax
 
-Links Payment to Customer.
+Links Allocation to Payment.
+
+### Database Concept
+
+Ensures allocations cannot exist without a payment.
+
+### SKCP Context
+
+Money must first be received before it can be allocated.
+
+---
+
+## Line 4
+
+```sql
+order_id INT NOT NULL
+```
+
+### SQL Syntax
+
+Stores Order ID.
+
+### Database Concept
+
+Foreign Key reference.
+
+### SKCP Context
+
+Identifies which customer order receives the payment.
+
+---
+
+### Foreign Key
+
+```sql
+FOREIGN KEY (order_id)
+REFERENCES orders(order_id)
+```
+
+### SQL Syntax
+
+Links Allocation to Order.
 
 ### Database Concept
 
@@ -241,43 +283,19 @@ Maintains Referential Integrity.
 
 ### SKCP Context
 
-Only existing customers can make payments.
-
----
-
-## Line 4
-
-```sql
-payment_date DATE NOT NULL
-```
-
-### SQL Syntax
-
-Stores the payment date.
-
-### Database Concept
-
-Every financial transaction has a business date.
-
-### SKCP Context
-
-Used for:
-
-- Daily collection reports
-- Monthly reports
-- Financial audit
+Only valid customer orders can receive payment allocations.
 
 ---
 
 ## Line 5
 
 ```sql
-total_amount_received DECIMAL(12,2)
+allocated_amount DECIMAL(12,2)
 ```
 
 ### SQL Syntax
 
-Stores the payment amount.
+Stores the allocated payment amount.
 
 CHECK prevents zero or negative values.
 
@@ -289,96 +307,39 @@ Financial values require precision.
 
 Example:
 
-₹15,000
+Payment Received:
 
-₹2,500
+₹20,000
 
-₹45,000
+Allocated:
+
+Order A → ₹8,000
+
+Order B → ₹12,000
 
 ---
 
 ## Line 6
 
 ```sql
-payment_mode
+allocation_date DATE NOT NULL
 ```
-
-Allowed values:
-
-- CASH
-- UPI
-- BANK_TRANSFER
-- CHEQUE
 
 ### SQL Syntax
 
-Uses CHECK constraint.
+Stores the allocation date.
 
 ### Database Concept
 
-Restricts payment mode to valid values.
+Every financial allocation has a transaction date.
 
 ### SKCP Context
 
-Represents how payment was received.
+Useful for audit and reconciliation.
 
 ---
 
 ## Line 7
-
-```sql
-reference_number VARCHAR(100)
-```
-
-### SQL Syntax
-
-Optional payment reference.
-
-### Database Concept
-
-Some payment modes require verification.
-
-### SKCP Context
-
-Examples:
-
-UPI Transaction ID
-
-Cheque Number
-
-Bank Reference Number
-
-Cash payments usually remain NULL.
-
----
-
-## Line 8
-
-```sql
-received_by VARCHAR(100)
-```
-
-### SQL Syntax
-
-Stores who collected the payment.
-
-### Database Concept
-
-Maintains accountability.
-
-### SKCP Context
-
-Examples:
-
-Father
-
-Office Staff
-
-Future Employee
-
----
-
-## Line 9
 
 ```sql
 remarks TEXT
@@ -396,15 +357,15 @@ Flexible business information.
 
 Examples:
 
-Advance payment
+Advance adjusted
 
-Final settlement
+Remaining balance cleared
 
-Cheque pending clearance
+Manual correction
 
 ---
 
-## Line 10
+## Line 8
 
 ```sql
 created_at TIMESTAMP
@@ -413,7 +374,7 @@ DEFAULT CURRENT_TIMESTAMP
 
 ### SQL Syntax
 
-Automatically stores record creation date and time.
+Automatically stores creation date and time.
 
 ### Database Concept
 
@@ -423,74 +384,70 @@ Audit column.
 
 Useful for:
 
-- Reports
 - Audit
-- AI analysis
+- Reports
+- AI
 - Debugging
 
 ---
 
 # Step 4 — Architect Notes
 
-### Why separate Payment and Payment Allocation?
+### Why create Payment Allocation?
 
-One payment may settle:
+Without this table:
 
-- One order
-- Multiple orders
-- Part of one order
+One payment could only belong to one order.
 
-Therefore:
+Real businesses don't work like that.
 
-Payment
+Example:
+
+Customer owes:
+
+Order 101 → ₹10,000
+
+Order 102 → ₹5,000
+
+Customer pays:
+
+₹15,000
+
+One payment settles both orders.
+
+---
+
+### Why not store OrderID in Payment?
+
+That would prevent one payment from paying multiple orders.
+
+The bridge table solves this problem cleanly.
+
+---
+
+### Why is this a Many-to-Many relationship?
+
+One Payment
 
 ↓
 
-Payment Allocation
+Many Orders
 
-is a standard ERP design.
-
----
-
-### Why store only Total Amount Received?
-
-Payment records the money received.
-
-How that money is distributed across orders belongs in Payment Allocation.
-
----
-
-### Why CustomerID?
-
-A customer may make many payments over time.
-
-Relationship:
-
-Customer
+One Order
 
 ↓
 
-Payment
+Many Payments
+
+Payment Allocation acts as the bridge.
 
 ---
 
-### Why not store Pending Balance?
+### Why store Allocation Date?
 
-Pending Balance is a **derived value**.
+Sometimes payment is received today but allocated later.
 
-It is calculated from:
-
-Orders
-
-+
-
-Payments
-
-+
-
-Payment Allocations
-
-Never store derived values.
+Keeping allocation history improves auditing.
 
 ---
 
@@ -510,18 +467,18 @@ Never store derived values.
 
 # Step 6 — Architect Approval
 
-## Payment Table
+## Payment Allocation Table
 
 🟢 **APPROVED**
 
 Ready for:
 
 - ✅ PostgreSQL Schema
-- ✅ Spring Boot JPA Entity (Payment.java)
+- ✅ Spring Boot JPA Entity (PaymentAllocation.java)
 - ✅ Repository Layer
 - ✅ Service Layer
 - ✅ REST APIs
-- ✅ Parent table for Payment Allocation
+- ✅ Foreign Key relationships with Payment and Order
 
 ---
 
@@ -529,12 +486,12 @@ Ready for:
 
 Today you learned:
 
-- What a Payment Header table is
+- What a bridge table is
+- Why Many-to-Many relationships require an intermediate table
 - Difference between Payment and Payment Allocation
-- Why payments belong to customers
-- Why financial amounts use DECIMAL
-- Why Pending Balance is calculated instead of stored
-- Another enterprise Header–Detail design pattern
+- How ERP systems track partial payments
+- Why financial allocation history is important
+- Enterprise-level financial database design
 
 ---
 
@@ -542,9 +499,9 @@ Today you learned:
 
 Excellent.
 
-The Payment table establishes the financial transaction layer of SKCP.
+The **Payment Allocation** table completes the Finance module and finalizes the Version 1 relational database architecture.
 
-Once **Payment Allocation** is completed, the Finance module will fully support:
+The complete financial flow is now:
 
 Customer
 
@@ -560,4 +517,4 @@ Payment
 
 Payment Allocation
 
-This is the same financial architecture used in professional ERP systems like SAP, Oracle ERP, Microsoft Dynamics, and Odoo.
+This is the same accounting architecture used in enterprise ERP systems like SAP, Oracle ERP, Microsoft Dynamics, and Odoo.

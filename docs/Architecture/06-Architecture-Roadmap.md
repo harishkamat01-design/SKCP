@@ -2,7 +2,7 @@
 
 **Project:** SKCP – Shree Kundodari Cement Products
 
-**Version:** 1.2
+**Version:** 2.0
 
 **Status:** Active
 
@@ -20,151 +20,205 @@ This document describes the planned architectural evolution of SKCP from its ini
 
 **Status:** Completed
 
-Completed during Modules 1 and 2.
+**Module 1 – Business Analysis**
 
-Focus Areas:
+### Focus Areas
 
 - Business Analysis
 - Business Rules
-- Business Principles
+- Business Constraints
+- Business Risks
+- Functional Requirements
+- Non-Functional Requirements
 - Business Workflows
 - Business Domains
-- Software Architecture
 - Documentation Standards
 
-Outcome:
+### Outcome
 
-A complete understanding of the business before writing code.
+A complete understanding of the business before writing any software.
 
 ---
 
-# Phase 2 – Database Foundation ✅
+# Phase 2 – Software Architecture ✅
+
+**Status:** Completed
+
+**Module 2 – Software Architecture**
+
+### Focus Areas
+
+- System Architecture
+- Business-First Architecture
+- Architecture Principles
+- Architecture Summary
+- Architecture Roadmap
+- Business Domain Design
+- Architecture Decision Records (ADR)
+
+### Outcome
+
+A scalable software architecture aligned with real business operations.
+
+---
+
+# Phase 3 – Database Architecture ✅
 
 **Status:** Completed (Module 3 Frozen)
 
-Completed:
+**Module 3 – Database Design**
+
+### Completed
 
 - Business Entity Identification
-- Entity Relationships
+- Entity Relationship Design
 - Primary Keys
 - Foreign Keys
 - Attribute Ownership
-- Database Normalization
+- Database Normalization (3NF)
 - Master Data vs Transaction Data
-- Current Position + Historical Transactions Model
-- Database Naming Standards
-- Database Relationship Summary
-- Database Data Dictionary
-- Database Master Index
-- Master ER Diagram
-- PostgreSQL Physical Database Planning
-- Architecture Decision Records (ADR)
-- 19 Version 1 Database Tables
-- Business Domain Mapping
+- Current Inventory Model
+- Payment Allocation Model
+- Production–Inventory Lifecycle
 - Inventory Flow Design
-- Payment Flow Design
 - Sales Flow Design
-- Production Flow Design
-- Module 3 Documentation Finalization
+- Finance Flow Design
+- Procurement Flow Design
+- Business Domain Mapping
+- Database Naming Standards
+- Database Data Dictionary
+- Database Relationship Summary
+- Master Entity Relationship Diagram
+- Database Master Index
+- Architecture Decision Records (ADR)
+- PostgreSQL Physical Schema
+- 19 Version 1 Database Tables
+- 19 Validated Relationships
 
-Outcome:
+### Outcome
 
-A production-ready logical database architecture that accurately represents the SKCP business and serves as the foundation for PostgreSQL implementation and Backend API development.
+A production-ready logical and physical PostgreSQL database architecture that accurately represents the SKCP business.
 
 ---
 
-# Phase 3 – Backend Foundation 🚧
+# Phase 4 – Backend Foundation 🚧
 
-**Status:** In Progress
+**Status:** Next Module
 
-**Module 4**
+**Module 4 – Backend Development**
 
-Focus Areas:
+### Focus Areas
 
-- PostgreSQL Physical Database Schema
 - Spring Boot Project Setup
 - Spring Data JPA
+- Hibernate ORM
+- Entity Classes
 - Repository Layer
 - Service Layer
 - REST APIs
-- Authentication & Authorization
+- DTO Layer
 - Validation
 - Exception Handling
-- DTO Layer
-- API Documentation
+- JWT Authentication
 - Business Logic Implementation
+- API Documentation
+- Testing
 
-Outcome:
+### Outcome
 
-A secure, scalable and maintainable backend aligned with the business architecture.
+A secure, scalable and maintainable backend fully integrated with the PostgreSQL database.
 
 ---
 
-# Phase 4 – Frontend Foundation
+# Phase 5 – Frontend Integration
 
 **Status:** Planned
 
-**Module 5**
+**Module 5 – Frontend Development**
 
-Focus Areas:
+### Focus Areas
 
-- Frontend–Backend Integration
-- User Experience
+- React Frontend Integration
 - Dashboard
 - Forms
 - Reports
 - Responsive Design
 - API Consumption
+- Authentication
+- User Experience
 
-Outcome:
+### Outcome
 
-A business-friendly user interface that mirrors factory operations.
+A business-friendly web application that mirrors the factory workflow.
 
 ---
 
-# Phase 5 – AI Foundation
+# Phase 6 – AI Foundation
 
 **Status:** Planned
 
-**Module 6**
+**Module 6 – AI Features**
 
-Focus Areas:
+### Focus Areas
 
 - Business Insights
+- Payment Prediction
+- Pending Payment Alerts
 - Production Suggestions
-- Payment Collection Recommendations
-- Inventory Alerts
-- Predictive Analysis
+- Inventory Forecasting
+- Demand Prediction
+- Business Analytics
 - AI-assisted Decision Support
 
-Outcome:
+### Outcome
 
-Transform SKCP into a Decision Support System.
+Transform SKCP into an AI-assisted Decision Support System.
 
 ---
 
-# Phase 6 – Business Operating System
+# Phase 7 – Deployment
 
-**Status:** Future Vision
+**Status:** Planned
 
-Focus Areas:
+**Module 7 – Deployment**
+
+### Focus Areas
+
+- Backend Deployment
+- Database Deployment
+- Frontend Deployment
+- Domain Configuration
+- Security
+- Backup Strategy
+- Monitoring
+- CI/CD Pipeline
+
+### Outcome
+
+Production-ready SKCP Management System.
+
+---
+
+# Future Vision
+
+### Business Operating System
+
+Future enhancements include:
 
 - Multi-Factory Support
-- Mobile Applications
 - Customer Portal
 - Supplier Portal
+- Mobile Application
 - Vehicle Tracking
-- AI Assistant
+- Machine Maintenance
+- AI Business Assistant
+- Predictive Analytics
+- Advanced Reporting
 - Business Forecasting
-- Advanced Analytics
-
-Outcome:
-
-A complete digital Business Operating System for cement manufacturing.
 
 ---
 
-# Long-Term Vision
+# Long-Term Evolution
 
 Manual Factory
 
@@ -182,7 +236,7 @@ Smart Factory
 
 ↓
 
-AI-Assisted Business
+AI-Assisted Factory
 
 ↓
 
@@ -192,36 +246,50 @@ Business Operating System
 
 # Guiding Principle
 
-Every phase must preserve the Business Rules, Business Principles, Database Architecture, and Founder Knowledge established during the earlier phases.
+Every phase preserves the Business Rules, Architecture Principles, Database Architecture, and Founder Knowledge established in earlier phases.
 
 ---
 
-# Architecture Progress Snapshot (31-Jul-2026)
+# Architecture Progress Snapshot
 
 ### Major Achievements
 
-- Business Analysis completed.
-- Software Architecture completed.
-- Logical Database Architecture completed.
-- 19 Version 1 tables finalized.
-- Six business domains established.
-- Relationship architecture completed.
-- Master ER Diagram completed.
-- Database documentation finalized.
-- Module 3 frozen.
+✅ Business Analysis Completed
 
-### Current Focus
+✅ Software Architecture Completed
 
-Backend implementation using:
+✅ Database Architecture Completed
 
-- PostgreSQL
-- Spring Boot
-- Spring Data JPA
-- REST APIs
+✅ PostgreSQL Physical Schema Completed
+
+✅ 19 Version 1 Tables Finalized
+
+✅ 19 Validated Relationships
+
+✅ 6 Business Domains Established
+
+✅ Master ER Diagram Completed
+
+✅ Database Documentation Finalized
+
+✅ Module 3 Frozen
 
 ---
 
-# Current Project Position
+# Current Focus
+
+Backend Development using
+
+- Spring Boot
+- PostgreSQL
+- Spring Data JPA
+- Hibernate
+- REST APIs
+- JWT Authentication
+
+---
+
+# Current Project Status
 
 | Module | Status |
 |---------|--------|
@@ -229,7 +297,7 @@ Backend implementation using:
 | Module 1 – Business Analysis | ✅ Completed |
 | Module 2 – Software Architecture | ✅ Completed |
 | Module 3 – Database Design | ✅ Completed |
-| Module 4 – Backend Development | 🚧 In Progress |
+| Module 4 – Backend Development | 🚧 Next |
 | Module 5 – Frontend Integration | ⏳ Planned |
 | Module 6 – AI Features | ⏳ Planned |
 | Module 7 – Deployment | ⏳ Planned |
@@ -240,19 +308,19 @@ Backend implementation using:
 
 Complete Module 4 by implementing:
 
-- PostgreSQL Physical Schema
-- Spring Boot Project Structure
-- JPA Entity Classes
+- Spring Boot Project
+- Entity Classes
 - Repository Layer
 - Service Layer
-- REST APIs
 - Business Logic
+- REST APIs
+- Authentication
 - Testing
 
-After completing Module 4, development will proceed to **Module 5 – Frontend Integration**.
+After Module 4, continue with Module 5 – Frontend Integration.
 
 ---
 
 # One-Line Memory
 
-Architecture is not built in one day—it evolves one well-designed module at a time.
+Architecture is built one well-designed module at a time, but every module must preserve the business it was designed to serve.

@@ -4,6 +4,7 @@
 # Can always be recreated from package.json.
 # ============================================
 node_modules/
+npm-debug.log*
 
 # ============================================
 # Environment Variables
@@ -11,7 +12,7 @@ node_modules/
 # Never commit these to GitHub.
 # ============================================
 .env
-.env.local
+.env.*
 
 # ============================================
 # Build Output
@@ -22,6 +23,16 @@ dist/
 build/
 
 # ============================================
+# Java / Spring Boot Build Output
+# Generated during Maven builds.
+# ============================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ============================================
 # Test Coverage Reports
 # Generated after running automated tests.
 # Can always be regenerated.
@@ -29,15 +40,16 @@ build/
 coverage/
 
 # ============================================
-# VS Code Workspace Settings
-# Personal editor settings specific to one developer.
+# IDE Files
+# Personal editor configuration.
 # ============================================
-.vscode/settings.json
+.vscode/
+.idea/
+*.iml
 
 # ============================================
 # Operating System Files
 # Automatically created by Windows/macOS.
-# Not related to the project.
 # ============================================
 .DS_Store
 Thumbs.db
@@ -45,30 +57,24 @@ Thumbs.db
 # ============================================
 # CommandCode Workspace
 # Local AI coding assistant configuration.
-# Developer-specific files.
 # ============================================
 .commandcode/
 
 # ============================================
 # HTTP Forge Workspace
-# Stores HTTP request collections, suites,
-# and AI agent workspace files.
-# Not required for the SKCP application.
+# Local HTTP request collections.
 # ============================================
 .http-forge/
 
-# Spring Boot
-target/
-
-# IntelliJ
-.idea/
-*.iml
-
-# VS Code
-.vscode/
-
+# ============================================
 # Logs
+# ============================================
+logs/
 *.log
 
-# Maven Wrapper Logs
+# ============================================
+# Maven Wrapper Cache
+# Ignore wrapper JAR if desired.
+# Maven will download it automatically.
+# ============================================
 .mvn/wrapper/maven-wrapper.jar

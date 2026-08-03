@@ -2,535 +2,353 @@
 
 ## Business Goal
 
-The primary objective of SKCP is to digitize the daily operations of Shree Kundodari Cement Products by replacing manual notebook-based processes with a centralized software system. The application aims to improve operational efficiency, payment tracking, stock management, and business reporting while providing a foundation for future AI-driven features.
+The primary objective of SKCP is to digitize the complete business operations of **Shree Kundodari Cement Products** by replacing manual notebook-based processes with an integrated ERP system.
 
-## 1. Document Header
+The application manages:
+
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+- Reporting
+
+The architecture follows a **Business-First Design** approach and provides a strong foundation for future AI-driven business insights.
+
+---
+
+# 1. Document Header
 
 | Field | Value |
 |-------|-------|
 | Project | SKCP – Shree Kundodari Cement Products |
 | Document | Business Workflow |
-| Version | 1.2 |
-| Status | Final Review |
+| Version | 2.0 |
+| Status | ✅ Module 3 Synchronized |
 | Author | Harish Kamat |
-| Reviewer | Architect |        
+| Reviewer | Architect |
 | Created On | 2026-07-24 |
-| Last Updated | 2026-07-31 |
+| Last Updated | 31 July 2026 |
 
 ---
 
-## 2. Purpose
+# 2. Purpose
 
 To describe how the SKCP business operates from manufacturing to payment collection.
+
 To provide a clear understanding of business processes before designing the software.
-This document helps developers, architects and future contributors understand the complete business process before software development begins.
+
+This document helps developers, architects, and future contributors understand the complete business process before software development begins.
+
+Although this document is business-oriented, it is fully synchronized with the finalized Module 3 database architecture.
 
 ---
 
-## 3. Scope
+# 3. Scope
 
 This document covers the complete business workflow of SKCP.
 
 It includes:
 
-- Manufacturing process
-- Stock management
-- Customer orders
-- Quotations
-- Payments
-- Delivery
-- Business reporting
-- Future AI features
+- Manufacturing
+- Procurement
+- Inventory
+- Sales
+- Finance
+- Reporting
+- Future AI Features
 
-This document does not include technical implementation, database design or API specifications.
+This document intentionally avoids technical implementation details while remaining fully aligned with the finalized logical database design.
 
 ---
 
-## 4. Business Overview
+# 4. Business Overview
 
 SKCP (Shree Kundodari Cement Products) manufactures and sells cement solid blocks.
 
-The business currently offers one product category with three block size variants:
+The business currently manufactures three product variants:
 
 - Solid Block 4" × 8" × 16"
 - Solid Block 6" × 8" × 16"
 - Solid Block 8" × 8" × 16"
 
-Products are manufactured daily and pass through a curing process before becoming available for sale.
+Manufacturing is performed daily and products pass through a curing process before becoming available for sale.
 
-The business follows four inventory stages:
+The business inventory lifecycle consists of:
 
 - Raw Material Stock
-- Production / Curing Yard
-- Finished Goods (Sales Yard)
+- Production
+- Curing Stock
+- Finished Goods Stock
 - Customer Delivery
 
-Products are manufactured based on mould size and are moved from the curing yard to the sales yard only after the father confirms that curing is complete.
+The finalized ERP architecture organizes the business into six domains:
 
-The business is currently managed manually using notebooks.
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+These domains are implemented using 19 normalized database tables connected through validated business relationships.
 
 ---
 
-## 5. Stakeholders
+# 5. Stakeholders
 
 | Stakeholder | Responsibility |
 |-------------|----------------|
-| Business Owner (Admin) | Manage products, customers, quotations, orders, stock and reports |
+| Business Owner (Admin) | Complete business management |
 | Customer | Purchase products and make payments |
-| Transport Provider | Deliver products to customer locations |
-| Future AI Assistant | Generate insights, payment reminders and business predictions |
+| Supplier | Supply raw materials |
+| Labour | Manufacturing operations |
+| Transport Provider | Deliver products |
+| Future AI Assistant | Business insights and forecasting |
 
+---
 
-## 6. Manufacturing Workflow
+# 6. Manufacturing Workflow
 
-The manufacturing process is carried out every day to maintain sufficient stock for customer demand.
+## Workflow
 
-### Workflow
-
-1. Cement blocks are manufactured daily, irrespective of customer orders.
-2. The quantity of manufactured blocks is recorded manually in the business notebook.
-3. Cement bags consumed during production are recorded.
-4. Production is recorded against the machine (Asset) used.
-5. Every production batch enters the curing yard.
-6. Products remain under curing for approximately 3–5 days.
-7. The father confirms when the curing batch is ready.
-8. Ready products are transferred to Finished Goods Stock.
-9. Available stock is updated automatically.
+Raw Material Available
+        ↓
+Production Planned
+        ↓
+Machine Selected
+        ↓
+Blocks Manufactured
+        ↓
+Production Recorded
+        ↓
+Curing Batch Created
+        ↓
+Blocks Remain Under Curing
+        ↓
+Quality Approved
+        ↓
+Finished Goods Stock Updated
 
 ### Current Process
 
-- Manufacturing is performed every day.
-- Production records are maintained in a notebook.
-- Stock counting is done manually.
-- Quality is verified before stock is updated.
-- Labour attendance is recorded weekly.
-- Cement consumption is recorded daily.
-- Blocks remain in the curing yard before moving to the sales yard.
-- Finished goods are maintained separately from curing stock.
-
-The business also maintains:
-
-- Raw material inventory
-- Labour attendance
-- Production machine (asset) information
-- Customer payment allocation against multiple orders
-
-These business objects are represented in the Version 1 database architecture.
+- Manufacturing is performed daily.
+- Production is recorded manually.
+- Cement consumption is tracked manually.
+- Labour attendance is maintained separately.
+- Products remain under curing before sale.
 
 ### Future SKCP System
 
-The SKCP application will digitally record:
-- Daily production quantity
-- Product variants
-- Available stock
+The system will record:
+
+- Daily production
+- Product manufactured
+- Machine (Asset) used
+- Cement consumption
 - Production history
-- Quality status (if required)
 
-The system will additionally::
+Every production record will:
 
-- Manage labour master information.
-- Record daily attendance.
-- Automatically calculate weekly salary.
-- Manage production assets.
-- Track raw material consumption.
-- Maintain curing stock.
-- Maintain finished goods stock.
+- Reference exactly one Product
+- Reference exactly one Production Asset
+- Automatically create one initial Curing Stock batch
 
-## 7. Customer Order Workflow
+The curing batch may later be transferred fully or partially into Finished Goods Stock after curing is complete.
 
-The customer order workflow describes the process from customer enquiry to payment completion.
+---
 
-### Workflow
+# 7. Customer Order Workflow
 
 Customer Enquiry
         ↓
-Initial Stock Verification
+Stock Verified
         ↓
 Quotation Prepared
         ↓
-Customer Confits Order
+Customer Confirms
         ↓
 Sales Order Created
-        ↓
-Stock Reserved (Future)
         ↓
 Delivery Planned
         ↓
 Transport Arranged
         ↓
-Products Delivered
+Delivery
         ↓
-Payment Received
-        ↓
-Pending Balance Updated
+Payment
 
-### Current Process
+---
 
-- Customer contacts the business for product availability.
-- Stock is verified manually.
-- A quotation is prepared based on available stock.
-- Once confirmed, products are prepared for delivery.
-- Delivery is arranged using an external transport provider.
-- Payments are recorded manually in a notebook.
-
-### Future SKCP System
-
-The SKCP application will:
-
-- Maintain customer records.
-- Generate digital quotations.
-- Record customer orders.
-- Track order status.
-- Calculate pending balances automatically.
-
-## 8. Payment Workflow
-
-The payment workflow manages customer payments and outstanding balances.
-
-### Workflow
+# 8. Payment Workflow
 
 Order Created
         ↓
-Invoice Generated
-        ↓
-Customer Pays
-
-        ├── Full Payment
-        │       ↓
-        │   Order Closed
-        │
-        └── Partial Payment
-                ↓
-        Payment Received
-                ↓
-        Payment Allocation
-                ↓
-        Pending Balance Updated
-                ↓
-        Future Reminder
-
-### Current Process
-
-- Payments are recorded manually.
-- Pending balances are calculated manually.
-- Follow-up depends on manual records.
-
-### Future SKCP System
-
-The application will:
-
-- Record every payment.
-- Calculate pending balances automatically.
-- Maintain complete payment history.
-- Generate payment reminders.
-
-## 9. Delivery Workflow
-
-The delivery workflow describes how products reach customers after order confirmation.
-
-### Workflow
-
-Customer Confirms Order
-        ↓
-Transport Vehicle Contacted
-        ↓
-Products Loaded
-        ↓
-Cutomer Confirms Order
-        ↓
-Products Picked from Finished Goods Stock
-↓
-Transport Arranged
-        ↓
-Products Delivered
-        ↓
-Finished Goods Stock Updated
-        ↓
 Customer Payment
-
-### Current Process
-
-- Transport is arranged using external vehicle owners.
-- Delivery charges are calculated separately.
-- Delivery details are maintained manually.
-
-### Future SKCP System
-
-The application will:
-
-- Record transport details.
-- Record delivery charges.
-- Maintain delivery history.
-- Track delivery status.
-
-## 10. Stock Management Workflow
-
-Stock management ensures sufficient inventory is available before accepting customer orders.
-
-### Workflow
-
-Raw Material Stock
         ↓
-Production
+Payment Recorded
         ↓
-Curing Stock
+Payment Allocation
         ↓
-Finished Goods Stock
+Outstanding Balance Updated
+
+One payment may settle multiple orders.
+
+One order may receive multiple installment payments.
+
+The system manages this using the Payment Allocation bridge table.
+
+---
+
+# 9. Delivery Workflow
+
+Customer Order
+        ↓
+Finished Goods Stock Verified
+        ↓
+Products Issued
+        ↓
+Transport Arranged
         ↓
 Customer Delivery
         ↓
-Finished Goods Updated
-        ↓
-Customer Order
-        ↓
-Stock Reduced
-        ↓
-Remaining Stock Updated
+Finished Goods Stock Updated
 
-### Current Process
+---
 
-- Stock counting is performed manually.
-- Daily production is added to available stock.
-- Stock is reduced after product delivery.
+# 10. Stock Management Workflow
 
-### Future SKCP System
+Supplier
+      │
+      ▼
+Purchase
+      │
+      ▼
+PurchaseItem
+      │
+      ▼
+RawMaterialStock
+      │
+      ▼
+Production
+      │
+      ▼
+CuringStock
+      │
+      ▼
+FinishedGoodsStock
+      │
+      ▼
+Delivery
 
-The application will:
+Inventory tables always store the **current stock position**.
 
-- Maintain real-time stock.
-- Track stock movement.
-- Generate stock reports.
-- Notify low stock levels (Future Enhancement).
+Historical movement is preserved in Procurement, Production and Delivery transactions.
 
-        Supplier
-        │
-        ▼
-        Purchase
-        │
-        ▼
-        Raw Material Stock
-        │
-        ▼
-        Production (Asset)
-        │
-        ▼
-        Curing Stock
-        │
-        ▼
-        Finished Goods Stock
-        │
-        ▼
-        Customer Order
-        │
-        ▼
-        Delivery
-        │
-        ▼
-        Payment
-        │
-        ▼
-        Payment Allocation
-        │
-        ▼
-        Business Reports
+---
 
+# 11. Business Rules
 
-## 11. Business Rules
+| Rule | Description |
+|------|-------------|
+| BR-001 | Customer must exist before Order creation. |
+| BR-002 | Supplier must exist before Purchase creation. |
+| BR-003 | Product must exist before Production. |
+| BR-004 | Raw Material must exist before Purchase. |
+| BR-005 | Labour attendance is independent of production. |
+| BR-006 | Every production record references exactly one Product. |
+| BR-007 | Every production record references exactly one Production Asset. |
+| BR-008 | Every production record creates exactly one initial Curing Stock batch. |
+| BR-009 | Curing batches may be partially transferred to Finished Goods Stock. |
+| BR-010 | Finished Goods Stock reduces immediately after Delivery. |
+| BR-011 | Every customer payment belongs to exactly one customer. |
+| BR-012 | Customer payments are allocated using Payment Allocation. |
+| BR-013 | One payment may settle multiple orders. |
+| BR-014 | One order may receive multiple payments. |
 
-### Description
+---
 
-Business Rules define the policies and conditions that govern how the SKCP business operates. These rules ensure that business processes are performed consistently and correctly.
+# 12. Business Constraints
 
-### Current Process
+| Constraint | Description |
+|------------|-------------|
+| BC-001 | Single manufacturing location |
+| BC-002 | Single Admin user |
+| BC-003 | Daily production |
+| BC-004 | External transport providers |
+| BC-005 | Inventory maintained digitally |
+| BC-006 | Current Inventory maintained separately from historical transactions |
 
-The business currently follows these rules based on experience and manual decision-making:
+---
 
-- Only quality-approved blocks are added to stock.
-- Stock availability is verified before accepting customer orders.
-- Transport charges are calculated separately from product costs.
-- Customers may have pending payments.
-- Discounts may be provided for large quantity orders.
-- Daily production is recorded manually.
+# 13. Business Risks
 
-### Future SKCP System
+| Risk | Mitigation |
+|------|------------|
+| Manual stock errors | Automated inventory |
+| Forgotten payments | Payment tracking |
+| Notebook loss | Database storage |
+| Incorrect calculations | Automated calculations |
+| Slow reporting | Automated reports |
+| Inventory inconsistency | Transaction-controlled stock updates |
 
-The SKCP application will enforce the following business rules automatically:
+---
 
-| Rule ID | Business Rule |
-|----------|---------------|
-| BR-001 | Only quality-approved blocks can be added to stock. |
-| BR-002 | Stock must be available before confirming an order. |
-| BR-003 | Transport charges are added separately. |
-| BR-004 | Customers may have pending payments. |
-| BR-005 | One customer can place multiple orders. |
-| BR-006 | One order can contain multiple block size variants. |
-| BR-007 | Discounts may be provided for large quantity orders. |
-| BR-008 | Daily production records shall be maintained. |ty orders. |
-| BR-008 | Daily production is recorded manually. |
-| BR-009 | Products must complete curing before becoming available for sale. |
-| BR-010 | Finished goods stock reduces immediately after delivery. |
-| BR-011 | Weekly labour salary is calculated based on attendance. |
-| BR-012 | Production is associated with the machine (asset) used. |
-| BR-013 | Every production record shall reference exactly one production asset (machine). |
-| BR-014 | Every production batch shall create a curing stock record. |
-| BR-015 | Customer payments shall be allocated to one or more customer orders. |
-
-## 12. Business Constraints
-
-### Description
-
-Business Constraints define the limitations and conditions within which the SKCP business currently operates. These constraints influence how the software must be designed.
-
-### Current Process
-
-The business currently operates with the following constraints:
-
-- Business operations are managed by a single Admin.
-- Manufacturing is performed at one location.
-- Transport is arranged through external vehicle providers.
-- Business records are maintained in physical notebooks.
-- Most calculations and reports are prepared manually.
-
-### Future SKCP System
-
-The SKCP application will be designed considering the following constraints:
-
-| ID | Business Constraint |
-|----|---------------------|
-| BC-001 | The business operates from a single manufacturing location. |
-| BC-002 | Version 1 supports one Admin user. |
-| BC-003 | Production is performed daily. |
-| BC-004 | Transport is arranged using external transport providers. |
-| BC-005 | Business data will be migrated from manual records to a digital system. |
-
-## 13. Business Risks
-
-### Description
-
-Business Risks identify potential issues that could negatively impact daily operations. Understanding these risks helps design features that reduce or eliminate them.
-
-### Current Process
-
-The current manual process introduces several operational risks:
-
-- Stock quantities may be miscalculated.
-- Pending customer payments may be forgotten.
-- Business notebooks may be damaged or lost.
-- Manual calculations may result in errors.
-- Business reports require significant manual effort.
-
-### Future SKCP System
-
-The SKCP application will reduce these risks through the following measures:
-
-| Risk ID | Business Risk | Mitigation |
-|----------|---------------|------------|
-| BRISK-001 | Manual stock calculation errors | Digital stock management |
-| BRISK-002 | Pending payments forgotten | Automatic payment tracking |
-| BRISK-003 | Notebook damage or loss | Secure database storage and backups |
-| BRISK-004 | Manual calculation mistakes | Automated calculations |
-| BRISK-005 | Delayed business reporting | Automatic report generation |
-
-
-## 14. Functional Requirements
-
-Functional Requirements describe what the SKCP application must do to support the business operations.
+# 14. Functional Requirements
 
 | ID | Requirement |
 |----|-------------|
-| FR-001 | The system shall manage customers. |
-| FR-002 | The system shall manage cement block products. |
-| FR-003 | The system shall maintain stock for all product variants. |
-| FR-004 | The system shall create quotations for customers. |
-| FR-005 | The system shall create customer orders. |
-| FR-006 | The system shall record deliveries. |
-| FR-007 | The system shall record customer payments. |
-| FR-008 | The system shall calculate pending balances automatically. |
-| FR-009 | The system shall generate monthly and yearly business reports. |
-| FR-010 | The system shall maintain daily production records. |
-| FR-011 | The system shall manage labour information. |
-| FR-012 | The system shall maintain daily labour attendance. |
-| FR-013 | The system shall manage production assets and machines. |
-| FR-014 | The system shall maintain raw material stock. |
-| FR-015 | The system shall maintain curing stock. |
-| FR-016 | The system shall maintain finished goods stock. |
-| FR-017 | The system shall calculate weekly labour salary automatically. |
-| FR-018 | The system shall allocate customer payments to customer orders. |
-| FR-019 | The system shall maintain curing stock separately from finished goods stock. |
-| FR-020 | The system shall associate every production record with a production asset. |
+| FR-001 | Manage Customers |
+| FR-002 | Manage Suppliers |
+| FR-003 | Manage Products |
+| FR-004 | Manage Raw Materials |
+| FR-005 | Manage Assets |
+| FR-006 | Record Purchases |
+| FR-007 | Record Production |
+| FR-008 | Maintain Labour Attendance |
+| FR-009 | Maintain Raw Material Stock |
+| FR-010 | Maintain Curing Stock |
+| FR-011 | Maintain Finished Goods Stock |
+| FR-012 | Manage Customer Orders |
+| FR-013 | Manage Deliveries |
+| FR-014 | Manage Customer Payments |
+| FR-015 | Allocate Payments to Orders |
+| FR-016 | Generate Business Reports |
+| FR-017 | Associate every Production with exactly one Asset |
+| FR-018 | Automatically create one Curing Batch for every Production |
+| FR-019 | Maintain Current Inventory separately from Transaction History |
+| FR-020 | Support Future AI Analytics |
 
-### Current Process
+---
 
-- Customer information is maintained manually.
-- Product details are recorded in notebooks.
-- Stock quantities are counted manually.
-- Quotations are prepared manually.
-- Orders are recorded manually.
-- Deliveries are tracked manually.
-- Payments are recorded manually.
-- Pending balances are calculated manually.
-- Monthly and yearly reports are prepared manually.
-- Daily production records are maintained in notebooks.
-
-### Future SKCP System
-
-The SKCP application will:
-
-- Manage customer information digitally.
-- Maintain product and pricing information.
-- Track stock automatically.
-- Generate quotations digitally.
-- Record customer orders.
-- Maintain delivery history.
-- Record all customer payments.
-- Calculate pending balances automatically.
-- Generate monthly and yearly reports.
-- Maintain complete production history.
-
-## 15. Non-Functional Requirements
-
-Non-Functional Requirements describe how well the SKCP application should perform and the quality standards it should maintain.
+# 15. Non Functional Requirements
 
 | ID | Requirement |
 |----|-------------|
-| NFR-001 | The application shall provide a simple and user-friendly interface. |
-| NFR-002 | The application shall be accessible through a web browser. |
-| NFR-003 | Business data shall be stored securely. |
-| NFR-004 | The application shall support future AI features. |
-| NFR-005 | The application shall provide fast response during daily operations. |
-| NFR-006 | The application shall be designed for future business growth. |
+| NFR-001 | Business-first architecture |
+| NFR-002 | Third Normal Form (3NF) |
+| NFR-003 | Secure business data |
+| NFR-004 | High maintainability |
+| NFR-005 | Fast inventory lookup |
+| NFR-006 | Preserve historical transactions |
+| NFR-007 | Scalable architecture |
+| NFR-008 | Future AI-ready |
 
-### Current Process
+---
 
-- Business records are maintained in physical notebooks.
-- Information retrieval is time-consuming.
-- Business calculations are performed manually.
-- Reports require manual effort.
-- There is no centralized digital storage.
-- Future expansion is difficult using manual processes.
+# Architecture Quality Checklist
 
-### Future SKCP System
-
-The SKCP application will:
-
-- Provide a simple and easy-to-use interface for the Admin.
-- Be accessible from any supported web browser.
-- Store business information securely in a database.
-- Be designed to integrate future AI capabilities.
-- Respond quickly during everyday operations.
-- Support additional features and business growth without major redesign.
-
-
-## Architecture Quality Checklist
-
-- [x] A new developer can understand this document without asking questions.
-- [x] The document describes the business, not the implementation.
-- [x] The document can be easily updated if the business changes.
-- [x] Manufacturing lifecycle includes Production → Curing → Finished Goods.
-- [x] Labour management workflow documented.
-- [x] Inventory lifecycle documented.
-- [x] Production Asset workflow documented.
-- [x] Curing Stock workflow documented.
-- [x] Payment Allocation workflow documented.
-- [x] Database architecture aligned with business workflow.
-- [x] Module 3 logical database design synchronized.
+- [x] Business workflow documented
+- [x] Procurement workflow documented
+- [x] Production workflow documented
+- [x] Production Asset workflow documented
+- [x] Inventory lifecycle documented
+- [x] Curing Stock documented
+- [x] Finished Goods documented
+- [x] Customer Order workflow documented
+- [x] Delivery workflow documented
+- [x] Payment Allocation workflow documented
+- [x] Current Inventory model documented
+- [x] Master–Transaction separation documented
+- [x] Database architecture synchronized
+- [x] Module 3 completely aligned

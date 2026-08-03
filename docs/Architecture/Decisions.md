@@ -2,9 +2,9 @@
 
 **Project:** SKCP (Shree Kundodari Cement Products) 
 
-**Version:** 1.2
+**Version:** 2.0
 
-**Status:** Active
+**Status:** Module 3 Frozen
 
 **Author:** Harish Kamat
 
@@ -18,16 +18,48 @@
 
 # Purpose
 
-This document records all major architectural and engineering decisions made during the development of SKCP.
-
+This document records every significant architectural decision made throughout the SKCP project.
+ADR-026
 Each Architecture Decision Record (ADR) captures:
 
 - Context
 - Decision
-- Reason
-- Expected Impact
+- Rationale
+- Consequences
+- Alternatives
+- Business Rules
+- Impact
 
-This document serves as a permanent technical reference for the project.
+The ADRs preserve architectural knowledge and explain why major design decisions were made.
+
+---
+# ADR Categories
+
+The Architecture Decision Log is organized into two categories.
+
+## General Architecture Decisions
+
+These define the long-term architectural philosophy of the SKCP system.
+
+Examples:
+
+- Business First
+- Business Domains
+- Inventory Philosophy
+- Header–Detail Pattern
+
+---
+
+## Database Architecture Decisions
+
+These document database-specific design decisions.
+
+Examples:
+
+- Master–Transaction Separation
+- Current Inventory Model
+- Payment Allocation Bridge
+- Header–Detail Pattern
 
 ---
 
@@ -722,7 +754,238 @@ Positive:
 - Future-ready architecture
 - Better operational analytics
 - Improved maintenance support
+# ADR-DB-003
 
+# Title
+
+Maintain Current Inventory Separately from Historical Transactions
+
+---
+
+## Status
+
+✅ Accepted
+
+---
+
+## Date
+
+31-Jul-2026
+
+---
+
+## Context
+
+SKCP requires fast access to the current inventory position while preserving the complete business history.
+
+The business needs to answer questions such as:
+
+- How much cement is available right now?
+- How many blocks are currently curing?
+- How many finished blocks are available for sale?
+
+At the same time, the system must preserve:
+
+- Purchase history
+- Production history
+- Delivery history
+
+Using transaction tables alone would require expensive calculations every time current stock is requested.
+
+---
+
+## Decision
+
+Separate inventory into **Current Inventory Tables** and **Historical Transaction Tables**.
+
+Current Inventory Tables
+
+• RawMaterialStock – Current raw material availability
+
+• CuringStock – Current products under curing
+
+• FinishedGoodsStock – Current finished goods available for sale
+
+Historical Transaction Tables
+
+- Purchase
+- PurchaseItem
+- Production
+- Delivery
+- DeliveryItem
+
+Current stock is updated automatically whenever a business transaction occurs.
+
+---
+
+## Rationale
+
+This design provides:
+
+- Fast inventory lookup
+- Complete transaction history
+- Simple reporting
+- Better scalability
+- Reduced query complexity
+
+- Instead of calculating stock from thousands of historical transactions every time, the application simply reads the current stock tables.
+
+- Inventory tables are snapshot tables.
+      They store only the latest business state, while historical movements remain in transaction tables.
+      This separation improves query performance and simplifies reporting.
+
+---
+
+## Inventory Flow
+
+```
+Purchase
+      │
+      ▼
+PurchaseItem
+      │
+      ▼
+RawMaterialStock
+      │
+      ▼
+Production
+      │
+      ▼
+CuringStock
+      │
+      ▼
+FinishedGoodsStock
+      │
+      ▼
+Delivery
+      │
+      ▼
+DeliveryItem
+```
+
+---
+
+## Consequences
+
+### Positive
+
+- Real-time inventory lookup
+- Historical transactions never modified
+- Better reporting performance
+- Easier backend implementation
+- Supports future AI forecasting
+
+### Negative
+
+- Negative
+
+• Inventory tables must always remain synchronized with business transactions.
+
+• Inventory updates should be performed within a single database transaction to prevent inconsistent stock balances
+
+• Requires transactional updates to prevent inconsistencies.
+
+---
+
+## Alternatives Considered
+
+### Option 1
+
+Calculate inventory from transaction history every time.
+
+**Rejected**
+
+Reason:
+
+- Slow queries
+- Complex calculations
+- Poor scalability
+
+---
+
+### Option 2
+
+Maintain dedicated inventory tables.
+
+**Accepted**
+
+Reason:
+
+Provides immediate inventory visibility while preserving a complete audit trail.
+
+---
+
+## Business Rules
+
+- RawMaterialStock stores only the current available quantity.
+- FinishedGoodsStock stores only sale-ready products.
+- CuringStock stores products currently under curing.
+- Purchase history is never deleted.
+- Production history is never deleted.
+- Delivery history is never deleted.
+- Inventory is updated automatically after each business transaction.
+- Current stock is system-maintained and updated only through business transactions.
+- Every Production record creates exactly one initial CuringStock record.
+- Products may be partially transferred from CuringStock to FinishedGoodsStock.
+
+      Production → CuringStock =     1:1
+
+      Product    → CuringStock =     1:N
+
+---
+
+## Impact
+
+Affected Tables
+
+- Purchase
+- PurchaseItem
+- Production
+- Delivery
+- DeliveryItem
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+Affected Documents
+
+- Database Relationship Summary
+- Master ER Diagram
+- PostgreSQL Physical Schema
+
+---
+
+Future Scope
+
+This architecture supports future implementation of:
+
+• Stock Ledger
+• Batch Tracking
+• Inventory Audit Trail
+• Automatic Reorder Alerts
+• AI Demand Forecasting
+• Material Consumption Analytics
+
+---
+
+
+## Decision Owner
+
+Harish Kamat
+
+---
+
+## Review Status
+
+✅ Approved
+
+---
+
+## Related Documents
+
+- Database_Relationship_Summary.md
+- Master_ER_Diagram.md
+- PostgreSQL_Schema.sql
 ---
 # ADR-022 : Business Domains Shall Organize the Entire ERP
 
@@ -813,17 +1076,14 @@ Positive:
 
 ## Current Status
 
-As of **30 July 2026**, the Architecture Decision Log contains **23 accepted Architecture Decision Records (ADRs)** covering:
+As of **31 July 2026**, the Architecture Decision Log contains:
 
-- Business Architecture
-- Software Architecture
-- Database Architecture
-- Inventory Philosophy
-- Normalization Principles
-- Business Domains
-- Future Scalability
+- 29 General Architecture Decisions (ADR-001 → ADR-029)
+- 4 Database Architecture Decisions (ADR-DB-001 → ADR-DB-004)
 
-These ADRs collectively form the architectural foundation of the SKCP ERP and shall guide all future development activities.
+These decisions collectively define the permanent architectural foundation of the SKCP ERP.
+
+All future modules shall remain aligned with these approved decisions.
 
 ---
 
@@ -897,64 +1157,275 @@ Positive
 
 Accepted
 
-## Context
+# ADR-DB-002
 
-Customers may pay one order through multiple payments, or one payment may settle multiple orders.
+# Title
 
-## Decision
+Resolve Customer Payment and Order Relationship using PaymentAllocation Bridge Table
 
-PaymentAllocation shall act as the bridge table between Payment and Order.
-
-## Reason
-
-Supports:
-
-- Partial Payments
-- Installment Payments
-- One payment across multiple orders
-
-## Impact
-
-Positive
-
-- Flexible finance module
-- Accurate outstanding balance
-- Complete payment history
 ---
-# ADR-026 : Current Stock Shall Not Store Historical Transactions
-
-## Date
-
-2026-07-31
 
 ## Status
 
+✅ Accepted
+
+---
+
+## ADR ID
+
+ADR-DB-002
+
+---
+
+## Module
+
+Module 3 – Database Design
+
+---
+
+## Version
+
+2.0
+
+---
+
+## Date
+
+31-Jul-2026
+
+---
+
+## Author
+
+Harish Kamat
+
+---
+
+# Context
+
+Customers rarely pay exactly one order at a time.
+
+Typical business scenarios include:
+
+- One payment settles multiple pending orders.
+- One order is paid through multiple installments.
+- Customers pay partially today and later complete the balance.
+- Customers make advance payments that are adjusted later.
+
+These scenarios create a **many-to-many relationship** between **Payments** and **Orders**.
+
+A direct foreign key between the two tables cannot support these real-world business requirements.
+
+---
+
+# Problem
+
+Without an intermediate table:
+
+```
+Payment
+    │
+    ▼
+ Order
+```
+
+the system would be limited to:
+
+- One payment → One order
+
+or
+
+- One order → One payment
+
+Neither model represents actual business operations at SKCP.
+
+---
+
+# Decision
+
+Introduce a dedicated bridge table:
+
+**PaymentAllocation**
+
+Final relationship:
+
+```
+Customer
+     │
+     ▼
+ Payment
+     │
+     ▼
+PaymentAllocation
+     │
+     ▼
+   Order
+```
+
+This bridge resolves the many-to-many relationship while preserving complete financial traceability.
+
+---
+
+# Relationship Summary
+
+| Parent | Child | Cardinality |
+|----------|--------|------------|
+| Customer | Payment | 1 : N |
+| Payment | PaymentAllocation | 1 : N |
+| Order | PaymentAllocation | 1 : N |
+
+---
+
+# Rationale
+
+Using a bridge table provides maximum flexibility while maintaining normalization.
+
+It supports:
+
+- Partial payments
+- Installment payments
+- Multiple order settlement
+- Multiple payments against one order
+- Accurate outstanding balance calculation
+- Complete audit history
+- Future AI-based payment analysis
+- Future customer credit analysis
+
+---
+
+# Alternatives Considered
+
+## Option 1
+
+Store **OrderID** inside **Payment**
+
+Rejected
+
+Reason:
+
+One payment could belong to only one order.
+
+Fails for:
+
+- Multiple order settlement
+
+---
+
+## Option 2
+
+Store **PaymentID** inside **Order**
+
+Rejected
+
+Reason:
+
+One order could receive only one payment.
+
+Fails for:
+
+- Installment payments
+
+---
+
+## Option 3
+
+PaymentAllocation Bridge Table
+
 Accepted
 
-## Context
+Reason:
 
-Inventory queries are frequent while historical transaction reports are occasional.
+Supports every real-world payment scenario while keeping the database normalized.
 
-## Decision
-
-Current stock tables shall only store the latest inventory position.
-
-Historical movement remains in transaction tables.
-
-## Reason
-
-Improves:
-
-- Performance
-- Simplicity
-- Inventory lookup
-
-## Impact
-
-Positive
-
-Real-time inventory becomes extremely fast.
 ---
+
+# Business Rules
+
+- Every Payment belongs to exactly one Customer.
+- Every PaymentAllocation belongs to exactly one Payment.
+- Every PaymentAllocation belongs to exactly one Order.
+- One Payment may allocate money across multiple Orders.
+- One Order may receive multiple Payments.
+- Allocation Amount must always be greater than zero.
+- Total allocated amount should never exceed the payment amount.
+- Outstanding Amount is calculated dynamically.
+- Allocation records are generated by the application, not manually.
+
+---
+
+# Benefits
+
+- Eliminates many-to-many ambiguity
+- Supports flexible payment behaviour
+- Maintains Third Normal Form (3NF)
+- Preserves complete payment history
+- Simplifies pending payment calculation
+- Supports future financial reporting
+- Supports future AI modules
+
+---
+
+# Impact
+
+Affected Tables
+
+- Customer
+- Payment
+- PaymentAllocation
+- Orders
+
+Affected Documents
+
+- Database Relationship Summary
+- Master ER Diagram
+- PostgreSQL Schema
+- Finance Domain Documentation
+- Spring Boot Entity Design
+
+---
+
+# Architecture Principle
+
+```
+Customer
+
+        │
+
+        ▼
+
+     Payment
+
+        │
+
+        ▼
+
+ PaymentAllocation
+
+        │
+
+        ▼
+
+      Orders
+```
+
+The bridge table separates financial transactions from commercial transactions, ensuring both remain independently auditable.
+
+---
+
+# Review Status
+
+✅ Approved
+
+---
+
+# Related Documents
+
+- Database_Relationship_Summary.md
+- Master_ER_Diagram.md
+- PostgreSQL_Schema.sql
+- Database_Data_Dictionary.md
+---
+
 # ADR-026 : Current Stock Shall Not Store Historical Transactions
 
 ## Date
@@ -1104,5 +1575,28 @@ Positive
 
 Simpler maintenance and onboarding.
 ---
+ADR-DB-001 Header Detail Pattern
+
+ADR-DB-002 Payment Allocation Bridge
+
+ADR-DB-003 Current Inventory Model
+
+ADR-DB-004 Master Transaction Separation
+
+---
+
+------------------------------------------------------------
+
+The Architecture Decision Log is a living document.
+
+Future architectural decisions shall continue to be documented here as the SKCP ERP evolves.
+
+Version: 2.0
+
+Status:
+✅ Module 3 Frozen
+
+Next Update:
+Module 4 – Backend Development
 
 **End of Architecture Decision Log**

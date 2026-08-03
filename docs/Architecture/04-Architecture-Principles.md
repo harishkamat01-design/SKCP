@@ -4,9 +4,9 @@
 
 **Module:** 2 – Software Architecture
 
-**Version:** 1.2
+**Version:** 2.0
 
-**Status:** Updated
+**Status:** Module 2 Frozen
 
 **Last Updated:** 2026-07-31
 
@@ -100,18 +100,7 @@ It should provide meaningful information that supports better business decisions
 
 # Principle 8 – Modular Design
 
-Each business domain should remain independent while collaborating with other domains.
-
-Core business domains:
-
-- Master Data
-- Procurement
-- Production
-- Inventory
-- Sales
-- Finance
-
-Each domain owns its own business responsibilities while collaborating through validated foreign-key relationships.
+Each business domain should remain independent while collaborating with other domains through validated foreign-key relationships.
 
 The six business domains are:
 
@@ -121,7 +110,8 @@ The six business domains are:
 - Inventory
 - Sales
 - Finance
----
+
+Each domain owns its business responsibilities while exposing only the data required by other domains.
 
 # Principle 9 – Documentation Before Implementation
 
@@ -321,25 +311,26 @@ Historical transaction tables explain how that quantity was reached.
 Example:
 
 Purchase
-
-↓
-
+      │
+      ▼
+PurchaseItem
+      │
+      ▼
 RawMaterialStock
-
-↓
-
+      │
+      ▼
 Production
-
-↓
-
+      │
+      ▼
 CuringStock
-
-↓
-
+      │
+      ▼
 FinishedGoodsStock
-
-↓
-
+      │
+      ▼
+Customer Order
+      │
+      ▼
 Delivery
 
 ### Benefit
@@ -360,15 +351,16 @@ Design today's solution while leaving clean extension points for tomorrow.
 
 ### Explanation
 
-Version 1 should solve today's business problems without introducing unnecessary complexity.
+Version 1 intentionally keeps the database simple while remaining scalable.
 
-However, the architecture should make it easy to support future enhancements such as:
+Future enhancements may include:
 
-- Machine maintenance
-- Batch traceability
-- Delivery confirmation
-- AI recommendations
-- Multiple factories
+- Machine Maintenance
+- Batch Traceability
+- Delivery Confirmation
+- AI Recommendations
+- Multiple Factory Locations
+- GST & Accounting Integration
 
 The goal is to prepare for future growth without introducing unnecessary complexity into Version 1.
 
@@ -421,10 +413,12 @@ Every significant decision should be documented as an Architecture Decision Reco
 
 Examples include:
 
-- Production references Asset
-- Payment Allocation bridge table
-- Current Inventory Model
-- Master–Transaction Separation
+- ADR-DB-001 – Production References Asset
+- ADR-DB-002 – Payment Allocation Bridge
+- ADR-DB-003 – Current Inventory Model
+- ADR-DB-004 – Master–Transaction Separation
+
+These ADRs are maintained inside the docs/adr directory.
 
 Each ADR records:
 
@@ -443,6 +437,37 @@ Each ADR records:
 
 ---
 
+# Principle 19
+
+## Business Rules Live in the Backend
+
+### Statement
+
+Business rules should be enforced by the backend rather than relying on the frontend.
+
+### Explanation
+
+The frontend is responsible for collecting user input.
+
+The backend validates business rules such as:
+
+- Stock availability
+- Payment allocation
+- Production updates
+- Inventory movement
+- Customer balance calculations
+
+This ensures consistent behavior regardless of how the system is accessed.
+
+### Benefit
+
+- Strong data integrity
+- Consistent business logic
+- Easier maintenance
+- Supports future APIs and AI integrations
+
+
+
 # One-Line Memory
 
-A strong architecture is built on stable principles, not changing technologies.
+Good architecture begins with understanding the business, transforms it into a maintainable system, and enables future growth without redesign.

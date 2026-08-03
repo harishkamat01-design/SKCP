@@ -68,19 +68,27 @@ RawMaterial
 # 3. Production
 
 ```
-Product
-    │
-    │ 1:N
-    ▼
+          Product
+             │
+             │ 1:N
+             ▼
+        Production
+        ▲        ▲
+        │        │
+      N:1      N:1
+        │        │
+     Asset     Product
+
 Production
-▲        │
-│        │
-│        ▼
-Asset   CuringStock
-          ▲
-          │
-          │
-       Product
+     │
+     │ 1:1
+     ▼
+CuringStock
+     ▲
+     │
+     │ N:1
+     │
+  Product
 ```
 
 Labour Attendance remains an independent business process.
@@ -100,15 +108,24 @@ Attendance
 ```
 RawMaterial
       │
-      │ 1:1
+      │1:1
       ▼
 RawMaterialStock
 
 Production
       │
+      │1:1
       ▼
 CuringStock
+      ▲
       │
+      │N:1
+      │
+   Product
+
+Product
+      │
+      │1:1
       ▼
 FinishedGoodsStock
 ```

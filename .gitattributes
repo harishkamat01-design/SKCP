@@ -1,12 +1,13 @@
-# ---------------------------------------
+# ============================================
 # SKCP Git Attributes
-# ---------------------------------------
+# ============================================
 
 # Automatically detect text files and normalize line endings
 * text=auto
 
-# Markdown
-*.md text
+# ============================================
+# Source Code
+# ============================================
 
 # Java
 *.java text
@@ -21,23 +22,45 @@
 *.ts text
 *.tsx text
 
-# JSON
-*.json text
-
 # HTML
 *.html text
 
 # CSS
 *.css text
 
+# ============================================
+# Configuration Files
+# ============================================
+
+# JSON
+*.json text
+
 # YAML
 *.yml text
 *.yaml text
 
-# Shell scripts
+# Spring Boot Properties
+*.properties text
+
+# XML (pom.xml, configuration files)
+*.xml text
+
+# Markdown
+*.md text
+
+# Git configuration files
+.gitattributes text
+.gitignore text
+
+# ============================================
+# Scripts
+# ============================================
+
+# Shell scripts (Linux/macOS)
 *.sh text eol=lf
 
 # Windows batch files
 *.bat text eol=crlf
 
-
+# Windows command files (Maven Wrapper)
+*.cmd text eol=crlf

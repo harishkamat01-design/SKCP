@@ -6,6 +6,24 @@ Separate Master Data from Transaction Data
 
 ---
 
+## ADR ID
+
+ADR-DB-004
+
+---
+
+## Module
+
+Module 3 – Database Design
+
+---
+
+## Version
+
+2.0
+
+---
+
 ## Status
 
 ✅ Accepted
@@ -18,7 +36,13 @@ Separate Master Data from Transaction Data
 
 ---
 
-## Context
+## Author
+
+Harish Kamat
+
+---
+
+# Context
 
 The SKCP system manages two fundamentally different types of information:
 
@@ -36,11 +60,23 @@ The database architecture must clearly distinguish long-lived business entities 
 
 ---
 
-## Decision
+# Architecture Principle
 
-The database shall be divided into two major categories:
+SKCP follows a **Business-First Database Design**.
 
-### Master Data
+Business entities (people, products, suppliers, assets) are stored separately from business events (orders, purchases, production, deliveries, and payments).
+
+This separation keeps business identities stable while allowing business transactions to grow indefinitely.
+
+---
+
+# Decision
+
+The database shall be divided into three major categories.
+
+---
+
+## Master Data
 
 Stores permanent business entities.
 
@@ -55,7 +91,7 @@ Examples:
 
 ---
 
-### Transaction Data
+## Transaction Data
 
 Stores business events that occur over time.
 
@@ -65,7 +101,7 @@ Examples:
 - PurchaseItem
 - Production
 - Attendance
-- Order
+- Orders
 - OrderItem
 - Delivery
 - DeliveryItem
@@ -74,9 +110,9 @@ Examples:
 
 ---
 
-### Inventory Tables
+## Inventory
 
-Inventory tables maintain the current business position while transaction tables preserve historical records.
+Inventory tables maintain the **current business position**, while transaction tables preserve historical records.
 
 Examples:
 
@@ -86,12 +122,12 @@ Examples:
 
 ---
 
-## Rationale
+# Rationale
 
 This separation provides:
 
 - Reduced data duplication
-- Better normalization
+- Better normalization (Third Normal Form)
 - Easier maintenance
 - Clear business ownership
 - Faster reporting
@@ -100,69 +136,98 @@ This separation provides:
 
 Master information is entered once and referenced everywhere using foreign keys.
 
+Inventory is maintained as a separate **current-state layer** instead of recalculating stock from historical transactions.
+
+This significantly improves reporting performance and simplifies backend processing.
+
 ---
 
-## Design Principle
+# Design Principle
 
-```
+```text
+Business
+
+        │
+
+        ▼
+
 Master Data
 
         │
-
-Referenced By
-
-        │
+        │ Referenced By
+        ▼
 
 Transaction Data
 
         │
-
-Updates
-
-        │
+        │ Updates
+        ▼
 
 Inventory
+
+        │
+        ▼
+
+Reports
+
+        │
+        ▼
+
+AI
 ```
 
 ---
 
-## Consequences
+# Consequences
 
-### Positive
+## Positive
 
 - Customer information exists only once.
-- Product information exists only once.
 - Supplier information exists only once.
-- Transaction history remains immutable.
-- Easier auditing.
+- Product information exists only once.
+- Asset information exists only once.
+- Reduced data redundancy.
+- Better normalization.
+- Complete audit trail.
+- Historical transactions remain immutable.
+- Faster reporting.
 - Cleaner database relationships.
+- Easier Spring Boot Entity mapping.
 - Simpler REST API design.
-- Easier implementation using Spring Data JPA.
-
-### Negative
-
-- Every transaction requires foreign key validation.
-- Master records must exist before transactions can be created.
+- Better scalability.
 
 ---
 
-## Business Rules
+## Negative
+
+- Every transaction requires foreign key validation.
+- Master records must exist before transactions can be created.
+- Inventory synchronization must be maintained by application logic.
+
+---
+
+# Business Rules
 
 - Every Customer must exist before an Order is created.
 - Every Supplier must exist before a Purchase is created.
 - Every Product must exist before Production or Sales.
 - Every Raw Material must exist before Procurement.
+- Every Labour must exist before Attendance is recorded.
+- Every Asset must exist before Production is recorded.
+- Master records own business identities.
+- Transaction records reference Master Data using foreign keys.
+- Inventory is maintained from transaction processing.
 - Transactions never duplicate master information.
-- Master records may be updated without affecting historical transactions.
+- Historical transaction records are immutable.
 - Transaction history is never deleted.
 
 ---
 
-## Alternatives Considered
+# Alternatives Considered
 
-### Option 1
+## Option 1
 
-Store customer, supplier, and product information directly inside transaction tables.
+Store customer, supplier, product, and asset information directly inside transaction tables.
 
 **Rejected**
 
@@ -171,25 +236,25 @@ Reason:
 - High redundancy
 - Update anomalies
 - Difficult maintenance
-- Violates normalization principles
+- Violates Third Normal Form (3NF)
 
 ---
 
-### Option 2
+## Option 2
 
-Separate Master and Transaction tables.
+Separate Master Data and Transaction Data.
 
 **Accepted**
 
 Reason:
 
-Provides a normalized, scalable, and maintainable ERP database design.
+Provides a normalized, scalable, maintainable, and ERP-ready database architecture.
 
 ---
 
-## Impact
+# Impact
 
-Affected Tables
+## Affected Tables
 
 ### Master Data
 
@@ -206,7 +271,7 @@ Affected Tables
 - PurchaseItem
 - Production
 - Attendance
-- Order
+- Orders
 - OrderItem
 - Delivery
 - DeliveryItem
@@ -221,7 +286,30 @@ Affected Tables
 
 ---
 
-## Related Documents
+# Future Benefits
+
+This architecture supports future implementation of:
+
+- AI Forecasting
+- Dashboard Analytics
+- Mobile Application
+- Multi-user Support
+- Multi-factory Expansion
+- ERP Reporting
+- Business Intelligence
+- Predictive Analytics
+
+---
+
+# Decision Summary
+
+Separating Master Data, Transaction Data, and Inventory establishes a clean ERP architecture that is scalable, normalized, and aligned with real-world business operations.
+
+This decision forms one of the core architectural foundations of the SKCP system and will guide future backend, API, reporting, and AI development.
+
+---
+
+# Related Documents
 
 - Database_Data_Dictionary.md
 - Database_Relationship_Summary.md
@@ -230,12 +318,6 @@ Affected Tables
 
 ---
 
-## Decision Owner
-
-Harish Kamat
-
----
-
-## Review Status
+# Review Status
 
 ✅ Approved

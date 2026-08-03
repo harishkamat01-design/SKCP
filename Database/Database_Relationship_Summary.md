@@ -7,10 +7,10 @@ Document
 Database Relationship Summary
 
 Version
-2.1
+3.0
 
 Status
-✅ Module 3 Frozen
+✅ Module 3 Completed & Frozen (Version 1)
 
 Owner
 Database Architecture
@@ -22,7 +22,7 @@ Phase
 Phase 3 – Database Relationship Design
 
 Last Updated
-31 July 2026
+02 August 2026
 
 ---
 
@@ -43,6 +43,21 @@ This document is used to build:
 - PostgreSQL Schema
 - Spring Boot JPA Entities
 - Backend APIs
+---
+
+## Document Objective
+
+This document is the authoritative reference for every relationship in the SKCP database.
+
+It explains:
+
+- Parent–Child ownership
+- Foreign Keys
+- Cardinality
+- Business dependency
+- Why each relationship exists
+
+Any future schema modification must be validated against this document before implementation. 
 
 ---
 
@@ -76,6 +91,17 @@ The SKCP database is organized into six business domains.
 Each domain owns a specific set of tables.
 
 ---
+
+## Relationship Legend
+
+| Symbol | Meaning |
+|---------|----------|
+| 1 : 1 | One record relates to exactly one record |
+| 1 : N | One record relates to many records |
+| FK | Foreign Key |
+| PK | Primary Key |
+
+---
 ## Database Relationship Statistics
 
 Total Tables: 19
@@ -90,12 +116,13 @@ Validated Relationships: 19
 
 Relationship Types
 
-• One-to-One Relationships : 2
-• One-to-Many Relationships : 17
+• One-to-One Relationships : 3
+
+• One-to-Many Relationships : 16
 
 Many-to-Many Relationships
 
-Resolved using bridge tables:
+Resolved using bridge table:
 • Payment ↔ Order → PaymentAllocation
 
 ---
@@ -348,7 +375,7 @@ This domain provides real-time inventory visibility while preserving historical 
 |---------------|-------------|-------------|-------------|-----------------|
 | RawMaterial | RawMaterialStock | 1 : 1 | RawMaterialID | Every raw material maintains one current stock record. |
 | Product | CuringStock | 1 : Many | ProductID | One product can have multiple curing batches over time. |
-| Production | CuringStock | 1 : Many | ProductionID | Every production record creates exactly one initial curing batch. That batch may later be partially transferred to Finished Goods Stock. |
+| Production | CuringStock | 1 : 1 | ProductionID | Every production record creates exactly one initial curing batch. That batch may later be partially transferred to Finished Goods Stock. |
 | Product | FinishedGoodsStock | 1 : 1 | ProductID | Every finished product maintains one current stock record. |
 
 ---
@@ -639,6 +666,34 @@ This is the master checklist.
 
 ---
 
+# Domain Dependency
+
+Master Data
+
+↓
+
+Procurement
+
+↓
+
+Production
+
+↓
+
+Inventory
+
+↓
+
+Sales
+
+↓
+
+Finance
+
+Every downstream domain depends on the stability of the previous domain.
+
+---
+
 ## Final Architect Summary
 
 The SKCP database relationship architecture was designed directly from real-world business operations rather than technical assumptions.
@@ -665,7 +720,19 @@ The validated relationship model now becomes the foundation for:
 
 ---
 
+---
 
+# Module Freeze Notice
+
+Module 3 is officially frozen for Version 1.
+
+No structural database changes shall be made unless:
+
+- Business requirements change
+- Architecture review approves
+- Version number is incremented
+
+This document now serves as the official relationship specification for the SKCP database.
 
 
 

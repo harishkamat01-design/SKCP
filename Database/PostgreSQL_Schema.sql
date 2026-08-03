@@ -35,7 +35,7 @@ SET search_path TO skcp;
 -- Create Tables
 
 -- ==========================================================
--- Table : customet
+-- Table : customer
 -- Domain: Master Data
 -- Purpose: Stores customer master information
 -- ==========================================================
@@ -441,7 +441,7 @@ CREATE TABLE raw_material_stock
 CREATE TABLE curing_stock
 (
     curing_stock_id SERIAL PRIMARY KEY,
-
+production_id INT NOT NULL UNIQUE, 
     product_id INT NOT NULL,
 
     quantity INT NOT NULL
@@ -449,7 +449,9 @@ CREATE TABLE curing_stock
 
     production_date DATE NOT NULL,
 
-    expected_ready_date DATE NOT NULL,
+    expected_ready_date DATE NOT NULL,  
+    /*  GENERATED ALWAYS AS
+        (production_date + INTERVAL '3 days') */
 
     status VARCHAR(10)
         NOT NULL
@@ -463,8 +465,12 @@ CREATE TABLE curing_stock
         DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_curing_product
-        FOREIGN KEY (product_id)
-        REFERENCES product(product_id)
+    FOREIGN KEY (product_id)
+    REFERENCES product(product_id),
+
+    CONSTRAINT fk_curing_production
+    FOREIGN KEY (production_id)
+    REFERENCES production(production_id)
 );
 
 -- ==========================================================
@@ -477,7 +483,7 @@ CREATE TABLE finished_goods_stock
 (
     finished_goods_stock_id SERIAL PRIMARY KEY,
 
-    product_id INT NOT NULL,
+    product_id INT NOT NULL UNIQUE,
 
     current_quantity INT NOT NULL DEFAULT 0,
 
@@ -721,39 +727,24 @@ CREATE TABLE payment
 );
 
 -- ==========================================================
--- Table : payment
+-- Table : payment_allocation
 -- Domain: Finance
--- Purpose: Stores customer payment transactions
+-- Purpose: Stores payment allocation against customer orders
 -- ==========================================================
 
-CREATE TABLE payment
+CREATE TABLE payment_allocation
 (
-    payment_id SERIAL PRIMARY KEY,
+    payment_allocation_id SERIAL PRIMARY KEY,
 
-    customer_id INT NOT NULL,
+    payment_id INT NOT NULL,
 
-    payment_date DATE NOT NULL,
+    order_id INT NOT NULL,
 
-    total_amount_received DECIMAL(12,2)
+    allocated_amount DECIMAL(12,2)
         NOT NULL
-        CHECK (total_amount_received > 0),
+        CHECK (allocated_amount > 0),
 
-    payment_mode VARCHAR(20)
-        NOT NULL
-        CHECK
-        (
-            payment_mode IN
-            (
-                'CASH',
-                'UPI',
-                'BANK_TRANSFER',
-                'CHEQUE'
-            )
-        ),
-
-    reference_number VARCHAR(100),
-
-    received_by VARCHAR(100) NOT NULL,
+    allocation_date DATE NOT NULL,
 
     remarks TEXT,
 
@@ -761,9 +752,13 @@ CREATE TABLE payment
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_payment_customer
-        FOREIGN KEY (customer_id)
-        REFERENCES customer(customer_id)
+    CONSTRAINT fk_paymentallocation_payment
+        FOREIGN KEY (payment_id)
+        REFERENCES payment(payment_id),
+
+    CONSTRAINT fk_paymentallocation_order
+        FOREIGN KEY (order_id)
+        REFERENCES orders(order_id)
 );
 
 

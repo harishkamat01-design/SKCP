@@ -4,6 +4,50 @@ This document contains the real words, phrases, and terminology used in the day-
 
 It serves as the common business language for developers, architects, testers, and future AI components.
 
+# SKCP Business Dictionary
+
+**Project:** SKCP – Shree Kundodari Cement Products
+
+**Document:** Business Dictionary
+
+**Module:** 1 – Business Analysis
+
+**Version:** 2.0
+
+**Status:** Module 1 Frozen
+
+**Author:** Harish Kamat
+
+**Reviewer:** Architect
+
+**Created On:** 24-Jul-2026
+
+**Last Updated:** 31-Jul-2026
+---
+
+# Purpose
+
+This document defines the standard business vocabulary used throughout the SKCP project.
+
+It establishes a single source of truth for business terminology across:
+
+- Business Analysis
+- Architecture
+- Database Design
+- Backend Development
+- Frontend Development
+- Reports
+- Future AI Features
+
+Using consistent terminology ensures that developers, architects, testers, and business users communicate using the same language.
+---
+
+# Scope
+
+This dictionary contains only business terms used in the daily operations of Shree Kundodari Cement Products.
+
+Technical terms such as API, Repository, DTO, SQL, or REST are intentionally excluded and documented separately in technical documentation.
+
 ---
 
 # Products
@@ -49,6 +93,24 @@ Stone aggregate used in the manufacturing process.
 
 Water used for mixing raw materials and curing blocks.
 
+---
+## Purchase
+
+A transaction used to procure raw materials from suppliers.
+
+A Purchase may contain multiple Purchase Items.
+
+---
+
+## Purchase Item
+
+An individual raw material line within a Purchase transaction.
+
+Each Purchase Item records:
+
+- Raw Material
+- Quantity
+- Purchase Rate
 ---
 
 # Production
@@ -239,10 +301,15 @@ SKU uniquely identifies a product throughout inventory, sales, and reporting.
 
 ## Inventory
 
-The current quantity of finished cement blocks available for sale.
+The complete physical stock maintained by the factory.
 
-Inventory increases through production and decreases through customer sales.
+Inventory exists in three stages:
 
+- Raw Material Stock
+- Curing Stock
+- Finished Goods Stock
+
+Inventory is automatically updated by business transactions and represents the current business position.
 ---
 
 ## Reserved Stock
@@ -260,6 +327,41 @@ Reserved Stock is not available for new customer orders.
 The minimum quantity of finished blocks that should always be available.
 
 When stock falls below this level, production should be scheduled.
+
+---
+## Order Item
+
+One product line within a customer order.
+
+Each Order Item stores:
+
+- Product
+- Quantity
+- Unit Price
+
+---
+
+## Delivery Item
+
+One product line delivered during a customer delivery.
+
+---
+
+## Production
+
+The business event of manufacturing cement blocks.
+
+Each Production record stores:
+
+- Product
+- Quantity Produced
+- Asset Used
+- Production Date
+
+
+## Production Batch
+
+One completed manufacturing cycle producing blocks of a specific product.
 
 ---
 
@@ -293,10 +395,14 @@ After the final settlement, the customer's pending payment becomes zero.
 
 ## Available Stock
 
-Finished blocks currently ready for immediate sale and delivery.
+Finished goods that are ready for immediate customer delivery.
 
-Available Stock excludes blocks that are reserved for existing customer orders.
+In Version 1, all Finished Goods are considered available because Reserved Stock is not yet implemented.
 
+Future versions may distinguish between:
+
+- Available Stock
+- Reserved Stock
 ---
 
 ## Production Batch
@@ -340,7 +446,9 @@ Represents blocks that have been produced but are still undergoing curing.
 
 These blocks are **not ready for sale**.
 
-The system recommends when they are ready, but the business owner confirms the movement to the Sales Yard.
+Blocks remain in Curing Stock until the business owner confirms that curing is complete.
+
+Only after confirmation are they transferred to Finished Goods Stock.
 
 ---
 
@@ -351,6 +459,15 @@ Represents blocks that are fully cured and available for sale.
 This stock is maintained as a single combined quantity for each product variant.
 
 When dispatching products, the business follows a practical **FIFO (First Cured, First Sold)** approach even though individual production batches are not tracked in Version 1.
+
+--
+## Finished Goods
+
+Cement blocks that have successfully completed curing and are available for customer sale.
+
+Finished Goods represent sale-ready inventory.
+
+
 
 ---
 
@@ -406,6 +523,9 @@ Attendance supports labour management and future productivity reporting.
 ## Payment Allocation
 
 The process of distributing one customer payment across one or more outstanding customer orders.
+Payment Allocation is automatically created by the system.
+
+Users never create allocation records manually.
 
 This enables:
 
@@ -444,6 +564,93 @@ Examples:
 Transaction tables preserve business history.
 
 ---
+## Business Insight
+
+Information generated from operational data that helps the business owner make better decisions.
+
+Future examples include:
+
+- Production recommendations
+- Low stock alerts
+- Pending payment reminders
+- Sales trends
+
+---
+
+## Header–Detail Pattern
+
+A standard ERP design where one business transaction contains multiple detail records.
+
+Examples:
+
+Purchase
+→ PurchaseItem
+
+Order
+→ OrderItem
+
+Delivery
+→ DeliveryItem
+
+Payment
+→ PaymentAllocation
+
+---
+
+## Business Domain
+
+A logical grouping of related business operations.
+
+The SKCP ERP consists of six business domains:
+
+- Master Data
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+
+---
+
+## Master Data
+
+Business entities that change infrequently and are referenced by transactions.
+
+Examples:
+
+- Customer
+- Product
+- Supplier
+- Labour
+- Asset
+
+---
+
+## Transaction Data
+
+Business events that occur over time.
+
+Examples:
+
+- Purchase
+- Production
+- Order
+- Delivery
+- Payment
+
+---
+
+## Current Inventory
+
+Tables that always represent the latest inventory position.
+
+Examples:
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+---
 
 # One-Line Memory
 
@@ -451,6 +658,14 @@ If someone uses these words inside the factory, SKCP should understand exactly w
 
 ---
 
-**Current Version:** 1.2  
-**Created On:** 24-Jul-2026  
-**Last Updated:** 30-Jul-2026
+---
+
+# Version Information
+
+**Version:** 2.0
+
+**Status:** Module 1 Frozen
+
+**Created On:** 24-Jul-2026
+
+**Last Updated:** 31-Jul-2026

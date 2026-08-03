@@ -2,7 +2,7 @@
 
 # Title
 
-Resolve Customer Payment and Order Relationship using Payment Allocation
+Resolve Customer Payment and Order Relationship using PaymentAllocation Bridge Table
 
 ---
 
@@ -12,33 +12,83 @@ Resolve Customer Payment and Order Relationship using Payment Allocation
 
 ---
 
+## ADR ID
+
+ADR-DB-002
+
+---
+
+## Module
+
+Module 3 – Database Design
+
+---
+
+## Version
+
+2.0
+
+---
+
 ## Date
 
 31-Jul-2026
 
 ---
 
-## Context
+## Author
 
-Customers frequently make payments that do not correspond to a single order.
-
-Typical business scenarios include:
-
-- One payment settling multiple pending orders.
-- One order being paid through multiple installments.
-- Customers making advance or partial payments.
-
-A direct relationship between **Payment** and **Order** cannot represent these business scenarios.
-
-The database design therefore required a mechanism to accurately record payment distribution while preserving financial traceability.
+Harish Kamat
 
 ---
 
-## Decision
+# Context
 
-Introduce a dedicated **PaymentAllocation** transaction table.
+Customers rarely pay exactly one order at a time.
 
-The relationship becomes:
+Typical business scenarios include:
+
+- One payment settles multiple pending orders.
+- One order is paid through multiple installments.
+- Customers pay partially today and later complete the balance.
+- Customers make advance payments that are adjusted later.
+
+These scenarios create a **many-to-many relationship** between **Payments** and **Orders**.
+
+A direct foreign key between the two tables cannot support these real-world business requirements.
+
+---
+
+# Problem
+
+Without an intermediate table:
+
+```
+Payment
+    │
+    ▼
+ Order
+```
+
+the system would be limited to:
+
+- One payment → One order
+
+or
+
+- One order → One payment
+
+Neither model represents actual business operations at SKCP.
+
+---
+
+# Decision
+
+Introduce a dedicated bridge table:
+
+**PaymentAllocation**
+
+Final relationship:
 
 ```
 Customer
@@ -53,79 +103,76 @@ PaymentAllocation
    Order
 ```
 
-This resolves the many-to-many relationship between Payments and Orders.
+This bridge resolves the many-to-many relationship while preserving complete financial traceability.
 
 ---
 
-## Rationale
+# Relationship Summary
+
+| Parent | Child | Cardinality |
+|----------|--------|------------|
+| Customer | Payment | 1 : N |
+| Payment | PaymentAllocation | 1 : N |
+| Order | PaymentAllocation | 1 : N |
+
+---
+
+# Rationale
 
 Using a bridge table provides maximum flexibility while maintaining normalization.
 
-It enables:
+It supports:
 
 - Partial payments
 - Installment payments
-- One payment settling multiple orders
-- Multiple payments settling one order
-- Accurate pending amount calculations
-- Complete payment audit trail
+- Multiple order settlement
+- Multiple payments against one order
+- Accurate outstanding balance calculation
+- Complete audit history
 - Future AI-based payment analysis
+- Future customer credit analysis
 
 ---
 
-## Consequences
+# Alternatives Considered
 
-### Positive
+## Option 1
 
-- Eliminates many-to-many complexity
-- Supports installment-based payments
-- Supports multi-order settlements
-- Preserves complete financial history
-- Maintains Third Normal Form (3NF)
-- Simplifies outstanding balance calculation
+Store **OrderID** inside **Payment**
 
-### Negative
-
-- Adds one additional transaction table
-- Payment posting requires allocation records
-
----
-
-## Alternatives Considered
-
-### Option 1
-
-Store OrderID directly inside Payment.
-
-**Rejected**
+Rejected
 
 Reason:
 
-A payment could only belong to one order.
+One payment could belong to only one order.
 
-This fails when customers pay for multiple orders together.
+Fails for:
+
+- Multiple order settlement
 
 ---
 
-### Option 2
+## Option 2
 
-Store PaymentID inside Order.
+Store **PaymentID** inside **Order**
 
-**Rejected**
+Rejected
 
 Reason:
 
-An order could only receive one payment.
+One order could receive only one payment.
 
-This fails for installment payments.
+Fails for:
+
+- Installment payments
 
 ---
 
-### Option 3
+## Option 3
 
-Create PaymentAllocation bridge table.
+PaymentAllocation Bridge Table
 
-**Accepted**
+Accepted
 
 Reason:
 
@@ -133,51 +180,88 @@ Supports every real-world payment scenario while keeping the database normalized
 
 ---
 
-## Business Rules
+# Business Rules
 
 - Every Payment belongs to exactly one Customer.
-- Every PaymentAllocation belongs to one Payment.
-- Every PaymentAllocation belongs to one Order.
-- One Payment may allocate funds to multiple Orders.
+- Every PaymentAllocation belongs to exactly one Payment.
+- Every PaymentAllocation belongs to exactly one Order.
+- One Payment may allocate money across multiple Orders.
 - One Order may receive multiple Payments.
-- The total allocated amount must equal the payment amount before saving the transaction.
-- Allocation records are generated automatically by the system.
-- Users do not manually create PaymentAllocation records.
+- Allocation Amount must always be greater than zero.
+- Total allocated amount should never exceed the payment amount.
+- Outstanding Amount is calculated dynamically.
+- Allocation records are generated by the application, not manually.
 
 ---
 
-## Impact
+# Benefits
+
+- Eliminates many-to-many ambiguity
+- Supports flexible payment behaviour
+- Maintains Third Normal Form (3NF)
+- Preserves complete payment history
+- Simplifies pending payment calculation
+- Supports future financial reporting
+- Supports future AI modules
+
+---
+
+# Impact
 
 Affected Tables
 
 - Customer
 - Payment
 - PaymentAllocation
-- Order
+- Orders
 
 Affected Documents
 
 - Database Relationship Summary
 - Master ER Diagram
-- PostgreSQL Physical Schema
+- PostgreSQL Schema
 - Finance Domain Documentation
+- Spring Boot Entity Design
 
 ---
 
-## Decision Owner
+# Architecture Principle
 
-Harish Kamat
+```
+Customer
+
+        │
+
+        ▼
+
+     Payment
+
+        │
+
+        ▼
+
+ PaymentAllocation
+
+        │
+
+        ▼
+
+      Orders
+```
+
+The bridge table separates financial transactions from commercial transactions, ensuring both remain independently auditable.
 
 ---
 
-## Review Status
+# Review Status
 
 ✅ Approved
 
 ---
 
-## Related Documents
+# Related Documents
 
 - Database_Relationship_Summary.md
 - Master_ER_Diagram.md
 - PostgreSQL_Schema.sql
+- Database_Data_Dictionary.md

@@ -2,11 +2,65 @@
 
 ---
 
+# Module
+
+**Module 3 – Database Design**
+
+**Status:** ✅ Completed & Frozen (Version 1)
+
+**Version:** 1.1
+
+**Last Updated:** 02-Aug-2026
+
+---
+
 # Purpose
 
-This document defines the naming conventions used throughout the SKCP database.
+This document defines the naming conventions followed throughout the SKCP PostgreSQL database.
 
-Following consistent naming standards improves readability, maintainability, and reduces ambiguity across the database, backend APIs, and frontend application.
+Consistent naming standards improve:
+
+- Readability
+- Maintainability
+- Spring Boot JPA Mapping
+- SQL Consistency
+- Future scalability
+
+These standards are followed across:
+
+- PostgreSQL
+- Spring Boot
+- REST APIs
+- Frontend
+- Documentation
+
+---
+
+# PostgreSQL Naming Convention
+
+SKCP follows PostgreSQL best practices.
+
+Everything is written in:
+
+- lowercase
+- snake_case
+
+Example
+
+```
+customer
+customer_name
+mobile_number
+created_at
+```
+
+NOT
+
+```
+Customer
+CustomerName
+CreatedDate
+```
 
 ---
 
@@ -14,171 +68,57 @@ Following consistent naming standards improves readability, maintainability, and
 
 ## Rules
 
-- Use **Singular** table names.
-- Use **PascalCase**.
+- Use singular table names.
+- Use lowercase.
+- Use snake_case when multiple words exist.
 - Use meaningful business terminology.
 - Avoid abbreviations.
 
-### Examples
+Examples
 
 ```
-Customer
-Supplier
-RawMaterial
-Purchase
-PurchaseItem
-Production
-Attendance
-FinishedGoodsStock
+customer
+supplier
+product
+raw_material
+purchase
+purchase_item
+production
+attendance
+raw_material_stock
+curing_stock
+finished_goods_stock
+order
+order_item
+delivery
+delivery_item
+payment
+payment_allocation
+asset
+labour
 ```
 
 ---
 
-# Database Object Naming
+# Column Naming
 
-## Primary Key Constraint
+## Rules
 
-PK_<TableName>
-
-Example
-
-PK_Customer
-PK_Order
-
----
-
-## Foreign Key Constraint
-
-FK_<ChildTable>_<ParentTable>
+- lowercase
+- snake_case
+- Business meaningful
+- No abbreviations
 
 Examples
 
-FK_Order_Customer
-FK_Purchase_Supplier
-FK_OrderItem_Product
-
----
-
-## Unique Constraint
-
-UQ_<TableName>_<Column>
-
-Example
-
-UQ_Customer_Phone
-UQ_Supplier_GSTNumber
-
----
-
-## Index
-
-IX_<TableName>_<Column>
-
-Examples
-
-IX_Order_OrderDate
-IX_Customer_CustomerName
-IX_Payment_PaymentDate
-
----
-
-# ENUM Naming
-
-Use meaningful business values.
-
-Examples
-
-OrderStatus
-
-Pending
-Partially Delivered
-Completed
-Cancelled
-
-DeliveryStatus
-
-Pending
-In Transit
-Delivered
-
-PaymentMode
-
-Cash
-UPI
-Bank Transfer
-Cheque
-
-TransportMode
-
-Customer Arranged
-Factory Arranged
-Third Party
-
----
-
-# NULL Standards
-
-Business-critical fields
-
-NOT NULL
-
-Examples
-
-CustomerName
-OrderDate
-CurrentQuantity
-
-Optional fields
-
-NULL
-
-Examples
-
-Remarks
-ReferenceNumber
-MinimumQuantity
-Notes
-
----
-
-
-# Reserved Words
-
-Avoid SQL reserved keywords.
-
-Avoid names like
-
-User
-Group
-Date
-Order
-
-Instead use
-
-Customer
-CustomerOrder
-OrderDate
-CreatedDate
-
----
-
-# Documentation Rule
-
-Every table must have:
-
-- Purpose
-- Business Responsibility
-- Primary Key
-- Foreign Keys
-- Business Rules
-- Example
-- Future Scope
-- Version History
-
-This keeps documentation consistent across all database objects.
----
-
-
+```
+customer_name
+supplier_name
+raw_material_id
+created_at
+order_date
+payment_mode
+```
 
 ---
 
@@ -186,24 +126,24 @@ This keeps documentation consistent across all database objects.
 
 ## Rule
 
-Every table has a single primary key.
+Every table has exactly one primary key.
 
-Format:
-
-```
-<TableName>ID
-```
-
-### Examples
+Format
 
 ```
-CustomerID
-SupplierID
-ProductID
-PurchaseID
-PaymentID
-AttendanceID
-AssetID
+<table_name>_id
+```
+
+Examples
+
+```
+customer_id
+supplier_id
+product_id
+purchase_id
+payment_id
+asset_id
+labour_id
 ```
 
 ---
@@ -212,174 +152,249 @@ AssetID
 
 ## Rule
 
-Foreign Keys use the referenced table name followed by **ID**.
+Foreign keys always use the referenced table name.
 
-Format:
-
-```
-ReferencedTableID
-```
-
-### Examples
+Format
 
 ```
-CustomerID
-SupplierID
-ProductID
-OrderID
-DeliveryID
-RawMaterialID
-LabourID
+<parent_table>_id
 ```
 
----
-
-# Boolean Fields
-
-## Rule
-
-Boolean fields begin with **Is**.
-
-### Examples
+Examples
 
 ```
-IsActive
-IsAvailable
-IsCompleted
+customer_id
+supplier_id
+product_id
+purchase_id
+order_id
+delivery_id
+raw_material_id
+asset_id
+labour_id
 ```
 
 ---
 
-# Date Fields
+# Audit Columns
 
-## Rule
-
-Date columns end with **Date**.
-
-### Examples
+Every table should include
 
 ```
-OrderDate
-PurchaseDate
-DeliveryDate
-JoiningDate
-AttendanceDate
-MaintenanceDate
-NextMaintenanceDate
-CreatedDate
+created_at
 ```
 
----
-
-# Quantity Fields
-
-## Rule
-
-Physical quantities end with **Quantity**.
-
-### Examples
+Future versions may include
 
 ```
-OrderedQuantity
-PurchasedQuantity
-ProducedQuantity
-DeliveredQuantity
-CurrentQuantity
-MinimumQuantity
+updated_at
+created_by
+updated_by
+deleted_at
+deleted_by
 ```
 
 ---
 
-# Amount Fields
+# Status Columns
 
-## Rule
-
-Financial values end with **Amount**.
-
-### Examples
+Status columns use
 
 ```
-TotalAmount
-PaidAmount
-RemainingAmount
-AllocatedAmount
-TransportAmount
+status
 ```
 
-> **Note**
->
-> Derived values (for example, Pending Amount) should not be stored unless there is a business requirement. They should be calculated whenever possible.
+Allowed values depend on business rules.
+
+Examples
+
+Customer
+
+```
+ACTIVE
+INACTIVE
+```
+
+Order
+
+```
+PENDING
+PARTIAL
+COMPLETED
+CANCELLED
+```
+
+Delivery
+
+```
+PENDING
+IN_TRANSIT
+DELIVERED
+```
+
+Asset
+
+```
+ACTIVE
+MAINTENANCE
+OUT_OF_SERVICE
+```
 
 ---
 
-# Status Fields
-
-## Rule
-
-Status fields end with **Status**.
-
-### Examples
-
-```
-OrderStatus
-DeliveryStatus
-PaymentStatus
-ConfirmationStatus
-AssetStatus
-```
-
----
-
-# Text Fields
-
-## Rule
+# Date Columns
 
 Use descriptive names.
 
-### Examples
+Examples
 
 ```
-CustomerName
-SupplierName
-ProductName
-SkillType
-Remarks
-Address
-Phone
-GSTNumber
-```
-
----
-
-# Audit Fields
-
-Every master and transaction table should include:
-
-```
-CreatedDate
-UpdatedDate
-```
-
-Future versions may introduce:
-
-```
-CreatedBy
-UpdatedBy
-DeletedDate
-DeletedBy
+order_date
+purchase_date
+delivery_date
+joining_date
+attendance_date
+production_date
+expected_delivery_date
+created_at
 ```
 
 ---
 
-# General Principles
+# Quantity Columns
 
-- Use business terminology.
-- Use full words instead of abbreviations.
-- Avoid duplicate information.
-- Every attribute has exactly one owner.
-- Store facts, calculate derived values.
-- Design tables around real business processes.
-- Follow Business-First Database Design.
+Use descriptive business names.
+
+Examples
+
+```
+ordered_quantity
+current_quantity
+minimum_quantity
+quantity_produced
+delivered_quantity
+```
+
+---
+
+# Amount Columns
+
+Financial values end with
+
+```
+amount
+```
+
+Examples
+
+```
+line_amount
+allocated_amount
+transport_cost
+daily_rate
+unit_price
+```
+
+Derived values should be calculated whenever possible instead of stored.
+
+Example
+
+Pending Amount
+
+❌ Do not store
+
+✅ Calculate
+
+---
+
+# Text Columns
+
+Examples
+
+```
+customer_name
+supplier_name
+product_name
+material_name
+contact_person
+remarks
+address
+phone
+gst_number
+```
+
+---
+
+# Constraint Naming
+
+Primary Key
+
+```
+pk_customer
+pk_supplier
+```
+
+Foreign Key
+
+```
+fk_order_customer
+fk_purchase_supplier
+fk_purchase_item_raw_material
+```
+
+Unique Constraint
+
+```
+uq_customer_mobile
+uq_supplier_gst_number
+```
+
+Index
+
+```
+idx_customer_name
+idx_order_date
+idx_payment_date
+```
+
+---
+
+# Reserved Words
+
+Avoid SQL reserved keywords.
+
+Avoid
+
+```
+user
+group
+order
+date
+```
+
+Prefer
+
+```
+customer
+customer_order
+order_date
+created_at
+```
+
+---
+
+# Documentation Rule
+
+Every table review document must include:
+
+- Business Purpose
+- Architecture Review
+- PostgreSQL Physical Table
+- SQL Explanation
+- Business Rules
+- Validation Checklist
+- Architect Approval
+- Lesson Summary
 
 ---
 
@@ -393,11 +408,11 @@ Business Objects
 
 ↓
 
-Database Tables
+PostgreSQL Tables
 
 ↓
 
-Backend Entities
+Spring Boot Entities
 
 ↓
 
@@ -405,9 +420,40 @@ REST APIs
 
 ↓
 
-Frontend Screens
+Frontend
 
-The same terminology should be used across every layer of the application.
+The same business terminology should be used across every layer.
+
+---
+
+# Current Standards
+
+| Standard | Convention |
+|-----------|------------|
+| Tables | lowercase, snake_case |
+| Columns | lowercase, snake_case |
+| Primary Keys | table_name_id |
+| Foreign Keys | parent_table_id |
+| Audit Columns | created_at |
+| Constraints | pk_, fk_, uq_ |
+| Indexes | idx_ |
+
+---
+
+# Architect Notes
+
+Why snake_case?
+
+- PostgreSQL standard
+- Easier SQL writing
+- Better compatibility with Spring Boot and Hibernate
+- No quoted identifiers required
+
+Why lowercase?
+
+PostgreSQL automatically converts unquoted identifiers to lowercase.
+
+Using lowercase avoids unnecessary double quotes.
 
 ---
 
@@ -416,7 +462,16 @@ The same terminology should be used across every layer of the application.
 | Item | Status |
 |------|--------|
 | Module | Module 3 – Database Design |
-| Version | 1.0 |
-| Status | ✅ Frozen (Version 1) |
-| Last Updated | 30-Jul-2026 |
+| Version | 1.1 |
+| Status | ✅ Completed & Frozen |
+| Last Updated | 02-Aug-2026 |
+| Next Module | Module 4 – Spring Boot Backend |
 | Author | Harish Kamat |
+
+---
+
+# Architect Verdict
+
+These naming standards are now frozen for Version 1.
+
+Every future PostgreSQL table, Spring Boot entity, repository, service, and REST API should follow these conventions to maintain consistency across the entire SKCP system.

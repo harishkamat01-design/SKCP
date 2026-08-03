@@ -1,65 +1,53 @@
 # Database Data Dictionary
 
+---
 
 ## Purpose
 
-The Database Data Dictionary provides the official catalog of all Version 1 SKCP database entities.
+The Database Data Dictionary is the official catalog of all **Version 1 SKCP PostgreSQL database tables**.
 
-It acts as the entry point for understanding:
+It acts as the primary reference for understanding:
 
 - Database tables
 - Table classification
 - Business ownership
-- Domain responsibility
+- Business domains
+- Table responsibilities
 - Database scope
 
-Detailed table structures, relationships, and business rules are documented separately.
-
-This document is the first reference before reviewing:
+This document should always be reviewed before reading:
 
 - Database Relationship Summary
 - Master ER Diagram
 - PostgreSQL Physical Schema
-- Backend Entity Design
+- Spring Boot Entity Classes
+- Backend Repository Design
 
 ---
 
-# Database Tables
+# Version 1 Database Tables
 
-    | Table | Domain | Category | Purpose |
-    |-|-|-|-|
-    | Asset | Master Data | Master | Factory assets, machines, vehicles, utilities and equipment |
-    | Customer | Master Data | Master | Customer information |
-    | Labour | Master Data | Master | Labour information |
-    | Product | Master Data | Master | Finished product catalog |
-    | RawMaterial | Master Data | Master | Raw material information |
-    | Supplier | Master Data | Master | Supplier information |
-    | Purchase | Procurement | Transaction | Purchase invoice header |
-    | PurchaseItem | Procurement | Transaction | Purchased raw material details |
-    | Production | Production | Transaction | Daily manufacturing record |
-    | Attendance | Production | Transaction | Daily labour attendance |
-    | RawMaterialStock | Inventory | Transaction | Current raw material stock |
-    | CuringStock | Inventory | Transaction | Blocks under curing |
-    | FinishedGoodsStock | Inventory | Transaction | Saleable finished products |
-    | Order | Sales | Transaction | Customer order header |
-    | OrderItem | Sales | Transaction | Ordered product details |
-    | Delivery | Sales | Transaction | Delivery transaction header |
-    | DeliveryItem | Sales | Transaction | Delivered product details |
-    | Payment | Finance | Transaction | Customer payment transaction |
-    | PaymentAllocation | Finance | Transaction | Payment allocation against orders |
-
----
-
-# Future Tables
-
-The following tables have been intentionally deferred to future versions.
-
-| Table | Planned Version | Purpose |
-|--------|-----------------|----------|
-| DeliveryConfirmation | Version 2 | Delivery acknowledgement and Proof of Delivery |
-| MachineMaintenanceHistory | Future | Detailed maintenance history |
-| WeeklySalary | Future | Salary processing |
-| ProductionPlanning | Future | Production scheduling |
+| Table | Domain | Category | Purpose |
+|---------|----------|------------|------------------------------------------------|
+| Asset | Master Data | Master | Factory assets, machines, vehicles, utilities and equipment |
+| Customer | Master Data | Master | Customer master information |
+| Labour | Master Data | Master | Labour master information |
+| Product | Master Data | Master | Finished product catalog |
+| RawMaterial | Master Data | Master | Raw material master information |
+| Supplier | Master Data | Master | Supplier master information |
+| Purchase | Procurement | Transaction | Purchase transaction header |
+| PurchaseItem | Procurement | Transaction | Purchased raw material details |
+| Production | Production | Transaction | Daily production record |
+| Attendance | Production | Transaction | Labour attendance |
+| RawMaterialStock | Inventory | Current Position | Current raw material inventory |
+| CuringStock | Inventory | Current Position | Blocks currently curing |
+| FinishedGoodsStock | Inventory | Current Position | Current saleable finished goods |
+| Order | Sales | Transaction | Customer order header |
+| OrderItem | Sales | Transaction | Ordered product details |
+| Delivery | Sales | Transaction | Delivery transaction header |
+| DeliveryItem | Sales | Transaction | Delivered product details |
+| Payment | Finance | Transaction | Customer payment transaction |
+| PaymentAllocation | Finance | Transaction | Payment allocation against orders |
 
 ---
 
@@ -68,37 +56,132 @@ The following tables have been intentionally deferred to future versions.
 SKCP Version 1 database is organized into six business domains.
 
 | Domain | Responsibility |
-|---------|---------------|
-| Master Data | Stores stable business identities |
-| Procurement | Manages supplier purchases and raw material acquisition |
-| Production | Manages manufacturing activities and workforce tracking |
-| Inventory | Manages current stock positions |
-| Sales | Manages customer orders and deliveries |
-| Finance | Manages payments and outstanding balances |
+|---------|----------------|
+| Master Data | Permanent business information |
+| Procurement | Raw material purchasing |
+| Production | Manufacturing operations |
+| Inventory | Current stock positions |
+| Sales | Customer orders and deliveries |
+| Finance | Customer payments |
 
 ---
 
-# Inventory Lifecycle Principle
+# Master Data Tables
 
-SKCP separates:
+These tables store permanent business information.
+
+- Customer
+- Supplier
+- Product
+- RawMaterial
+- Labour
+- Asset
+
+Master tables rarely change and are referenced by transaction tables.
+
+---
+
+# Transaction Tables
+
+These tables record business events.
+
+Procurement
+
+- Purchase
+- PurchaseItem
+
+Production
+
+- Production
+- Attendance
+
+Sales
+
+- Order
+- OrderItem
+- Delivery
+- DeliveryItem
+
+Finance
+
+- Payment
+- PaymentAllocation
+
+Every transaction represents an actual business event.
+
+---
+
+# Inventory Tables
+
+Inventory tables always represent the **current stock position**.
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+Historical stock movement is maintained through transaction tables.
+
+---
+
+# Inventory Philosophy
+
+SKCP follows the ERP principle:
+
+Current Position
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
 
 Historical Transactions
 
+- Purchase
+- Production
+- Delivery
+
+This avoids repeatedly calculating stock and improves reporting performance.
+
+---
+
+# Business Flow
+
+Supplier
+
 ↓
+
 Purchase
-Production
-Delivery
-
-
-Current Inventory Position
 
 ↓
+
 RawMaterialStock
+
+↓
+
+Production
+
+↓
+
 CuringStock
+
+↓
+
 FinishedGoodsStock
 
+↓
 
-This prevents repeated calculation of stock balances and improves system performance.
+Order
+
+↓
+
+Delivery
+
+↓
+
+Payment
+
+↓
+
+Business Insights
 
 ---
 
@@ -109,59 +192,118 @@ This prevents repeated calculation of stock balances and improves system perform
 | Master Tables | 6 |
 | Transaction Tables | 10 |
 | Inventory Tables | 3 |
-| Total Version 1 Tables | 19 |
+| Total Tables | 19 |
+
 ---
 
 # Relationship Statistics
 
-| Relationship Type | Count |
-|---|---:|
-| One-to-Many Relationships | 16 |
-| One-to-One Relationships | 3 |
-| Total Validated Relationships | 19 |
+| Relationship | Count |
+|--------------|------:|
+| One-to-Many | 16 |
+| One-to-One | 3 |
+| Total Relationships | 19 |
 
 ---
 
-## Database Philosophy
+# Documentation Available
 
-The SKCP database follows a Business-First design.
+Module 3 now contains:
 
-    Business
-
-    ↓
-
-    Master Data
-
-    ↓
-
-    Transactions
-
-    ↓
-
-    Inventory
-
-    ↓
-
-    Reports
-
-    ↓
-
-    AI
-
-Each table exists because it represents a real business object or business event.
-
-No table is created unless it reflects an actual business process.
+- Database Data Dictionary
+- Database Master Index
+- Database Naming Standards
+- Database Relationship Summary
+- Master ER Diagram
+- PostgreSQL Schema
+- Seed Data
+- Individual Table Reviews
+- README
 
 ---
 
-## Status
+# Future Tables (Deferred)
+
+These tables are intentionally excluded from Version 1.
+
+| Table | Planned Version | Purpose |
+|---------|-----------------|-------------------------------|
+| DeliveryConfirmation | Version 2 | Proof of Delivery |
+| MachineMaintenanceHistory | Future | Machine maintenance records |
+| WeeklySalary | Future | Payroll processing |
+| ProductionPlanning | Future | Production scheduling |
+| ReservedStock | Future | Order reservation |
+| WarehouseLocation | Future | Multi-location inventory |
+
+---
+
+# Database Philosophy
+
+SKCP follows a Business-First Architecture.
+
+Business
+
+↓
+
+Master Data
+
+↓
+
+Transactions
+
+↓
+
+Inventory
+
+↓
+
+Reports
+
+↓
+
+AI
+
+Every table exists because it represents either:
+
+- A Business Object
+- A Business Event
+- A Current Business Position
+
+No unnecessary tables exist.
+
+---
+
+# Current Status
 
 | Item | Status |
 |------|--------|
 | Module | Module 3 – Database Design |
-| Version | 1.0 |
-| Status | ✅ Approved for Phase 5 |
-| Last Updated | 31-Jul-2026 |
+| Version | 1.1 |
+| Status | ✅ Completed & Frozen |
+| Last Updated | 02-Aug-2026 |
+| Next Module | Module 4 – Spring Boot Backend |
 | Author | Harish Kamat |
 
 ---
+
+# Architect Verdict
+
+The Version 1 database architecture is complete.
+
+All 19 PostgreSQL tables have been:
+
+- Business validated
+- Architect reviewed
+- Physically designed
+- Documented
+- Frozen
+
+The database is now ready for:
+
+- Spring Boot Entity Classes
+- JPA Relationships
+- Repository Layer
+- Service Layer
+- REST APIs
+
+Module 3 is officially complete.

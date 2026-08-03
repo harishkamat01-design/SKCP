@@ -1,8 +1,5 @@
 # ADR-DB-001
-
-# Title
-
-Link Production to Asset using `AssetID`
+# Production → Asset Relationship
 
 ---
 
@@ -14,68 +11,79 @@ Link Production to Asset using `AssetID`
 
 ## Date
 
-30-Jul-2026
+31-Jul-2026
+
+---
+
+## Module
+
+Module 3 – Database Design
 
 ---
 
 ## Context
 
-The Production module records the daily manufacturing activity for finished products.
+The Production module records the daily manufacturing of cement blocks.
 
-Although the current manual process does not explicitly record which block-making machine was used, the business owns multiple production assets with different capacities.
+Initially, production was designed using only:
 
-The database design needed to decide whether Production should remain independent or reference the machine used.
+- Product
+- Quantity Produced
+- Production Date
+
+However, during architecture review it was identified that the machine used for production is an important business resource.
+
+Although the current manual notebook does not record the machine, future reporting and analytics require production to be associated with the equipment used.
 
 ---
 
 ## Decision
 
-The `Production` table shall contain `AssetID` as a foreign key referencing the `Asset` table.
+Every Production record shall reference exactly one Asset.
 
 Relationship:
 
-```
 Asset (1)
-     │
-     │
-     ▼
-Production (Many)
-```
+        │
+        │
+        ▼
+Production (N)
+
+Foreign Key:
+
+AssetID
 
 ---
 
 ## Rationale
 
-Adding `AssetID` introduces minimal implementation complexity while significantly improving the long-term value of the system.
-
 This relationship enables:
 
 - Machine-wise production reports
-- Production traceability
-- Equipment utilization analysis
+- Machine utilization tracking
 - Maintenance planning
-- Historical production analysis
-- Future AI-driven production optimization
-- Future Overall Equipment Effectiveness (OEE) calculations
+- Production traceability
+- Future Overall Equipment Effectiveness (OEE)
+- AI-based productivity analysis
 
-Without this relationship, these capabilities would require future database redesign.
+Without this relationship, production data cannot be analyzed by machine.
 
 ---
 
 ## Consequences
 
-### Positive
+### Advantages
 
-- Improves production traceability
-- Supports future reporting
-- Supports AI and analytics
-- Enables machine utilization metrics
-- No impact on existing business workflow
+- Better production analytics
+- Supports preventive maintenance
+- Scalable architecture
+- No database redesign required in future
 
-### Negative
+### Trade-offs
 
-- One additional foreign key in the Production table
-- Requires selecting the production asset when recording production
+Current business users must select the machine while recording production.
+
+Since only one block-making machine is currently used, this introduces minimal operational overhead while greatly improving future scalability.
 
 ---
 
@@ -83,12 +91,9 @@ Without this relationship, these capabilities would require future database rede
 
 ### Option 1
 
-Do not store machine information.
+No Asset relationship.
 
-**Rejected**
-
-Reason:
-Future reporting and analytics would not be possible without redesigning the schema.
+Rejected because machine-level reporting would become impossible.
 
 ---
 
@@ -96,54 +101,59 @@ Future reporting and analytics would not be possible without redesigning the sch
 
 Store machine name as text.
 
-**Rejected**
-
-Reason:
-Violates normalization and creates duplicate master data.
+Rejected because it violates database normalization and causes data duplication.
 
 ---
 
-### Option 3
+### Option 3 (Selected)
 
-Reference the Asset table using `AssetID`.
+Reference Asset using AssetID.
 
-**Accepted**
+Accepted.
 
-Reason:
-Maintains normalization while enabling future scalability.
+---
+
+## Implementation
+
+Relationship
+
+Asset (1)
+
+↓
+
+Production (N)
+
+Foreign Key
+
+Production.AssetID
+
+↓
+
+Asset.AssetID
 
 ---
 
 ## Impact
 
-Affected Tables:
+Affected Modules
 
-- Asset
-- Production
+- Database Design
+- PostgreSQL Schema
+- Spring Boot Entity Design
+- Reporting
+- AI Analytics
 
-Affected Documents:
+---
+
+## References
 
 - Database Relationship Summary
 - Master ER Diagram
-- PostgreSQL Physical Schema
-- Spring Boot Entity Model
+- PostgreSQL Schema
+- Module 3 Documentation
 
 ---
 
-## Decision Owner
-
-Harish Kamat
-
----
-
-## Review Status
-
-✅ Approved
-
----
-
-## Related Documents
-
-- Database_Relationship_Summary.md
-- Master_ER_Diagram.md
-- PostgreSQL_Schema.sql
+Author : Harish Kamat
+Status : Accepted
+Version : 1.0

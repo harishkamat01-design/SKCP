@@ -1,278 +1,470 @@
-# SKCP System Architecture
+# 01 – System Architecture
+
+# Project
+
+**SKCP ERP System**
+
+Shree Kundodari Cement Products
 
 ---
 
-# 1. Document Header
+# Module
 
-| Field | Value |
-|--------|-------|
-| Project | SKCP – Shree Kundodari Cement Products |
-| Document | System Architecture |
-| Version | 2.0 |
-| Status | Approved |
-| Author | Harish Kamat |
-| Reviewer | Architect |
-| Created On | 2026-07-24 |
-| Last Updated | 2026-07-31 |
+Module 2 – Software Architecture
+
+(Updated after Module 3 Completion)
 
 ---
 
-# 2. Purpose
+# Document
 
-To define the overall architecture of the **SKCP Management System** and ensure that the software is scalable, maintainable, and aligned with the business needs of **Shree Kundodari Cement Products**.
-
-This document acts as the master architectural blueprint for the entire project and guides all future implementation activities.
+System Architecture
 
 ---
 
-# 3. Scope
+# Version
 
-This document defines the complete software architecture of the SKCP ERP system.
-
-It includes:
-
-- Business Architecture
-- Software Architecture
-- Database Architecture
-- Backend Architecture
-- Frontend Architecture
-- AI Architecture
-- Deployment Architecture
-- External Integrations
-
-Detailed implementation specifications are maintained in their respective documents.
+3.0
 
 ---
 
-# 4. System Overview
+# Status
 
-SKCP is designed as a Business-First Manufacturing ERP.
+✅ Approved
 
-The architecture mirrors the real business workflow rather than technical layers.
-
-Business
-
-↓
-
-Business Domains
-
-↓
-
-Database
-
-↓
-
-Backend APIs
-
-↓
-
-Frontend
-
-↓
-
-AI Decision Support
+✅ Module 3 Completed
 
 ---
 
-# 5. High-Level Components
+# Author
 
-| Component | Responsibility |
-|------------|----------------|
-| React Frontend | User Interface for Admin |
-| Spring Boot Backend | Business Logic, Authentication, REST APIs |
-| PostgreSQL Database | Stores business master data, transactions and inventory |
-| AI Layer (Future) | Business insights, forecasting, decision support |
-| External Services | Vercel, Neon PostgreSQL, Email, WhatsApp (Future) |
+Harish Kamat
 
 ---
 
-# 6. Technology Stack
+# Last Updated
 
-| Layer | Technology |
-|--------|------------|
-| Frontend | React + Vite |
-| Backend | Spring Boot |
-| Database | PostgreSQL |
-| ORM | Spring Data JPA |
-| Authentication | JWT |
-| AI | OpenAI APIs *(Future)* |
-| Hosting | Vercel + Render |
-| Database Hosting | Neon PostgreSQL |
-| Version Control | GitHub |
+31 July 2026
 
 ---
 
-# 7. Primary Users
+# Purpose
 
-| User | Responsibilities |
-|------|------------------|
-| Admin | Manage complete business operations |
-| Customer *(Future)* | View quotations, orders and payment status |
-| Transport Provider *(Future)* | Receive delivery details |
+This document describes the complete high-level architecture of the SKCP ERP System.
 
----
+It serves as the foundation for:
 
-# 8. Business Domains
-
-The entire ERP is organized into six core business domains.
-
-| Domain | Description |
-|---------|-------------|
-| Master Data | Business master information |
-| Procurement | Supplier purchases and raw materials |
-| Production | Manufacturing operations |
-| Inventory | Raw material, curing and finished goods stock |
-| Sales | Orders and deliveries |
-| Finance | Payments and outstanding balances |
-
----
-
-# 9. High-Level System Architecture
-
-```text
-                    Admin
-
-                      │
-
-                      ▼
-
-             React Frontend (Vite)
-
-                      │
-
-                REST API (HTTPS)
-
-                      │
-
-                      ▼
-
-          Spring Boot Backend (Java)
-
-                      │
-
-         Business Services & Validation
-
-                      │
-
-                      ▼
-
-            PostgreSQL Database
-
-        (19 Business Tables / 19 Relationships)
-
-                      │
-
-        ┌─────────────┴─────────────┐
-
-        ▼                           ▼
-
- Reports & Dashboard          AI Layer (Future)
-
-                               │
-
-                      Business Insights
-
-                      Stock Forecasting
-
-                      Payment Prediction
-
-                      Demand Forecast
-```
-
----
-
-# 10. Database Architecture
-
-The database follows a Business-First normalized design.
-
-### Current Statistics
-
-| Item | Count |
-|------|------:|
-| Master Tables | 6 |
-| Transaction Tables | 10 |
-| Inventory Tables | 3 |
-| Total Tables | **19** |
-| Validated Relationships | **19** |
-
-Database artifacts completed:
-
-- Database Data Dictionary
-- Database Naming Standards
-- Database Relationship Summary
-- Master ER Diagram
-- Architecture Decision Records (ADR)
-
----
-
-# 11. Architecture Principles
-
-The SKCP system follows these principles:
-
-- Business-First Design
-- Architecture-First Development
-- Separation of Concerns
-- Single Responsibility Principle
-- Master–Transaction Separation
-- Current Position + Historical Transactions Inventory Model
-- Header–Detail Pattern
-- Database Normalization
-- Low Coupling
-- High Cohesion
-- AI-Ready Architecture
+- Database Design
+- Backend Development
+- Frontend Integration
+- AI Features
 - Future Scalability
 
 ---
 
-# 12. Current Project Status
+# Project Overview
+
+SKCP ERP is an Admin-only business management system designed for Shree Kundodari Cement Products.
+
+The system digitizes the complete business workflow including:
+
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+- Reporting
+
+The architecture is designed using a Business-First approach, ensuring every component directly supports real-world business operations.
+
+---
+
+# High-Level Architecture
+
+```
+                +----------------------+
+                |      Admin User      |
+                +----------+-----------+
+                           |
+                           |
+                    React Frontend
+                           |
+                           |
+                 REST API (Spring Boot)
+                           |
+                           |
+               Business Service Layer
+                           |
+                           |
+                  Spring Data JPA
+                           |
+                           |
+                    PostgreSQL Database
+```
+
+---
+
+# Architecture Layers
+
+## Presentation Layer
+
+Technology
+
+- React
+- HTML
+- CSS
+- JavaScript
+
+Responsibilities
+
+- Dashboard
+- Data Entry
+- Reports
+- User Interaction
+- Authentication Screens
+
+---
+
+## API Layer
+
+Technology
+
+- Spring Boot
+- REST Controllers
+
+Responsibilities
+
+- Expose REST APIs
+- Input Validation
+- Authentication
+- Authorization
+- API Documentation
+
+---
+
+## Business Layer
+
+Technology
+
+- Spring Services
+
+Responsibilities
+
+- Business Rules
+- Inventory Logic
+- Payment Allocation
+- Production Logic
+- Sales Workflow
+- Report Generation
+
+---
+
+## Data Access Layer
+
+Technology
+
+- Spring Data JPA
+- Hibernate
+
+Responsibilities
+
+- CRUD Operations
+- Entity Mapping
+- Transactions
+- Repository Layer
+
+---
+
+## Database Layer
+
+Technology
+
+- PostgreSQL
+
+Responsibilities
+
+- Data Persistence
+- Relationship Management
+- Constraints
+- Referential Integrity
+
+---
+
+# Business Modules
+
+## 1. Master Data
+
+Stores permanent business information.
+
+Tables
+
+- Asset
+- Customer
+- Labour
+- Product
+- RawMaterial
+- Supplier
+
+---
+
+## 2. Procurement
+
+Manages purchasing of raw materials.
+
+Tables
+
+- Purchase
+- PurchaseItem
+
+---
+
+## 3. Production
+
+Manages daily manufacturing operations.
+
+Tables
+
+- Production
+- Attendance
+
+---
+
+## 4. Inventory
+
+Maintains current inventory positions.
+
+Tables
+
+- RawMaterialStock
+- CuringStock
+- FinishedGoodsStock
+
+---
+
+## 5. Sales
+
+Handles customer orders and deliveries.
+
+Tables
+
+- Order
+- OrderItem
+- Delivery
+- DeliveryItem
+
+---
+
+## 6. Finance
+
+Handles payments and allocations.
+
+Tables
+
+- Payment
+- PaymentAllocation
+
+---
+
+# Database Overview
+
+Database Engine
+
+PostgreSQL
+
+Database Name
+
+skcp_db
+
+Schema
+
+skcp
+
+Database Statistics
+
+| Category | Count |
+|----------|------:|
+| Master Tables | 6 |
+| Transaction Tables | 10 |
+| Inventory Tables | 3 |
+| Total Tables | 19 |
+
+---
+
+# Relationship Overview
+
+Relationship Statistics
+
+| Relationship | Count |
+|-------------|------:|
+| One-to-One | 3 |
+| One-to-Many | 16 |
+| Total Relationships | 19 |
+
+The database follows:
+
+- Third Normal Form (3NF)
+- Business-First Design
+- Header–Detail Pattern
+- Master–Transaction Separation
+- Current Inventory Model
+
+---
+
+# System Workflow
+
+```
+Supplier
+      │
+      ▼
+Purchase
+      │
+      ▼
+PurchaseItem
+      │
+      ▼
+RawMaterialStock
+      │
+      ▼
+Production
+      │
+      ▼
+CuringStock
+      │
+      ▼
+FinishedGoodsStock
+      │
+      ▼
+Customer Order
+      │
+      ▼
+Delivery
+      │
+      ▼
+Payment
+      │
+      ▼
+Payment Allocation
+```
+
+---
+
+# Technology Stack
+
+## Frontend
+
+- React
+
+---
+
+## Backend
+
+- Java 21
+- Spring Boot
+- Spring MVC
+- Spring Data JPA
+- Hibernate
+
+---
+
+## Database
+
+- PostgreSQL
+
+---
+
+## Authentication
+
+- JWT
+
+---
+
+## Deployment
+
+Frontend
+
+- Vercel
+
+Backend
+
+- Render / Railway / Docker (Future)
+
+Database
+
+- PostgreSQL
+
+---
+
+# Architecture Decision Records (ADR)
+
+Major architecture decisions are documented separately.
+
+Current ADRs
+
+- ADR-DB-001 – Header–Detail Pattern
+- ADR-DB-002 – Payment Allocation Bridge
+- ADR-DB-003 – Current Inventory Model
+- ADR-DB-004 – Master vs Transaction Separation
+
+These ADRs preserve architectural reasoning and improve future maintainability.
+
+---
+
+# Design Principles
+
+The SKCP architecture follows:
+
+- Business-First Design
+- Single Source of Truth
+- Layered Architecture
+- Separation of Concerns
+- High Cohesion
+- Low Coupling
+- Database Normalization
+- Future Scalability
+- Clean Code Principles
+
+---
+
+# Current Progress
 
 | Module | Status |
 |---------|--------|
-| Module 0 – Environment Setup | ✅ Completed |
 | Module 1 – Business Analysis | ✅ Completed |
 | Module 2 – Software Architecture | ✅ Completed |
 | Module 3 – Database Design | ✅ Completed |
-| Module 4 – Backend Development | 🚀 Next Phase |
-| Module 5 – Frontend Integration | ⏳ Planned |
-| Module 6 – AI Features | ⏳ Planned |
-| Module 7 – Deployment | ⏳ Planned |
+| Module 4 – Backend Development | ⏳ Next |
 
 ---
 
-# 13. Next Phase
+# Next Phase
 
-With the completion of Module 3, the project is now ready to begin:
+Module 4 – Backend Development
 
-## Phase 5 – PostgreSQL Physical Database Schema
+The completed architecture and PostgreSQL schema will now be implemented using:
 
-Followed by
-
-## Module 4 – Backend Development
-
-Planned deliverables:
-
-- PostgreSQL Physical Schema
-- Spring Boot Project Setup
-- JPA Entity Classes
-- Repository Layer
-- Service Layer
+- Spring Boot
+- JPA
+- Hibernate
+- PostgreSQL
 - REST APIs
-- Authentication
-- Database Integration
+- JWT Authentication
 
 ---
 
-# Review Checklist
+# Document Status
 
-- [x] Purpose defined
-- [x] Scope defined
-- [x] System Overview completed
-- [x] High-Level Components identified
-- [x] Technology Stack documented
-- [x] Business Domains finalized
-- [x] High-Level Architecture completed
-- [x] Database Architecture documented
-- [x] Architecture Principles finalized
-- [x] Module 3 completed
-- [ ] Backend implementation review pending
-- [ ] Final architecture approval
+Version
+
+3.0
+
+Status
+
+✅ Approved
+
+Owner
+
+Harish Kamat
+
+Last Updated
+
+31 July 2026

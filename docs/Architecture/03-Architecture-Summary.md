@@ -2,52 +2,62 @@
 
 **Project:** SKCP – Shree Kundodari Cement Products
 
-**Module:** 2 – Software Architecture
+**Module:** Architecture Summary
 
-**Version:** 1.2
+**Version:** 2.0
 
-**Status:** Updated
+**Status:** ✅ Module 3 Frozen
 
 **Latest Updated:** 2026-07-31
 
 **Last Updated:** 2026-07-26
 
-**Status:** Completed
-
 ---
 
 # Purpose
 
-This document provides a consolidated architectural overview of the SKCP Management System.
+This document provides the consolidated architectural overview of the SKCP ERP System.
 
 It summarizes:
 
-- Business Understanding
+- Business Architecture
 - Software Architecture
 - Database Architecture
-- Architectural Decisions
+- Architecture Decision Records (ADR)
 - Business Domains
+- System Principles
 - Long-Term Vision
 
-This document evolves throughout the project and serves as the central architectural reference.
+This document serves as the master architecture reference for the entire SKCP project.
 
 ---
 
 # What is SKCP?
 
-SKCP is an Admin-only Business Management System developed for Shree Kundodari Cement Products.
+SKCP (Shree Kundodari Cement Products) is an Admin-only ERP system developed to digitize the complete operations of a cement block manufacturing business.
 
-Its purpose is to digitally manage and optimize the complete operation of the cement block manufacturing business while preserving the founder's years of business knowledge.
+The system supports:
 
-The system is designed around the real business workflow instead of forcing the business to adapt to software.
+- Procurement
+- Production
+- Inventory
+- Sales
+- Finance
+- Reporting
+
+The architecture mirrors the real-world business workflow instead of forcing the business to adapt to software.
 
 ---
 
 # Architecture Philosophy
 
-The architecture follows a **Business-First** approach.
+The SKCP architecture follows five guiding principles:
 
-### Guiding Principle
+- Business First
+- Simplicity Before Complexity
+- Master–Transaction Separation
+- Current Position + Historical Transactions
+- AI-Ready Design
 
 > Software should mirror the business, not force the business to mirror the software.
 
@@ -57,15 +67,19 @@ Every technical decision must support the actual factory operations.
 
 # Architecture Layers
 
-Business
-
-↓
-
-System
-
-↓
-
-Application
+    Business
+        ↓
+    Business Workflow
+        ↓
+    Software Architecture
+        ↓
+    Database Architecture
+        ↓
+    Backend APIs
+        ↓
+    Frontend
+        ↓
+    AI Features
 
 Business defines **WHY**.
 
@@ -143,47 +157,42 @@ Manages customer payments.
 # Business Value Stream
 
 Supplier
-
-↓
-
-Raw Material Purchase
-
-↓
-
-Raw Material Stock
-
-↓
-
+      │
+      ▼
+Purchase
+      │
+      ▼
+PurchaseItem
+      │
+      ▼
+RawMaterialStock
+      │
+      ▼
 Production
-
-↓
-
-Curing Yard
-
-↓
-
-Finished Goods (Sales Yard)
-
-↓
-
+      │
+      ▼
+CuringStock
+      │
+      ▼
+FinishedGoodsStock
+      │
+      ▼
 Customer Order
-
-↓
-
+      │
+      ▼
 Delivery
-
-↓
-
+      │
+      ▼
 Payment
-
-↓
-
+      │
+      ▼
+Payment Allocation
+      │
+      ▼
 Reports
-
-↓
-
+      │
+      ▼
 Business Growth
-
 ---
 
 # Information Flow
@@ -234,13 +243,15 @@ AI Insights (Future)
 
 # Business Decision Layer
 
-Before confirming any order, the business evaluates:
+The ERP now supports these business decisions through validated business data:
 
-- Customer Trust
-- Order Quantity
 - Current Inventory
+- Pending Payments
 - Production Capacity
-- Delivery Commitment
+- Customer History
+- Delivery Status
+- Labour Availability
+- Machine Utilization       
 - Payment Confidence
 
 Only after successful evaluation does the order become a confirmed business commitment.
@@ -251,26 +262,28 @@ Only after successful evaluation does the order become a confirmed business comm
 
 Examples include:
 
+- Every Production belongs to one Product.
+- Every Production uses one Asset.
+- Every Production creates one Curing Batch.
+- One Product maintains one Finished Goods Stock.
+- One Raw Material maintains one Current Stock.
 - Products must complete curing before sale.
-- Finished goods reduce immediately after delivery.
-- One customer can have multiple orders.
-- One order can contain multiple products.
-- One delivery can contain multiple products.
-- Weekly labour salary is calculated from attendance.
-- Production is associated with the machine used.
-- Outstanding payment is calculated automatically.
-- Quality is never compromised.
+- Finished Goods reduce immediately after delivery.
+- Customer payments are allocated through Payment Allocation.
+- Historical transactions are never modified.
+- Current Inventory is maintained separately from transaction history.
 
 ---
 
 # Business Principles
 
 - Business First
-- Simplicity Before Complexity
-- Quality Before Quantity
-- Customer Trust
-- Preserve Founder Knowledge
-- Adapt to Business Constraints
+- Single Source of Truth
+- Third Normal Form (3NF)
+- Master–Transaction Separation
+- Current Inventory Model
+- Auditability
+- Future AI Ready
 
 ---
 
@@ -304,6 +317,16 @@ Examples:
 - Purchase Reminders
 - Maintenance Scheduling
 
+
+Future AI modules will support:
+
+- Production Forecasting
+- Inventory Forecasting
+- Payment Prediction
+- Purchase Planning
+- Labour Analytics
+- Machine Utilization Analysis
+
 ---
 
 # Scalability
@@ -322,41 +345,58 @@ The architecture is designed to support future growth, including:
 - AI payment reminders
 - Predictive inventory management
 
+
+The architecture supports future expansion including:
+
+- Multiple Factories
+- Multiple Warehouses
+- Multiple Products
+- Multiple Production Machines
+- GST Integration
+- Invoice Management
+- Mobile Application
+- AI Decision Support
+
 while preserving the same business rules and architectural principles.
 
 ---
 
-# Module Outcome
-
 ## Module 1
 
-- Business Analysis Completed
+✅ Business Analysis Completed
 
 ## Module 2
 
-- Software Architecture Completed
+✅ Software Architecture Completed
 
 ## Module 3
 
-Completed:
+✅ Database Design Completed
 
-- Logical Database Design
+Completed Deliverables
+
 - Database Data Dictionary
-- Database Naming Standards
-- Database Relationship Summary
-- Master Entity Relationship Diagram
-- 19 Version 1 Database Tables
+- Database Master Index
+- Naming Standards
+- Relationship Summary
+- Master ER Diagram
+- PostgreSQL Physical Schema
+- Architecture Decision Records
+- 19 Tables
 - 19 Validated Relationships
-- Business Domains Documentation
-- Architecture Decision Records (ADR)
 
-Remaining:
+Next Module
 
-- PostgreSQL Physical Database Schema
+➡ Module 4 – Backend Development
 
-After completing the PostgreSQL schema, the project will begin:
+Technology
 
-**Module 4 – Backend Development (Spring Boot + PostgreSQL)**.
+- Spring Boot
+- PostgreSQL
+- Spring Data JPA
+- Hibernate
+- REST APIs
+- JWT Authentication
 ---
 
 # One-Line Memory
@@ -392,34 +432,21 @@ Business workflows were converted into a modular software architecture following
 
 ### Phase 3 — Database Architecture
 
-The business architecture has been transformed into a fully documented logical database architecture.
-
-Completed deliverables include:
-
-- Database Data Dictionary
-- Database Master Index
-- Database Naming Standards
-- Database Relationship Summary
-- Master Entity Relationship Diagram
-- Architecture Decision Records (ADR)
-
-The Version 1 database consists of:
+The finalized database architecture contains:
 
 - 19 Database Tables
-- 6 Business Domains
 - 19 Validated Relationships
+- 3 One-to-One Relationships
+- 16 One-to-Many Relationships
 
 The architecture follows:
 
-- Business-First Design
-- Normalized Relational Model
+- Third Normal Form (3NF)
+- Business First
 - Master–Transaction Separation
-- Current Position + Historical Transactions Inventory Model
-- Header–Detail Design Pattern
-
-Only the PostgreSQL physical implementation remains before backend development begins.
-
----
+- Current Inventory Model
+- Header–Detail Pattern
+- Payment Allocation Bridge Pattern
 ---
 
 # Current Documentation Snapshot
@@ -446,10 +473,8 @@ Only the PostgreSQL physical implementation remains before backend development b
 - Database Naming Standards
 - Database Relationship Summary
 - Master Entity Relationship Diagram
-
-### Remaining
-
-- PostgreSQL Physical Database Schema
+- PostgreSQL Schema
+- ADR Documents
 
 ---
 
