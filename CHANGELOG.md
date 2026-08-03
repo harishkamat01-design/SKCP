@@ -3,6 +3,233 @@
 All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 ---
 
+# [2026-08-03] – Module 4 Backend Development (Customer Module Completed)
+
+## 🎯 Summary
+
+Successfully completed the first end-to-end backend module for the SKCP ERP system.
+
+The Customer module is now fully functional using:
+
+- Spring Boot
+- Spring Data JPA (Hibernate)
+- PostgreSQL
+- REST APIs
+- Postman
+
+This marks the first complete implementation of the Backend Architecture.
+
+---
+
+## Added
+
+### Customer Backend Module
+
+Implemented the complete layered architecture:
+
+- Customer Entity
+- Customer Repository
+- Customer Service
+- Customer Controller
+
+Following the standard Spring Boot architecture:
+
+Controller
+↓
+Service
+↓
+Repository
+↓
+Hibernate / JPA
+↓
+PostgreSQL
+
+---
+
+### REST APIs
+
+Implemented complete CRUD APIs.
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/customers | Retrieve all customers |
+| GET | /api/customers/{id} | Retrieve customer by ID |
+| POST | /api/customers | Create customer |
+| PUT | /api/customers/{id} | Update customer |
+| DELETE | /api/customers/{id} | Delete customer |
+
+---
+
+### Backend Development Workflow
+
+Established the standard development workflow:
+
+1. Create Entity
+2. Create Repository
+3. Create Service
+4. Create Controller
+5. Build Project
+6. Run Spring Boot
+7. Test using Postman
+8. Verify PostgreSQL
+
+This workflow will be reused for every future business module.
+
+---
+
+### Documentation
+
+Added reusable developer documentation:
+
+- Backend Daily Build & Run Guide
+- Spring Boot Build Commands
+- Maven Command Reference
+- Spring Boot Development Workflow
+- CRUD Development Pattern
+
+---
+
+## Fixed
+
+### PostgreSQL created_at Constraint
+
+Resolved the NOT NULL constraint failure for the `created_at` column.
+
+Implemented automatic timestamp generation using:
+
+- LocalDateTime.now()
+- @PrePersist lifecycle callback
+
+This ensures every newly created customer automatically receives a creation timestamp.
+
+---
+
+## Improved
+
+### Git Configuration
+
+Improved Git consistency across the project.
+
+Updated:
+
+- Root `.gitignore`
+- Backend `.gitignore`
+- Root `.gitattributes`
+- Backend `.gitattributes`
+
+Standardized:
+
+- Line endings
+- Maven wrapper handling
+- IDE exclusions
+- Build artifacts
+- Node modules
+- Environment files
+
+---
+
+### Development Knowledge
+
+Strengthened understanding of:
+
+- Spring Boot Architecture
+- Hibernate ORM
+- Spring Data JPA
+- PostgreSQL Integration
+- REST API Design
+- Postman Testing
+- Maven Build Lifecycle
+- Layered Architecture
+
+---
+
+## Decisions
+
+Established the standard backend development pattern for all future modules.
+
+Every business module will follow:
+
+Business Object
+↓
+Database Table
+↓
+Entity
+↓
+Repository
+↓
+Service
+↓
+Controller
+↓
+REST API
+↓
+Postman Testing
+
+This architecture will be reused for:
+
+- Product
+- Supplier
+- Raw Material
+- Inventory
+- Production
+- Purchase
+- Order
+- Payment
+- Delivery
+
+---
+
+## Milestone Achieved
+
+✅ First Spring Boot Backend Module Completed
+
+Successfully integrated:
+
+- Spring Boot
+- Hibernate
+- JPA
+- PostgreSQL
+- REST APIs
+- Postman
+
+Verified complete CRUD functionality:
+
+- Create
+- Read
+- Update
+- Delete
+
+The SKCP backend is now capable of storing and managing customer data through production-ready REST APIs.
+
+---
+
+## Next
+
+🚀 Continue Module 4 – Backend Development
+
+Upcoming modules:
+
+- Product Module
+- Supplier Module
+- Raw Material Module
+- Inventory Module
+- Purchase Module
+- Order Module
+- Payment Module
+- Delivery Module
+
+---
+
+### Architect Verdict
+
+Today represents one of the most important milestones in the project.
+
+The SKCP backend has moved beyond planning and documentation into a working software system.
+
+The Customer module now serves as the reference implementation for every remaining backend module, significantly accelerating future development.
+
+
+---
 # [2026-08-01] – Module 3 Physical Database Completed
 
 ## 🎯 Summary

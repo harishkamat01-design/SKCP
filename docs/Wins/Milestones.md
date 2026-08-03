@@ -146,6 +146,97 @@
 
 ---
 
+## 03-Aug-2026
+
+### ⚙️ Module 4 – Backend Development (Phase 1)
+
+#### Achievements
+
+##### Spring Boot Backend Foundation
+
+- Spring Boot project configured
+- PostgreSQL connected
+- REST API architecture established
+- Layered architecture implemented
+  - Controller Layer
+  - Service Layer
+  - Repository Layer
+  - Entity Layer
+
+##### Customer Module Completed
+
+Implemented complete CRUD operations.
+
+###### Customer APIs
+
+- POST Create Customer
+- GET All Customers
+- GET Customer By ID
+- PUT Update Customer
+- DELETE Customer
+
+##### Entity Improvements
+
+- Added createdAt timestamp
+- Implemented @PrePersist lifecycle callback
+- Immutable creation timestamp
+- Clean entity mapping using JPA annotations
+
+##### API Testing
+
+Successfully tested using Postman.
+
+Verified:
+
+- Create
+- Read
+- Update
+- Delete
+
+##### Database Validation
+
+Verified in PostgreSQL:
+
+- Table creation
+- Column mappings
+- Constraints
+- Primary Key generation
+- Timestamp storage
+- CRUD synchronization
+
+##### Project Hygiene
+
+Repository standardized.
+
+Completed:
+
+- Root .gitignore
+- Root .gitattributes
+- Backend .gitignore
+- Backend .gitattributes
+
+##### Learning Outcomes
+
+- Spring Boot REST architecture
+- JPA Entity lifecycle
+- Repository pattern
+- Service layer responsibilities
+- Controller responsibilities
+- PostgreSQL integration
+- HTTP status codes
+- API testing workflow
+- Professional repository management
+
+#### Status
+
+🚧 Module 4 ~20% Complete
+
+#### Next Milestone
+
+🎯 Build Product Module
+
+---
+
 # 📖 Milestone Philosophy
 
 A milestone represents a significant improvement in one or more of the following:

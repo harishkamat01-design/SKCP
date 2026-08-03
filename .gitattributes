@@ -1,66 +1,74 @@
-# ============================================
-# SKCP Git Attributes
-# ============================================
+# ==========================================================
+# SKCP Project - Root Git Attributes
+# Purpose:
+#   - Normalize text files
+#   - Preserve correct line endings
+#   - Prevent OS-specific issues
+# ==========================================================
 
-# Automatically detect text files and normalize line endings
+# Auto detect text files
 * text=auto
 
-# ============================================
+# ==========================================================
 # Source Code
-# ============================================
+# ==========================================================
 
-# Java
-*.java text
+*.java          text
+*.js            text
+*.jsx           text
+*.ts            text
+*.tsx           text
+*.html          text
+*.css           text
+*.scss          text
 
-# JavaScript
-*.js text
-
-# JSX
-*.jsx text
-
-# TypeScript
-*.ts text
-*.tsx text
-
-# HTML
-*.html text
-
-# CSS
-*.css text
-
-# ============================================
+# ==========================================================
 # Configuration Files
-# ============================================
+# ==========================================================
 
-# JSON
-*.json text
+*.json          text
+*.xml           text
+*.properties    text
+*.yml           text
+*.yaml          text
+*.sql           text
 
-# YAML
-*.yml text
-*.yaml text
+# Documentation
+*.md            text
 
-# Spring Boot Properties
-*.properties text
+# Git files
+.gitattributes  text
+.gitignore      text
 
-# XML (pom.xml, configuration files)
-*.xml text
-
-# Markdown
-*.md text
-
-# Git configuration files
-.gitattributes text
-.gitignore text
-
-# ============================================
+# ==========================================================
 # Scripts
-# ============================================
+# ==========================================================
 
-# Shell scripts (Linux/macOS)
-*.sh text eol=lf
+# Linux / macOS
+*.sh            text eol=lf
 
-# Windows batch files
-*.bat text eol=crlf
+# Windows
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
 
-# Windows command files (Maven Wrapper)
-*.cmd text eol=crlf
+# ==========================================================
+# Binary Files
+# (Never modify line endings)
+# ==========================================================
+
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.pdf           binary
+*.zip           binary
+*.jar           binary
+
+# ==========================================================
+# Office Files
+# ==========================================================
+
+*.docx          binary
+*.xlsx          binary
+*.pptx          binary

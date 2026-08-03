@@ -1,2 +1,40 @@
-/mvnw text eol=lf
+# ----------------------------------------
+# SKCP Backend - Git Attributes
+# Spring Boot Backend
+# ----------------------------------------
+
+# Auto detect text files
+* text=auto
+
+# Java Source
+*.java text
+
+# Spring Configuration
+*.properties text
+*.yml text
+*.yaml text
+*.xml text
+
+# SQL Scripts
+*.sql text
+
+# Documentation
+*.md text
+*.txt text
+
+# JSON
+*.json text
+
+# Shell Scripts
+*.sh text eol=lf
+
+# Windows Scripts
+*.bat text eol=crlf
 *.cmd text eol=crlf
+
+# Maven Wrapper
+mvnw text eol=lf
+mvnw.cmd text eol=crlf
+
+# Binary Files
+*.jar binary

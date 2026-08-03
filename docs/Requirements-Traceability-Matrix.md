@@ -44,21 +44,20 @@ This guarantees that no requirement is forgotten during development.
 
 | Requirement ID | Business Requirement | Business Object | Database Table | Backend API | Frontend Screen | Test Case | Status |
 |----------------|----------------------|-----------------|----------------|-------------|-----------------|-----------|--------|
-| BR-001 | Manage Customers | Customer | Customer | Planned | Planned | Planned | ✅ Designed |
-| BR-002 | Manage Products | Product | Product | Planned | Planned | Planned | ✅ Designed |
-| BR-003 | Manage Inventory | Inventory | Inventory | Planned | Planned | Planned | ✅ Designed |
-| BR-004 | Create Customer Orders | Order | Order | Planned | Planned | Planned | ✅ Designed |
-| BR-005 | Multiple Products per Order | Order Item | Order Item | Planned | Planned | Planned | ✅ Designed |
-| BR-006 | Track Customer Payments | Payment | Payment | Planned | Planned | Planned | ✅ Designed |
-| BR-007 | Manage Deliveries | Delivery | Delivery | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-008 | Track Production | Production | Production | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-009 | Manage Suppliers | Supplier | Supplier | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-010 | Manage Raw Materials | Raw Material | Raw Material | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-011 | Manage Labour | Labour | Labour | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-012 | Manage Machines | Machine | Machine | Planned | Planned | Planned | ⏳ Pending Design |
-| BR-013 | Business Reports | Multiple | Multiple | Planned | Planned | Planned | ⏳ Future |
-| BR-014 | AI Decision Support | Multiple | Multiple | Future | Future | Future | ⏳ Module 6 |
-
+| BR-001 | Manage Customers | Customer | Customer | ✅ CRUD Completed | ⏳ Planned | ✅ API Tested | ✅ Implemented |
+| BR-002 | Manage Products | Product | Product | ⏳ Planned | ⏳ Planned | ⏳ Planned | ✅ Designed |
+| BR-003 | Manage Inventory | Inventory | Inventory | ⏳ Planned | ⏳ Planned | ⏳ Planned | ✅ Designed |
+| BR-004 | Create Customer Orders | Order | Order | ⏳ Planned | ⏳ Planned | ⏳ Planned | ✅ Designed |
+| BR-005 | Multiple Products per Order | Order Item | Order Item | ⏳ Planned | ⏳ Planned | ⏳ Planned | ✅ Designed |
+| BR-006 | Track Customer Payments | Payment | Payment | ⏳ Planned | ⏳ Planned | ⏳ Planned | ✅ Designed |
+| BR-007 | Manage Deliveries | Delivery | Delivery | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-008 | Track Production | Production | Production | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-009 | Manage Suppliers | Supplier | Supplier | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-010 | Manage Raw Materials | Raw Material | Raw Material | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-011 | Manage Labour | Labour | Labour | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-012 | Manage Machines | Machine | Machine | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Pending Design |
+| BR-013 | Business Reports | Multiple | Multiple | ⏳ Planned | ⏳ Planned | ⏳ Planned | ⏳ Future |
+| BR-014 | AI Decision Support | Multiple | Multiple | ⏳ Future | ⏳ Future | ⏳ Future | ⏳ Module 6 |
 ---
 
 # Module Progress Mapping
@@ -135,33 +134,62 @@ Completed
 
 ---
 
-## ⏭️ Module 4 – Backend Development
+## 🚧 Module 4 – Backend Development
 
-This module will map every database table to REST APIs.
+### Backend Foundation Completed
 
-Example
+Implemented the first production-ready backend module using Spring Boot.
 
-Customer Table
+### Customer Module Completed
 
-↓
+Implemented complete CRUD operations.
 
-Customer Entity
+#### APIs Completed
 
-↓
+- POST Create Customer
+- GET All Customers
+- GET Customer By ID
+- PUT Update Customer
+- DELETE Customer
 
-Customer Repository
+### Backend Architecture Implemented
 
-↓
+- Customer Entity
+- Customer Repository
+- Customer Service
+- Customer Controller
 
-Customer Service
+### Features Implemented
 
-↓
+- JPA Entity Mapping
+- Repository Pattern
+- Service Layer
+- REST Controller
+- Auto-generated Primary Key
+- createdAt timestamp
+- Entity lifecycle using `@PrePersist`
 
-Customer Controller
+### Testing Completed
 
-↓
+Verified using Postman:
 
-Customer API
+- Create Customer
+- Read Customer
+- Update Customer
+- Delete Customer
+
+### Database Validation
+
+Verified with PostgreSQL:
+
+- Customer table
+- Data persistence
+- CRUD synchronization
+- Timestamp generation
+
+### Next Module
+
+Product Management CRUD
 
 ---
 
@@ -248,6 +276,20 @@ No requirement should ever be lost during development.
 
 ---
 
+## Current Traceability Coverage
+
+| Layer | Status |
+|--------|--------|
+| Business Analysis | ✅ |
+| Software Architecture | ✅ |
+| Database Design | 🚧 |
+| Customer Backend CRUD | ✅ |
+| Frontend | ⏳ |
+| AI | ⏳ |
+| Deployment | ⏳ |
+
+---
+
 ## Current Project Status
 
 | Module | Status |
@@ -255,8 +297,8 @@ No requirement should ever be lost during development.
 | Module 0 – Environment Setup | ✅ Completed |
 | Module 1 – Business Analysis | ✅ Completed |
 | Module 2 – Software Architecture | ✅ Completed |
-| Module 3 – Database Design | 🚧 80% Complete |
-| Module 4 – Backend Development | ⏳ Planned |
+| Module 3 – Database Design | 🚧 90% Complete (Core Database Completed) |
+| Module 4 – Backend Development | 🚧 Customer CRUD Completed |
 | Module 5 – Frontend Development | ⏳ Planned |
 | Module 6 – AI Integration | ⏳ Planned |
 | Module 7 – Deployment & Production | ⏳ Planned |
