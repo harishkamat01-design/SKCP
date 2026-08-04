@@ -275,7 +275,7 @@
   | Module 1 – Business Analysis | ✅ Complete |
   | Module 2 – Software Architecture | ✅ Complete |
   | Module 3 – Database Design & PostgreSQL Physical Schema | ✅ Completed |
-  | Module 4 – Spring Boot Backend Development | 🚧 Customer Module Completed |
+  | Module 4 – Spring Boot Backend Development | 🚧 Customer and Supplier  Module Completed |
   | Module 5 – Frontend Integration | ⏳ Upcoming |
   | Module 6 – AI Decision Support | ⏳ Upcoming |
   | Module 7 – Deployment | ⏳ Upcoming |

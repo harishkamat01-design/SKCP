@@ -3,6 +3,227 @@
 All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 ---
 
+# [2026-08-04] – Module 4 Backend Development (Supplier Module Completed)
+
+## 🎯 Summary
+
+Successfully completed the Supplier backend module and upgraded both the Customer and Supplier modules to follow a consistent, production-ready backend architecture.
+
+The backend now contains two fully functional Master Data modules with standardized REST API design.
+
+---
+
+## Added
+
+### Supplier Backend Module
+
+Implemented the complete layered architecture:
+
+- Supplier Entity
+- Supplier Repository
+- Supplier Service
+- Supplier Controller
+
+Following the standard Spring Boot architecture:
+
+Controller
+↓
+Service
+↓
+Repository
+↓
+Hibernate / JPA
+↓
+PostgreSQL
+
+---
+
+### Supplier REST APIs
+
+Implemented complete CRUD APIs.
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/suppliers | Retrieve all suppliers |
+| GET | /api/suppliers/{id} | Retrieve supplier by ID |
+| POST | /api/suppliers | Create supplier |
+| PUT | /api/suppliers/{id} | Update supplier |
+| DELETE | /api/suppliers/{id} | Delete supplier |
+
+---
+
+### Postman API Testing
+
+Successfully tested every Supplier API.
+
+Verified:
+
+- Create Supplier
+- Get All Suppliers
+- Get Supplier by ID
+- Update Supplier
+- Delete Supplier
+
+Also verified HTTP responses for invalid resource requests.
+
+---
+
+## Changed
+
+### Customer Module Refactoring
+
+Upgraded the Customer module to follow the same architecture as the Supplier module.
+
+Improved:
+
+- Production-ready update pattern
+- Immutable `createdAt` handling
+- ResponseEntity implementation
+- Proper HTTP status codes
+
+---
+
+### Supplier Update Logic
+
+Improved the update implementation.
+
+Instead of replacing the entity directly, the API now:
+
+1. Retrieves the existing Supplier
+2. Updates only editable fields
+3. Preserves immutable fields
+4. Saves the existing entity
+
+This prevents accidental loss of audit information.
+
+---
+
+## Improved
+
+### REST API Standards
+
+Both Customer and Supplier modules now consistently use:
+
+- ResponseEntity
+- HTTP 200 OK
+- HTTP 201 Created
+- HTTP 204 No Content
+- HTTP 404 Not Found
+
+This establishes the standard response pattern for all future backend modules.
+
+---
+
+### Audit Field Protection
+
+Improved handling of immutable audit fields.
+
+`createdAt` is now preserved during update operations instead of being overwritten with `null`.
+
+Implemented using:
+
+- `@Column(updatable = false)`
+- Fetch → Modify → Save update pattern
+
+---
+
+### Code Consistency
+
+Standardized project structure across both modules.
+
+Both now follow the same implementation pattern:
+
+- Entity
+- Repository
+- Service
+- Controller
+
+This reusable architecture will be followed throughout the project.
+
+---
+
+## Decisions
+
+Established the official CRUD development standard for SKCP.
+
+Every backend module will follow:
+
+  Business Object
+  ↓
+  Database Table
+  ↓
+  Entity
+  ↓
+  Repository
+  ↓
+  Service
+  ↓
+  Controller
+  ↓
+  Postman Testing
+  ↓
+  Documentation
+
+Future modules will reuse this pattern:
+
+- Product
+- Raw Material
+- Labour
+- Asset
+- Purchase
+- Production
+- Inventory
+- Order
+- Delivery
+- Payment
+
+---
+
+## Milestone Achieved
+
+✅ Supplier Module Completed
+
+✅ Customer Module Upgraded
+
+✅ Two Production-Ready Master Modules Completed
+
+The backend now contains two fully tested CRUD modules using a consistent enterprise architecture.
+
+This establishes the reusable development pattern for the remainder of Module 4.
+
+---
+
+## Next
+
+🚀 Continue Module 4 – Backend Development
+
+Upcoming modules:
+
+- Product Module
+- Raw Material Module
+- Labour Module
+- Asset Module
+
+After completing all Master Data modules:
+
+- Purchase Module
+- Production Module
+- Inventory Module
+- Sales Module
+- Finance Module
+
+---
+
+### Architect Verdict
+
+Today's work significantly improved the backend quality.
+
+Instead of simply creating CRUD operations, the project now follows consistent enterprise development practices, including immutable audit fields, standardized HTTP responses, reusable architecture, and production-ready update logic.
+
+The Customer and Supplier modules now serve as the reference implementation for every remaining backend module.
+
+---
+
 # [2026-08-03] – Module 4 Backend Development (Customer Module Completed)
 
 ## 🎯 Summary
