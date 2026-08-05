@@ -275,7 +275,7 @@
   | Module 1 – Business Analysis | ✅ Complete |
   | Module 2 – Software Architecture | ✅ Complete |
   | Module 3 – Database Design & PostgreSQL Physical Schema | ✅ Completed |
-  | Module 4 – Spring Boot Backend Development | 🚧 Customer and Supplier  Module Completed |
+  | Module 4 – Spring Boot Backend Development | 🚧 Master Data + Procurement Modules Completed |
   | Module 5 – Frontend Integration | ⏳ Upcoming |
   | Module 6 – AI Decision Support | ⏳ Upcoming |
   | Module 7 – Deployment | ⏳ Upcoming |
@@ -352,55 +352,86 @@
 
   Completed
 
-  - Spring Boot Project Setup
-  - PostgreSQL Integration
-  - Customer Entity
-  - Customer Repository
-  - Customer Service
-  - Customer Controller
-  - Customer CRUD REST APIs
-  - Postman CRUD Testing
-  - Hibernate & Spring Data JPA Integration
-  - Backend Build & Run Workflow
-  - Git Configuration Standardization
+### Master Data
+
+- Customer Module
+- Supplier Module
+- Raw Material Module
+- Asset Module
+
+### Procurement
+
+- Purchase Module
+- Purchase Item Module
+
+### Infrastructure
+
+- Spring Boot Project Setup
+- PostgreSQL Integration
+- Hibernate Configuration
+- Spring Data JPA
+- Layered Architecture
+- REST APIs
+- CRUD Testing using Postman
+
 
   Current Focus
 
-  - Product Module
-  - Supplier Module
-  - Raw Material Module
-  - Inventory Module
+- Product Module
+- Labour Module
+- Attendance Module
+- Inventory Module
+- Production Module
 
 ## Module 4 (Current Progress)
 
   Completed
 
-  - Spring Boot Project Created
-  - PostgreSQL Connected
-  - Hibernate Configured
-  - Spring Data JPA Configured
-  - Customer Module Completed
-  - CRUD APIs Implemented
-  - Postman Testing Completed
-  - Backend Layered Architecture Established
+- Spring Boot Project Created
+- PostgreSQL Connected
+- Hibernate Configured
+- Spring Data JPA Configured
+
+### Master Modules
+
+- Customer
+- Supplier
+- Raw Material
+- Asset
+
+### Procurement Modules
+
+- Purchase
+- Purchase Item
+
+### Backend Architecture
+
+- Entity Layer
+- Repository Layer
+- Service Layer
+- Controller Layer
+- REST APIs
+- CRUD Operations
+- Postman Testing
+
 
   Architecture
 
-  Customer
-  ↓
-  Entity
-  ↓
-  Repository
-  ↓
-  Service
-  ↓
-  Controller
-  ↓
-  REST API
-  ↓
-  Postman
-  ↓
-  PostgreSQL
+        Business Table
+                ↓
+        Entity
+                ↓
+        Repository
+                ↓
+        Service
+                ↓
+        Controller
+                ↓
+        REST API
+                ↓
+        Postman
+                ↓
+        PostgreSQL
 
 This architecture will be reused for every remaining business module.
 
@@ -430,6 +461,7 @@ This architecture will be reused for every remaining business module.
   | **30-Jul-2026** | **Module 3** | **Database Relationship Architecture & Module 3 Milestone** | **🏆 Major Milestone** |
   | **31-Jul-2026** | **Module 3** | **PostgreSQL Physical Schema Finalization & Table Reviews** | **🏆 Module 3 Completed** |
   | **03-Aug-2026** | **Module 4** | **Spring Boot Customer CRUD + PostgreSQL + Postman** | **🏆 Backend Milestone** |
+  | 05-Aug-2026 | Module 4 | Supplier, Purchase, Purchase Item, Raw Material & Asset CRUD | 🏆 Major Backend Progress |
 
   ---
 
@@ -594,23 +626,26 @@ Upcoming
   The logical database architecture is now frozen and ready for PostgreSQL implementation.
   
 
-  ## Module 4 – Backend Development (Current)
+  ## Module 4 – Backend Development
 
-  Successfully completed:
+Completed
 
-  - Spring Boot Setup
-  - PostgreSQL Integration
-  - Hibernate Configuration
-  - Spring Data JPA Configuration
-  - Customer Entity
-  - Customer Repository
-  - Customer Service 
-  - Customer Controller
-  - Customer CRUD APIs
-  - Postman Testing
-  - Layered Architecture
+- Customer
+- Supplier
+- Raw Material
+- Asset
+- Purchase
+- Purchase Item
 
-  This backend foundation will be reused for every remaining business module.
+Upcoming
+
+- Product
+- Labour
+- Attendance
+- Inventory
+- Production
+- Sales
+- Finance
 
   ---
   ## Database
@@ -677,7 +712,54 @@ Upcoming
 
   The project has successfully completed the database architecture and has begun backend implementation using Spring Boot, Hibernate, Spring Data JPA, PostgreSQL and Postman.
 
-  The first backend business module (Customer) is fully functional and establishes the development pattern for the remaining modules.
+  The backend foundation has been established using a reusable enterprise architecture.
+
+  Completed business modules:
+
+  - Customer
+  - Supplier
+  - Raw Material
+  - Asset
+  - Purchase
+  - Purchase Item
+
+  These modules now serve as the reference implementation for all remaining backend modules.
+
+  ---
+
+  # 🏛 Backend Development Pattern
+
+  Every backend module follows the same enterprise architecture.
+
+              Business Object
+                      ↓
+              Database Table
+                      ↓
+              Entity
+                      ↓
+              Repository
+                      ↓
+              Service
+                      ↓
+              Controller
+                      ↓
+              REST API
+                      ↓
+              Postman Testing
+                      ↓ 
+              Documentation
+
+  This pattern has been successfully implemented for:
+
+  - Customer
+  - Supplier
+  - Raw Material
+  - Asset
+  - Purchase
+  - Purchase Item
+
+  The same architecture will be reused throughout the SKCP project.
+
 
   ---
 

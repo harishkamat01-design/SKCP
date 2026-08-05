@@ -3,6 +3,559 @@
 All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 ---
 
+# [2026-08-05] – Module 4 Backend Development (Procurement, Attendance & Master Data Completed)
+
+## 🎯 Summary
+
+This development session marked one of the biggest milestones in the SKCP backend.
+
+Successfully completed multiple production-ready backend modules using a standardized enterprise architecture and established reusable patterns for all future parent–child relationships.
+
+The following modules are now fully implemented and CRUD tested:
+
+- Attendance
+- Purchase
+- Purchase Item
+- Raw Material
+- Labour
+- Asset
+
+The project now contains a solid backend foundation with reusable architecture, business-layer validations, and standardized CRUD implementation.
+
+---
+
+# Added
+
+## Labour Module
+
+Implemented complete backend architecture:
+
+- Labour Entity
+- Labour Repository
+- Labour Service
+- Labour Controller
+
+Implemented complete CRUD APIs.
+
+Verified:
+
+- GET
+- POST
+- PUT
+- DELETE
+
+---
+
+## Attendance Module
+
+Implemented complete backend architecture:
+
+- Attendance Entity
+- Attendance Repository
+- Attendance Service
+- Attendance Controller
+
+Implemented Parent → Child relationship
+
+Attendance
+↓
+
+Labour
+
+using
+
+```java
+@ManyToOne
+@JoinColumn(name="labour_id")
+private Labour labour;
+```
+
+Implemented complete CRUD APIs.
+
+---
+
+## Purchase Module
+
+Implemented complete backend architecture:
+
+- Purchase Entity
+- Purchase Repository
+- Purchase Service
+- Purchase Controller
+
+Implemented Parent relationship
+
+Purchase
+↓
+
+Supplier
+
+Completed CRUD APIs.
+
+---
+
+## Purchase Item Module
+
+Implemented complete backend architecture:
+
+- PurchaseItem Entity
+- PurchaseItem Repository
+- PurchaseItem Service
+- PurchaseItem Controller
+
+Implemented dual Parent relationships
+
+PurchaseItem
+↓
+
+Purchase
+
+PurchaseItem
+↓
+
+RawMaterial
+
+using two @ManyToOne relationships.
+
+Completed CRUD APIs.
+
+---
+
+## Asset Module
+
+Implemented complete backend architecture:
+
+- Asset Entity
+- Asset Repository
+- Asset Service
+- Asset Controller
+
+Completed CRUD APIs.
+
+---
+
+# Added Documentation
+
+Created detailed module documentation for:
+
+- Labour
+- Attendance
+- Purchase
+- Purchase Item
+- Asset
+
+Each document contains:
+
+- Database Structure
+- Entity Design
+- CRUD APIs
+- Lessons Learned
+- PostgreSQL Verification
+- Architecture
+- Module Progress
+
+---
+
+# Changed
+
+## Attendance Business Logic
+
+Attendance module was redesigned.
+
+Originally
+
+dailyRate
+
+and
+
+dailyAmount
+
+were supplied manually.
+
+This created inconsistent data.
+
+Now Attendance automatically derives:
+
+- dailyRate
+- dailyAmount
+
+from the selected Labour.
+
+The Service Layer now controls these fields.
+
+---
+
+## Attendance Update API
+
+Removed manual updates for
+
+```java
+dailyRate
+
+dailyAmount
+```
+
+from Controller.
+
+Only editable fields are updated.
+
+The Service recalculates derived values automatically.
+
+---
+
+## Purchase Item Architecture
+
+Refined PurchaseItem relationship implementation.
+
+Instead of storing
+
+```text
+purchaseId
+
+rawMaterialId
+```
+
+the Entity now stores
+
+```java
+Purchase purchase;
+
+RawMaterial rawMaterial;
+```
+
+allowing Hibernate to manage relationships correctly.
+
+---
+
+# Improved
+
+## Parent–Child Architecture
+
+A reusable Parent–Child relationship pattern was established.
+
+The project now consistently models relationships using entities instead of foreign key integers.
+
+Examples:
+
+```
+Attendance
+↓
+
+Labour
+
+Purchase
+↓
+
+Supplier
+
+PurchaseItem
+↓
+
+Purchase
+
+PurchaseItem
+↓
+
+RawMaterial
+```
+
+This becomes the standard for all future SKCP modules.
+
+---
+
+## Service Layer Ownership
+
+Business rules are no longer handled by Controllers.
+
+Controllers now:
+
+- Receive requests
+- Validate existence
+- Delegate work to Services
+
+Services now:
+
+- Apply business rules
+- Calculate derived fields
+- Preserve data consistency
+
+---
+
+## Architecture Consistency
+
+All completed modules now follow the identical enterprise architecture.
+
+```
+Entity
+
+↓
+
+Repository
+
+↓
+
+Service
+
+↓
+
+Controller
+
+↓
+
+Postman Testing
+
+↓
+
+Documentation
+```
+
+This architecture is now frozen for the remaining backend development.
+
+---
+
+# Lessons Learned
+
+## Parent–Child Relationships
+
+Instead of storing foreign keys
+
+```java
+Integer labourId;
+```
+
+we now store
+
+```java
+private Labour labour;
+```
+
+Benefits:
+
+- Cleaner object model
+- Automatic joins
+- Easier future DTO implementation
+- Better frontend integration
+
+---
+
+## Business Rules belong in Service Layer
+
+Derived values should never come from the frontend.
+
+Example:
+
+Attendance
+
+Daily Rate
+
+↓
+
+Read from Labour
+
+↓
+
+Daily Amount
+
+↓
+
+Calculated
+
+This prevents inconsistent business data.
+
+---
+
+## DTOs are the Correct Long-Term Solution
+
+Current GET responses return complete object graphs.
+
+Example
+
+PurchaseItem
+
+↓
+
+Purchase
+
+↓
+
+Supplier
+
+↓
+
+RawMaterial
+
+While POST responses may contain partially populated nested objects.
+
+Future DTO implementation will:
+
+- Reduce payload size
+- Improve frontend responses
+- Prevent recursive serialization
+- Improve API performance
+
+This architecture decision has been adopted for the entire SKCP project.
+
+---
+
+## Master Data vs Transaction Modules
+
+Master Data
+
+- Customer
+- Supplier
+- Product
+- Labour
+- Raw Material
+- Asset
+
+are independent.
+
+Transaction Modules
+
+- Attendance
+- Purchase
+- Purchase Item
+
+introduce Parent–Child relationships and business logic.
+
+---
+
+# PostgreSQL Verification
+
+Verified successfully using pgAdmin.
+
+Confirmed:
+
+- Record creation
+- Updates
+- Deletes
+- Foreign Key relationships
+- Business data integrity
+
+All CRUD operations passed.
+
+---
+
+# Milestones Achieved
+
+## Master Data
+
+✅ Customer
+
+✅ Supplier
+
+✅ Product
+
+✅ Raw Material
+
+✅ Labour
+
+✅ Asset
+
+---
+
+## Procurement
+
+✅ Purchase
+
+✅ Purchase Item
+
+---
+
+## Attendance
+
+✅ Attendance
+
+---
+
+## Parent–Child Relationships
+
+Successfully implemented and understood:
+
+```
+Supplier
+↓
+
+Purchase
+
+Purchase
+↓
+
+PurchaseItem
+
+RawMaterial
+↓
+
+PurchaseItem
+
+Labour
+↓
+
+Attendance
+```
+
+This becomes the reusable ERP architecture moving forward.
+
+---
+
+# Project Progress
+
+Current backend status
+
+```
+MASTER DATA
+──────────────────────
+✅ Customer
+✅ Supplier
+✅ Product
+✅ Raw Material
+✅ Labour
+✅ Asset
+
+TRANSACTIONS
+──────────────────────
+✅ Attendance
+✅ Purchase
+✅ Purchase Item
+```
+
+---
+
+# Next
+
+The next development phase begins.
+
+Upcoming modules:
+
+- Inventory
+- Production
+- Sales
+- Payment
+- Reports
+- Dashboard
+
+These modules will now consume the completed Master Data and Procurement layers.
+
+---
+
+# Architect Verdict
+
+This session transformed the SKCP backend from a collection of CRUD modules into a true enterprise backend.
+
+The project now demonstrates:
+
+- Standardized layered architecture
+- Proper Parent–Child entity relationships
+- Service-layer business logic
+- Production-ready CRUD implementation
+- PostgreSQL data integrity
+- Reusable development standards
+- Documentation-first engineering
+
+The backend foundation is now mature enough to begin implementing the core business workflows of the ERP system.
+
+---
+
 # [2026-08-04] – Module 4 Backend Development (Supplier Module Completed)
 
 ## 🎯 Summary
