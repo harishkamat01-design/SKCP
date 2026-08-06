@@ -407,14 +407,14 @@ CREATE TABLE raw_material_stock
 
     raw_material_id INT
         NOT NULL
-        UNIQUE
+        UNIQUE                                          /*UNIQUE  = |RawMaterial|RawMaterialStock|1 :1|RawMaterialID|*/
         REFERENCES raw_material(raw_material_id),
 
-    current_quantity DECIMAL(10,2)
+    current_stock_level DECIMAL(10,2)
         NOT NULL
         DEFAULT 0,
 
-    minimum_quantity DECIMAL(10,2),
+    minimum_stock_level DECIMAL(10,2),
 
     last_updated_date DATE
         NOT NULL
@@ -435,24 +435,32 @@ CREATE TABLE raw_material_stock
 -- ==========================================================
 -- Table : curing_stock
 -- Domain: Inventory
--- Purpose: Stores current curing inventory batches
+-- Purpose: Stores production batches currently under curing
 -- ==========================================================
 
 CREATE TABLE curing_stock
 (
     curing_stock_id SERIAL PRIMARY KEY,
-production_id INT NOT NULL UNIQUE, 
+
+    -- One Production Batch → One Curing Batch
+    production_id INT NOT NULL UNIQUE,                 /*UNIQUE  = |Production|CuringStock|1 : 1|ProductionID| */
+
+    -- Product being cured
     product_id INT NOT NULL,
 
+    -- Quantity currently under curing
     quantity INT NOT NULL
         CHECK (quantity >= 0),
 
+    -- Date production was completed
     production_date DATE NOT NULL,
 
-    expected_ready_date DATE NOT NULL,  
-    /*  GENERATED ALWAYS AS
-        (production_date + INTERVAL '3 days') */
+    -- Automatically calculated in Spring Boot not by PostgreSQL in this case as it is Business Logic and 
+    -- we can chage the days from 3 to 5 days from Servie Layer
+    -- expected_ready_date = production_date + 3 days
+    expected_ready_date DATE NOT NULL,
 
+    -- Current curing status
     status VARCHAR(10)
         NOT NULL
         DEFAULT 'CURING'
@@ -464,13 +472,14 @@ production_id INT NOT NULL UNIQUE,
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
 
+    -- Relationships
     CONSTRAINT fk_curing_product
-    FOREIGN KEY (product_id)
-    REFERENCES product(product_id),
+        FOREIGN KEY (product_id)
+        REFERENCES product(product_id),
 
     CONSTRAINT fk_curing_production
-    FOREIGN KEY (production_id)
-    REFERENCES production(production_id)
+        FOREIGN KEY (production_id)
+        REFERENCES production(production_id)
 );
 
 -- ==========================================================
@@ -483,11 +492,11 @@ CREATE TABLE finished_goods_stock
 (
     finished_goods_stock_id SERIAL PRIMARY KEY,
 
-    product_id INT NOT NULL UNIQUE,
+    product_id INT NOT NULL UNIQUE,                 /*UNIQUE  = |Product|FinishedGoodsStock|1 : 1|ProductID|*/
 
-    current_quantity INT NOT NULL DEFAULT 0,
+    current_stock_level INT NOT NULL DEFAULT 0,
 
-    minimum_quantity INT DEFAULT 0,
+    minimum_stock_level INT DEFAULT 0,
 
     last_updated_date DATE
         NOT NULL
@@ -557,9 +566,9 @@ CREATE TABLE order_item
 (
     order_item_id SERIAL PRIMARY KEY,
 
-    order_id INT NOT NULL,
+    order_id INT NOT NULL,                    /* |Order|OrderItem|1 : N|OrderID|  */
 
-    product_id INT NOT NULL,
+    product_id INT NOT NULL,                  /* |Product|OrderItem|1 : N|ProductID| */
 
     ordered_quantity INT NOT NULL
         CHECK (ordered_quantity > 0),
@@ -658,9 +667,9 @@ CREATE TABLE delivery_item
 (
     delivery_item_id SERIAL PRIMARY KEY,
 
-    delivery_id INT NOT NULL,
+    delivery_id INT NOT NULL,                 /* |Delivery|DeliveryItem|1 : N|DeliveryID| */
 
-    product_id INT NOT NULL,
+    product_id INT NOT NULL,                  /* |Product|DeliveryItem|1 : N|ProductID|   */
 
     delivered_quantity INT NOT NULL
         CHECK (delivered_quantity > 0),
@@ -690,7 +699,7 @@ CREATE TABLE payment
 (
     payment_id SERIAL PRIMARY KEY,
 
-    customer_id INT NOT NULL,
+    customer_id INT NOT NULL,                       /* |Customer|Payment|1 : N|CustomerID| */
 
     payment_date DATE NOT NULL,
 
