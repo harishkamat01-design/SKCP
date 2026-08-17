@@ -74,7 +74,7 @@ One Order may require:
 
 - Every Order belongs to exactly one Customer.
 - Every Order has a unique OrderID.
-- An Order may contain one or many products.
+- An Order may contain one or many Order Items.
 - One Order may be delivered in multiple trips.
 - Order Status changes as deliveries are completed.
 
@@ -164,7 +164,7 @@ Only Deliveries increase over time.
 - Customer owns customer information.
 - Order Item owns product information.
 - Delivery owns logistics.
-- Payment is linked through the Order.
+- Payment will be associated with the Order through the Sales/Payment design.
 - One Order supports multiple deliveries.
 
 ---

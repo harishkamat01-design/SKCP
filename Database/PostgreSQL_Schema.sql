@@ -241,7 +241,7 @@ CREATE TABLE purchase
 (
     purchase_id SERIAL PRIMARY KEY,
 
-    supplier_id INT NOT NULL,
+    supplier_id INT NOT NULL,            /* |Supplier|Purchase|1 : N|SupplierID|  */
 
     purchase_date DATE NOT NULL,
 
@@ -280,9 +280,9 @@ CREATE TABLE purchase_item
 (
     purchase_item_id SERIAL PRIMARY KEY,
 
-    purchase_id INT NOT NULL,
+    purchase_id INT NOT NULL,                    /* |Purchase|PurchaseItem|1 : N|PurchaseID|  */
 
-    raw_material_id INT NOT NULL,
+    raw_material_id INT NOT NULL,                 /* |RawMaterial|PurchaseItem|1 : N|RawMaterialID| */
 
     quantity DECIMAL(10,2) NOT NULL,
 
@@ -319,7 +319,7 @@ CREATE TABLE production
 
     production_date DATE NOT NULL,
 
-    product_id INT NOT NULL,
+    product_id INT NOT NULL,                        /* |Product|Production|1 : N|ProductID| */
 
     quantity_produced INT NOT NULL CHECK (quantity_produced > 0),
 
@@ -370,7 +370,7 @@ CREATE TABLE attendance
 (
     attendance_id SERIAL PRIMARY KEY,
 
-    labour_id INT NOT NULL,
+    labour_id INT NOT NULL,                 /* |Labour|Attendance|1 : N|LabourID| */
 
     attendance_date DATE NOT NULL,
 
@@ -384,6 +384,11 @@ CREATE TABLE attendance
 
     daily_amount DECIMAL(10,2) NOT NULL,
 
+    status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE', 'INACTIVE')),
+
     remarks TEXT,
 
     created_at TIMESTAMP
@@ -394,6 +399,7 @@ CREATE TABLE attendance
         FOREIGN KEY (labour_id)
         REFERENCES labour(labour_id)
 );
+
 
 -- ==========================================================
 -- Table : raw_material_stock
@@ -407,7 +413,8 @@ CREATE TABLE raw_material_stock
 
     raw_material_id INT
         NOT NULL
-        UNIQUE                                          /*UNIQUE  = |RawMaterial|RawMaterialStock|1 :1|RawMaterialID|*/
+        UNIQUE
+        /* UNIQUE = |RawMaterial|RawMaterialStock|1 :1|RawMaterialID| */
         REFERENCES raw_material(raw_material_id),
 
     current_stock_level DECIMAL(10,2)
@@ -420,10 +427,25 @@ CREATE TABLE raw_material_stock
         NOT NULL
         DEFAULT CURRENT_DATE,
 
-    status VARCHAR(20)
+    -- STOCK CONDITION
+
+    stock_status VARCHAR(20)
         NOT NULL
         DEFAULT 'NORMAL'
-        CHECK (status IN ('NORMAL','LOW_STOCK','OUT_OF_STOCK')),
+        CHECK (
+            stock_status IN
+            ('NORMAL', 'LOW_STOCK', 'OUT_OF_STOCK')
+        ),
+
+    -- RECORD LIFECYCLE / SOFT DELETE
+
+    record_status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK (
+            record_status IN
+            ('ACTIVE', 'INACTIVE')
+        ),
 
     notes TEXT,
 
@@ -481,7 +503,6 @@ CREATE TABLE curing_stock
         FOREIGN KEY (production_id)
         REFERENCES production(production_id)
 );
-
 -- ==========================================================
 -- Table : finished_goods_stock
 -- Domain: Inventory
@@ -513,6 +534,10 @@ CREATE TABLE finished_goods_stock
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
 
+    record_status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE',
+
     CONSTRAINT fk_finished_goods_stock_product
         FOREIGN KEY (product_id)
         REFERENCES product(product_id)
@@ -528,7 +553,7 @@ CREATE TABLE orders
 (
     order_id SERIAL PRIMARY KEY,
 
-    customer_id INT NOT NULL,
+    customer_id INT NOT NULL,                   /* |Customer|Order|1 : N|CustomerID| */
 
     order_date DATE NOT NULL,
 
@@ -544,6 +569,11 @@ CREATE TABLE orders
             'COMPLETED',
             'CANCELLED'
         )),
+    
+    record_status VARCHAR(10)
+    NOT NULL
+    DEFAULT 'ACTIVE'
+    CHECK (record_status IN ('ACTIVE', 'INACTIVE')),
 
     remarks TEXT,
 
@@ -566,15 +596,20 @@ CREATE TABLE order_item
 (
     order_item_id SERIAL PRIMARY KEY,
 
-    order_id INT NOT NULL,                    /* |Order|OrderItem|1 : N|OrderID|  */
+    order_id INT NOT NULL,
 
-    product_id INT NOT NULL,                  /* |Product|OrderItem|1 : N|ProductID| */
+    product_id INT NOT NULL,
 
     ordered_quantity INT NOT NULL
         CHECK (ordered_quantity > 0),
 
     unit_selling_price DECIMAL(12,2) NOT NULL
         CHECK (unit_selling_price >= 0),
+
+    record_status VARCHAR(10)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK (record_status IN ('ACTIVE', 'INACTIVE')),
 
     remarks TEXT,
 
@@ -652,6 +687,21 @@ CREATE TABLE delivery
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
 
+    record_status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK
+        (
+            record_status IN
+            (
+                'ACTIVE',
+                'INACTIVE'
+            )
+        ),
+
+    CONSTRAINT chk_delivery_trip_number
+        CHECK (trip_number <= total_trips),
+
     CONSTRAINT fk_delivery_order
         FOREIGN KEY (order_id)
         REFERENCES orders(order_id)
@@ -679,6 +729,11 @@ CREATE TABLE delivery_item
     created_at TIMESTAMP
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
+
+    record_status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK (record_status IN ('ACTIVE', 'INACTIVE')),
 
     CONSTRAINT fk_deliveryitem_delivery
         FOREIGN KEY (delivery_id)
@@ -726,6 +781,14 @@ CREATE TABLE payment
 
     remarks TEXT,
 
+    record_status VARCHAR(20)
+        NOT NULL
+        DEFAULT 'ACTIVE'
+        CHECK
+        (
+            record_status IN ('ACTIVE', 'INACTIVE')
+        ),
+
     created_at TIMESTAMP
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP,
@@ -738,16 +801,16 @@ CREATE TABLE payment
 -- ==========================================================
 -- Table : payment_allocation
 -- Domain: Finance
--- Purpose: Stores payment allocation against customer orders
+-- Purpose: Stores payment allocation against customer orders   
 -- ==========================================================
 
 CREATE TABLE payment_allocation
 (
     payment_allocation_id SERIAL PRIMARY KEY,
 
-    payment_id INT NOT NULL,
+    payment_id INT NOT NULL,                /* |Payment|PaymentAllocation|1 : N|PaymentID| */
 
-    order_id INT NOT NULL,
+    order_id INT NOT NULL,                  /* |Order|PaymentAllocation|1 : N|OrderID| */
 
     allocated_amount DECIMAL(12,2)
         NOT NULL
@@ -757,9 +820,14 @@ CREATE TABLE payment_allocation
 
     remarks TEXT,
 
+    record_status VARCHAR(20)
+    NOT NULL
+    DEFAULT 'ACTIVE'
+    CHECK (record_status IN ('ACTIVE', 'INACTIVE')),
+
     created_at TIMESTAMP
-        NOT NULL
-        DEFAULT CURRENT_TIMESTAMP,
+    NOT NULL
+    DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_paymentallocation_payment
         FOREIGN KEY (payment_id)

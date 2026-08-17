@@ -31,6 +31,10 @@ public class FinishedGoodsStock {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "record_status", nullable = false)
+    private String recordStatus;
+
+
     @Column(name = "notes")
     private String notes;
 
@@ -43,6 +47,10 @@ public class FinishedGoodsStock {
 
         if (this.lastUpdatedDate == null) {
             this.lastUpdatedDate = LocalDate.now();
+        }
+
+        if (this.recordStatus == null) {
+            this.recordStatus = "ACTIVE";
         }
     }
 
@@ -100,6 +108,19 @@ public class FinishedGoodsStock {
     public void setStatus(String status) {
         this.status = status;
     }
+
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
+    }
+
+
+
+
 
     public String getNotes() {
         return notes;

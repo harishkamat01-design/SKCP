@@ -39,7 +39,7 @@ public class Asset
     private String location;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    private String status= "ACTIVE";
 
     @Column(name = "last_maintenance_date")
     private LocalDate lastMaintenanceDate;

@@ -1,7 +1,13 @@
 package com.skcp.controller;
 
-import com.skcp.entity.FinishedGoodsStock;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.finishedgoodsstock.FinishedGoodsStockCreateRequest;
+import com.skcp.dto.request.finishedgoodsstock.FinishedGoodsStockUpdateRequest;
+import com.skcp.dto.response.finishedgoodsstock.FinishedGoodsStockResponse;
 import com.skcp.service.FinishedGoodsStockService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,82 +18,149 @@ import java.util.List;
 @RequestMapping("/api/finished-goods-stock")
 public class FinishedGoodsStockController {
 
-    // Dependency Injection
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
     private final FinishedGoodsStockService finishedGoodsStockService;
 
-    // Constructor Injection
-    public FinishedGoodsStockController(FinishedGoodsStockService finishedGoodsStockService) {
+    public FinishedGoodsStockController(
+            FinishedGoodsStockService finishedGoodsStockService) {
+
         this.finishedGoodsStockService = finishedGoodsStockService;
     }
 
-    // GET ALL
-    @GetMapping
-    public ResponseEntity<List<FinishedGoodsStock>> getAllFinishedGoodsStock() {
 
-        List<FinishedGoodsStock> stockList =
+    // ============================================================
+    // GET ALL ACTIVE FINISHED GOODS STOCK
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<
+            ApiResponse<List<FinishedGoodsStockResponse>>
+            > getAllFinishedGoodsStock() {
+
+        List<FinishedGoodsStockResponse> stockList =
                 finishedGoodsStockService.getAllFinishedGoodsStock();
 
-        return ResponseEntity.ok(stockList);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Finished goods stock retrieved successfully",
+                        stockList
+                )
+        );
     }
 
-    // GET BY ID
+
+    // ============================================================
+    // GET ACTIVE FINISHED GOODS STOCK BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<FinishedGoodsStock> getFinishedGoodsStockById(
-            @PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<FinishedGoodsStockResponse>
+            > getFinishedGoodsStockById(
+                    @PathVariable Integer id) {
 
-        FinishedGoodsStock stock =
+        FinishedGoodsStockResponse stock =
                 finishedGoodsStockService.getFinishedGoodsStockById(id);
 
-        if (stock != null) {
-            return ResponseEntity.ok(stock);
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Finished goods stock retrieved successfully",
+                        stock
+                )
+        );
     }
 
-    // CREATE
+
+    // ============================================================
+    // CREATE FINISHED GOODS STOCK
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<FinishedGoodsStock> createFinishedGoodsStock(
-            @RequestBody FinishedGoodsStock finishedGoodsStock) {
+    public ResponseEntity<
+            ApiResponse<FinishedGoodsStockResponse>
+            > createFinishedGoodsStock(
+                    @Valid
+                    @RequestBody FinishedGoodsStockCreateRequest request) {
 
-        FinishedGoodsStock savedStock =
-                finishedGoodsStockService.saveFinishedGoodsStock(finishedGoodsStock);
+        FinishedGoodsStockResponse savedStock =
+                finishedGoodsStockService.createFinishedGoodsStock(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStock);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Finished goods stock created successfully",
+                                savedStock
+                        )
+                );
     }
 
-    // UPDATE
+
+    // ============================================================
+    // UPDATE FINISHED GOODS STOCK
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<FinishedGoodsStock> updateFinishedGoodsStock(
-            @PathVariable Integer id,
-            @RequestBody FinishedGoodsStock finishedGoodsStock) {
+    public ResponseEntity<
+            ApiResponse<FinishedGoodsStockResponse>
+            > updateFinishedGoodsStock(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody FinishedGoodsStockUpdateRequest request) {
 
-        FinishedGoodsStock updatedStock =
-                finishedGoodsStockService.updateFinishedGoodsStock(id, finishedGoodsStock);
+        FinishedGoodsStockResponse updatedStock =
+                finishedGoodsStockService.updateFinishedGoodsStock(
+                        id,
+                        request
+                );
 
-        if (updatedStock != null) {
-            return ResponseEntity.ok(updatedStock);
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Finished goods stock updated successfully",
+                        updatedStock
+                )
+        );
     }
 
-    // DELETE
+
+    // ============================================================
+    // DELETE / DEACTIVATE FINISHED GOODS STOCK
+    // ============================================================
+    //
+    // Soft Delete:
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Database row is preserved.
+    //
+    // API returns:
+    //
+    // 200 OK
+    // {
+    //     "data": null,
+    //     "message": "Finished goods stock deleted successfully",
+    //     "status": "SUCCESS",
+    //     "timestamp": "..."
+    // }
+    //
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFinishedGoodsStock(
-            @PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteFinishedGoodsStock(
+                    @PathVariable Integer id) {
 
-        FinishedGoodsStock stock =
-                finishedGoodsStockService.getFinishedGoodsStockById(id);
+        finishedGoodsStockService.deleteFinishedGoodsStock(id);
 
-        if (stock != null) {
-
-            finishedGoodsStockService.deleteFinishedGoodsStock(id);
-
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Finished goods stock deleted successfully",
+                        null
+                )
+        );
     }
-
 }

@@ -1,5 +1,6 @@
 package com.skcp.entity;
 
+import com.skcp.enums.RawMaterialUnit;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -18,21 +19,31 @@ public class RawMaterial {
     @Column(name = "material_category", nullable = false, length = 50)
     private String materialCategory;
 
+    @Column(name = "unit", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private RawMaterialUnit unit;
+
     @Column(name = "description")
     private String description;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "status", nullable = false, length = 10)
+    private String status = "ACTIVE";
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
+
         this.createdAt = LocalDateTime.now();
+
+        if (this.status == null || this.status.isBlank()) {
+            this.status = "ACTIVE";
+        }
     }
 
     // Default Constructor
+
     public RawMaterial() {
 
     }
@@ -61,6 +72,14 @@ public class RawMaterial {
 
     public void setMaterialCategory(String materialCategory) {
         this.materialCategory = materialCategory;
+    }
+
+    public RawMaterialUnit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(RawMaterialUnit unit) {
+        this.unit = unit;
     }
 
     public String getDescription() {

@@ -13,7 +13,7 @@ public class DeliveryItem {
     @Column(name = "delivery_item_id")
     private Integer deliveryItemId;
 
-    // Parent Relationship → Delivery (Many : 1)    
+    // Parent Relationship → Delivery (Many : 1)
     @ManyToOne
     @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
@@ -32,9 +32,17 @@ public class DeliveryItem {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    // Soft Delete Status
+    @Column(name = "record_status", nullable = false, length = 20)
+    private String recordStatus = "ACTIVE";
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+
+        if (this.recordStatus == null) {
+            this.recordStatus = "ACTIVE";
+        }
     }
 
     // Default Constructor
@@ -93,6 +101,14 @@ public class DeliveryItem {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
+    }
 }
 
 
@@ -101,6 +117,7 @@ public class DeliveryItem {
 Why @ManyToOne?
 
 A single delivery trip can contain multiple products.
+
 Example:
 
 Delivery #15
@@ -110,6 +127,7 @@ Delivery #15
 8" Block      → 50
 
 Likewise, the same product can appear across many different deliveries.
+
 Delivery 1 → 4" Block
 Delivery 2 → 4" Block
 Delivery 3 → 4" Block

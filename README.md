@@ -1,691 +1,409 @@
-  # 🏭 SKCP - Shree Kundodari Cement Products
+# 🏭 SKCP – Shree Kundodari Cement Products
 
-  > A Business Management System for a Cement Products Manufacturing Industry with future AI-powered Decision Support.
-
-  ---
-
-  # 📌 About
-
-  **SKCP (Shree Kundodari Cement Products)** is a digital transformation project for a family-owned cement products manufacturing business located in **Kumta, Karnataka, India**.
-
-  The goal is to transform manual notebook-based operations into a structured software system that helps manage:
-
-  - Customers
-  - Orders
-  - Production
-  - Inventory
-  - Payments
-  - Reports
-  - Business Insights
-
-  This project is being developed as a real-world Software Engineering project following professional engineering practices.
-
-  ---
-
-  # 🎯 Vision
-
-  To build a Manufacturing ERP system that helps small and medium-scale manufacturing businesses:
-
-  - Digitize operations
-  - Preserve business knowledge
-  - Improve decision making
-  - Reduce repetitive work
-  - Enable future AI-powered business intelligence
-
-  ---
-
-  # 👨‍💼 Project Owner
-
-  **Harish Kamat**
-
-  Developing this system for his father's manufacturing business.
-
-  ---
-
-  # 🏢 Business Information
-
-  | Field | Details |
-  |---|---|
-  | Company | Shree Kundodari Cement Products |
-  | Location | Kumta, Karnataka, India |
-  | Industry | Cement Block Manufacturing |
-
-  ---
-
-  # 🧱 Products
-
-  Currently SKCP manufactures:
-
-  | Product | Size |
-  |---|---|
-  | Solid Block | 4" × 8" × 16" |
-  | Solid Block | 6" × 8" × 16" |
-  | Solid Block | 8" × 8" × 16" |
-
-  ---
-
-  # 🏭 Business Domains
-
-  SKCP follows three primary business domains:
-
-  Raw Materials
-    ↓
-  Production
-    ↓
-  Sales
-
-
-  ## Raw Materials
-
-  Responsible for:
-
-  - Suppliers
-  - Purchases
-  - Cement
-  - Sand
-  - Jelly
-  - Material Stock
-
-
-  ## Production
-
-  Responsible for:
-
-  - Planning
-  - Machines
-  - Labour
-  - Manufacturing
-  - Curing
-  - Quality
-  - Finished Goods
-
-
-  ## Sales
-
-  Responsible for:
-
-  - Customers
-  - Orders
-  - Delivery
-  - Payments
-  - Customer Relationships
-
-  ---
-
-  # 🔄 Business Value Stream
-
-  The complete business flow:
-  Supplier
-  ↓
-  Raw Materials
-  ↓
-  Production
-  ↓
-  Finished Goods Stock
-  ↓
-  Customer Order
-  ↓
-  Delivery
-  ↓
-  Payment
-  ↓
-  Business Decisions
-
-
-  The software mirrors this real business flow.
-
-  ---
-
-  # 🏗 Project Architecture Approach
-
-  SKCP follows a Business-First Architecture approach.
-
-  The design sequence is:
-
-
-  Business Understanding
-  ↓
-  Business Domains
-  ↓
-  Business Objects
-  ↓
-  Business Rules
-  ↓
-  Database Design
-  ↓
-  Backend Development
-  ↓
-  Frontend Integration
-  ↓
-  AI Decision Support
-  ↓
-  Deployment
-
-  ---
-
-  # 📂 Project Structure
-
-  SKCP/
-  ├── frontend/
-  ├── backend/
-  ├── database/
-  ├── docs/
-  │
-  ├── Architecture/
-  ├── Business/
-  ├── Database/
-  ├── Diagrams/
-  ├── Journal/
-  ├── Learning/
-  ├── Planning/
-  ├── Templates/
-  └── Wins/
-  ├── README.md
-  ├── CHANGELOG.md
-  ├── LICENSE
-  └── .gitignore
-
-  ---
-
-  # 📚 Documentation
-
-  All project knowledge is maintained under:
-
-  docs/
-
-  Documentation includes:
-
-  ## Business
-
-  - Business Fundamentals
-  - Business Domains
-  - Business Value Stream
-  - Business Objects
-  - Business Workflows
-  - Business Rules
-  - Business Principles
-  - Decision Support
-  - Business Lessons Learned
-
-
-  ## Architecture
-
-  - Architecture Fundamentals
-  - System Architecture
-  - Architecture Decisions
-  - Architecture Lessons Learned
-
-
-  ## Database
-
-  - Database Fundamentals
-  - Business Objects vs Entities
-  - Primary Keys
-  - Relationships
-  - Normalization
-  - Database Lessons Learned
-
-
-  ## Learning Repository
-
-  - Software Engineering Handbook
-  - Interview Preparation
-  - Daily Journal
-  - Learning Summaries
-
-  ---
-
-  # 🛠 Technology Stack
-
-  ## Frontend
-
-  - React
-  - Tailwind CSS
-  - Vite
-
-
-  ## Backend
-
-  - Spring Boot (Java)
-
-
-  ## Database
-
-  - PostgreSQL
-
-
-  ## Authentication
-
-  - JWT
-
-
-  ## Deployment
-
-  - Vercel
-  - Render
-  - Neon PostgreSQL
-
-  ---
-
-  # 📊 Project Status
-
-  | Module | Status |
-  |---|---|
-  | Module 0 – Environment Setup | ✅ Complete |
-  | Module 1 – Business Analysis | ✅ Complete |
-  | Module 2 – Software Architecture | ✅ Complete |
-  | Module 3 – Database Design & PostgreSQL Physical Schema | ✅ Completed |
-  | Module 4 – Spring Boot Backend Development | ✅ Completed |
-  | Module 5 – Frontend Integration | ⏳ Upcoming |
-  | Module 6 – AI Decision Support | ⏳ Upcoming |
-  | Module 7 – Deployment | ⏳ Upcoming |
-
-  ---
-
-  # ✅ Completed Foundation
-
-  ## Module 0
-
-  - Development environment setup
-  - Git setup
-  - GitHub repository
-  - React frontend deployment
-  - Documentation structure
-
-
-  ## Module 1
-
-  Completed:
-
-  - Business analysis
-  - Requirements understanding
-  - Business workflows
-  - Business rules
-  - Business principles
-
-
-  ## Module 2
-
-  Completed:
-
-  - System architecture
-  - Business domains
-  - Value stream analysis
-  - Architecture principles
-  - Architecture documentation
-
-
-  ## Module 3
-
-  Completed:
-
-  - Database Fundamentals
-  - Business Object Identification
-  - Master vs Transaction Data
-  - Primary Keys
-  - Foreign Keys
-  - Data Ownership
-  - Database Normalization
-  - 19 Version 1 Database Tables
-  - Database Relationship Design
-  - Production-Quality ER Diagram
-  - Database Relationship Summary
-  - Master ER Diagram
-  - PostgreSQL Physical Schema
-  - PostgreSQL Naming Standards
-  - PostgreSQL Constraints
-  - PostgreSQL Default Values
-  - PostgreSQL Audit Columns
-  - PostgreSQL Schema Documentation
-  - Individual Table Reviews
-  - Architecture Validation
-
-  Status:
-
-  ✅ Module 3 Fully Completed
-
-  Next:
-
-  🚀 Module 4 – Spring Boot Backend Development
-
-  Module 4 – Backend Development
-
-  Completed
-
-### Master Data
-
-- Customer Module
-- Supplier Module
-- Raw Material Module
-- Asset Module
-
-### Procurement
-
-- Purchase Module
-- Purchase Item Module
-
-### Infrastructure
-
-- Spring Boot Project Setup
-- PostgreSQL Integration
-- Hibernate Configuration
-- Spring Data JPA
-- Layered Architecture
-- REST APIs
-- CRUD Testing using Postman
-
-### Master Modules
-
-- Customer
-- Supplier
-- Raw Material
-- Asset
-
-### Procurement Modules
-
-- Purchase
-- Purchase Item
-
-### Backend Architecture
-
-- Entity Layer
-- Repository Layer
-- Service Layer
-- Controller Layer
-- REST APIs
-- CRUD Operations
-- Postman Testing
-
-
-  Architecture
-
-        Business Table
-                ↓
-        Entity
-                ↓
-        Repository
-                ↓
-        Service
-                ↓
-        Controller
-                ↓
-        REST API
-                ↓
-        Postman
-                ↓
-        PostgreSQL
-
-This architecture will be reused for every remaining business module.
-
-  ---
-
-
-  # Journal
-
-  This folder contains the day-by-day development journal for the **SKCP (Shree Kundodari Cement Products)** project.
-
-  The journal captures the complete learning journey, business discussions, architecture decisions, database design progress, implementation milestones, challenges, and lessons learned.
-
-  Each daily journal serves as a historical record of how the project evolved from business analysis to a production-ready software architecture.
-
-  ---
-
-  # Journal Entries
-
-  | Date | Module | Focus | Status |
-  |------|---------|-------|--------|
-  | 24-Jul-2026 | Module 1 | Business Analysis | ✅ Completed |
-  | 25-Jul-2026 | Module 2 | Software Architecture | ✅ Completed |
-  | 26-Jul-2026 | Module 3 | Database Design (Foundation) | ✅ Completed |
-  | 27-Jul-2026 | Module 3 | Manufacturing & Sales Database Design | ✅ Completed |
-  | 28-Jul-2026 | Module 3 | Database Documentation & Refinement | ✅ Completed |
-  | 29-Jul-2026 | Module 3 | Database Tables Finalization | ✅ Completed |
-  | **30-Jul-2026** | **Module 3** | **Database Relationship Architecture & Module 3 Milestone** | **🏆 Major Milestone** |
-  | **31-Jul-2026** | **Module 3** | **PostgreSQL Physical Schema Finalization & Table Reviews** | **🏆 Module 3 Completed** |
-  | **03-Aug-2026** | **Module 4** | **Spring Boot Customer CRUD + PostgreSQL + Postman** | **🏆 Backend Milestone** |
-  | 05-Aug-2026 | Module 4 | Supplier, Purchase, Purchase Item, Raw Material & Asset CRUD | 🏆 Major Backend Progress |
-  | **06-Aug-2026** | **Module 4** | **Completed all 19 Backend Modules, CRUD APIs, Postman Testing & Module Documentation** | **🏆 Module 4 Completed** |
-
-  ---
-
-  # 30 July 2026 Highlights
-
-  This was one of the biggest milestones in the SKCP project.
-
-  Major accomplishments include:
-
-  - Finalized all **19 Version 1 database tables**
-  - Completed the relationship design for all six business domains:
-    - Master Data
-    - Procurement
-    - Production
-    - Inventory
-    - Sales
-    - Finance
-  - Added the architectural decision to link **Asset → Production** using `AssetID`
-  - Created the **Database Relationship Summary** document covering all business domains
-  - Confirmed Version 1 business scope and identified future enhancements for later releases
-  - Prepared Module 3 for architecture review and ER diagram generation
-
-  At the end of the day, the logical database architecture reached a stable and implementation-ready state.
-
-  ---
-
-  # 31 July 2026 Highlights
-
-  Module 3 reached its final milestone.
-
-  Major accomplishments include:
-
-  - Completed PostgreSQL Physical Database Schema
-  - Finalized all CREATE TABLE statements
-  - Standardized PostgreSQL naming conventions
-  - Added constraints and default values
-  - Added audit columns (created_at)
-  - Created detailed table review documents for all Version 1 tables
-  - Documented SQL syntax, database concepts, and SKCP business context for every table
-  - Validated the complete physical database architecture
-
-  By the end of the day, Module 3 was officially completed and the project became ready for backend implementation.
-
-  --- 
-
-  # Current Project Status
-
-        | Module | Status |
-        |---------|--------|
-        | Module 0 – Environment Setup | ✅ Completed |
-        | Module 1 – Business Analysis | ✅ Completed |
-        | Module 2 – Software Architecture | ✅ Completed |
-        | Module 3 – Database Design | ✅ Completed |
-        | Module 4 – Spring Boot Backend Development | ✅ Completed |
-        | Module 4.5 – Backend Refinement | 🚧 Planned |
-        | Module 5 – Frontend Integration | ⏳ Upcoming |
-        | Module 6 – AI Features | ⏳ Upcoming |
-        | Module 7 – Deployment | ⏳ Upcoming |
+> A Business Management System for a Cement Products Manufacturing Industry with future AI-powered Decision Support.
 
 ---
 
-  ## Module 4 – Backend Development
+# 📌 About
 
-  ### Status
+**SKCP (Shree Kundodari Cement Products)** is a digital transformation project for a family-owned cement products manufacturing business located in **Kumta, Karnataka, India**.
 
-✅ Fully Completed
+The project transforms manual notebook-based business operations into a structured software system covering:
 
-### Enterprise Architecture Implemented
+- Customers
+- Suppliers
+- Raw Materials
+- Purchases
+- Production
+- Labour & Attendance
+- Inventory
+- Orders
+- Delivery
+- Payments
+- Reports
+- Business Insights
+- Future AI-powered Decision Support
 
-Every module follows the same enterprise architecture.
+SKCP is being developed as a real-world **Software Engineering project**, following business-first, architecture-first and enterprise software engineering practices.
 
+---
+
+# 🎯 Vision
+
+To build a practical Manufacturing ERP system that helps small and medium-scale manufacturing businesses:
+
+- Digitize daily operations
+- Reduce manual notebook-based work
+- Preserve business knowledge
+- Improve operational visibility
+- Improve decision making
+- Reduce repetitive work
+- Provide reliable business data
+- Enable future AI-powered business intelligence
+
+---
+
+# 👨‍💼 Project Owner
+
+**Harish Kamat**
+
+Developing this system for his father's cement products manufacturing business.
+
+---
+
+# 🏢 Business Information
+
+| Field | Details |
+|---|---|
+| Company | Shree Kundodari Cement Products |
+| Location | Kumta, Karnataka, India |
+| Industry | Cement Block Manufacturing |
+| Business Type | Manufacturing |
+| Primary Product | Cement Solid Blocks |
+
+---
+
+# 🧱 Products
+
+SKCP currently manufactures three solid block variants:
+
+| Product | Size |
+|---|---|
+| Solid Block | 4" × 8" × 16" |
+| Solid Block | 6" × 8" × 16" |
+| Solid Block | 8" × 8" × 16" |
+| Solid Block | 12" × 8" × 6" |
+
+---
+
+# 🏭 Business Domains
+
+SKCP follows three primary business domains.
+
+```text
+Raw Materials
+      ↓
+Production
+      ↓
+Sales
 ```
-Database
-    ↓
-Entity
-    ↓
-Repository
-    ↓
-Service
-    ↓
-Controller
-    ↓
-REST API
-    ↓
-Postman CRUD Testing
-    ↓
-Documentation
-```
 
-### Completed Backend Modules
+## Raw Materials
 
-#### Master Data
+Responsible for:
 
-- Customer
-- Supplier
-- Product
-- Raw Material
-- Labour
-- Asset
+- Suppliers
+- Purchases
+- Purchase Items
+- Cement
+- Sand
+- Jelly
+- Raw Material Stock
 
-#### Procurement
+## Production
 
-- Purchase
-- Purchase Item
-
-#### Production
+Responsible for:
 
 - Production
+- Labour
 - Attendance
+- Curing
+- Finished Goods
+- Production-related inventory
 
-#### Inventory
+## Sales
 
-- Raw Material Stock
-- Curing Stock
-- Finished Goods Stock
+Responsible for:
 
-#### Sales
-
+- Customers
 - Orders
-- Order Item
+- Order Items
 - Delivery
-- Delivery Item
-
-#### Finance
-
-- Payment
+- Delivery Items
+- Payments
 - Payment Allocation
+- Customer Relationships
 
-### Completed Deliverables
+---
 
-- Entity Layer
-- Repository Layer
-- Service Layer
-- Controller Layer
-- REST APIs
-- CRUD Operations
-- PostgreSQL Integration
-- Hibernate ORM
-- Spring Data JPA
-- Postman CRUD Testing
-- Architecture Documentation
-- Individual Module Documentation
+# 🔄 Business Value Stream
 
-**Total Backend Modules Completed:** 19
+The complete business flow is:
 
-Module 4 is officially completed.
-  ---
+```text
+Supplier
+   ↓
+Raw Materials
+   ↓
+Purchase
+   ↓
+Raw Material Stock
+   ↓
+Production
+   ↓
+Curing
+   ↓
+Finished Goods Stock
+   ↓
+Customer Order
+   ↓
+Delivery
+   ↓
+Payment
+   ↓
+Business Information
+   ↓
+Business Decisions
+```
 
-  # 📅 Development Workflow
+The software architecture mirrors the actual business value stream.
 
-  Every development session follows:
+---
 
-  Understand
-  ↓
-  Design
-  ↓
-  Implement
-  ↓
-  Test
-  ↓
-  Document Important Decisions
-  ↓
-  Git Commit
-  ↓
-  GitHub Push
+# 🏗 Architecture Approach
 
-  ---
+SKCP follows a **Business-First + Architecture-First** approach.
 
-  # 📈 Roadmap
+The development sequence is:
 
-    ✅ Module 0
-    Environment Setup
-          ↓
-    ✅ Module 1
-    Business Analysis
+```text
+Business Understanding
         ↓
-    ✅ Module 2
-    Software Architecture
+Business Domains
         ↓
-    ✅ Module 3
-    Database Design + PostgreSQL Physical Schema
+Business Objects
         ↓
-    ✅ Module 4
-Backend Development Completed
+Business Rules
         ↓
-🚧 Module 4.5
+Database Design
+        ↓
+PostgreSQL Physical Schema
+        ↓
+Backend Development
+        ↓
 Backend Refinement
-(DTO • ModelMapper • Response Models • Exception Handling • Validation)
         ↓
-    ⏳ Module 5
-    Frontend Integration
+Frontend Integration
         ↓
-    ⏳ Module 6
-    AI Decision Support
+AI Decision Support Foundation
         ↓
-    ⏳ Module 7
-    Deployment
+Deployment
+```
 
-  ---
+---
 
-  # 🏆 Major Milestones Achieved
+# 🧩 System Architecture
 
-  ## Module 3 – Database Design & PostgreSQL Physical Schema
+The overall system follows a layered architecture.
 
-  Successfully completed:
+```text
+                    SKCP SYSTEM
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+   React Frontend                   Spring Boot Backend
+        │                                 │
+        │                          Controller Layer
+        │                                 ↓
+        │                           Service Layer
+        │                                 ↓
+        │                         Repository Layer
+        │                                 ↓
+        │                            JPA / Hibernate
+        │                                 ↓
+        └──────────────────────── PostgreSQL
+```
 
-  - Business-First Database Architecture
-  - 19 Version 1 Database Tables
-  - PostgreSQL Physical Schema
-  - PostgreSQL Constraints
-  - Production-Quality ER Diagram
-  - Complete Relationship Architecture
-  - Individual Table Review Documents
-  - Database Documentation
-  - Architecture Decision Records
-  - Fully Normalized Database Design
+---
 
-  The database architecture is now frozen and ready for Spring Boot implementation.y
-  - Master ER Diagram
+# 🛠 Technology Stack
 
-  The logical database architecture is now frozen and ready for PostgreSQL implementation.
-  
+## Frontend
 
-  ## 🏆 Module 4 – Spring Boot Backend Development
+- React
+- Vite
+- Tailwind CSS
 
-Successfully completed:
+## Backend
 
-- Spring Boot Backend
-- Hibernate ORM
+- Java
+- Spring Boot
 - Spring Data JPA
-- PostgreSQL Integration
-- Layered Architecture
-- REST API Development
-- CRUD APIs
-- Postman Testing
-- 19 Business Modules
-- Enterprise Folder Structure
-- Individual Module Documentation
-- Architecture Review Documents
+- Hibernate
+- REST APIs
 
-Backend modules completed:
+## Database
+
+- PostgreSQL
+
+## Authentication
+
+- JWT
+
+## API Testing
+
+- Postman
+
+## Deployment
+
+- Vercel
+- Render
+- Neon PostgreSQL
+
+---
+
+# 📂 Project Structure
+
+```text
+SKCP/
+│
+├── frontend/
+│
+├── backend/
+│
+├── database/
+│
+├── docs/
+│   │
+│   ├── Architecture/
+│   ├── Business/
+│   ├── Database/
+│   ├── Diagrams/
+│   ├── Journal/
+│   ├── Learning/
+│   ├── Planning/
+│   ├── Templates/
+│   └── Wins/
+│
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+└── .gitignore
+```
+
+---
+
+# 📚 Documentation
+
+Project knowledge is maintained under:
+
+```text
+docs/
+```
+
+Documentation covers:
+
+## Business
+
+- Business Fundamentals
+- Business Domains
+- Business Value Stream
+- Business Objects
+- Business Workflows
+- Business Rules
+- Business Principles
+- Decision Support
+- Business Lessons Learned
+
+## Architecture
+
+- Architecture Fundamentals
+- System Architecture
+- Architecture Decisions
+- Architecture Lessons Learned
+
+## Database
+
+- Database Fundamentals
+- Business Objects vs Entities
+- Primary Keys
+- Foreign Keys
+- Relationships
+- Normalization
+- Database Relationship Architecture
+- PostgreSQL Physical Schema
+- Database Lessons Learned
+
+## Software Engineering
+
+- Software Engineering Handbook
+- Interview Preparation
+- Daily Journal
+- Learning Summaries
+- Engineering Decisions
+- Project Lessons Learned
+
+---
+
+# 🗄 Database
+
+The SKCP database was designed using a business-first approach.
+
+## Database Characteristics
+
+- PostgreSQL
+- Normalized relational design
+- Primary keys
+- Foreign keys
+- Business relationships
+- Constraints
+- Default values
+- Audit columns
+- Consistent naming standards
+- Production-oriented schema design
+
+## Version 1 Database
+
+The database architecture contains **19 core business tables/modules**.
+
+The database relationship architecture was reviewed and validated before backend implementation.
+
+---
+
+# ⚙️ Backend
+
+The backend is implemented using:
+
+- Java
+- Spring Boot
+- Spring Data JPA
+- Hibernate
+- PostgreSQL
+- REST APIs
+
+## Backend Architecture
+
+Every business module follows the layered architecture:
+
+```text
+Business Requirement
+        ↓
+Database Table
+        ↓
+Entity
+        ↓
+Repository
+        ↓
+Service
+        ↓
+Controller
+        ↓
+REST API
+        ↓
+Postman Testing
+        ↓
+PostgreSQL
+```
+
+The Service layer is responsible for business logic rather than relying on client-supplied derived values.
+
+---
+
+# 🧩 Backend Business Modules
+
+The completed backend contains the following 19 business modules.
+
+## Master Data
 
 - Customer
 - Supplier
@@ -693,171 +411,608 @@ Backend modules completed:
 - Raw Material
 - Labour
 - Asset
-- Attendance
+
+## Procurement
+
 - Purchase
 - Purchase Item
+
+## Production
+
 - Production
+- Attendance
+
+## Inventory
+
 - Raw Material Stock
 - Curing Stock
 - Finished Goods Stock
+
+## Sales
+
 - Orders
 - Order Item
 - Delivery
 - Delivery Item
+
+## Finance
+
 - Payment
 - Payment Allocation
 
-The backend foundation is now complete and ready for enterprise refinement and frontend integration.
+---
 
-  ---
-  # Next Planned Activities
+# 🔧 Backend Refinement
+
+After the initial CRUD implementation, the backend was refined toward enterprise-quality development practices.
+
+The refinement included concepts such as:
+
+- Request DTOs
+- Response models
+- DTO-to-entity mapping
+- Validation
+- `@Valid`
+- Global exception handling
+- Standardized API responses
+- Business logic in Service layer
+- Derived-field calculation in backend
+- Improved API design
+- Module-level testing
+- Backend documentation
+
+The purpose of the refinement phase was to move the backend beyond basic CRUD toward a more maintainable enterprise architecture.
+
+---
+
+# 🌐 Frontend Integration
+
+The existing React frontend was integrated with the Spring Boot backend.
+
+The frontend communicates with backend REST APIs to manage business data.
+
+The integration covers the major business areas:
+
+```text
+React Frontend
+      ↓
+REST API
+      ↓
+Spring Boot
+      ↓
+Service Layer
+      ↓
+Repository Layer
+      ↓
+PostgreSQL
+```
+
+The frontend provides the user interface while the backend owns business processing and persistence.
+
+---
+
+# 🤖 AI Decision Support
+
+AI is considered a future decision-support capability of SKCP.
+
+The initial business requirement identified **Pending Payment** as an important AI-assisted decision-support use case.
+
+The long-term objective is to provide insights such as:
+
+- Pending payment identification
+- Customer payment behaviour
+- Business trends
+- Production trends
+- Inventory insights
+- Sales analysis
+- Operational recommendations
+
+AI is designed as a decision-support capability rather than a replacement for business ownership and judgement.
+
+---
+
+# 🚀 Deployment
+
+The SKCP system uses modern cloud deployment infrastructure.
+
+```text
+User
+ ↓
+React Frontend
+ ↓
+Vercel
+ ↓
+Spring Boot REST API
+ ↓
+Render
+ ↓
+PostgreSQL
+ ↓
+Neon
+```
+
+The frontend is deployed using **Vercel**.
+
+The backend is deployed using **Render**.
+
+The PostgreSQL database is hosted using **Neon PostgreSQL**.
+
+---
+
+# 📊 Project Status
+
+| Module | Status |
+|---|---|
+| Module 0 – Environment Setup | ✅ Completed |
+| Module 1 – Business Analysis | ✅ Completed |
+| Module 2 – Software Architecture | ✅ Completed |
+| Module 3 – Database Design & PostgreSQL Physical Schema | ✅ Completed |
+| Module 4 – Spring Boot Backend Development | ✅ Completed |
+| Module 4.5 – Backend Refinement | ✅ Completed |
+| Module 5 – Frontend Integration | **Yet To Start**|
+| Module 6 – AI Decision Support | **Yet To Start** |
+| Module 7 – Deployment | **Yet To Start** |
+
+## Overall Status
+
+# 🏆 SKCP End-to-End Implementation Completed
+
+The project has progressed from business analysis and database architecture through backend development, backend refinement, frontend integration, AI decision-support foundation and deployment.
+
+---
+
+# 🏆 Major Milestones
+
+## Module 0 – Environment Setup
+
+Completed:
+
+- Development environment
+- Git setup
+- GitHub repository
+- React frontend setup
+- Initial deployment
+- Documentation structure
+
+---
+
+## Module 1 – Business Analysis
+
+Completed:
+
+- Business understanding
+- Requirements analysis
+- Business domains
+- Business workflows
+- Business objects
+- Business rules
+- Business principles
+- Business value stream
+- Decision-support requirements
+
+---
+
+## Module 2 – Software Architecture
+
+Completed:
+
+- System architecture
+- Business-first architecture
+- Domain identification
+- Architecture principles
+- Architecture decisions
+- System design documentation
+- Architecture validation
+
+---
+
+## Module 3 – Database Design
+
+Completed:
+
+- Database fundamentals
+- Business object identification
+- Master vs transaction data
+- Primary keys
+- Foreign keys
+- Relationships
+- Data ownership
+- Normalization
+- 19 Version 1 database tables
+- Relationship architecture
+- ER diagrams
+- PostgreSQL physical schema
+- Naming standards
+- Constraints
+- Default values
+- Audit columns
+- Database documentation
+- Individual table reviews
+- Architecture validation
+
+### Module 3 Status
+
+**✅ Fully Completed**
+
+---
+
+## Module 4 – Spring Boot Backend
+
+Completed:
+
+- Spring Boot project
+- PostgreSQL integration
+- Hibernate ORM
+- Spring Data JPA
+- Layered architecture
+- Entity layer
+- Repository layer
+- Service layer
+- Controller layer
+- REST APIs
+- CRUD operations
+- Postman testing
+- 19 business modules
+- Module documentation
+
+### Module 4 Status
+
+**✅ Fully Completed**
+
+---
 
 ## Module 4.5 – Backend Refinement
 
-Planned:
+Completed:
 
-- DTO Layer
-- ModelMapper
-- Standard API Response
-- Global Exception Handling
+- DTO architecture
+- Request/response models
+- Mapping strategy
 - Validation
-- Logging
-- Swagger/OpenAPI
-- Unit Testing
+- `@Valid`
+- Global exception handling
+- Standard API responses
+- Business logic refinement
+- Backend-derived calculations
+- API refinement
+- Module-level testing
+- Enterprise backend practices
 
-After Backend Refinement:
+### Module 4.5 Status
+
+**✅ Fully Completed**
+
+---
 
 ## Module 5 – Frontend Integration
 
-- Dashboard
-- Master Modules
-- Production Modules
-- Inventory Modules
-- Sales Modules
-- Finance Modules
+- React frontend integration
+- Backend API integration
+- Business module integration
+- API communication
+- Frontend-to-backend data flow
+- End-to-end business workflows
 
-  ---
+### Module 5 Status
 
-  # 🧠 Learning Philosophy
+**Yet To Start**
 
-  SKCP is not only a software project.
+---
 
-  It is also a Software Engineering learning journey.
+## Module 6 – AI Decision Support
 
-  Every concept is understood through:
+- AI decision-support architecture
+- Business insight foundation
+- Pending payment decision-support use case
+- Future AI integration approach
 
-  Real Business
-  ↓
-  Software Engineering Concept
-  ↓
-  SKCP Implementation
-  ↓
-  Interview Learning
+### Module 6 Status
 
-  ---
+**Yet To Start**
 
-  # 📊 Diagrams
+---
 
-  Visual documentation includes:
+## Module 7 – Deployment
 
-  - Business Value Stream
-  - Business Workflows
-  - ER Diagram
-  - Database Relationships
-  - System Architecture
-  - AI Architecture
+- Frontend deployment
+- Backend deployment
+- PostgreSQL cloud database
+- Production configuration
+- End-to-end application deployment
 
-  Stored under:
+### Module 7 Status
 
-  docs/Diagrams/
+**Yet To Start**
 
-  ---
+---
 
-  # 🎯 Long-Term Goal
+# 🔄 Development Workflow
 
-  Develop SKCP into a complete Manufacturing ERP platform with:
+Every development session follows:
 
-  - Operational automation
-  - Business intelligence
-  - Decision support
-  - AI-powered recommendations
+```text
+Understand
+    ↓
+Design
+    ↓
+Implement
+    ↓
+Test
+    ↓
+Validate
+    ↓
+Document Important Decisions
+    ↓
+Git Commit
+    ↓
+GitHub Push
+```
 
-  Current Phase:
+---
 
-  The project has successfully completed the database architecture and has begun backend implementation using Spring Boot, Hibernate, Spring Data JPA, PostgreSQL and Postman.
+# 📅 Development Journal
 
- Current Phase
+The `docs/Journal/` directory contains the chronological development history of SKCP.
 
-The complete backend implementation has been successfully completed.
+Major milestones include:
 
-This includes:
+| Date | Module | Focus | Status |
+|---|---|---|---|
+| 24-Jul-2026 | Module 1 | Business Analysis | ✅ Completed |
+| 25-Jul-2026 | Module 2 | Software Architecture | ✅ Completed |
+| 26-Jul-2026 | Module 3 | Database Design Foundation | ✅ Completed |
+| 27-Jul-2026 | Module 3 | Manufacturing & Sales Database Design | ✅ Completed |
+| 28-Jul-2026 | Module 3 | Database Documentation & Refinement | ✅ Completed |
+| 29-Jul-2026 | Module 3 | Database Tables Finalization | ✅ Completed |
+| 30-Jul-2026 | Module 3 | Database Relationship Architecture | 🏆 Major Milestone |
+| 31-Jul-2026 | Module 3 | PostgreSQL Physical Schema Finalization | 🏆 Module Completed |
+| 03-Aug-2026 | Module 4 | Spring Boot Customer CRUD + PostgreSQL + Postman | 🏆 Backend Milestone |
+| 05-Aug-2026 | Module 4 | Multiple Backend CRUD Modules | 🏆 Major Backend Progress |
+| 06-Aug-2026 | Module 4 | 19 Backend Modules Completed | 🏆 Module Completed |
+| 10-Aug-2026 | Module 4.5 | Backend Refinement | 🚧 Refinement Started |
+| Aug-2026 | Modules 4.5–7 | Refinement, Frontend, AI & Deployment | 🏆 End-to-End Completion |
 
-- 19 PostgreSQL Tables
-- 19 Spring Boot Modules
-- Enterprise Layered Architecture
-- CRUD REST APIs
-- PostgreSQL Integration
-- Hibernate ORM
-- Spring Data JPA
-- Postman Testing
-- Individual Module Documentation
+---
 
-The next phase is Backend Refinement, followed by React Frontend Integration.
+# 🧠 Learning Philosophy
 
-  ---
+SKCP is not only a software project.
 
-  # 🏛 Backend Development Pattern
+It is also a **Software Engineering learning journey**.
 
-  Every backend module follows the same enterprise architecture.
+Every major concept is understood through:
 
-              Business Object
-                      ↓
-              Database Table
-                      ↓
-              Entity
-                      ↓
-              Repository
-                      ↓
-              Service
-                      ↓
-              Controller
-                      ↓
-              REST API
-                      ↓
-              Postman Testing
-                      ↓ 
-              Documentation
+```text
+Real Business
+      ↓
+Software Engineering Concept
+      ↓
+SKCP Design
+      ↓
+SKCP Implementation
+      ↓
+Testing
+      ↓
+Documentation
+      ↓
+Interview Learning
+```
 
-  This pattern has been successfully implemented for:
+This approach allows the project to serve both as a real business application and as a practical Software Engineering learning repository.
 
-  - Customer
-  - Supplier
-  - Raw Material
-  - Asset
-  - Purchase
-  - Purchase Item
+---
 
-  The same architecture will be reused throughout the SKCP project.
+# 📐 Engineering Principles
 
+SKCP follows these core principles:
 
-  ---
+### 1. Business First
 
-  # 📜 License
+Software decisions should originate from actual business requirements.
 
-  MIT License
+### 2. Architecture First
 
-  ---
+The system should be designed before implementation.
 
-  # 👨‍💻 Developed By
+### 3. Domain Alignment
 
-  **Harish Kamat**
+The software structure should mirror the actual business domains.
 
-  A real-world Software Engineering project built using an architecture-first and business-first approach.
+### 4. Customer Trust
 
-  Business First
-  ↓
-  Architecture First
-  ↓
-  Engineering Excellence
-  ↓
-  AI-Ready Software
+Customer trust is a primary business objective.
+
+### 5. Quality Over Speed
+
+Production quality and proper curing should never be compromised for production quantity.
+
+### 6. Business Logic in the Backend
+
+Critical business rules should be enforced by the backend rather than trusted to the frontend.
+
+### 7. Data Integrity
+
+Database relationships, constraints and backend validation should protect business data.
+
+### 8. Maintainability
+
+The system should remain understandable and maintainable as the business grows.
+
+### 9. AI as Decision Support
+
+AI should assist business decisions rather than replace business ownership and judgement.
+
+---
+
+# 📊 Diagrams
+
+Visual documentation includes:
+
+- Business Value Stream
+- Business Workflows
+- System Architecture
+- Database Architecture
+- ER Diagram
+- Database Relationships
+- Backend Architecture
+- AI Architecture
+- Deployment Architecture
+
+Stored under:
+
+```text
+docs/Diagrams/
+```
+
+---
+
+# 📖 Software Engineering Knowledge Repository
+
+SKCP also maintains a dedicated learning repository covering:
+
+- Software Engineering fundamentals
+- SDLC
+- Requirements Engineering
+- Business Analysis
+- Software Architecture
+- Database Design
+- Backend Engineering
+- Frontend Engineering
+- REST APIs
+- Git & GitHub
+- Testing
+- Deployment
+- DevOps
+- AI & Agentic AI
+- System Design
+- Engineering Best Practices
+- Interview Preparation
+
+The central interview preparation document is:
+
+```text
+Software-Engineering-Interview-Handbook.md
+```
+
+---
+
+# 🎯 Current Project Phase
+
+The original implementation roadmap has been completed till Module 4.5.
+
+```text
+✅ Module 0 – Environment Setup
+        ↓
+✅ Module 1 – Business Analysis
+        ↓
+✅ Module 2 – Software Architecture
+        ↓
+✅ Module 3 – Database Design
+        ↓
+✅ Module 4 – Backend Development
+        ↓
+✅ Module 4.5 – Backend Refinement
+        ↓
+✅ Module 5 – Frontend Integration
+        ↓
+✅ Module 6 – AI Decision Support
+        ↓
+✅ Module 7 – Deployment
+```
+
+# 🏆 END-TO-END PROJECT COMPLETED
+
+SKCP now represents a complete journey from:
+
+```text
+Manual Business Process
+        ↓
+Business Analysis
+        ↓
+Architecture
+        ↓
+Database
+        ↓
+Backend
+        ↓
+Backend Refinement
+        ↓
+Frontend
+        ↓
+AI Decision Support
+        ↓
+Cloud Deployment
+```
+
+---
+
+# 🚀 Future Enhancements
+
+Although the initial end-to-end implementation is complete, SKCP can continue evolving.
+
+Potential future enhancements include:
+
+- Advanced business dashboards
+- Advanced reporting
+- Production analytics
+- Inventory forecasting
+- Customer payment analytics
+- AI-powered recommendations
+- Business trend analysis
+- Predictive insights
+- Automated alerts
+- Advanced role-based access
+- Performance optimization
+- Automated testing expansion
+- Monitoring and observability
+- Additional ERP capabilities
+
+These enhancements will be treated as future iterations rather than prerequisites for the current completed system.
+
+---
+
+# 🏁 Long-Term Goal
+
+The long-term goal is to evolve SKCP into a practical, scalable and AI-ready **Manufacturing ERP platform** for small and medium-scale manufacturing businesses.
+
+The platform aims to provide:
+
+- Operational automation
+- Reliable business data
+- Business visibility
+- Decision support
+- Business intelligence
+- AI-powered recommendations
+- Scalable software architecture
+
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+# 👨‍💻 Developed By
+
+**Harish Kamat**
+
+A real-world Software Engineering project developed using a:
+
+```text
+Business-First Approach
+        ↓
+Architecture-First Approach
+        ↓
+Engineering Excellence
+        ↓
+AI-Ready Software
+```
+
+---
+
+# 🏆 SKCP
+
+**From a business notebook to a complete digital Manufacturing Management System.**
+
+**Business First → Architecture First → Engineering Excellence → AI-Ready Software**

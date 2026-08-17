@@ -1,3 +1,21 @@
+
+package com.skcp.repository;
+
+import com.skcp.entity.Purchase;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PurchaseRepository extends JpaRepository<Purchase, Integer> {
+
+    List<Purchase> findByStatus(String status);
+}
+
+
+
+
+
+/* 
 package com.skcp.repository;
 
 import com.skcp.entity.Purchase;
@@ -8,6 +26,8 @@ import org.springframework.stereotype.Repository;
 public interface PurchaseRepository extends JpaRepository<Purchase, Integer> {
 
 }
+
+*/
 
 /*********************************************************************************
 Explanation:

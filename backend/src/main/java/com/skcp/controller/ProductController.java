@@ -1,5 +1,153 @@
 package com.skcp.controller;
 
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.product.ProductCreateRequest;
+import com.skcp.dto.request.product.ProductUpdateRequest;
+import com.skcp.dto.response.product.ProductResponse;
+import com.skcp.dto.response.product.ProductSummaryResponse;
+import com.skcp.service.ProductService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    private final ProductService productService;
+
+
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+
+    // ============================================================
+    // GET ALL PRODUCTS
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<
+            ApiResponse<List<ProductSummaryResponse>>
+            > getAllProducts() {
+
+        List<ProductSummaryResponse> products =
+                productService.getAllProducts();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Products retrieved successfully",
+                        products
+                )
+        );
+    }
+
+
+    // ============================================================
+    // GET PRODUCT BY ID
+    // ============================================================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<ProductResponse>
+            > getProductById(
+                    @PathVariable Integer id) {
+
+        ProductResponse product =
+                productService.getProductById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Product retrieved successfully",
+                        product
+                )
+        );
+    }
+
+
+    // ============================================================
+    // CREATE PRODUCT
+    // ============================================================
+
+    @PostMapping
+    public ResponseEntity<
+            ApiResponse<ProductResponse>
+            > createProduct(
+                    @Valid
+                    @RequestBody ProductCreateRequest request) {
+
+        ProductResponse savedProduct =
+                productService.createProduct(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.success(
+                        "Product created successfully",
+                        savedProduct
+                )
+        );
+    }
+
+
+    // ============================================================
+    // UPDATE PRODUCT
+    // ============================================================
+
+    @PutMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<ProductResponse>
+            > updateProduct(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody ProductUpdateRequest request) {
+
+        ProductResponse updatedProduct =
+                productService.updateProduct(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Product updated successfully",
+                        updatedProduct
+                )
+        );
+    }
+
+
+    // ============================================================
+    // DELETE / DEACTIVATE PRODUCT
+    // ============================================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteProduct(
+                    @PathVariable Integer id) {
+
+        productService.deleteProduct(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Product deleted successfully",
+                        null
+                )
+        );
+    }
+}
+
+
+
+
+/*
+package com.skcp.controller;
+
 import com.skcp.entity.Product;
 import com.skcp.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -87,3 +235,4 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 }
+    */

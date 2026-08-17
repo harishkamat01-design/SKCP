@@ -1,7 +1,14 @@
 package com.skcp.controller;
 
-import com.skcp.entity.Purchase;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.purchase.PurchaseCreateRequest;
+import com.skcp.dto.request.purchase.PurchaseUpdateRequest;
+import com.skcp.dto.response.purchase.PurchaseResponse;
+import com.skcp.dto.response.purchase.PurchaseSummaryResponse;
 import com.skcp.service.PurchaseService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,85 +19,99 @@ import java.util.List;
 @RequestMapping("/api/purchases")
 public class PurchaseController {
 
-    // Dependency Injection
     private final PurchaseService purchaseService;
 
-    // Constructor Injection
     public PurchaseController(PurchaseService purchaseService) {
         this.purchaseService = purchaseService;
     }
 
-    // Get all purchases
     @GetMapping
-    public ResponseEntity<List<Purchase>> getAllPurchases() {
+    public ResponseEntity<
+            ApiResponse<List<PurchaseSummaryResponse>>
+            > getAllPurchases() {
 
-        List<Purchase> purchaseList = purchaseService.getAllPurchases();
+        List<PurchaseSummaryResponse> purchases =
+                purchaseService.getAllPurchases();
 
-        return ResponseEntity.ok(purchaseList);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchases retrieved successfully",
+                        purchases
+                )
+        );
     }
 
-    // Get purchase by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Purchase> getPurchaseById(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<PurchaseResponse>
+            > getPurchaseById(
+                    @PathVariable Integer id
+            ) {
 
-        Purchase purchase = purchaseService.getPurchaseById(id);
+        PurchaseResponse purchase =
+                purchaseService.getPurchaseById(id);
 
-        if (purchase == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(purchase);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase retrieved successfully",
+                        purchase
+                )
+        );
     }
 
-    // Create purchase
     @PostMapping
-    public ResponseEntity<Purchase> createPurchase(@RequestBody Purchase purchase) {
+    public ResponseEntity<
+            ApiResponse<PurchaseResponse>
+            > createPurchase(
+                    @Valid @RequestBody PurchaseCreateRequest request
+            ) {
 
-        Purchase savedPurchase = purchaseService.savePurchase(purchase);
+        PurchaseResponse savedPurchase =
+                purchaseService.createPurchase(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPurchase);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.success(
+                        "Purchase created successfully",
+                        savedPurchase
+                )
+        );
     }
 
-    // Update purchase
     @PutMapping("/{id}")
-    public ResponseEntity<Purchase> updatePurchase(
-            @PathVariable Integer id,
-            @RequestBody Purchase purchase) {
+    public ResponseEntity<
+            ApiResponse<PurchaseResponse>
+            > updatePurchase(
+                    @PathVariable Integer id,
+                    @Valid @RequestBody PurchaseUpdateRequest request
+            ) {
 
-        Purchase existingPurchase = purchaseService.getPurchaseById(id);
+        PurchaseResponse updatedPurchase =
+                purchaseService.updatePurchase(
+                        id,
+                        request
+                );
 
-        if (existingPurchase == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Update editable fields
-        existingPurchase.setSupplier(purchase.getSupplier());
-        existingPurchase.setPurchaseDate(purchase.getPurchaseDate());
-        existingPurchase.setInvoiceNumber(purchase.getInvoiceNumber());
-        existingPurchase.setTotalAmount(purchase.getTotalAmount());
-        existingPurchase.setPaymentStatus(purchase.getPaymentStatus());
-        existingPurchase.setRemarks(purchase.getRemarks());
-        existingPurchase.setStatus(purchase.getStatus());
-
-        Purchase updatedPurchase =
-                purchaseService.savePurchase(existingPurchase);
-
-        return ResponseEntity.ok(updatedPurchase);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase updated successfully",
+                        updatedPurchase
+                )
+        );
     }
 
-    // Delete purchase
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePurchase(@PathVariable Integer id) {
+                        @DeleteMapping("/{id}")
+                        public ResponseEntity<ApiResponse<Void>> deletePurchase(
+                                @PathVariable Integer id
+                        ) {
+                        purchaseService.deletePurchase(id);
 
-        Purchase existingPurchase = purchaseService.getPurchaseById(id);
+                        return ResponseEntity.ok(
+                                ApiResponse.<Void>success(
+                                        "Purchase marked as inactive successfully",
+                                        null
+                                )
+                        );
+                        }
 
-        if (existingPurchase == null) {
-            return ResponseEntity.notFound().build();
-        }
 
-        purchaseService.deletePurchase(id);
-
-        return ResponseEntity.noContent().build();
-    }
 }
-

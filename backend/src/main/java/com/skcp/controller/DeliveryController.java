@@ -1,123 +1,163 @@
 package com.skcp.controller;
 
-import com.skcp.entity.Delivery;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.delivery.DeliveryCreateRequest;
+import com.skcp.dto.request.delivery.DeliveryUpdateRequest;
+import com.skcp.dto.response.delivery.DeliveryResponse;
+import com.skcp.dto.response.delivery.DeliverySummaryResponse;
 import com.skcp.service.DeliveryService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/deliveries")
-@CrossOrigin(origins = "*")
 public class DeliveryController {
 
-    // Dependency Injection
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
     private final DeliveryService deliveryService;
 
-    // Constructor Injection
     public DeliveryController(DeliveryService deliveryService) {
+
         this.deliveryService = deliveryService;
     }
 
-    // =====================================================
-    // GET ALL DELIVERIES
-    // =====================================================
+
+    // ============================================================
+    // GET ALL ACTIVE DELIVERIES
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<List<Delivery>> getAllDeliveries() {
+    public ResponseEntity<
+            ApiResponse<List<DeliverySummaryResponse>>
+            > getAllDeliveries() {
 
-        List<Delivery> deliveries = deliveryService.getAllDeliveries();
+        List<DeliverySummaryResponse> deliveries =
+                deliveryService.getAllDeliveries();
 
-        return new ResponseEntity<>(deliveries, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Deliveries retrieved successfully",
+                        deliveries
+                )
+        );
     }
 
-    // =====================================================
-    // GET DELIVERY BY ID
-    // =====================================================
+
+    // ============================================================
+    // GET ACTIVE DELIVERY BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<Delivery> getDeliveryById(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<DeliveryResponse>
+            > getDeliveryById(
+                    @PathVariable Integer id) {
 
-        Optional<Delivery> delivery = deliveryService.getDeliveryById(id);
+        DeliveryResponse delivery =
+                deliveryService.getDeliveryById(id);
 
-        return delivery
-                .map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Delivery retrieved successfully",
+                        delivery
+                )
+        );
     }
 
-    // =====================================================
+
+    // ============================================================
     // CREATE DELIVERY
-    // =====================================================
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery delivery) {
+    public ResponseEntity<
+            ApiResponse<DeliveryResponse>
+            > createDelivery(
+                    @Valid
+                    @RequestBody DeliveryCreateRequest request) {
 
-        Delivery savedDelivery = deliveryService.saveDelivery(delivery);
+        DeliveryResponse savedDelivery =
+                deliveryService.createDelivery(request);
 
-        return new ResponseEntity<>(savedDelivery, HttpStatus.CREATED);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Delivery created successfully",
+                                savedDelivery
+                        )
+                );
     }
 
-    // =====================================================
+
+    // ============================================================
     // UPDATE DELIVERY
-    // =====================================================
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<Delivery> updateDelivery(
-            @PathVariable Integer id,
-            @RequestBody Delivery delivery) {
+    public ResponseEntity<
+            ApiResponse<DeliveryResponse>
+            > updateDelivery(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody DeliveryUpdateRequest request) {
 
-        Optional<Delivery> existingDelivery = deliveryService.getDeliveryById(id);
+        DeliveryResponse updatedDelivery =
+                deliveryService.updateDelivery(
+                        id,
+                        request
+                );
 
-        if (existingDelivery.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Delivery updatedDelivery = deliveryService.updateDelivery(id, delivery);
-
-        return new ResponseEntity<>(updatedDelivery, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Delivery updated successfully",
+                        updatedDelivery
+                )
+        );
     }
 
-    // =====================================================
-    // DELETE DELIVERY
-    // =====================================================
+
+    // ============================================================
+    // DELETE / SOFT DELETE DELIVERY
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Valid ACTIVE ID:
+    //     200 OK
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Invalid ID:
+    //     404 NOT FOUND
+    //
+    // No physical DELETE occurs.
+    //
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDelivery(@PathVariable Integer id) {
-
-        Optional<Delivery> existingDelivery = deliveryService.getDeliveryById(id);
-
-        if (existingDelivery.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteDelivery(
+                    @PathVariable Integer id) {
 
         deliveryService.deleteDelivery(id);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Delivery deleted successfully",
+                        null
+                )
+        );
     }
 }
-
- 
-/*
-
-Endpoint: /api/deliveries
-Using the plural resource name follows REST API best practices.
-
-
-HTTP Methods: 
-
-| Method | Endpoint | Purpose |
-|---------|----------|----------|
-| GET | `/api/deliveries` | Retrieve all deliveries |
-| GET | `/api/deliveries/{id}` | Retrieve a delivery by ID |
-| POST | `/api/deliveries` | Create a new delivery |
-| PUT | `/api/deliveries/{id}` | Update an existing delivery |
-| DELETE | `/api/deliveries/{id}` | Delete a delivery |
-
-HTTP Status Codes
-| Status | Meaning |
-|---------|---------|
-| **200 OK** | Successful GET or PUT |
-| **201 CREATED** | Successful POST |
-| **204 NO CONTENT** | Successful DELETE |
-| **404 NOT FOUND** | Record not found |
-
-*/

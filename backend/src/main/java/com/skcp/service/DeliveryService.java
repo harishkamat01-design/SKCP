@@ -1,96 +1,246 @@
 package com.skcp.service;
 
+import com.skcp.dto.request.delivery.DeliveryCreateRequest;
+import com.skcp.dto.request.delivery.DeliveryUpdateRequest;
+import com.skcp.dto.response.delivery.DeliveryResponse;
+import com.skcp.dto.response.delivery.DeliverySummaryResponse;
 import com.skcp.entity.Delivery;
+import com.skcp.entity.Order;
+import com.skcp.exception.DuplicateResourceException;
+import com.skcp.exception.ResourceNotFoundException;
+import com.skcp.mapper.DeliveryMapper;
 import com.skcp.repository.DeliveryRepository;
+import com.skcp.repository.OrderRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DeliveryService {
 
+    // ============================================================
+    // DEPENDENCIES
+    // ============================================================
+
     private final DeliveryRepository deliveryRepository;
+    private final OrderRepository orderRepository;
 
-    // Constructor Injection
-    public DeliveryService(DeliveryRepository deliveryRepository) {
+
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
+    public DeliveryService(
+            DeliveryRepository deliveryRepository,
+            OrderRepository orderRepository) {
+
         this.deliveryRepository = deliveryRepository;
+        this.orderRepository = orderRepository;
     }
 
-    // ==========================
-    // CREATE
-    // ==========================
-    public Delivery saveDelivery(Delivery delivery) {
-        return deliveryRepository.save(delivery);
+
+    // ============================================================
+    // GET ALL ACTIVE DELIVERIES
+    // ============================================================
+
+    public List<DeliverySummaryResponse> getAllDeliveries() {
+
+        return deliveryRepository
+                .findByRecordStatus("ACTIVE")
+                .stream()
+                .map(DeliveryMapper::toSummaryResponse)
+                .collect(Collectors.toList());
     }
 
-    // ==========================
-    // READ ALL
-    // ==========================
-    public List<Delivery> getAllDeliveries() {
-        return deliveryRepository.findAll();
+
+    // ============================================================
+    // GET ACTIVE DELIVERY BY ID
+    // ============================================================
+
+    public DeliveryResponse getDeliveryById(Integer id) {
+
+        Delivery delivery =
+                deliveryRepository
+                        .findByDeliveryIdAndRecordStatus(
+                                id,
+                                "ACTIVE"
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Delivery not found with id: " + id
+                                )
+                        );
+
+        return DeliveryMapper.toResponse(delivery);
     }
 
-    // ==========================
-    // READ BY ID
-    // ==========================
-    public Optional<Delivery> getDeliveryById(Integer deliveryId) {
-        return deliveryRepository.findById(deliveryId);
+
+    // ============================================================
+    // CREATE DELIVERY
+    // ============================================================
+
+    public DeliveryResponse createDelivery(
+            DeliveryCreateRequest request) {
+
+        // --------------------------------------------------------
+        // Validate Order
+        // --------------------------------------------------------
+
+        Order order =
+                orderRepository.findById(
+                        request.getOrderId()
+                ).orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: "
+                                        + request.getOrderId()
+                        )
+                );
+
+
+        // --------------------------------------------------------
+        // Map Request → Entity
+        // --------------------------------------------------------
+
+        Delivery delivery =
+                DeliveryMapper.toEntity(
+                        request,
+                        order
+                );
+
+
+        // --------------------------------------------------------
+        // Save
+        // --------------------------------------------------------
+
+        Delivery savedDelivery =
+                deliveryRepository.save(delivery);
+
+
+        // --------------------------------------------------------
+        // Entity → Response
+        // --------------------------------------------------------
+
+        return DeliveryMapper.toResponse(savedDelivery);
     }
 
-    // ==========================
-    // UPDATE
-    // ==========================
-    public Delivery updateDelivery(Integer deliveryId, Delivery updatedDelivery) {
 
-        return deliveryRepository.findById(deliveryId)
-                .map(existingDelivery -> {
+    // ============================================================
+    // UPDATE DELIVERY
+    // ============================================================
 
-                    existingDelivery.setOrder(updatedDelivery.getOrder());
-                    existingDelivery.setDeliveryDate(updatedDelivery.getDeliveryDate());
-                    existingDelivery.setTripNumber(updatedDelivery.getTripNumber());
-                    existingDelivery.setTotalTrips(updatedDelivery.getTotalTrips());
-                    existingDelivery.setVehicleType(updatedDelivery.getVehicleType());
-                    existingDelivery.setVehicleNumber(updatedDelivery.getVehicleNumber());
-                    existingDelivery.setDriverName(updatedDelivery.getDriverName());
-                    existingDelivery.setTransportMode(updatedDelivery.getTransportMode());
-                    existingDelivery.setTransportCost(updatedDelivery.getTransportCost());
-                    existingDelivery.setDeliveryStatus(updatedDelivery.getDeliveryStatus());
-                    existingDelivery.setRemarks(updatedDelivery.getRemarks());
+    public DeliveryResponse updateDelivery(
+            Integer id,
+            DeliveryUpdateRequest request) {
 
-                    return deliveryRepository.save(existingDelivery);
+        // --------------------------------------------------------
+        // Find ACTIVE Delivery
+        // --------------------------------------------------------
 
-                })
-                .orElseThrow(() ->
-                        new RuntimeException("Delivery not found with ID : " + deliveryId));
+        Delivery delivery =
+                deliveryRepository
+                        .findByDeliveryIdAndRecordStatus(
+                                id,
+                                "ACTIVE"
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Delivery not found with id: " + id
+                                )
+                        );
+
+
+        // --------------------------------------------------------
+        // Validate Order
+        // --------------------------------------------------------
+
+        Order order =
+                orderRepository.findById(
+                        request.getOrderId()
+                ).orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with id: "
+                                        + request.getOrderId()
+                        )
+                );
+
+
+        // --------------------------------------------------------
+        // Update Entity
+        // --------------------------------------------------------
+
+        DeliveryMapper.updateEntity(
+                delivery,
+                request,
+                order
+        );
+
+
+        // --------------------------------------------------------
+        // Save
+        // --------------------------------------------------------
+
+        Delivery updatedDelivery =
+                deliveryRepository.save(delivery);
+
+
+        // --------------------------------------------------------
+        // Entity → Response
+        // --------------------------------------------------------
+
+        return DeliveryMapper.toResponse(updatedDelivery);
     }
 
-    // ==========================
-    // DELETE
-    // ==========================
-    public void deleteDelivery(Integer deliveryId) {
-        deliveryRepository.deleteById(deliveryId);
+
+    // ============================================================
+    // SOFT DELETE DELIVERY
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Valid ACTIVE ID:
+    //     200 OK
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Invalid ID:
+    //     404 NOT FOUND
+    //
+    // No physical DELETE occurs.
+    // ============================================================
+
+    public void deleteDelivery(Integer id) {
+
+        Delivery delivery =
+                deliveryRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Delivery not found with id: " + id
+                                )
+                        );
+
+
+        // --------------------------------------------------------
+        // Already INACTIVE
+        // --------------------------------------------------------
+
+        if ("INACTIVE".equals(
+                delivery.getRecordStatus())) {
+
+            throw new DuplicateResourceException(
+                    "Delivery already deleted with id: " + id
+            );
+        }
+
+
+        // --------------------------------------------------------
+        // Soft Delete
+        // --------------------------------------------------------
+
+        delivery.setRecordStatus("INACTIVE");
+
+        deliveryRepository.save(delivery);
     }
 }
-
-
-/*
-
-# Responsibilities
-## Current responsibilities:
-
-Save a delivery
-Fetch all deliveries
-Fetch a delivery by ID
-Update an existing delivery
-Delete a delivery
-
-# Constructor Injection:
-private final DeliveryRepository deliveryRepository;
-
-Using constructor injection is the recommended Spring Boot practice because it:
-- Promotes immutability
-- Makes dependencies explicit
-- Improves testability
-
-*/

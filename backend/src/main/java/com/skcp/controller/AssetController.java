@@ -1,7 +1,14 @@
 package com.skcp.controller;
 
-import com.skcp.entity.Asset;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.asset.AssetCreateRequest;
+import com.skcp.dto.request.asset.AssetUpdateRequest;
+import com.skcp.dto.response.asset.AssetResponse;
+import com.skcp.dto.response.asset.AssetSummaryResponse;
 import com.skcp.service.AssetService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,90 +17,119 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/assets")
-public class AssetController {
+public class AssetController
+{
 
-    // Dependency Injection
     private final AssetService assetService;
 
+
     // Constructor Injection
-    public AssetController(AssetService assetService) {
+    public AssetController(AssetService assetService)
+    {
         this.assetService = assetService;
     }
 
-    // Get all assets
+
+    // ============================================================
+    // GET ALL ASSETS
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<List<Asset>> getAllAssets() {
+    public ResponseEntity<ApiResponse<List<AssetSummaryResponse>>> getAllAssets()
+    {
+        List<AssetSummaryResponse> assets =
+                assetService.getAllAssets();
 
-        List<Asset> assetList = assetService.getAllAssets();
-
-        return ResponseEntity.ok(assetList);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Assets retrieved successfully",
+                        assets
+                )
+        );
     }
 
-    // Get asset by ID
+
+    // ============================================================
+    // GET ASSET BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<Asset> getAssetById(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<AssetResponse>> getAssetById(
+            @PathVariable Integer id
+    )
+    {
+        AssetResponse asset =
+                assetService.getAssetById(id);
 
-        Asset asset = assetService.getAssetById(id);
-
-        if (asset == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(asset);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Asset retrieved successfully",
+                        asset
+                )
+        );
     }
 
-    // Create asset
+
+    // ============================================================
+    // CREATE ASSET
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<Asset> createAsset(@RequestBody Asset asset) {
+    public ResponseEntity<ApiResponse<AssetResponse>> createAsset(
+            @Valid @RequestBody AssetCreateRequest request
+    )
+    {
+        AssetResponse savedAsset =
+                assetService.createAsset(request);
 
-        Asset savedAsset = assetService.saveAsset(asset);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAsset);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.success(
+                        "Asset created successfully",
+                        savedAsset
+                )
+        );
     }
 
-    // Update asset
+
+    // ============================================================
+    // UPDATE ASSET
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<Asset> updateAsset(
+    public ResponseEntity<ApiResponse<AssetResponse>> updateAsset(
             @PathVariable Integer id,
-            @RequestBody Asset asset) {
+            @Valid @RequestBody AssetUpdateRequest request
+    )
+    {
+        AssetResponse updatedAsset =
+                assetService.updateAsset(id, request);
 
-        Asset existingAsset = assetService.getAssetById(id);
-
-        if (existingAsset == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Update editable fields
-        existingAsset.setAssetName(asset.getAssetName());
-        existingAsset.setAssetCategory(asset.getAssetCategory());
-        existingAsset.setManufacturer(asset.getManufacturer());
-        existingAsset.setModelNumber(asset.getModelNumber());
-        existingAsset.setSerialNumber(asset.getSerialNumber());
-        existingAsset.setPurchaseDate(asset.getPurchaseDate());
-        existingAsset.setInstallationDate(asset.getInstallationDate());
-        existingAsset.setLocation(asset.getLocation());
-        existingAsset.setStatus(asset.getStatus());
-        existingAsset.setLastMaintenanceDate(asset.getLastMaintenanceDate());
-        existingAsset.setNextMaintenanceDate(asset.getNextMaintenanceDate());
-        existingAsset.setNotes(asset.getNotes());
-
-        Asset updatedAsset = assetService.saveAsset(existingAsset);
-
-        return ResponseEntity.ok(updatedAsset);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Asset updated successfully",
+                        updatedAsset
+                )
+        );
     }
 
-    // Delete asset
+
+    // ============================================================
+    // DELETE ASSET
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAsset(@PathVariable Integer id) {
-
-        Asset existingAsset = assetService.getAssetById(id);
-
-        if (existingAsset == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<ApiResponse<Void>> deleteAsset(
+            @PathVariable Integer id
+    )
+    {
         assetService.deleteAsset(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Asset deleted successfully",
+                        null
+                )
+        );
     }
+
 }

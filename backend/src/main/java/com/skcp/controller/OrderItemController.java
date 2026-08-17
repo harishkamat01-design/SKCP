@@ -1,7 +1,12 @@
 package com.skcp.controller;
 
-import com.skcp.entity.OrderItem;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.orderitem.OrderItemCreateRequest;
+import com.skcp.dto.request.orderitem.OrderItemUpdateRequest;
+import com.skcp.dto.response.orderitem.OrderItemResponse;
 import com.skcp.service.OrderItemService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,90 +19,152 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class OrderItemController {
 
-    // Dependency Injection
+    // ============================================================
+    // DEPENDENCIES
+    // ============================================================
+
     private final OrderItemService orderItemService;
 
-    // Constructor Injection
-    public OrderItemController(OrderItemService orderItemService) {
+
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
+    public OrderItemController(
+            OrderItemService orderItemService) {
+
         this.orderItemService = orderItemService;
     }
 
-    // =====================================================
-    // GET ALL ORDER ITEMS
-    // =====================================================
+
+    // ============================================================
+    // GET ALL ACTIVE ORDER ITEMS
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<List<OrderItem>> getAllOrderItems() {
+    public ResponseEntity<
+            ApiResponse<List<OrderItemResponse>>
+            > getAllOrderItems() {
 
-        List<OrderItem> orderItems = orderItemService.getAllOrderItems();
+        List<OrderItemResponse> orderItems =
+                orderItemService.getAllOrderItems();
 
-        return new ResponseEntity<>(orderItems, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Order items retrieved successfully",
+                        orderItems
+                )
+        );
     }
 
-    // =====================================================
-    // GET ORDER ITEM BY ID
-    // =====================================================
+
+    // ============================================================
+    // GET ACTIVE ORDER ITEM BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<OrderItem> getOrderItemById(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<OrderItemResponse>
+            > getOrderItemById(
+                    @PathVariable Integer id) {
 
-        OrderItem orderItem = orderItemService.getOrderItemById(id);
+        OrderItemResponse orderItem =
+                orderItemService.getOrderItemById(id);
 
-        if (orderItem != null) {
-            return new ResponseEntity<>(orderItem, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Order item retrieved successfully",
+                        orderItem
+                )
+        );
     }
 
-    // =====================================================
+
+    // ============================================================
     // CREATE ORDER ITEM
-    // =====================================================
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<OrderItem> createOrderItem(@RequestBody OrderItem orderItem) {
+    public ResponseEntity<
+            ApiResponse<OrderItemResponse>
+            > createOrderItem(
+                    @Valid
+                    @RequestBody OrderItemCreateRequest request) {
 
-        OrderItem savedOrderItem = orderItemService.saveOrderItem(orderItem);
+        OrderItemResponse savedOrderItem =
+                orderItemService.createOrderItem(request);
 
-        return new ResponseEntity<>(savedOrderItem, HttpStatus.CREATED);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Order item created successfully",
+                                savedOrderItem
+                        )
+                );
     }
 
-    // =====================================================
+
+    // ============================================================
     // UPDATE ORDER ITEM
-    // =====================================================
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<OrderItem> updateOrderItem(
-            @PathVariable Integer id,
-            @RequestBody OrderItem updatedOrderItem) {
+    public ResponseEntity<
+            ApiResponse<OrderItemResponse>
+            > updateOrderItem(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody OrderItemUpdateRequest request) {
 
-        OrderItem existingOrderItem = orderItemService.getOrderItemById(id);
+        OrderItemResponse updatedOrderItem =
+                orderItemService.updateOrderItem(
+                        id,
+                        request
+                );
 
-        if (existingOrderItem == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        existingOrderItem.setOrder(updatedOrderItem.getOrder());
-        existingOrderItem.setProduct(updatedOrderItem.getProduct());
-        existingOrderItem.setOrderedQuantity(updatedOrderItem.getOrderedQuantity());
-        existingOrderItem.setUnitSellingPrice(updatedOrderItem.getUnitSellingPrice());
-        existingOrderItem.setRemarks(updatedOrderItem.getRemarks());
-
-        OrderItem savedOrderItem = orderItemService.saveOrderItem(existingOrderItem);
-
-        return new ResponseEntity<>(savedOrderItem, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Order item updated successfully",
+                        updatedOrderItem
+                )
+        );
     }
 
-    // =====================================================
-    // DELETE ORDER ITEM
-    // =====================================================
+
+    // ============================================================
+    // DELETE / SOFT DELETE ORDER ITEM
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Database row is preserved.
+    //
+    // API returns:
+    //
+    // 200 OK
+    // {
+    //     "data": null,
+    //     "message": "Order item deleted successfully",
+    //     "status": "SUCCESS",
+    //     "timestamp": "..."
+    // }
+    //
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrderItem(@PathVariable Integer id) {
-
-        OrderItem existingOrderItem = orderItemService.getOrderItemById(id);
-
-        if (existingOrderItem == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteOrderItem(
+                    @PathVariable Integer id) {
 
         orderItemService.deleteOrderItem(id);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Order item deleted successfully",
+                        null
+                )
+        );
     }
 }

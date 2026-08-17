@@ -4,43 +4,25 @@ import com.skcp.entity.DeliveryItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public interface DeliveryItemRepository extends JpaRepository<DeliveryItem, Integer>
-{
+public interface DeliveryItemRepository
+        extends JpaRepository<DeliveryItem, Integer> {
 
+    // =====================================================
+    // FIND DELIVERY ITEM BY ID AND RECORD STATUS
+    // =====================================================
+
+    Optional<DeliveryItem> findByDeliveryItemIdAndRecordStatus(
+            Integer deliveryItemId,
+            String recordStatus
+    );
+
+    // =====================================================
+    // FIND DELIVERY ITEMS BY RECORD STATUS
+    // =====================================================
+
+    List<DeliveryItem> findByRecordStatus(String recordStatus);
 }
-
-
-/*
-
-# Purpose:
-- The Repository Layer is responsible only for communicating with the database.
-- It should never contain business logic.
-
-# Extending JpaRepository:
-JpaRepository<DeliveryItem, Integer>
--Spring Boot automatically provides:
-    save()
-    findAll()
-    findById()
-    deleteById()
-    existsById()
-    count()
-    saveAll()
-    deleteAll()
-No SQL queries are required.
-
-# Enterprise Architecture:
-    Controller
-        │
-        ▼
-    Service
-        │
-        ▼
-    Repository
-        │
-        ▼
-    PostgreSQL
-Each layer has a single responsibility.
-
-*/

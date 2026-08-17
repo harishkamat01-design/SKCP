@@ -42,6 +42,10 @@ public class Payment
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    // Soft Delete Status
+    @Column(name = "record_status", nullable = false)
+    private String recordStatus = "ACTIVE";
+
     @PrePersist
     public void prePersist() 
     {
@@ -129,6 +133,14 @@ public class Payment
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
+    }
 }
 
 /*
@@ -154,7 +166,7 @@ This is the correct enterprise mapping because:
 
 # Why BigDecimal?
 private BigDecimal totalAmountReceived;
-This is the correct datatype for financial applications 
+This is the correct datatype for financial applications
 because it avoids floating-point precision issues that occur with double.
 
 # Why LocalDate?
@@ -163,12 +175,21 @@ Only the payment date is required; time is captured separately by createdAt.
 
 # Why createdAt?
 @PrePersist
-Automatically records when the payment entry was created for auditing purposes.
+Automatically records when the payment entry is created for auditing purposes.
+
+# Why recordStatus?
+recordStatus supports the SKCP soft-delete architecture.
+
+ACTIVE
+   ↓ DELETE
+INACTIVE
+
+No physical deletion occurs.
 
 # Design Decisions
 - Customer is referenced through a @ManyToOne relationship rather than storing customer details directly.
 - Payment intentionally does not contain orderId. One payment may be allocated across multiple orders in the upcoming PaymentAllocation module.
 - Monetary values use BigDecimal for precision.
 - The entity is fully normalized and consistent with the overall SKCP architecture.
-
+- recordStatus supports soft deletion using ACTIVE / INACTIVE.
 */

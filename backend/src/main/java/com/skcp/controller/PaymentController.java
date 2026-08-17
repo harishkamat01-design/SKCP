@@ -1,86 +1,170 @@
 package com.skcp.controller;
 
-import com.skcp.entity.Payment;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.payment.PaymentCreateRequest;
+import com.skcp.dto.request.payment.PaymentUpdateRequest;
+import com.skcp.dto.response.payment.PaymentResponse;
+import com.skcp.dto.response.payment.PaymentSummaryResponse;
 import com.skcp.service.PaymentService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
 
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
     private final PaymentService paymentService;
 
-    // Constructor Injection
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(
+            PaymentService paymentService) {
+
         this.paymentService = paymentService;
     }
 
-    // ==========================
-    // CREATE
-    // ==========================
-    @PostMapping
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
 
-        Payment savedPayment = paymentService.savePayment(payment);
+    // ============================================================
+    // GET ALL ACTIVE PAYMENTS
+    // ============================================================
 
-        return new ResponseEntity<>(savedPayment, HttpStatus.CREATED);
-    }
-
-    // ==========================
-    // READ ALL
-    // ==========================
     @GetMapping
-    public ResponseEntity<List<Payment>> getAllPayments() {
+    public ResponseEntity<
+            ApiResponse<List<PaymentSummaryResponse>>
+            > getAllPayments() {
 
-        return ResponseEntity.ok(paymentService.getAllPayments());
+        List<PaymentSummaryResponse> payments =
+                paymentService.getAllPayments();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payments retrieved successfully",
+                        payments
+                )
+        );
     }
 
-    // ==========================
-    // READ BY ID
-    // ==========================
+
+    // ============================================================
+    // GET ACTIVE PAYMENT BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<PaymentResponse>
+            > getPaymentById(
+                    @PathVariable Integer id) {
 
-        Optional<Payment> payment = paymentService.getPaymentById(id);
+        PaymentResponse payment =
+                paymentService.getPaymentById(id);
 
-        return payment.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment retrieved successfully",
+                        payment
+                )
+        );
     }
 
-    // ==========================
-    // UPDATE
-    // ==========================
+
+    // ============================================================
+    // CREATE PAYMENT
+    // ============================================================
+
+    @PostMapping
+    public ResponseEntity<
+            ApiResponse<PaymentResponse>
+            > createPayment(
+                    @Valid
+                    @RequestBody PaymentCreateRequest request) {
+
+        PaymentResponse savedPayment =
+                paymentService.createPayment(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Payment created successfully",
+                                savedPayment
+                        )
+                );
+    }
+
+
+    // ============================================================
+    // UPDATE PAYMENT
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable Integer id,
-                                                 @RequestBody Payment payment) {
+    public ResponseEntity<
+            ApiResponse<PaymentResponse>
+            > updatePayment(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody PaymentUpdateRequest request) {
 
-        try {
+        PaymentResponse updatedPayment =
+                paymentService.updatePayment(
+                        id,
+                        request
+                );
 
-            Payment updatedPayment =
-                    paymentService.updatePayment(id, payment);
-
-            return ResponseEntity.ok(updatedPayment);
-
-        } catch (RuntimeException ex) {
-
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment updated successfully",
+                        updatedPayment
+                )
+        );
     }
 
-    // ==========================
-    // DELETE
-    // ==========================
+
+    // ============================================================
+    // DELETE / SOFT DELETE PAYMENT
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Valid ACTIVE ID:
+    //     200 OK
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Invalid ID:
+    //     404 NOT FOUND
+    //
+    // Database row is preserved.
+    //
+    // The Service is responsible for business logic and
+    // throwing the appropriate business exceptions.
+    //
+    // The finalized exception architecture handles the
+    // corresponding API error response.
+    //
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePayment(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deletePayment(
+                    @PathVariable Integer id) {
 
         paymentService.deletePayment(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Payment deleted successfully",
+                        null
+                )
+        );
     }
 }
-

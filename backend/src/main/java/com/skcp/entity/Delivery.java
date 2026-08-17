@@ -18,7 +18,7 @@ public class Delivery {
     // Parent Relationship → Orders
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private Orders order;
+    private Order order;
 
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
@@ -38,20 +38,23 @@ public class Delivery {
     @Column(name = "driver_name", length = 100)
     private String driverName;
 
-    @Column(name = "transport_mode", nullable = false)
+    @Column(name = "transport_mode", nullable = false, length = 20)
     private String transportMode;
 
     @Column(name = "transport_cost", precision = 12, scale = 2)
     private BigDecimal transportCost;
 
-    @Column(name = "delivery_status", nullable = false)
+    @Column(name = "delivery_status", nullable = false, length = 20)
     private String deliveryStatus;
 
-    @Column(name = "remarks")
+    @Column(name = "remarks", columnDefinition = "TEXT")
     private String remarks;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "record_status", nullable = false, length = 20)
+    private String recordStatus;
 
     @PrePersist
     public void prePersist() {
@@ -61,9 +64,20 @@ public class Delivery {
         if (this.transportCost == null) {
             this.transportCost = BigDecimal.ZERO;
         }
+
+        if (this.deliveryStatus == null) {
+            this.deliveryStatus = "PENDING";
+        }
+
+        if (this.recordStatus == null) {
+            this.recordStatus = "ACTIVE";
+        }
     }
 
+    // ==========================
     // Default Constructor
+    // ==========================
+
     public Delivery() {
 
     }
@@ -80,11 +94,11 @@ public class Delivery {
         this.deliveryId = deliveryId;
     }
 
-    public Orders getOrder() {
+    public Order getOrder() {
         return order;
     }
 
-    public void setOrder(Orders order) {
+    public void setOrder(Order order) {
         this.order = order;
     }
 
@@ -174,5 +188,13 @@ public class Delivery {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
     }
 }

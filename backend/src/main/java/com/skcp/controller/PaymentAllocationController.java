@@ -1,105 +1,177 @@
 package com.skcp.controller;
 
-import com.skcp.entity.PaymentAllocation;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.paymentallocation.PaymentAllocationCreateRequest;
+import com.skcp.dto.request.paymentallocation.PaymentAllocationUpdateRequest;
+import com.skcp.dto.response.paymentallocation.PaymentAllocationResponse;
+import com.skcp.dto.response.paymentallocation.PaymentAllocationSummaryResponse;
 import com.skcp.service.PaymentAllocationService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/payment-allocations")
 @CrossOrigin(origins = "*")
 public class PaymentAllocationController {
 
-    // Dependency Injection
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
     private final PaymentAllocationService paymentAllocationService;
 
-    // Constructor Injection
-    public PaymentAllocationController(PaymentAllocationService paymentAllocationService) {
+    public PaymentAllocationController(
+            PaymentAllocationService paymentAllocationService) {
+
         this.paymentAllocationService = paymentAllocationService;
     }
 
-    // =====================================================
-    // GET ALL PAYMENT ALLOCATIONS
-    // =====================================================
-    @GetMapping
-    public ResponseEntity<List<PaymentAllocation>> getAllPaymentAllocations() {
 
-        List<PaymentAllocation> paymentAllocations =
+    // ============================================================
+    // GET ALL ACTIVE PAYMENT ALLOCATIONS
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<
+            ApiResponse<List<PaymentAllocationSummaryResponse>>
+            > getAllPaymentAllocations() {
+
+        List<PaymentAllocationSummaryResponse> allocations =
                 paymentAllocationService.getAllPaymentAllocations();
 
-        return new ResponseEntity<>(paymentAllocations, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment allocations retrieved successfully",
+                        allocations
+                )
+        );
     }
 
-    // =====================================================
-    // GET PAYMENT ALLOCATION BY ID
-    // =====================================================
+
+    // ============================================================
+    // GET ACTIVE PAYMENT ALLOCATION BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentAllocation> getPaymentAllocationById(
-            @PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<PaymentAllocationResponse>
+            > getPaymentAllocationById(
+                    @PathVariable Integer id) {
 
-        Optional<PaymentAllocation> paymentAllocation =
+        PaymentAllocationResponse allocation =
                 paymentAllocationService.getPaymentAllocationById(id);
 
-        return paymentAllocation
-                .map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment allocation retrieved successfully",
+                        allocation
+                )
+        );
     }
 
-    // =====================================================
+
+    // ============================================================
     // CREATE PAYMENT ALLOCATION
-    // =====================================================
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<PaymentAllocation> createPaymentAllocation(
-            @RequestBody PaymentAllocation paymentAllocation) {
+    public ResponseEntity<
+            ApiResponse<PaymentAllocationResponse>
+            > createPaymentAllocation(
+                    @Valid
+                    @RequestBody
+                    PaymentAllocationCreateRequest request) {
 
-        PaymentAllocation savedPaymentAllocation =
-                paymentAllocationService.savePaymentAllocation(paymentAllocation);
+        PaymentAllocationResponse savedAllocation =
+                paymentAllocationService.createPaymentAllocation(
+                        request
+                );
 
-        return new ResponseEntity<>(savedPaymentAllocation, HttpStatus.CREATED);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Payment allocation created successfully",
+                                savedAllocation
+                        )
+                );
     }
 
-    // =====================================================
+
+    // ============================================================
     // UPDATE PAYMENT ALLOCATION
-    // =====================================================
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<PaymentAllocation> updatePaymentAllocation(
-            @PathVariable Integer id,
-            @RequestBody PaymentAllocation paymentAllocation) {
+    public ResponseEntity<
+            ApiResponse<PaymentAllocationResponse>
+            > updatePaymentAllocation(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody
+                    PaymentAllocationUpdateRequest request) {
 
-        Optional<PaymentAllocation> existingPaymentAllocation =
-                paymentAllocationService.getPaymentAllocationById(id);
+        PaymentAllocationResponse updatedAllocation =
+                paymentAllocationService.updatePaymentAllocation(
+                        id,
+                        request
+                );
 
-        if (existingPaymentAllocation.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        PaymentAllocation updatedPaymentAllocation =
-                paymentAllocationService.updatePaymentAllocation(id, paymentAllocation);
-
-        return new ResponseEntity<>(updatedPaymentAllocation, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment allocation updated successfully",
+                        updatedAllocation
+                )
+        );
     }
 
-    // =====================================================
-    // DELETE PAYMENT ALLOCATION
-    // =====================================================
+
+    // ============================================================
+    // DELETE / SOFT DELETE PAYMENT ALLOCATION
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Valid ACTIVE ID:
+    //     200 OK
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Invalid ID:
+    //     404 NOT FOUND
+    //
+    // Database row is preserved.
+    //
+    // The Service is responsible for:
+    //     - finding the allocation
+    //     - checking recordStatus
+    //     - changing ACTIVE → INACTIVE
+    //     - throwing the appropriate exception
+    //
+    // The finalized exception architecture handles
+    // the corresponding API error response.
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePaymentAllocation(
-            @PathVariable Integer id) {
-
-        Optional<PaymentAllocation> existingPaymentAllocation =
-                paymentAllocationService.getPaymentAllocationById(id);
-
-        if (existingPaymentAllocation.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deletePaymentAllocation(
+                    @PathVariable Integer id) {
 
         paymentAllocationService.deletePaymentAllocation(id);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Payment allocation deleted successfully",
+                        null
+                )
+        );
     }
 }

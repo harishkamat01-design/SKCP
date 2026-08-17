@@ -1,7 +1,14 @@
 package com.skcp.controller;
 
-import com.skcp.entity.Supplier;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.supplier.SupplierCreateRequest;
+import com.skcp.dto.request.supplier.SupplierUpdateRequest;
+import com.skcp.dto.response.supplier.SupplierResponse;
+import com.skcp.dto.response.supplier.SupplierSummaryResponse;
 import com.skcp.service.SupplierService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,83 +17,118 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/suppliers")
-public class SupplierController {
+public class SupplierController
+{
 
-    // Dependency Injection
     private final SupplierService supplierService;
 
+
     // Constructor Injection
-    public SupplierController(SupplierService supplierService) {
+    public SupplierController(SupplierService supplierService)
+    {
         this.supplierService = supplierService;
     }
 
-    // Get all suppliers
+
+    // ============================================================
+    // GET ALL SUPPLIERS
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<List<Supplier>> getAllSuppliers() {
-        List<Supplier> suppliers = supplierService.getAllSuppliers();
-        return ResponseEntity.ok(suppliers);
+    public ResponseEntity<ApiResponse<List<SupplierSummaryResponse>>> getAllSuppliers()
+    {
+        List<SupplierSummaryResponse> suppliers =
+                supplierService.getAllSuppliers();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Suppliers retrieved successfully",
+                        suppliers
+                )
+        );
     }
 
-    // Get supplier by ID
+
+    // ============================================================
+    // GET SUPPLIER BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<Supplier> getSupplierById(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<SupplierResponse>> getSupplierById(
+            @PathVariable Integer id
+    )
+    {
+        SupplierResponse supplier =
+                supplierService.getSupplierById(id);
 
-        Supplier supplier = supplierService.getSupplierById(id);
-
-        if (supplier == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(supplier);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Supplier retrieved successfully",
+                        supplier
+                )
+        );
     }
 
-    // Create supplier
+
+    // ============================================================
+    // CREATE SUPPLIER
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<Supplier> createSupplier(@RequestBody Supplier supplier) {
+    public ResponseEntity<ApiResponse<SupplierResponse>> createSupplier(
+            @Valid @RequestBody SupplierCreateRequest request
+    )
+    {
+        SupplierResponse savedSupplier =
+                supplierService.createSupplier(request);
 
-        Supplier savedSupplier = supplierService.saveSupplier(supplier);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedSupplier);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.success(
+                        "Supplier created successfully",
+                        savedSupplier
+                )
+        );
     }
 
-    // Update supplier
+
+    // ============================================================
+    // UPDATE SUPPLIER
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<Supplier> updateSupplier(
+    public ResponseEntity<ApiResponse<SupplierResponse>> updateSupplier(
             @PathVariable Integer id,
-            @RequestBody Supplier supplier) {
+            @Valid @RequestBody SupplierUpdateRequest request
+    )
+    {
+        SupplierResponse updatedSupplier =
+                supplierService.updateSupplier(id, request);
 
-        Supplier existingSupplier = supplierService.getSupplierById(id);
-
-        if (existingSupplier == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Update only editable fields
-        existingSupplier.setSupplierName(supplier.getSupplierName());
-        existingSupplier.setContactPerson(supplier.getContactPerson());
-        existingSupplier.setPhone(supplier.getPhone());
-        existingSupplier.setWhatsapp(supplier.getWhatsapp());
-        existingSupplier.setAddress(supplier.getAddress());
-        existingSupplier.setGstNumber(supplier.getGstNumber());
-        existingSupplier.setStatus(supplier.getStatus());
-
-        Supplier updatedSupplier = supplierService.saveSupplier(supplier);
-
-        return ResponseEntity.ok(updatedSupplier);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Supplier updated successfully",
+                        updatedSupplier
+                )
+        );
     }
 
-    // Delete supplier
+
+    // ============================================================
+    // DELETE SUPPLIER
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSupplier(@PathVariable Integer id) {
-
-        Supplier existingSupplier = supplierService.getSupplierById(id);
-
-        if (existingSupplier == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<ApiResponse<Void>> deleteSupplier(
+            @PathVariable Integer id
+    )
+    {
         supplierService.deleteSupplier(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Supplier deleted successfully",
+                        null
+                )
+        );
     }
 }

@@ -2,7 +2,1214 @@
 
 All notable changes to the SKCP (Shree Kundodari Cement Products) project are documented here.
 ---
+# [2026-08-11 to 2026-08-17] - Backend Refinement & Finance Module Completion
 
+## Summary
+
+Successfully completed the remaining **Backend Refinement phase** for the SKCP ERP System.
+
+The focus of this phase was to standardize the remaining backend modules using the enterprise architecture established during the earlier refinement work and complete the final **Finance module**.
+
+The backend now follows a consistent pattern across all 19 business modules.
+
+## Major Areas Completed
+
+- Backend refinement of remaining business modules
+- Request DTO standardization
+- Response DTO standardization
+- Mapper pattern implementation
+- Service layer refinement
+- Controller standardization
+- `@Valid` request validation
+- Standard `ApiResponse<T>`
+- Global Exception Handling
+- HTTP status code standardization
+- Postman CRUD testing
+- PostgreSQL verification
+- Soft-delete / logical deactivation
+- Active / inactive record handling
+- Protected system-controlled fields
+- Consistent `ResourceNotFoundException`
+- Consistent `DuplicateResourceException`
+- Enterprise CRUD architecture across backend modules
+
+## Finance Module Completion
+
+The final Finance module, **Payment Allocation**, was completed and integrated with:
+
+- Payment
+- Customer
+- Order
+
+### Payment Allocation Business Rules
+
+The implementation validates that:
+
+- Payment exists
+- Payment is ACTIVE
+- Order exists
+- Order is ACTIVE
+- Payment and Order belong to the same Customer
+- Allocation amount is greater than zero
+- Allocation does not exceed the remaining payment amount
+- Only ACTIVE allocations are visible to normal business operations
+- Deleted allocations are retained using soft delete
+
+### Payment Allocation Architecture
+
+```text
+PaymentAllocationCreateRequest
+            ↓
+PaymentAllocationService
+            ↓
+PaymentAllocationMapper
+            ↓
+PaymentAllocation Entity
+            ↓
+PaymentAllocationRepository
+            ↓
+PostgreSQL
+```
+
+## Backend Module Status
+
+All **19 backend business modules** have now been implemented and refined.
+
+### Master Data
+
+- Customer
+- Supplier
+- Product
+- Raw Material
+- Labour
+- Asset
+
+### Procurement
+
+- Purchase
+- Purchase Item
+
+### Production
+
+- Production
+- Attendance
+
+### Inventory
+
+- Raw Material Stock
+- Curing Stock
+- Finished Goods Stock
+
+### Sales
+
+- Orders
+- Order Item
+- Delivery
+- Delivery Item
+
+### Finance
+
+- Payment
+- Payment Allocation
+
+## Final Backend Milestone
+
+🏆 **Module 4 – Spring Boot Backend Development: Completed**
+
+The backend now includes:
+
+- 19 Spring Boot business modules
+- Entity Layer
+- Repository Layer
+- Service Layer
+- Controller Layer
+- Request DTOs
+- Response DTOs
+- Mapper Layer
+- Validation
+- Global Exception Handling
+- Standard API Response
+- REST APIs
+- CRUD Operations
+- PostgreSQL Integration
+- Hibernate ORM
+- Spring Data JPA
+- Soft Delete / Record Status
+- Postman CRUD Testing
+- Individual Module Documentation
+
+## Architecture Standardization
+
+The following architecture is now consistently applied:
+
+```text
+Database
+    ↓
+Entity
+    ↓
+Repository
+    ↓
+Service
+    ↓
+Mapper
+    ↓
+Controller
+    ↓
+REST API
+    ↓
+Postman
+    ↓
+PostgreSQL
+```
+
+The Service layer owns business rules and validation of business relationships, while the Controller remains responsible for HTTP/API interaction.
+
+## Important Business Design Decisions
+
+### Soft Delete
+
+Business records are not physically deleted.
+
+```text
+ACTIVE
+   ↓
+DELETE
+   ↓
+INACTIVE
+```
+
+The database record is preserved for history and audit purposes.
+
+### Protected Fields
+
+System-controlled fields such as:
+
+- Primary IDs
+- `createdAt`
+- `recordStatus`
+
+are protected from normal update operations.
+
+### Payment Allocation
+
+Payment allocation is intentionally separated from the Payment entity.
+
+```text
+Customer
+   │
+   ├── Payment 1
+   ├── Payment 2
+   └── Payment 3
+          │
+          ▼
+   Payment Allocation
+          │
+          ├── Order 1
+          └── Order 2
+```
+
+This supports future customer-level outstanding payment calculations and order payment status management.
+
+## Milestone
+
+🏆 **SKCP Backend Refinement and Finance Module Completion**
+
+The complete backend foundation and refinement phase is now finished.
+
+All 19 backend modules have been implemented, standardized, tested, and connected to PostgreSQL.
+
+## Next Steps
+
+The next development phase is:
+
+### Module 5 – Frontend Integration
+
+Planned focus:
+
+- React frontend integration
+- Backend API integration
+- Dashboard integration
+- Master modules
+- Procurement modules
+- Production modules
+- Inventory modules
+- Sales modules
+- Finance modules
+
+Future phases remain:
+
+- Module 6 – AI Decision Support
+- Module 7 – Deployment
+
+
+# [2026-08-07 to 2026-08-10] - Backend Refinement & Master Entity Standardization
+
+## Summary
+
+Successfully completed a major **Backend Refinement phase** for the SKCP ERP System.
+
+The focus of this phase was to move the existing Spring Boot backend beyond basic CRUD implementation and establish a more consistent, maintainable, and enterprise-style architecture for SKCP Master entities.
+
+## Major Areas Completed
+
+- Supplier Master refinement
+- Product Master refinement
+- Request DTOs
+- Response DTOs
+- Mapper pattern
+- Service layer refinement
+- Controller standardization
+- `@Valid` request validation
+- Global Exception Handling
+- Standard `ApiResponse<T>`
+- HTTP status code standardization
+- Postman API testing
+- PostgreSQL verification
+- Logical deletion / deactivation
+- Common Master-Entity pattern
+
+## Milestone
+
+The **Product Master module is now officially closed and tested successfully**.
+
+## Next Steps
+
+The Supplier and Product modules now provide the foundation for standardizing the remaining SKCP Master entities.
+
+# [2026-08-07] - Backend Refinement Started
+
+## Objective
+
+Started the next phase of SKCP backend development beyond the initial CRUD implementation.
+
+The objective was to improve the existing backend architecture by introducing:
+
+- DTO-based API contracts
+- Mapper layer
+- Standard response models
+- Validation
+- Exception handling
+- Consistent HTTP responses
+- Better separation of responsibilities
+
+---
+
+## Added
+
+### DTO-Based API Design
+
+Introduced separate Request and Response DTOs instead of exposing JPA entities directly through the REST API.
+
+The Product module uses:
+
+```text
+ProductCreateRequest
+ProductUpdateRequest
+ProductResponse
+ProductSummaryResponse
+```
+
+
+This separates:
+```text
+API Contract
+↓
+DTO
+↓
+Entity
+↓
+Database
+```
+
+
+### Mapper Layer
+
+Introduced the Mapper pattern for Product.
+
+Responsibilities include:
+
+```text
+Request DTO
+↓
+ProductMapper
+↓
+Product Entity
+
+text
+
+and:
+
+Product Entity
+↓
+ProductMapper
+↓
+ProductResponse
+
+```
+This keeps DTO/entity conversion outside the Controller and Service.
+
+# Changed
+
+## Service Layer Refinement
+The Service layer was refined to contain business operations rather than HTTP-specific logic.
+
+Product Service responsibilities include:
+- Create Product
+- Get All Products
+- Get Product By ID
+- Update Product
+- Deactivate Product
+
+The Controller is responsible for HTTP concerns while the Service is responsible for business operations.
+
+---
+
+# [2026-08-08] – Product Master Implementation
+
+## Objective
+Completed the Product Master backend implementation using a fixed development order.
+
+### Implementation sequence:
+
+1. `Product.java`
+2. `ProductRepository.java`
+3. `ProductCreateRequest.java`
+
+4. `ProductUpdateRequest.java`
+5. `ProductResponse.java`
+6. `ProductSummaryResponse.java`
+7. `ProductMapper.java`
+8. `ProductService.java`
+9. `ProductController.java`
+10. Validation + Exception Handling
+11. Postman Testing
+
+# Added
+
+## Product Entity
+
+Implemented Product entity with:
+
+- Product ID
+- Product Code
+- Product Name
+- Size
+- Length
+- Width
+- Height
+- Unit
+
+
+- Description
+- Status
+- Created At
+
+Database table:  product
+
+
+# Product Repository
+
+Implemented:
+
+```java
+public interface ProductRepository
+    extends JpaRepository<Product, Integer> {
+}
+```
+Spring Data JPA provides the standard persistence operations.
+
+## Product Request DTOs
+Implemented:
+
+- ProductCreateRequest
+
+- ProductUpdateRequest
+
+The DTOs define the API input contract and provide a place for validation rules.
+
+# Product Response DTOs
+
+Implemented:
+
+- `ProductResponse`
+- `ProductSummaryResponse`
+
+## ProductResponse
+Used when detailed Product information is required.
+
+## ProductSummaryResponse
+Used for lightweight Product list responses.
+
+This avoids returning unnecessary data when retrieving multiple products.
+
+# Product Mapper
+
+Implemented `ProductMapper` to handle:
+
+```text
+ProductCreateRequest
+↓
+Product
+
+ProductUpdateRequest
+↓
+Product
+↓
+ProductResponse
+
+Product
+↓
+ProductSummaryResponse
+```
+
+# [2026-08-09] – Validation & Exception Handling
+
+## Objective
+Standardized validation and error handling for the Product API.
+
+---
+
+## Added
+
+### Request Validation
+Product request DTOs use Jakarta Bean Validation annotations.
+
+The Controller triggers validation using:
+
+```java
+@Valid @RequestBody ProductCreateRequest request
+```
+
+and
+
+> @Valid @RequestBody ProductUpdateRequest request
+
+## Validation Flow
+The complete validation flow is:
+
+```text
+
+HTTP Request
+↓
+JSON
+↓
+Request DTO
+↓
+@Valid
+↓
+Bean Validation
+↓
+Validation Successful?
+↓
+YES
+↓
+Controller
+↓
+Service
+
+
+
+If validation fails:
+
+HTTP Request
+↓
+@Valid
+↓
+Validation Failure
+↓
+GlobalExceptionHandler
+↓
+Standard Error Response
+↓
+HTTP 400 Bad Request
+```
+
+# Global Exception Handling
+
+Implemented standardized exception handling so API failures do not expose unnecessary internal implementation details.
+
+The API returns a consistent response structure for application failures.
+
+## Example:
+
+```json
+{
+  "success": false,
+  "message": "Product not found with id: 99",
+  "data": null,
+  "timestamp": "..."
+}
+```
+
+## Improved
+### Validation Error Handling
+
+Validation errors are converted into clean API responses rather than exposing raw Spring framework errors to API consumers.
+
+This establishes a consistent error contract for SKCP.
+
+
+# [2026-08-10] – Product Postman Testing & Master Entity Standardization
+
+## Objective
+Completed end-to-end Postman testing of the Product Master API and finalized the common SKCP Master-Entity pattern.
+
+---
+
+## Added
+
+### Product API Testing
+Tested the complete Product lifecycle using Postman.
+
+#### Create Product
+**POST** `/api/products`
+
+Successfully tested Product creation.
+
+**Response:**  
+`201 Created`
+
+Example request:
+
+```json
+{
+  "productCode": "SB-005",
+  "productName": "Solid Block",
+  "size": "6x3x16",
+  "length": 16.00,
+  "width": 3.00,
+  "height": 6.00,
+  "unit": "INCH",
+  "description": "Standard 3 inch cement solid block"
+}
+```
+
+The Product was successfully created.
+
+### Get All Products
+
+> GET /api/products
+
+Successfully tested.
+
+Response:
+
+> 200 OK
+
+The response returns:
+
+> List<ProductSummaryResponse>
+
+### Get Product By ID
+
+**GET** `/api/products/{id}`
+
+Successfully tested.
+
+**Response:**  
+`200 OK`
+
+The API returns:
+
+---
+
+### Update Product
+
+**PUT** `/api/products/{id}`
+
+Successfully tested.
+
+The update API uses:
+
+> ProductUpdateRequest
+
+
+Validation is triggered using:
+
+
+```java
+@Valid
+```
+
+### Delete / Deactivate Product
+**DELETE** /api/products/{id}
+
+The Product API was changed to follow the Master-Entity logical deactivation pattern.
+
+Instead of physically deleting the database record:
+
+  ACTIVE
+      ↓
+  DELETE API
+      ↓
+  INACTIVE
+
+The database record remains available.
+
+Successful response:
+
+. 200 OK
+
+Response body:
+```json
+{
+  "success": true,
+  "message": "Product deactivated successfully",
+  "data": null,
+  "timestamp": "..."
+}
+```
+
+PostgreSQL verification confirmed that the Product remains in the database with:
+> status = INACTIVE
+
+### Changed
+
+#### HTTP Status Code Standardization
+
+ProductController now clearly owns HTTP status codes.
+
+#### Create
+> 201 Created
+
+#### Get
+> 200 OK
+
+#### Update
+> 200 OK
+
+
+### Delete / Deactivate
+- `200 OK`
+
+### Validation Failure
+- `400 Bad Request`
+
+### Resource Not Found
+- `404 Not Found`
+
+---
+
+# ApiResponse Standardization
+
+Introduced a common generic response wrapper:
+
+```java
+ApiResponse<T>
+```
+
+```json
+{
+  "success": true,
+  "message": "Product created successfully",
+  "data": {},
+  "timestamp": "..."
+}
+```
+The standard failure response is:
+
+
+```json
+{
+  "success": false,
+  "message": "Product not found",
+  "data": null,
+  "timestamp": "..."
+}
+```
+
+### Changed
+#### Separation of HTTP Status and Response Body
+
+Established a clear separation of responsibilities.
+
+```text
+
+Controller
+    ↓
+HTTP Status Code
++
+ApiResponse Body
+
+```
+```java
+ResponseEntity.ok(...)
+```
+
+or:
+
+> ResponseEntity.status(HttpStatus.CREATED)
+
+### Common Master-Entity Pattern
+
+#### Established a common pattern that can be reused across SKCP Master entities.
+
+```text
+HTTP Request
+    ↓
+Controller
+    ↓
+@Valid / DTO
+    ↓
+Service
+    ↓
+Repository
+    ↓
+PostgreSQL
+    ↓
+Repository
+    ↓
+Service
+    ↓
+Mapper
+    ↓
+Response DTO
+    ↓
+ApiResponse<T>
+    ↓
+HTTP Response
+```
+This pattern provides a consistent foundation for all SKCP Master entities going forward.
+
+```text
+
+Mapper
+↓
+ApiResponse
+↓
+HTTP Response
+
+```
+
+
+# Master Entity Architecture
+
+The common SKCP Master pattern is now:
+
+
+  Entity
+
+  Repository
+
+  Request DTO
+
+  Response DTO
+
+  Mapper
+
+  Service
+
+  Controller
+
+  Validation
+
+  Exception Handling
+
+  ApiResponse
+
+# Logical Deactivation Standard
+
+Established logical deactivation as the preferred pattern for SKCP Master entities where historical data must be preserved.
+
+**Example:**
+
+```text
+ACTIVE
+↓
+Deactivate
+↓
+INACTIVE
+```
+
+
+This pattern can be applied consistently to:
+
+- Customer
+- Supplier
+- Product
+- Asset
+- Labour
+- Raw Material
+
+The record remains in PostgreSQL instead of being physically removed.
+
+
+# Improved
+
+## Data Preservation
+Logical deactivation protects historical business information.
+
+### Benefits:
+- Preserves historical records
+- Prevents accidental permanent deletion
+- Maintains relationships
+- Supports audit/history requirements
+- Prevents transaction history from becoming inconsistent
+
+---
+
+## API Consistency
+Master APIs now follow a common response pattern:
+
+```json
+{
+    "success": true,
+    "message": "...",
+    "data": {},
+    "timestamp": "..."
+}
+```
+This makes frontend integration easier because the React application can expect a predictable response structure.
+
+# Product Master Final Status
+
+- Product Entity
+- Product Repository
+- ProductCreateRequest
+- ProductUpdateRequest
+- ProductResponse
+- ProductSummaryResponse
+- ProductMapper
+- ProductService
+- ProductController
+- Validation
+- Global Exception Handling
+- ApiResponse
+- Postman Testing
+- PostgreSQL Verification
+- Logical Deactivation
+
+**Product Master is officially:**
+
+- **CLOSED**
+
+---
+
+# Supplier Master Final Status
+
+Supplier Master was also brought into the refined Master-Entity pattern.
+
+**Implemented and tested:**
+
+- Supplier Entity
+- Supplier Repository
+- Request DTOs
+- Response DTOs
+- Mapper
+- Service
+- Controller
+- Validation
+- Exception Handling
+- ApiResponse
+- Postman Testing
+- Logical Deactivation Pattern
+
+**Supplier Master is:**
+
+- **CLOSED**
+
+---
+
+# Lessons Learned
+
+## 1. Controller Should Stay Thin
+The Controller should primarily handle:
+
+- HTTP
+- Request
+- Response
+- Status Code
+- Validation Trigger
+
+Business logic should remain in the Service.
+
+# 2. Service Owns Business Logic
+
+The Service should handle:
+
+- Find Entity
+- Create Entity
+- Update Entity
+- Deactivate Entity
+- Business Rules
+- Repository Coordination
+
+---
+
+# 3. Repository Owns Persistence
+
+The Repository communicates with PostgreSQL through Spring Data JPA.
+
+Example:
+
+```java
+productRepository.findById(id);
+```
+
+# 4. DTOs Protect the API Contract
+
+DTOs prevent the database Entity from becoming the direct API contract.
+
+```text
+Client
+    ↓
+DTO
+    ↓
+Mapper
+    ↓
+Entity
+```
+
+# 5. Mapper Separates Conversion Logic
+
+The Mapper keeps DTO ↔ Entity conversion centralized.
+
+```text
+DTO → Mapper → Entity
+Entity → Mapper → DTO
+```
+
+# 6. @Valid Is the Validation Trigger
+
+Validation annotations alone define the rules, but @Valid tells Spring to execute those rules for the incoming request DTO.
+
+```text
+DTO Validation Rules
++
+@Valid
+    ↓
+Validation Execution
+```
+# 7. ApiResponse Provides Consistency
+
+`ApiResponse<T>` allows the same response structure to be reused for:
+
+```java
+ApiResponse<ProductResponse>
+```
+
+> ApiResponse<List<ProductSummaryResponse>>
+
+> ApiResponse<Void>
+
+# 8. HTTP Status and Response Body Are Different
+
+HTTP status communicates the HTTP-level result.
+
+ApiResponse communicates application-level information.
+
+```text
+HTTP Status
++
+Response Body
+```|
+
+Both should be designed consistently.
+
+
+```text
+Service
+↓
+Repository
+↓
+PostgreSQL
+```
+
+# Decision 002 – Common API Response
+
+All Master APIs should use:
+
+> ApiResponse<T>
+
+
+for standardized response bodies.
+
+# Decision 003 – Logical Deactivation
+
+Master entities should preferably be deactivated instead of physically deleted when historical references must be preserved.
+
+# Decision 004 – Controller Owns HTTP Status
+
+Controllers are responsible for HTTP status codes.
+
+Services should not return `ResponseEntity`.
+
+# Decision 005 – Service Owns Business Logic
+
+Services should not contain HTTP-specific response construction.
+
+They should return business/domain results to the Controller.
+
+---
+
+# Backend Refinement Milestone
+
+The period from **7 August to 10 August 2026** established the refined SKCP backend development standard.
+
+The architecture now clearly separates:
+
+- **HTTP Layer** → Controller
+- **Business Layer** → Service
+- **Persistence Layer** → Repository
+- **Database** → PostgreSQL
+
+with supporting components:
+
+- DTO
+- Mapper
+- Validation
+- Exception Handling
+- ApiResponse
+
+
+Module 0 – Environment Setup
+Module 1 – Business Analysis
+Module 2 – Software Architecture
+Module 3 – Database Design
+Module 4 – Backend Development
+
+
+**Backend Refinement**  
+In Progress
+
+---
+
+# Master Entity Status
+
+- Customer (Pending)
+- Supplier CLOSED
+- Product CLOSED
+
+
+- Raw Material
+- Labour
+- Asset
+
+---
+
+# Next Phase
+
+The next development phase will continue using the established Master-Entity standard.
+
+Future Master entities should follow:
+
+
+  Entity
+
+  Repository
+
+  Create Request DTO
+
+  Update Request DTO
+
+  Response DTO
+
+  Summary Response DTO
+
+  Mapper
+
+  Service
+
+  Controller
+
+  Validation
+
+  Exception Handling
+
+  ApiResponse
+
+  Logical Deactivation
+
+  Postman Testing
+
+  PostgreSQL Verification
+
+- Controller
+- Validation
+- Exception Handling
+- ApiResponse
+- Postman Testing
+- PostgreSQL Verification
+
+---
+
+# Architect Verdict 🎉
+
+The **7–10 August 2026 Backend Refinement** phase successfully transformed the initial SKCP CRUD implementation into a more standardized Master-Entity architecture.
+
+The most important architectural improvements were:
+
+- DTO-based API contracts
+- Mapper separation
+- Thin Controllers
+- Business-focused Services
+- Repository-based persistence
+- `@Valid` validation
+- Global Exception Handling
+- Standard `ApiResponse<T>`
+- Consistent HTTP status codes
+- Logical Master-Entity deactivation
+- PostgreSQL verification
+
+---
+
+# Final Status
+
+✅ **Product Master** – CLOSED  
+✅ **Supplier Master** – CLOSED  
+⏳ **Backend Refinement** – In Progress  
+⏳ **Customer, Raw Material, Labour, Asset** – Pending
+
+The foundation is now established for the remaining SKCP Master entities to be built consistently and efficiently. 🚀
+
+- PostgreSQL verification
+- End-to-end Postman testing
+
+The Supplier Master and Product Master are now established as reference implementations for future SKCP Master entities.
+
+
+```text
+Supplier Master CLOSED
+Product Master CLOSED
+
+Common Pattern ESTABLISHED
+API Standard ESTABLISHED
+Validation ESTABLISHED
+Exception Handling ESTABLISHED
+ApiResponse ESTABLISHED
+Soft Delete ESTABLISHED
+```
+
+
+This becomes the baseline architecture for the remaining SKCP Master entities.
+
+---
+
+> **📋 Official CHANGELOG Entry – 7–10 August 2026**
+
+This is the version I would use as the official `CHANGELOG.md` entry for **7–10 August**.  
+It avoids claiming that new business modules were implemented during those four days;  
+instead, it records the **refinement and standardization work that actually happened after the initial Module 4 implementation.**
+
+---
+
+**Status Summary:**
+
+| Component | Status |
+|-----------|--------|
+| Supplier Master | ✅ CLOSED |
+| Product Master | ✅ CLOSED |
+| Common Pattern | ✅ ESTABLISHED |
+| API Standard | ✅ ESTABLISHED |
+| Validation | ✅ ESTABLISHED |
+| Exception Handling | ✅ ESTABLISHED |
+| ApiResponse | ✅ ESTABLISHED |
+| Soft Delete | ✅ ESTABLISHED |
+
+The foundation is now production-ready for scaling to all remaining SKCP Master entities. 🚀
+
+
+---
 # [2026-08-06] – Module 4 Backend Development Completed 🎉
 
 ## 🎯 Summary

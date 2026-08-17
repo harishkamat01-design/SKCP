@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment_allocation")
-public class PaymentAllocation 
+public class PaymentAllocation
 {
 
     @Id
@@ -17,16 +17,23 @@ public class PaymentAllocation
     private Integer paymentAllocationId;
 
     // Parent Relationship → Payment
-    @ManyToOne                                                  /* |Payment|PaymentAllocation|1 : N|PaymentID| */
+    @ManyToOne
+    /* |Payment|PaymentAllocation|1 : N|PaymentID| */
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
     // Parent Relationship → Orders
-    @ManyToOne                                                 /*  |Order|PaymentAllocation|1 : N|OrderID| */
+    @ManyToOne
+    /* |Order|PaymentAllocation|1 : N|OrderID| */
     @JoinColumn(name = "order_id", nullable = false)
-    private Orders order;
+    private Order order;
 
-    @Column(name = "allocated_amount", nullable = false, precision = 12, scale = 2)
+    @Column(
+        name = "allocated_amount",
+        nullable = false,
+        precision = 12,
+        scale = 2
+    )
     private BigDecimal allocatedAmount;
 
     @Column(name = "allocation_date", nullable = false)
@@ -35,11 +42,14 @@ public class PaymentAllocation
     @Column(name = "remarks")
     private String remarks;
 
+    @Column(name = "record_status", nullable = false)
+    private String recordStatus = "ACTIVE";
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
-    public void prePersist() 
+    public void prePersist()
     {
 
         this.createdAt = LocalDateTime.now();
@@ -47,10 +57,17 @@ public class PaymentAllocation
         if (this.allocationDate == null) {
             this.allocationDate = LocalDate.now();
         }
+
+        if (this.recordStatus == null) {
+            this.recordStatus = "ACTIVE";
+        }
     }
 
+    // ==========================
     // Default Constructor
-    public PaymentAllocation() 
+    // ==========================
+
+    public PaymentAllocation()
     {
 
     }
@@ -75,11 +92,11 @@ public class PaymentAllocation
         this.payment = payment;
     }
 
-    public Orders getOrder() {
+    public Order getOrder() {
         return order;
     }
 
-    public void setOrder(Orders order) {
+    public void setOrder(Order order) {
         this.order = order;
     }
 
@@ -105,6 +122,14 @@ public class PaymentAllocation
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
     }
 
     public LocalDateTime getCreatedAt() {

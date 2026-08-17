@@ -1,7 +1,9 @@
 package com.skcp.controller;
 
-import com.skcp.entity.CuringStock;
+import com.skcp.dto.request.curringstock.CuringStockRequest;
+import com.skcp.dto.response.curringstock.CuringStockResponse;
 import com.skcp.service.CuringStockService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,91 +15,62 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class CuringStockController {
 
-    // Dependency Injection
     private final CuringStockService curingStockService;
 
-    // Constructor Injection
-    public CuringStockController(CuringStockService curingStockService) {
+    public CuringStockController(
+            CuringStockService curingStockService) {
         this.curingStockService = curingStockService;
     }
 
-    // ==========================================================
-    // GET ALL CURING STOCK
-    // ==========================================================
     @GetMapping
-    public ResponseEntity<List<CuringStock>> getAllCuringStock() {
-        List<CuringStock> curingStockList = curingStockService.getAllCuringStock();
-        return ResponseEntity.ok(curingStockList);
+    public ResponseEntity<List<CuringStockResponse>>
+    getAllCuringStock() {
+
+        return ResponseEntity.ok(
+                curingStockService.getAllCuringStock()
+        );
     }
 
-    // ==========================================================
-    // GET CURING STOCK BY ID
-    // ==========================================================
     @GetMapping("/{id}")
-    public ResponseEntity<CuringStock> getCuringStockById(@PathVariable Integer id) {
+    public ResponseEntity<CuringStockResponse>
+    getCuringStockById(@PathVariable Integer id) {
 
-        CuringStock curingStock = curingStockService.getCuringStockById(id);
-
-        if (curingStock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(curingStock);
+        return ResponseEntity.ok(
+                curingStockService.getCuringStockById(id)
+        );
     }
 
-    // ==========================================================
-    // CREATE CURING STOCK
-    // ==========================================================
     @PostMapping
-    public ResponseEntity<CuringStock> createCuringStock(@RequestBody CuringStock curingStock) {
+    public ResponseEntity<CuringStockResponse>
+    createCuringStock(
+            @Valid @RequestBody CuringStockRequest request) {
 
-        CuringStock savedCuringStock = curingStockService.saveCuringStock(curingStock);
+        CuringStockResponse response =
+                curingStockService.createCuringStock(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(savedCuringStock);
+                .body(response);
     }
 
-    // ==========================================================
-    // UPDATE CURING STOCK
-    // ==========================================================
     @PutMapping("/{id}")
-    public ResponseEntity<CuringStock> updateCuringStock(
+    public ResponseEntity<CuringStockResponse>
+    updateCuringStock(
             @PathVariable Integer id,
-            @RequestBody CuringStock curingStock) {
+            @Valid @RequestBody CuringStockRequest request) {
 
-        CuringStock existingCuringStock = curingStockService.getCuringStockById(id);
+        CuringStockResponse response =
+                curingStockService.updateCuringStock(
+                        id,
+                        request
+                );
 
-        if (existingCuringStock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        existingCuringStock.setProduction(curingStock.getProduction());
-        existingCuringStock.setProduct(curingStock.getProduct());
-        existingCuringStock.setQuantity(curingStock.getQuantity());
-        existingCuringStock.setProductionDate(curingStock.getProductionDate());
-        existingCuringStock.setStatus(curingStock.getStatus());
-        existingCuringStock.setRemarks(curingStock.getRemarks());
-
-        // expectedReadyDate is automatically recalculated in the Service
-
-        CuringStock updatedCuringStock =
-                curingStockService.saveCuringStock(existingCuringStock);
-
-        return ResponseEntity.ok(updatedCuringStock);
+        return ResponseEntity.ok(response);
     }
 
-    // ==========================================================
-    // DELETE CURING STOCK
-    // ==========================================================
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCuringStock(@PathVariable Integer id) {
-
-        CuringStock existingCuringStock = curingStockService.getCuringStockById(id);
-
-        if (existingCuringStock == null) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void>
+    deleteCuringStock(@PathVariable Integer id) {
 
         curingStockService.deleteCuringStock(id);
 

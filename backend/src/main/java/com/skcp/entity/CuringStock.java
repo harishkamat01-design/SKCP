@@ -16,7 +16,7 @@ public class CuringStock {
 
     // One Production Batch → One Curing Batch
     @OneToOne
-    @JoinColumn(name = "production_id", nullable = false)
+    @JoinColumn(name = "production_id", nullable = false, unique = true)
     private Production production;
 
     // Product being cured
@@ -30,29 +30,35 @@ public class CuringStock {
     @Column(name = "production_date", nullable = false)
     private LocalDate productionDate;
 
-    // Calculated in Service Layer
+    // Calculated by Service Layer
     @Column(name = "expected_ready_date", nullable = false)
     private LocalDate expectedReadyDate;
 
+    // Lifecycle:
+    // CURING → READY → MOVED
     @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "remarks")
     private String remarks;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "record_status", nullable = false)
+    private String recordStatus;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+
+        if (this.recordStatus == null) {
+            this.recordStatus = "ACTIVE";
+        }
     }
 
-    // Default Constructor
     public CuringStock() {
     }
-
-    // Getters and Setters
 
     public Integer getCuringStockId() {
         return curingStockId;
@@ -116,6 +122,14 @@ public class CuringStock {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getRecordStatus() {
+        return recordStatus;
+    }
+
+    public void setRecordStatus(String recordStatus) {
+        this.recordStatus = recordStatus;
     }
 
     public LocalDateTime getCreatedAt() {

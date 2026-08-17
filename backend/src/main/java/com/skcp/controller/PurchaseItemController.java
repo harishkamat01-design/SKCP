@@ -1,8 +1,11 @@
 package com.skcp.controller;
 
-import com.skcp.entity.PurchaseItem;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.purchaseitem.PurchaseItemCreateRequest;
+import com.skcp.dto.request.purchaseitem.PurchaseItemUpdateRequest;
+import com.skcp.dto.response.purchaseitem.PurchaseItemResponse;
 import com.skcp.service.PurchaseItemService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,96 +13,460 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/purchase-items")
-public class PurchaseItemController {
+public class PurchaseItemController
+{
+
+    // ============================================================
+    // DEPENDENCY
+    // ============================================================
+
+    private final PurchaseItemService purchaseItemService;
+
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
+
+    public PurchaseItemController(
+            PurchaseItemService purchaseItemService
+    )
+    {
+        this.purchaseItemService = purchaseItemService;
+    }
+
+
+    // ============================================================
+    // GET ALL PURCHASE ITEMS
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<
+            ApiResponse<List<PurchaseItemResponse>>
+            > getAllPurchaseItems()
+    {
+
+        List<PurchaseItemResponse> purchaseItems =
+                purchaseItemService.getAllPurchaseItems();
+
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase items retrieved successfully",
+                        purchaseItems
+                )
+        );
+    }
+
+
+    // ============================================================
+    // GET PURCHASE ITEM BY ID
+    // ============================================================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > getPurchaseItemById(
+            @PathVariable Integer id
+    )
+    {
+
+        PurchaseItemResponse purchaseItem =
+                purchaseItemService.getPurchaseItemById(id);
+
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item retrieved successfully",
+                        purchaseItem
+                )
+        );
+    }
+
+
+    // ============================================================
+    // CREATE PURCHASE ITEM
+    // ============================================================
+
+    @PostMapping("/purchase/{purchaseId}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > createPurchaseItem(
+            @PathVariable Integer purchaseId,
+            @Valid @RequestBody
+            PurchaseItemCreateRequest request
+    )
+    {
+
+        PurchaseItemResponse savedPurchaseItem =
+                purchaseItemService.createPurchaseItem(
+                        purchaseId,
+                        request
+                );
+
+
+        /*
+         * SKCP API STANDARD:
+         *
+         * Successful business operations return HTTP 200 OK.
+         */
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item created successfully",
+                        savedPurchaseItem
+                )
+        );
+    }
+
+
+    // ============================================================
+    // UPDATE PURCHASE ITEM
+    // ============================================================
+
+    @PutMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > updatePurchaseItem(
+            @PathVariable Integer id,
+            @Valid @RequestBody
+            PurchaseItemUpdateRequest request
+    )
+    {
+
+        PurchaseItemResponse updatedPurchaseItem =
+                purchaseItemService.updatePurchaseItem(
+                        id,
+                        request
+                );
+
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item updated successfully",
+                        updatedPurchaseItem
+                )
+        );
+    }
+
+
+    // ============================================================
+    // DELETE PURCHASE ITEM
+    // ============================================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deletePurchaseItem(
+            @PathVariable Integer id
+    )
+    {
+
+        purchaseItemService.deletePurchaseItem(id);
+
+
+        /*
+         * This is a SOFT DELETE.
+         *
+         * Database:
+         * status = INACTIVE
+         *
+         * Physical row remains in database.
+         */
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item deleted successfully",
+                        null
+                )
+        );
+    }
+
+}
+
+
+/*
+package com.skcp.controller;
+
+import com.skcp.common.ApiResponse;
+import com.skcp.service.PurchaseItemService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.skcp.dto.request.purchaseitem.PurchaseItemCreateRequest;
+import com.skcp.dto.request.purchaseitem.PurchaseItemUpdateRequest;
+import com.skcp.dto.response.purchaseitem.PurchaseItemResponse;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/purchase-items")
+public class PurchaseItemController
+{
 
     // Dependency Injection
     private final PurchaseItemService purchaseItemService;
 
     // Constructor Injection
-    public PurchaseItemController(PurchaseItemService purchaseItemService) {
+    public PurchaseItemController(
+            PurchaseItemService purchaseItemService
+    )
+    {
         this.purchaseItemService = purchaseItemService;
     }
 
-    // Get all purchase items
-    @GetMapping
-    public ResponseEntity<List<PurchaseItem>> getAllPurchaseItems() {
 
-        List<PurchaseItem> purchaseItems =
+    // ============================================================
+    // GET ALL PURCHASE ITEMS
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<
+            ApiResponse<List<PurchaseItemResponse>>
+            > getAllPurchaseItems()
+    {
+        List<PurchaseItemResponse> purchaseItems =
+                purchaseItemService.getAllPurchaseItems();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase items retrieved successfully",
+                        purchaseItems
+                )
+        );
+    }
+
+
+    // ============================================================
+    // GET PURCHASE ITEM BY ID
+    // ============================================================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > getPurchaseItemById(
+            @PathVariable Integer id
+    )
+    {
+        PurchaseItemResponse purchaseItem =
+                purchaseItemService.getPurchaseItemById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item retrieved successfully",
+                        purchaseItem
+                )
+        );
+    }
+
+
+    // ============================================================
+    // CREATE PURCHASE ITEM
+    // ============================================================
+
+    @PostMapping("/purchase/{purchaseId}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > createPurchaseItem(
+            @PathVariable Integer purchaseId,
+            @Valid @RequestBody PurchaseItemCreateRequest request
+    )
+    {
+        PurchaseItemResponse savedPurchaseItem =
+                purchaseItemService.createPurchaseItem(
+                        purchaseId,
+                        request
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Purchase item created successfully",
+                                savedPurchaseItem
+                        )
+                );
+    }
+
+
+    // ============================================================
+    // UPDATE PURCHASE ITEM
+    // ============================================================
+
+    @PutMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<PurchaseItemResponse>
+            > updatePurchaseItem(
+            @PathVariable Integer id,
+            @Valid @RequestBody PurchaseItemUpdateRequest request
+    )
+    {
+        PurchaseItemResponse updatedPurchaseItem =
+                purchaseItemService.updatePurchaseItem(
+                        id,
+                        request
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item updated successfully",
+                        updatedPurchaseItem
+                )
+        );
+    }
+
+
+    // ============================================================
+    // DELETE PURCHASE ITEM
+    // ============================================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deletePurchaseItem(
+            @PathVariable Integer id
+    )
+    {
+        purchaseItemService.deletePurchaseItem(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Purchase item deleted successfully",
+                        null
+                )
+        );
+    }
+
+}
+
+*/
+
+
+
+/* 
+package com.skcp.controller;
+
+import com.skcp.service.PurchaseItemService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.skcp.dto.request.purchaseitem.PurchaseItemCreateRequest;
+import com.skcp.dto.request.purchaseitem.PurchaseItemUpdateRequest;
+import com.skcp.dto.response.purchaseitem.PurchaseItemResponse;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/purchase-items")
+public class PurchaseItemController
+{
+
+    // Dependency Injection
+    private final PurchaseItemService purchaseItemService;
+
+    // Constructor Injection
+    public PurchaseItemController(
+            PurchaseItemService purchaseItemService
+    )
+    {
+        this.purchaseItemService = purchaseItemService;
+    }
+
+
+    // ============================================================
+    // GET ALL PURCHASE ITEMS
+    // ============================================================
+
+    @GetMapping
+    public ResponseEntity<List<PurchaseItemResponse>>
+    getAllPurchaseItems()
+    {
+        List<PurchaseItemResponse> purchaseItems =
                 purchaseItemService.getAllPurchaseItems();
 
         return ResponseEntity.ok(purchaseItems);
     }
 
-    // Get purchase item by ID
+
+    // ============================================================
+    // GET PURCHASE ITEM BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<PurchaseItem> getPurchaseItemById(
-            @PathVariable Integer id) {
-
-        PurchaseItem purchaseItem =
+    public ResponseEntity<PurchaseItemResponse>
+    getPurchaseItemById(
+            @PathVariable Integer id
+    )
+    {
+        PurchaseItemResponse purchaseItem =
                 purchaseItemService.getPurchaseItemById(id);
-
-        if (purchaseItem == null) {
-            return ResponseEntity.notFound().build();
-        }
 
         return ResponseEntity.ok(purchaseItem);
     }
 
-    // Create purchase item
-    @PostMapping
-    public ResponseEntity<PurchaseItem> createPurchaseItem(
-            @RequestBody PurchaseItem purchaseItem) {
 
-        PurchaseItem savedPurchaseItem =
-                purchaseItemService.savePurchaseItem(purchaseItem);
+    // ============================================================
+    // CREATE PURCHASE ITEM
+    // ============================================================
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+    @PostMapping("/purchase/{purchaseId}")
+    public ResponseEntity<PurchaseItemResponse>
+    createPurchaseItem(
+            @PathVariable Integer purchaseId,
+            @Valid @RequestBody PurchaseItemCreateRequest request
+    )
+    {
+        PurchaseItemResponse savedPurchaseItem =
+                purchaseItemService.createPurchaseItem(
+                        purchaseId,
+                        request
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(savedPurchaseItem);
     }
 
-    // Update purchase item
+
+    // ============================================================
+    // UPDATE PURCHASE ITEM
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<PurchaseItem> updatePurchaseItem(
+    public ResponseEntity<PurchaseItemResponse>
+    updatePurchaseItem(
             @PathVariable Integer id,
-            @RequestBody PurchaseItem purchaseItem) {
-
-        PurchaseItem existingPurchaseItem =
-                purchaseItemService.getPurchaseItemById(id);
-
-        if (existingPurchaseItem == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Update editable fields
-
-        existingPurchaseItem.setPurchase(purchaseItem.getPurchase());
-        existingPurchaseItem.setRawMaterial(purchaseItem.getRawMaterial());
-        existingPurchaseItem.setQuantity(purchaseItem.getQuantity());
-        existingPurchaseItem.setUnit(purchaseItem.getUnit());
-        existingPurchaseItem.setUnitPrice(purchaseItem.getUnitPrice());
-        existingPurchaseItem.setLineAmount(purchaseItem.getLineAmount());
-        existingPurchaseItem.setRemarks(purchaseItem.getRemarks());
-
-        PurchaseItem updatedPurchaseItem =
-                purchaseItemService.savePurchaseItem(existingPurchaseItem);
+            @Valid @RequestBody PurchaseItemUpdateRequest request
+    )
+    {
+        PurchaseItemResponse updatedPurchaseItem =
+                purchaseItemService.updatePurchaseItem(
+                        id,
+                        request
+                );
 
         return ResponseEntity.ok(updatedPurchaseItem);
     }
 
-    // Delete purchase item
+
+    // ============================================================
+    // DELETE PURCHASE ITEM
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePurchaseItem(
-            @PathVariable Integer id) {
-
-        PurchaseItem existingPurchaseItem =
-                purchaseItemService.getPurchaseItemById(id);
-
-        if (existingPurchaseItem == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<Void>
+    deletePurchaseItem(
+            @PathVariable Integer id
+    )
+    {
         purchaseItemService.deletePurchaseItem(id);
 
         return ResponseEntity.noContent().build();
     }
+
 }
+
+*/

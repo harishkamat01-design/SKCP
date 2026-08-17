@@ -1,7 +1,14 @@
 package com.skcp.controller;
 
-import com.skcp.entity.RawMaterialStock;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.request.rawmaterialstock.RawMaterialStockCreateRequest;
+import com.skcp.dto.request.rawmaterialstock.RawMaterialStockUpdateRequest;
+import com.skcp.dto.response.rawmaterialstock.RawMaterialStockResponse;
+import com.skcp.dto.response.rawmaterialstock.RawMaterialStockSummaryResponse;
 import com.skcp.service.RawMaterialStockService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,91 +19,139 @@ import java.util.List;
 @RequestMapping("/api/raw-material-stock")
 public class RawMaterialStockController {
 
-    // Dependency Injection
+
+    // ============================================================
+    // DEPENDENCY INJECTION
+    // ============================================================
+
     private final RawMaterialStockService rawMaterialStockService;
 
-    // Constructor Injection
-    public RawMaterialStockController(RawMaterialStockService rawMaterialStockService) {
-        this.rawMaterialStockService = rawMaterialStockService;
+
+    // ============================================================
+    // CONSTRUCTOR INJECTION
+    // ============================================================
+
+    public RawMaterialStockController(
+            RawMaterialStockService rawMaterialStockService) {
+
+        this.rawMaterialStockService =
+                rawMaterialStockService;
     }
 
-    // ===========================
-    // GET ALL
-    // ===========================
+
+    // ============================================================
+    // GET ALL ACTIVE RAW MATERIAL STOCK
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<List<RawMaterialStock>> getAllRawMaterialStock() {
-        List<RawMaterialStock> stockList = rawMaterialStockService.getAllRawMaterialStock();
-        return ResponseEntity.ok(stockList);
+    public ResponseEntity<
+            ApiResponse<List<RawMaterialStockSummaryResponse>>
+            > getAllRawMaterialStock() {
+
+        List<RawMaterialStockSummaryResponse> stockList =
+                rawMaterialStockService.getAllRawMaterialStock();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Raw material stock records retrieved successfully",
+                        stockList
+                )
+        );
     }
 
-    // ===========================
-    // GET BY ID
-    // ===========================
+
+    // ============================================================
+    // GET RAW MATERIAL STOCK BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<RawMaterialStock> getRawMaterialStockById(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<RawMaterialStockResponse>
+            > getRawMaterialStockById(
+                    @PathVariable Integer id) {
 
-        RawMaterialStock stock = rawMaterialStockService.getRawMaterialStockById(id);
+        RawMaterialStockResponse stock =
+                rawMaterialStockService
+                        .getRawMaterialStockById(id);
 
-        if (stock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(stock);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Raw material stock record retrieved successfully",
+                        stock
+                )
+        );
     }
 
-    // ===========================
-    // CREATE
-    // ===========================
-    @PostMapping
-    public ResponseEntity<RawMaterialStock> createRawMaterialStock(
-            @RequestBody RawMaterialStock rawMaterialStock) {
 
-        RawMaterialStock savedStock =
-                rawMaterialStockService.saveRawMaterialStock(rawMaterialStock);
+    // ============================================================
+    // CREATE RAW MATERIAL STOCK
+    // ============================================================
+
+    @PostMapping
+    public ResponseEntity<
+            ApiResponse<RawMaterialStockResponse>
+            > createRawMaterialStock(
+                    @Valid
+                    @RequestBody RawMaterialStockCreateRequest request) {
+
+        RawMaterialStockResponse savedStock =
+                rawMaterialStockService
+                        .createRawMaterialStock(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(savedStock);
+                .body(
+                        ApiResponse.success(
+                                "Raw material stock record created successfully",
+                                savedStock
+                        )
+                );
     }
 
-    // ===========================
-    // UPDATE
-    // ===========================
+
+    // ============================================================
+    // UPDATE RAW MATERIAL STOCK
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<RawMaterialStock> updateRawMaterialStock(
-            @PathVariable Integer id,
-            @RequestBody RawMaterialStock updatedStock) {
+    public ResponseEntity<
+            ApiResponse<RawMaterialStockResponse>
+            > updateRawMaterialStock(
+                    @PathVariable Integer id,
+                    @Valid
+                    @RequestBody RawMaterialStockUpdateRequest request) {
 
-        RawMaterialStock existingStock =
-                rawMaterialStockService.getRawMaterialStockById(id);
+        RawMaterialStockResponse updatedStock =
+                rawMaterialStockService
+                        .updateRawMaterialStock(id, request);
 
-        if (existingStock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        updatedStock.setRawMaterialStockId(id);
-
-        RawMaterialStock savedStock =
-                rawMaterialStockService.saveRawMaterialStock(updatedStock);
-
-        return ResponseEntity.ok(savedStock);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Raw material stock record updated successfully",
+                        updatedStock
+                )
+        );
     }
 
-    // ===========================
-    // DELETE
-    // ===========================
+
+    // ============================================================
+    // DELETE / SOFT DELETE
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRawMaterialStock(@PathVariable Integer id) {
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteRawMaterialStock(
+                    @PathVariable Integer id) {
 
-        RawMaterialStock existingStock =
-                rawMaterialStockService.getRawMaterialStockById(id);
+        rawMaterialStockService
+                .deleteRawMaterialStock(id);
 
-        if (existingStock == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        rawMaterialStockService.deleteRawMaterialStock(id);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<Void>success(
+                        "Raw material stock record deleted successfully",
+                        null
+                )
+        );
     }
 }
