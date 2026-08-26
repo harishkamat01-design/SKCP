@@ -1,16 +1,15 @@
-package com.skcp.dto.response.curringstock;
+package com.skcp.dto.response.curingstock;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class CuringStockSummaryResponse {
+public class CuringStockResponse {
 
     private Integer curingStockId;
 
     private Integer productionId;
 
     private Integer productId;
-
-    private String productName;
 
     private Integer quantity;
 
@@ -20,13 +19,14 @@ public class CuringStockSummaryResponse {
 
     private String status;
 
+    private String remarks;
+
     private String recordStatus;
 
-    // Default Constructor
-    public CuringStockSummaryResponse() {
-    }
+    private LocalDateTime createdAt;
 
-    // Getters and Setters
+    public CuringStockResponse() {
+    }
 
     public Integer getCuringStockId() {
         return curingStockId;
@@ -50,14 +50,6 @@ public class CuringStockSummaryResponse {
 
     public void setProductId(Integer productId) {
         this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
     }
 
     public Integer getQuantity() {
@@ -92,11 +84,27 @@ public class CuringStockSummaryResponse {
         this.status = status;
     }
 
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
     public String getRecordStatus() {
         return recordStatus;
     }
 
     public void setRecordStatus(String recordStatus) {
         this.recordStatus = recordStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

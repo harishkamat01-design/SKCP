@@ -1,37 +1,179 @@
 package com.skcp.mapper;
 
-import com.skcp.dto.response.curringstock.CuringStockResponse;
+import com.skcp.dto.response.curingstock.CuringStockResponse;
+import com.skcp.dto.response.curingstock.CuringStockSummaryResponse;
 import com.skcp.entity.CuringStock;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class CuringStockMapper {
 
-    public CuringStockResponse toResponse(CuringStock entity) {
+    // ============================================================
+    // DETAIL RESPONSE MAPPING
+    // ============================================================
 
-        CuringStockResponse dto = new CuringStockResponse();
+    public CuringStockResponse toResponse(
+            CuringStock entity) {
 
-        dto.setCuringStockId(entity.getCuringStockId());
+        CuringStockResponse dto =
+                new CuringStockResponse();
+
+        // --------------------------------------------------------
+        // CURING STOCK
+        // --------------------------------------------------------
+
+        dto.setCuringStockId(
+                entity.getCuringStockId()
+        );
+
+        // --------------------------------------------------------
+        // PRODUCTION
+        // --------------------------------------------------------
 
         if (entity.getProduction() != null) {
+
             dto.setProductionId(
-                    entity.getProduction().getProductionId()
+                    entity.getProduction()
+                            .getProductionId()
             );
         }
+
+        // --------------------------------------------------------
+        // PRODUCT
+        // --------------------------------------------------------
 
         if (entity.getProduct() != null) {
+
             dto.setProductId(
-                    entity.getProduct().getProductId()
+                    entity.getProduct()
+                            .getProductId()
             );
         }
 
-        dto.setQuantity(entity.getQuantity());
-        dto.setProductionDate(entity.getProductionDate());
-        dto.setExpectedReadyDate(entity.getExpectedReadyDate());
-        dto.setStatus(entity.getStatus());
-        dto.setRemarks(entity.getRemarks());
-        dto.setRecordStatus(entity.getRecordStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
+        // --------------------------------------------------------
+        // STOCK DETAILS
+        // --------------------------------------------------------
+
+        dto.setQuantity(
+                entity.getQuantity()
+        );
+
+        dto.setProductionDate(
+                entity.getProductionDate()
+        );
+
+        dto.setExpectedReadyDate(
+                entity.getExpectedReadyDate()
+        );
+
+        // --------------------------------------------------------
+        // LIFECYCLE STATUS
+        // --------------------------------------------------------
+
+        dto.setStatus(
+                entity.getStatus()
+        );
+
+        // --------------------------------------------------------
+        // OTHER DETAILS
+        // --------------------------------------------------------
+
+        dto.setRemarks(
+                entity.getRemarks()
+        );
+
+        dto.setRecordStatus(
+                entity.getRecordStatus()
+        );
+
+        dto.setCreatedAt(
+                entity.getCreatedAt()
+        );
+
+        return dto;
+    }
+
+    // ============================================================
+    // SUMMARY RESPONSE MAPPING
+    // ============================================================
+
+    public CuringStockSummaryResponse toSummaryResponse(
+            CuringStock entity) {
+
+        CuringStockSummaryResponse dto =
+                new CuringStockSummaryResponse();
+
+        // --------------------------------------------------------
+        // CURING STOCK
+        // --------------------------------------------------------
+
+        dto.setCuringStockId(
+                entity.getCuringStockId()
+        );
+
+        // --------------------------------------------------------
+        // PRODUCTION
+        // --------------------------------------------------------
+
+        if (entity.getProduction() != null) {
+
+            dto.setProductionId(
+                    entity.getProduction()
+                            .getProductionId()
+            );
+        }
+
+        // --------------------------------------------------------
+        // PRODUCT
+        // --------------------------------------------------------
+
+        if (entity.getProduct() != null) {
+
+            dto.setProductId(
+                    entity.getProduct()
+                            .getProductId()
+            );
+
+            // IMPORTANT:
+            // Product name is now included in the summary.
+            dto.setProductName(
+                    entity.getProduct()
+                            .getProductName()
+            );
+        }
+
+        // --------------------------------------------------------
+        // STOCK DETAILS
+        // --------------------------------------------------------
+
+        dto.setQuantity(
+                entity.getQuantity()
+        );
+
+        dto.setProductionDate(
+                entity.getProductionDate()
+        );
+
+        dto.setExpectedReadyDate(
+                entity.getExpectedReadyDate()
+        );
+
+        // --------------------------------------------------------
+        // LIFECYCLE STATUS
+        // --------------------------------------------------------
+
+        dto.setStatus(
+                entity.getStatus()
+        );
+
+        // --------------------------------------------------------
+        // RECORD STATUS
+        // --------------------------------------------------------
+
+        dto.setRecordStatus(
+                entity.getRecordStatus()
+        );
 
         return dto;
     }

@@ -1,22 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./styles.css";
-
-function App()
-{
-  return (
-
-    <h1>SKCP Frontend</h1>
-
-        );
-}
+import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-
- <React.StrictMode>
-
+  <React.StrictMode>
     <App />
-
   </React.StrictMode>
-
 );

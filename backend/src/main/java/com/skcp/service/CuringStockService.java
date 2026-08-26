@@ -1,16 +1,20 @@
 package com.skcp.service;
 
-import com.skcp.exception.ResourceNotFoundException;
-import com.skcp.dto.request.curringstock.CuringStockRequest;
-import com.skcp.dto.response.curringstock.CuringStockResponse;
+import com.skcp.dto.request.curingstock.CuringStockCreateRequest;
+import com.skcp.dto.request.curingstock.CuringStockUpdateRequest;
+import com.skcp.dto.response.curingstock.CuringStockResponse;
+import com.skcp.dto.response.curingstock.CuringStockSummaryResponse;
 import com.skcp.entity.CuringStock;
 import com.skcp.entity.Product;
 import com.skcp.entity.Production;
 import com.skcp.enums.RecordStatus;
+import com.skcp.exception.DuplicateResourceException;
+import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.mapper.CuringStockMapper;
 import com.skcp.repository.CuringStockRepository;
 import com.skcp.repository.ProductRepository;
 import com.skcp.repository.ProductionRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,14 +39,24 @@ public class CuringStockService {
         this.curingStockMapper = curingStockMapper;
     }
 
-    public List<CuringStockResponse> getAllCuringStock() {
+    // ==========================================================
+    // GET ALL ACTIVE CURING STOCK
+    // ==========================================================
+
+    public List<CuringStockSummaryResponse> getAllCuringStock() {
 
         return curingStockRepository
-                .findByRecordStatus(RecordStatus.ACTIVE.name())
+                .findByRecordStatus(
+                        RecordStatus.ACTIVE.name()
+                )
                 .stream()
-                .map(curingStockMapper::toResponse)
+                .map(curingStockMapper::toSummaryResponse)
                 .toList();
     }
+
+    // ==========================================================
+    // GET ACTIVE CURING STOCK BY ID
+    // ==========================================================
 
     public CuringStockResponse getCuringStockById(Integer id) {
 
@@ -53,32 +67,52 @@ public class CuringStockService {
                                 RecordStatus.ACTIVE.name()
                         )
                         .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Curing stock not found with id: " + id
-        )
-);
+                                new ResourceNotFoundException(
+                                        "Curing stock not found with id: " + id
+                                )
+                        );
 
         return curingStockMapper.toResponse(curingStock);
     }
 
+    // ==========================================================
+    // CREATE CURING STOCK
+    // ==========================================================
+
     public CuringStockResponse createCuringStock(
-            CuringStockRequest request) {
+            CuringStockCreateRequest request) {
+
+        // ------------------------------------------------------
+        // FIND PRODUCTION
+        // ------------------------------------------------------
 
         Production production =
-                productionRepository.findById(request.getProductionId())
+                productionRepository
+                        .findById(request.getProductionId())
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new ResourceNotFoundException(
                                         "Production not found with id: "
                                                 + request.getProductionId()
-                                ));
+                                )
+                        );
+
+        // ------------------------------------------------------
+        // FIND PRODUCT
+        // ------------------------------------------------------
 
         Product product =
-                productRepository.findById(request.getProductId())
+                productRepository
+                        .findById(request.getProductId())
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new ResourceNotFoundException(
                                         "Product not found with id: "
                                                 + request.getProductId()
-                                ));
+                                )
+                        );
+
+        // ------------------------------------------------------
+        // CREATE ENTITY
+        // ------------------------------------------------------
 
         CuringStock curingStock = new CuringStock();
 
@@ -88,18 +122,32 @@ public class CuringStockService {
         curingStock.setProductionDate(request.getProductionDate());
         curingStock.setRemarks(request.getRemarks());
 
-        // Server-controlled lifecycle state
+        // ------------------------------------------------------
+        // SERVER-CONTROLLED LIFECYCLE STATUS
+        // ------------------------------------------------------
+
         curingStock.setStatus("CURING");
 
-        // Server-controlled record state
+        // ------------------------------------------------------
+        // SERVER-CONTROLLED RECORD STATUS
+        // ------------------------------------------------------
+
         curingStock.setRecordStatus(
                 RecordStatus.ACTIVE.name()
         );
 
-        // Business rule
+        // ------------------------------------------------------
+        // BUSINESS RULE
+        // Production Date + 3 Days
+        // ------------------------------------------------------
+
         curingStock.setExpectedReadyDate(
                 request.getProductionDate().plusDays(3)
         );
+
+        // ------------------------------------------------------
+        // SAVE
+        // ------------------------------------------------------
 
         CuringStock saved =
                 curingStockRepository.save(curingStock);
@@ -107,9 +155,17 @@ public class CuringStockService {
         return curingStockMapper.toResponse(saved);
     }
 
+    // ==========================================================
+    // UPDATE CURING STOCK
+    // ==========================================================
+
     public CuringStockResponse updateCuringStock(
             Integer id,
-            CuringStockRequest request) {
+            CuringStockUpdateRequest request) {
+
+        // ------------------------------------------------------
+        // FIND ACTIVE RECORD
+        // ------------------------------------------------------
 
         CuringStock existing =
                 curingStockRepository
@@ -118,40 +174,50 @@ public class CuringStockService {
                                 RecordStatus.ACTIVE.name()
                         )
                         .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Curing stock not found with id: " + id
-        )
-);
+                                new ResourceNotFoundException(
+                                        "Curing stock not found with id: " + id
+                                )
+                        );
 
-        Production production =
-                productionRepository.findById(request.getProductionId())
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Production not found with id: "
-                                                + request.getProductionId()
-                                ));
+        // ------------------------------------------------------
+        // FIND PRODUCT
+        // ------------------------------------------------------
 
         Product product =
-                productRepository.findById(request.getProductId())
+                productRepository
+                        .findById(request.getProductId())
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new ResourceNotFoundException(
                                         "Product not found with id: "
                                                 + request.getProductId()
-                                ));
+                                )
+                        );
 
-        existing.setProduction(production);
+        // ------------------------------------------------------
+        // UPDATE ALLOWED FIELDS
+        // ------------------------------------------------------
+
         existing.setProduct(product);
         existing.setQuantity(request.getQuantity());
         existing.setProductionDate(request.getProductionDate());
         existing.setRemarks(request.getRemarks());
 
-        // Recalculate derived field
+        // ------------------------------------------------------
+        // RECALCULATE DERIVED FIELD
+        // ------------------------------------------------------
+
         existing.setExpectedReadyDate(
                 request.getProductionDate().plusDays(3)
         );
 
-        // DO NOT take status from request.
-        // Existing lifecycle status remains unchanged.
+        // ------------------------------------------------------
+        // DO NOT MODIFY:
+        //
+        // production
+        // status
+        // recordStatus
+        // createdAt
+        // ------------------------------------------------------
 
         CuringStock updated =
                 curingStockRepository.save(existing);
@@ -159,19 +225,40 @@ public class CuringStockService {
         return curingStockMapper.toResponse(updated);
     }
 
+    // ==========================================================
+    // SOFT DELETE CURING STOCK
+    // ==========================================================
+
     public void deleteCuringStock(Integer id) {
+
+        // ------------------------------------------------------
+        // FIRST CHECK WHETHER RECORD EXISTS
+        // ------------------------------------------------------
 
         CuringStock existing =
                 curingStockRepository
-                        .findByCuringStockIdAndRecordStatus(
-                                id,
-                                RecordStatus.ACTIVE.name()
-                        )
+                        .findById(id)
                         .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Curing stock not found with id: " + id
-        )
-);
+                                new ResourceNotFoundException(
+                                        "Curing stock not found with id: " + id
+                                )
+                        );
+
+        // ------------------------------------------------------
+        // ALREADY INACTIVE
+        // ------------------------------------------------------
+
+        if (RecordStatus.INACTIVE.name()
+                .equals(existing.getRecordStatus())) {
+
+            throw new DuplicateResourceException(
+                    "Curing stock is already inactive with id: " + id
+            );
+        }
+
+        // ------------------------------------------------------
+        // ACTIVE → INACTIVE
+        // ------------------------------------------------------
 
         existing.setRecordStatus(
                 RecordStatus.INACTIVE.name()

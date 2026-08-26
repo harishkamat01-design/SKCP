@@ -1,63 +1,101 @@
 package com.skcp.controller;
 
-import com.skcp.dto.request.curringstock.CuringStockRequest;
-import com.skcp.dto.response.curringstock.CuringStockResponse;
+import com.skcp.dto.request.curingstock.CuringStockCreateRequest;
+import com.skcp.dto.request.curingstock.CuringStockUpdateRequest;
+import com.skcp.common.ApiResponse;
+import com.skcp.dto.response.curingstock.CuringStockResponse;
+import com.skcp.dto.response.curingstock.CuringStockSummaryResponse;
 import com.skcp.service.CuringStockService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity; 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/curing-stock")
-@CrossOrigin(origins = "*")
 public class CuringStockController {
 
     private final CuringStockService curingStockService;
 
     public CuringStockController(
             CuringStockService curingStockService) {
+
         this.curingStockService = curingStockService;
     }
 
+    // ==========================================================
+    // GET ALL ACTIVE CURING STOCK
+    // ==========================================================
+
     @GetMapping
-    public ResponseEntity<List<CuringStockResponse>>
+    public ResponseEntity<ApiResponse<List<CuringStockSummaryResponse>>>
     getAllCuringStock() {
 
+        List<CuringStockSummaryResponse> curingStockList =
+                curingStockService.getAllCuringStock();
+
         return ResponseEntity.ok(
-                curingStockService.getAllCuringStock()
+                ApiResponse.success(
+                        "Curing stock records retrieved successfully",
+                        curingStockList
+                )
         );
     }
+
+    // ==========================================================
+    // GET ACTIVE CURING STOCK BY ID
+    // ==========================================================
 
     @GetMapping("/{id}")
-    public ResponseEntity<CuringStockResponse>
+    public ResponseEntity<ApiResponse<CuringStockResponse>>
     getCuringStockById(@PathVariable Integer id) {
 
+        CuringStockResponse curingStock =
+                curingStockService.getCuringStockById(id);
+
         return ResponseEntity.ok(
-                curingStockService.getCuringStockById(id)
+                ApiResponse.success(
+                        "Curing stock record retrieved successfully",
+                        curingStock
+                )
         );
     }
 
+    // ==========================================================
+    // CREATE CURING STOCK
+    // ==========================================================
+
     @PostMapping
-    public ResponseEntity<CuringStockResponse>
+    public ResponseEntity<ApiResponse<CuringStockResponse>>
     createCuringStock(
-            @Valid @RequestBody CuringStockRequest request) {
+            @Valid @RequestBody CuringStockCreateRequest request) {
 
         CuringStockResponse response =
                 curingStockService.createCuringStock(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(
+                        ApiResponse.success(
+                                "Curing stock created successfully",
+                                response
+                        )
+                );
     }
 
+    // ==========================================================
+    // UPDATE CURING STOCK
+    // ==========================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<CuringStockResponse>
+    public ResponseEntity<ApiResponse<CuringStockResponse>>
     updateCuringStock(
             @PathVariable Integer id,
-            @Valid @RequestBody CuringStockRequest request) {
+            @Valid @RequestBody CuringStockUpdateRequest request) {
 
         CuringStockResponse response =
                 curingStockService.updateCuringStock(
@@ -65,15 +103,29 @@ public class CuringStockController {
                         request
                 );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Curing stock updated successfully",
+                        response
+                )
+        );
     }
 
+    // ==========================================================
+    // SOFT DELETE CURING STOCK
+    // ==========================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>
+    public ResponseEntity<ApiResponse<Void>>
     deleteCuringStock(@PathVariable Integer id) {
 
         curingStockService.deleteCuringStock(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Curing stock deleted successfully",
+                        null
+                )
+        );
     }
 }

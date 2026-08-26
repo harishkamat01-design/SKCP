@@ -1,87 +1,87 @@
-package com.skcp.dto.response.product;
+    package com.skcp.dto.response.product;
 
-public class ProductSummaryResponse {
+    public class ProductSummaryResponse {
 
-    // ============================================================
-    // PRODUCT ID
-    // ============================================================
+        // ============================================================
+        // PRODUCT ID
+        // ============================================================
 
-    private Integer productId;
-
-
-    // ============================================================
-    // PRODUCT CODE
-    // ============================================================
-
-    private String productCode;
+        private Integer productId;
 
 
-    // ============================================================
-    // PRODUCT NAME
-    // ============================================================
+        // ============================================================
+        // PRODUCT CODE
+        // ============================================================
 
-    private String productName;
-
-
-    // ============================================================
-    // SIZE
-    // ============================================================
-
-    private String size;
+        private String productCode;
 
 
-    // ============================================================
-    // STATUS
-    // ============================================================
+        // ============================================================
+        // PRODUCT NAME
+        // ============================================================
 
-    private String status;
+        private String productName;
 
 
-    // ============================================================
-    // GETTERS AND SETTERS
-    // ============================================================
+        // ============================================================
+        // SIZE
+        // ============================================================
 
-    public Integer getProductId() {
-        return productId;
+        private String size;
+
+
+        // ============================================================
+        // STATUS
+        // ============================================================
+
+        private String status;
+
+
+        // ============================================================
+        // GETTERS AND SETTERS
+        // ============================================================
+
+        public Integer getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Integer productId) {
+            this.productId = productId;
+        }
+
+
+        public String getProductCode() {
+            return productCode;
+        }
+
+        public void setProductCode(String productCode) {
+            this.productCode = productCode;
+        }
+
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+
+        public String getSize() {
+            return size;
+        }
+
+        public void setSize(String size) {
+            this.size = size;
+        }
+
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
-
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-}
