@@ -5,6 +5,7 @@ import com.skcp.dto.request.customer.CustomerUpdateRequest;
 import com.skcp.dto.response.customer.CustomerResponse;
 import com.skcp.dto.response.customer.CustomerSummaryResponse;
 import com.skcp.entity.Customer;
+import com.skcp.exception.DuplicateResourceException;
 import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.mapper.CustomerMapper;
 import com.skcp.repository.CustomerRepository;
@@ -31,6 +32,10 @@ public class CustomerService
         this.customerMapper = customerMapper;
     }
 
+    // ============================================================
+    // GET ALL ACTIVE CUSTOMERS
+    // ============================================================
+
     public List<CustomerSummaryResponse> getAllCustomers()
     {
         return customerRepository.findByStatus("ACTIVE")
@@ -38,6 +43,10 @@ public class CustomerService
                 .map(customerMapper::toSummaryResponse)
                 .toList();
     }
+
+    // ============================================================
+    // GET CUSTOMER BY ID
+    // ============================================================
 
     public CustomerResponse getCustomerById(Integer id)
     {
@@ -51,6 +60,10 @@ public class CustomerService
 
         return customerMapper.toResponse(customer);
     }
+
+    // ============================================================
+    // CREATE CUSTOMER
+    // ============================================================
 
     public CustomerResponse createCustomer(
             CustomerCreateRequest request)
@@ -70,6 +83,10 @@ public class CustomerService
 
         return customerMapper.toResponse(savedCustomer);
     }
+
+    // ============================================================
+    // UPDATE CUSTOMER
+    // ============================================================
 
     public CustomerResponse updateCustomer(
             Integer id,
@@ -94,8 +111,31 @@ public class CustomerService
         return customerMapper.toResponse(updatedCustomer);
     }
 
-    public CustomerResponse deleteCustomer(Integer id)
+    // ============================================================
+    // DELETE / SOFT DELETE CUSTOMER
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // No physical DELETE occurs.
+    //
+    // Valid ACTIVE ID:
+    //     200 OK
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Invalid ID:
+    //     404 NOT FOUND
+    //
+    // ============================================================
+
+    public void deleteCustomer(Integer id)
     {
+        // --------------------------------------------------------
+        // Check whether ID exists at all
+        // --------------------------------------------------------
+
         Customer customer =
                 customerRepository.findById(id)
                         .orElseThrow(() ->
@@ -104,12 +144,24 @@ public class CustomerService
                                 )
                         );
 
+        // --------------------------------------------------------
+        // Already INACTIVE
+        // --------------------------------------------------------
+
+        if ("INACTIVE".equals(customer.getStatus()))
+        {
+            throw new DuplicateResourceException(
+                    "Customer already deleted with id: " + id
+            );
+        }
+
+        // --------------------------------------------------------
+        // ACTIVE → INACTIVE
+        // --------------------------------------------------------
+
         customer.setStatus("INACTIVE");
 
-        Customer updatedCustomer =
-                customerRepository.save(customer);
-
-        return customerMapper.toResponse(updatedCustomer);
+        customerRepository.save(customer);
     }
 }
 

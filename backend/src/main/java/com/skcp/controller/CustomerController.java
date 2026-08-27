@@ -24,8 +24,14 @@ public class CustomerController
         this.customerService = customerService;
     }
 
+    // ============================================================
+    // GET ALL ACTIVE CUSTOMERS
+    // ============================================================
+
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CustomerSummaryResponse>>> getAllCustomers()
+    public ResponseEntity<
+            ApiResponse<List<CustomerSummaryResponse>>
+            > getAllCustomers()
     {
         List<CustomerSummaryResponse> customers =
                 customerService.getAllCustomers();
@@ -38,8 +44,14 @@ public class CustomerController
         );
     }
 
+    // ============================================================
+    // GET CUSTOMER BY ID
+    // ============================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomerById(
+    public ResponseEntity<
+            ApiResponse<CustomerResponse>
+            > getCustomerById(
             @PathVariable Integer id
     )
     {
@@ -54,30 +66,49 @@ public class CustomerController
         );
     }
 
+    // ============================================================
+    // CREATE CUSTOMER
+    // ============================================================
+
     @PostMapping
-    public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(
-            @Valid @RequestBody CustomerCreateRequest request
+    public ResponseEntity<
+            ApiResponse<CustomerResponse>
+            > createCustomer(
+            @Valid
+            @RequestBody CustomerCreateRequest request
     )
     {
         CustomerResponse savedCustomer =
                 customerService.createCustomer(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(
-                        "Customer created successfully",
-                        savedCustomer
-                )
-        );
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                "Customer created successfully",
+                                savedCustomer
+                        )
+                );
     }
 
+    // ============================================================
+    // UPDATE CUSTOMER
+    // ============================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
+    public ResponseEntity<
+            ApiResponse<CustomerResponse>
+            > updateCustomer(
             @PathVariable Integer id,
-            @Valid @RequestBody CustomerUpdateRequest request
+            @Valid
+            @RequestBody CustomerUpdateRequest request
     )
     {
         CustomerResponse updatedCustomer =
-                customerService.updateCustomer(id, request);
+                customerService.updateCustomer(
+                        id,
+                        request
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -87,23 +118,49 @@ public class CustomerController
         );
     }
 
+    // ============================================================
+    // DELETE / SOFT DELETE CUSTOMER
+    // ============================================================
+    //
+    // ACTIVE → INACTIVE
+    //
+    // Database row is preserved.
+    //
+    // API returns:
+    //
+    // 200 OK
+    // {
+    //     "data": null,
+    //     "message": "Customer deleted successfully",
+    //     "status": "SUCCESS",
+    //     "timestamp": "..."
+    // }
+    //
+    // Already INACTIVE:
+    //     409 CONFLICT
+    //
+    // Non-existent ID:
+    //     404 NOT FOUND
+    //
+    // ============================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> deleteCustomer(
+    public ResponseEntity<
+            ApiResponse<Void>
+            > deleteCustomer(
             @PathVariable Integer id
     )
     {
-        CustomerResponse deletedCustomer =
-                customerService.deleteCustomer(id);
+        customerService.deleteCustomer(id);
 
         return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Customer marked as inactive successfully",
-                        deletedCustomer
+                ApiResponse.<Void>success(
+                        "Customer deleted successfully",
+                        null
                 )
         );
     }
 }
-
 
 
 
