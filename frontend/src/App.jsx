@@ -1,4 +1,5 @@
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
+import Login from "./components/auth/Login";
 
 import Customer from "./components/master-data/customer/Customer";
 import Supplier from "./components/master-data/supplier/Supplier";
@@ -22,11 +23,40 @@ import Delivery from "./components/sales/delivery/Delivery";
 import Payment from "./components/payment/payment/Payment";
 import PaymentAllocation from "./components/payment/paymentallocation/PaymentAllocation";
 
+import Dashboard from "./components/application/dashboard/Dashboard";
+import Reports from "./components/application/reports/Reports";
+import Settings from "./components/application/settings/Settings";
+import AboutUs from "./components/application/aboutus/AboutUs";
+
 import Sidebar from "./components/layout/Sidebar";
 
-function App() {
-  const [activeSection, setActiveSection] = useState("dashboard");
-  const [isDark, setIsDark] = useState(false);
+function App()
+{
+
+    const [activeSection, setActiveSection] = useState("dashboard");
+    const [isDark, setIsDark] = useState(() => localStorage.getItem("skcp_theme") === "dark");
+    const [currentLang, setCurrentLang] = useState("en");
+
+    const [isAuthenticated, setIsAuthenticated] = useState(
+      () => Boolean(sessionStorage.getItem("skcp_token"))
+    );
+
+    const handleLogout = () => {
+    sessionStorage.removeItem("skcp_token");
+    sessionStorage.removeItem("skcp_user");
+    sessionStorage.removeItem("skcp_role");
+    sessionStorage.removeItem("skcp_user_id");
+
+  setIsAuthenticated(false);
+};
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      isDark ? "dark" : "light"
+    );
+    localStorage.setItem("skcp_theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -79,95 +109,41 @@ function App() {
         return <PaymentAllocation />;
 
       case "dashboard":
-        return (
-          <div className="card">
-            <div className="card-head">
-              <div className="card-title">Dashboard</div>
-            </div>
-
-            <div className="card-body">
-              Welcome to the SKCP Management Portal.
-            </div>
-          </div>
-        );
+        return <Dashboard />;
 
       case "reports":
-        return (
-          <div className="card">
-            <div className="card-head">
-              <div className="card-title">Reports</div>
-            </div>
-
-            <div className="card-body">
-              Reports module will be implemented here.
-            </div>
-          </div>
-        );
+        return <Reports />;
 
       case "settings":
-        return (
-          <div className="card">
-            <div className="card-head">
-              <div className="card-title">Settings</div>
-            </div>
-
-            <div className="card-body">
-              Settings module will be implemented here.
-            </div>
-          </div>
-        );
+        return <Settings />;
 
       case "about":
-        return (
-          <div className="card">
-            <div className="card-head">
-              <div className="card-title">About Us</div>
-            </div>
-
-            <div className="card-body">Shree Kundodari Cement Products.</div>
-          </div>
-        );
+        return <AboutUs />;
 
       default:
-        return (
-          <div className="card">
-            <div className="card-head">
-              <div className="card-title">Dashboard</div>
-            </div>
-
-            <div className="card-body">
-              Welcome to the SKCP Management Portal.
-            </div>
-          </div>
-        );
+        return <Dashboard />;
     }
   };
 
   const getPageTitle = () => {
     const titles = {
       dashboard: "Dashboard",
-
       customer: "Customers",
       supplier: "Suppliers",
       product: "Products",
       "raw-material": "Raw Materials",
       labour: "Labour",
       asset: "Assets",
-
       attendance: "Attendance",
       purchase: "Purchases",
       production: "Production",
-
       "raw-material-stock": "Raw Material Stock",
       "curing-stock": "Curing Stock",
       "finished-goods-stock": "Finished Goods Stock",
-
       order: "Orders",
       delivery: "Deliveries",
-
       payment: "Payments",
       "payment-allocation": "Payment Allocation",
-
       reports: "Reports",
       settings: "Settings",
       about: "About Us",
@@ -176,21 +152,41 @@ function App() {
     return titles[activeSection] || "Dashboard";
   };
 
+  if (!isAuthenticated) {
+    return (
+      <Login
+      isDark={isDark}
+      setIsDark={setIsDark}
+        onLogin={() => {
+          setIsAuthenticated(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className={isDark ? "app dark" : "app"}>
       <Sidebar
-        isDark={isDark}
-        setIsDark={setIsDark}
-        setActiveSection={setActiveSection}
-        activeSection={activeSection}
+      isDark={isDark}
+      setIsDark={setIsDark}
+      currentLang={currentLang}
+      setCurrentLang={setCurrentLang}
+      setActiveSection={setActiveSection}
+      activeSection={activeSection}
+      onLogout={handleLogout}   
+
       />
 
       <main className="main">
         <header className="topbar">
-          <div className="topbar-title">{getPageTitle()}</div>
+          <div className="topbar-title">
+            {getPageTitle()}
+          </div>
         </header>
 
-        <section className="content">{renderActiveSection()}</section>
+        <section className="content">
+          {renderActiveSection()}
+        </section>
       </main>
     </div>
   );

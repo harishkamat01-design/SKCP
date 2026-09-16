@@ -1,614 +1,240 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
+
+import {
+    apiGet,
+    apiPost,
+    apiPut,
+    apiDelete,
+} from "../../../services/api";
+
+
+
+const PAYMENT_MODES = [
+    "CASH",
+    "UPI",
+    "BANK_TRANSFER",
+    "CHEQUE",
+];
+
+const initialFormData = {
+    customerId: "",
+    paymentDate: "",
+    totalAmountReceived: "",
+    paymentMode: "CASH",
+    referenceNumber: "",
+    receivedBy: "",
+    remarks: "",
+};
+
+const formatDate = (dateValue) =>
+    dateValue
+        ? new Date(`${dateValue}T00:00:00`).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+          })
+        : "-";
+
+const formatDateTime = (dateValue) =>
+    dateValue ? new Date(dateValue).toLocaleString() : "-";
+
+const formatCurrency = (amount) =>
+    `₹ ${Number(amount || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}`;
+
+
 
 function Payment() {
-    const API_URL = "http://localhost:8080/api/payments";
-    const ALLOCATION_API_URL =
-        "http://localhost:8080/api/payment-allocations";
-
-    // ============================================================
-    // STATE
-    // ============================================================
-
-    const [paymentList, setPaymentList] = useState([]);
-    const [allocationList, setAllocationList] = useState([]);
+    const [payments, setPayments] = useState([]);
+    const [allocations, setAllocations] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [searchKeyword, setSearchKeyword] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const [selectedPayment, setSelectedPayment] = useState(null);
-    const [selectedPaymentAllocations, setSelectedPaymentAllocations] =
-        useState([]);
+    const [selectedAllocations, setSelectedAllocations] = useState([]);
+    const [viewLoading, setViewLoading] = useState(false);
+    const [viewError, setViewError] = useState("");
 
-    const [showViewModal, setShowViewModal] = useState(false);
     const [showFormModal, setShowFormModal] = useState(false);
-
-    const [editingId, setEditingId] = useState(null);
-
-    const [formData, setFormData] = useState({
-        customerId: "",
-        paymentDate: "",
-        totalAmountReceived: "",
-        paymentMode: "CASH",
-        referenceNumber: "",
-        receivedBy: "",
-        remarks: ""
-    });
-
+    const [editingPayment, setEditingPayment] = useState(null);
+    const [formData, setFormData] = useState(initialFormData);
     const [formError, setFormError] = useState("");
+    const [formSuccess, setFormSuccess] = useState("");
     const [saving, setSaving] = useState(false);
 
-    // ============================================================
-    // FETCH PAYMENTS + PAYMENT ALLOCATIONS
-    // ============================================================
+    const [deletingId, setDeletingId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
-    const fetchPayments = async () => {
+    const fetchPaymentsAndAllocations = async () => {
+        setLoading(true);
+        setError("");
+
         try {
-            setLoading(true);
-            setError("");
-
-            const [paymentsResponse, allocationsResponse] =
+            const [paymentsData, allocationsData] =
                 await Promise.all([
-                    fetch(API_URL),
-                    fetch(ALLOCATION_API_URL)
+                    apiGet("/api/payments"),
+                    apiGet("/api/payment-allocations"),
                 ]);
 
-            const paymentsResult = await paymentsResponse.json();
-            const allocationsResult =
-                await allocationsResponse.json();
+            const paymentList = Array.isArray(paymentsData)
+                ? paymentsData
+                : Array.isArray(paymentsData?.data)
+                ? paymentsData.data
+                : [];
 
-            console.log(
-                "Payments API response:",
-                paymentsResult
-            );
+            const allocationList = Array.isArray(allocationsData)
+                ? allocationsData
+                : Array.isArray(allocationsData?.data)
+                ? allocationsData.data
+                : [];
 
-            console.log(
-                "Payment Allocations API response:",
-                allocationsResult
-            );
-
-            if (!paymentsResponse.ok) {
-                throw new Error(
-                    paymentsResult.message ||
-                    `Failed to fetch payments (${paymentsResponse.status})`
-                );
-            }
-
-            if (!allocationsResponse.ok) {
-                throw new Error(
-                    allocationsResult.message ||
-                    `Failed to fetch payment allocations (${allocationsResponse.status})`
-                );
-            }
-
-            setPaymentList(paymentsResult.data || []);
-            setAllocationList(allocationsResult.data || []);
+            setPayments(paymentList);
+            setAllocations(allocationList);
         } catch (err) {
-            console.error(
-                "Error fetching payments / allocations:",
-                err
-            );
-
             setError(
-                err.message ||
-                "Unable to load payments."
+                err.message || "Failed to load payment records."
             );
         } finally {
             setLoading(false);
         }
     };
 
-    // ============================================================
-    // INITIAL LOAD
-    // ============================================================
-
     useEffect(() => {
-        fetchPayments();
+        fetchPaymentsAndAllocations();
     }, []);
 
-    // ============================================================
-    // SEARCH
-    // ============================================================
-
-    const filteredPayments = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
-
-        if (!keyword) {
-            return paymentList;
-        }
-
-        return paymentList.filter((payment) => {
-            return (
-                String(payment.paymentId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.customerId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.paymentDate || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.totalAmountReceived || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.paymentMode || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.receivedBy || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(payment.recordStatus || "")
-                    .toLowerCase()
-                    .includes(keyword)
-            );
-        });
-    }, [paymentList, searchKeyword]);
-
-    // ============================================================
-    // GET ACTIVE ALLOCATIONS FOR PAYMENT
-    // ============================================================
-
-    const getAllocationsForPayment = (paymentId) => {
-        return allocationList.filter(
+    const getActiveAllocationsForPayment = (paymentId) =>
+        allocations.filter(
             (allocation) =>
                 Number(allocation.paymentId) === Number(paymentId) &&
                 allocation.recordStatus === "ACTIVE"
         );
-    };
 
-    // ============================================================
-    // CALCULATE TOTAL ALLOCATED
-    // ============================================================
-
-    const getTotalAllocatedAmount = (paymentId) => {
-        const allocations =
-            getAllocationsForPayment(paymentId);
-
-        return allocations.reduce(
+    const getTotalAllocated = (paymentId) =>
+        getActiveAllocationsForPayment(paymentId).reduce(
             (total, allocation) =>
                 total + Number(allocation.allocatedAmount || 0),
             0
         );
-    };
 
-    // ============================================================
-    // CALCULATE UNALLOCATED AMOUNT
-    // ============================================================
+    const getUnallocatedAmount = (payment) =>
+        Number(payment.totalAmountReceived || 0) -
+        getTotalAllocated(payment.paymentId);
 
-    const getUnallocatedAmount = (payment) => {
-        const receivedAmount =
-            Number(payment.totalAmountReceived || 0);
+    const filteredPayments = useMemo(() => {
+        const term = searchTerm.trim().toLowerCase();
 
-        const allocatedAmount =
-            getTotalAllocatedAmount(payment.paymentId);
+        if (!term) {
+            return payments;
+        }
 
-        return receivedAmount - allocatedAmount;
-    };
+        return payments.filter((payment) => {
+            const searchableText = [
+                payment.paymentId,
+                payment.customerId,
+                payment.paymentDate,
+                payment.totalAmountReceived,
+                payment.paymentMode,
+                payment.receivedBy,
+                payment.recordStatus,
+            ]
+                .filter(
+                    (value) => value !== null && value !== undefined
+                )
+                .join(" ")
+                .toLowerCase();
 
-    // ============================================================
-    // VIEW PAYMENT
-    // ============================================================
+            return searchableText.includes(term);
+        });
+    }, [payments, searchTerm]);
 
-    const handleView = async (id) => {
+    const handleView = async (payment) => {
+        setViewLoading(true);
+        setViewError("");
+        setSelectedPayment(null);
+        setSelectedAllocations([]);
+
         try {
-            setError("");
+    const paymentResponse = await apiGet(
+        `/api/payments/${payment.paymentId}`
+    );
 
-            const response =
-                await fetch(`${API_URL}/${id}`);
+    const paymentData = Array.isArray(paymentResponse)
+        ? paymentResponse[0]
+        : paymentResponse?.data || paymentResponse;
 
-            const result =
-                await response.json();
+    setSelectedPayment(paymentData);
 
-            console.log(
-                "Payment details:",
-                result
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Failed to fetch payment details (${response.status})`
-                );
-            }
-
-            const payment = result.data;
-
-            setSelectedPayment(payment);
-
-            const allocations =
-                getAllocationsForPayment(
-                    payment.paymentId
-                );
-
-            setSelectedPaymentAllocations(
-                allocations
-            );
-
-            setShowViewModal(true);
+    setSelectedAllocations(
+        getActiveAllocationsForPayment(payment.paymentId)
+    );
         } catch (err) {
-            console.error(
-                "Error fetching payment details:",
-                err
+            setViewError(
+                err.message || "Failed to load payment details."
             );
-
-            setError(
-                err.message ||
-                "Unable to load payment details."
-            );
+        } finally {
+            setViewLoading(false);
         }
     };
 
-    // ============================================================
-    // OPEN CREATE FORM
-    // ============================================================
+    const closeViewModal = () => {
+        setSelectedPayment(null);
+        setSelectedAllocations([]);
+        setViewError("");
+    };
 
     const handleAdd = () => {
-        setEditingId(null);
-
-        setFormData({
-            customerId: "",
-            paymentDate: "",
-            totalAmountReceived: "",
-            paymentMode: "CASH",
-            referenceNumber: "",
-            receivedBy: "",
-            remarks: ""
-        });
-
+        setEditingPayment(null);
+        setFormData(initialFormData);
         setFormError("");
+        setFormSuccess("");
         setShowFormModal(true);
     };
 
-    // ============================================================
-    // OPEN EDIT FORM
-    // ============================================================
-
-    const handleEdit = async (id) => {
-        try {
-            setFormError("");
-            setError("");
-
-            const response =
-                await fetch(`${API_URL}/${id}`);
-
-            const result =
-                await response.json();
-
-            console.log(
-                "Payment details for edit:",
-                result
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Failed to fetch payment details (${response.status})`
-                );
-            }
-
-            const payment = result.data;
-
-            setEditingId(id);
-
-            setFormData({
-                customerId:
-                    payment.customerId ?? "",
-
-                paymentDate:
-                    payment.paymentDate ?? "",
-
-                totalAmountReceived:
-                    payment.totalAmountReceived ?? "",
-
-                paymentMode:
-                    payment.paymentMode ?? "CASH",
-
-                referenceNumber:
-                    payment.referenceNumber ?? "",
-
-                receivedBy:
-                    payment.receivedBy ?? "",
-
-                remarks:
-                    payment.remarks ?? ""
-            });
-
-            setShowFormModal(true);
-        } catch (err) {
-            console.error(
-                "Error loading payment for edit:",
-                err
-            );
-
-            setError(
-                err.message ||
-                "Unable to load the payment record for editing."
-            );
-        }
-    };
-
-    // ============================================================
-    // FORM CHANGE
-    // ============================================================
-
-    const handleChange = (event) => {
-        const { name, value } =
-            event.target;
-
-        setFormData((previous) => ({
-            ...previous,
-            [name]: value
-        }));
-    };
-
-    // ============================================================
-    // CREATE / UPDATE
-    // ============================================================
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
+    const handleEdit = async (payment) => {
         setFormError("");
-
-        // --------------------------------------------------------
-        // BASIC FRONTEND VALIDATION
-        // --------------------------------------------------------
-
-        if (!formData.customerId) {
-            setFormError(
-                "Customer ID is required."
-            );
-            return;
-        }
-
-        if (Number(formData.customerId) <= 0) {
-            setFormError(
-                "Customer ID must be greater than 0."
-            );
-            return;
-        }
-
-        if (!formData.paymentDate) {
-            setFormError(
-                "Payment date is required."
-            );
-            return;
-        }
-
-        if (!formData.totalAmountReceived) {
-            setFormError(
-                "Total amount received is required."
-            );
-            return;
-        }
-
-        if (
-            Number(formData.totalAmountReceived) <= 0
-        ) {
-            setFormError(
-                "Total amount received must be greater than 0."
-            );
-            return;
-        }
-
-        const validPaymentModes = [
-            "CASH",
-            "UPI",
-            "BANK_TRANSFER",
-            "CHEQUE"
-        ];
-
-        if (
-            !validPaymentModes.includes(
-                formData.paymentMode
-            )
-        ) {
-            setFormError(
-                "Invalid payment mode."
-            );
-            return;
-        }
-
-        if (!formData.receivedBy.trim()) {
-            setFormError(
-                "Received by is required."
-            );
-            return;
-        }
-
-        if (
-            formData.receivedBy.trim().length > 100
-        ) {
-            setFormError(
-                "Received by must not exceed 100 characters."
-            );
-            return;
-        }
-
-        if (
-            formData.referenceNumber.trim().length > 100
-        ) {
-            setFormError(
-                "Reference number must not exceed 100 characters."
-            );
-            return;
-        }
-
-        // --------------------------------------------------------
-        // REQUEST BODY
-        // --------------------------------------------------------
-
-        const requestBody = {
-            customerId:
-                Number(formData.customerId),
-
-            paymentDate:
-                formData.paymentDate,
-
-            totalAmountReceived:
-                Number(formData.totalAmountReceived),
-
-            paymentMode:
-                formData.paymentMode,
-
-            referenceNumber:
-                formData.referenceNumber.trim() === ""
-                    ? null
-                    : formData.referenceNumber.trim(),
-
-            receivedBy:
-                formData.receivedBy.trim(),
-
-            remarks:
-                formData.remarks.trim() === ""
-                    ? null
-                    : formData.remarks.trim()
-        };
+        setFormSuccess("");
+        setEditingPayment(payment);
+        setShowFormModal(true);
 
         try {
-            setSaving(true);
-
-            const url = editingId
-                ? `${API_URL}/${editingId}`
-                : API_URL;
-
-            const method = editingId
-                ? "PUT"
-                : "POST";
-
-            const response = await fetch(
-                url,
-                {
-                    method,
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:
-                        JSON.stringify(
-                            requestBody
-                        )
-                }
+            const paymentResponse = await apiGet(
+                `/api/payments/${payment.paymentId}`
             );
 
-            const result =
-                await response.json();
-
-            console.log(
-                "Save Payment response:",
-                result
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Request failed (${response.status})`
-                );
-            }
-
-            setShowFormModal(false);
-            setEditingId(null);
+            const paymentData = Array.isArray(paymentResponse)
+                ? paymentResponse[0]
+                : paymentResponse?.data || paymentResponse;
 
             setFormData({
-                customerId: "",
-                paymentDate: "",
-                totalAmountReceived: "",
-                paymentMode: "CASH",
-                referenceNumber: "",
-                receivedBy: "",
-                remarks: ""
+                customerId: paymentData.customerId ?? "",
+                paymentDate: paymentData.paymentDate ?? "",
+                totalAmountReceived:
+                    paymentData.totalAmountReceived ?? "",
+                paymentMode: paymentData.paymentMode ?? "CASH",
+                referenceNumber:
+                    paymentData.referenceNumber ?? "",
+                receivedBy: paymentData.receivedBy ?? "",
+                remarks: paymentData.remarks ?? "",
             });
-
-            await fetchPayments();
         } catch (err) {
-            console.error(
-                "Error saving payment:",
-                err
-            );
-
             setFormError(
-                err.message ||
-                "Unable to save payment."
-            );
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    // ============================================================
-    // DELETE / SOFT DELETE
-    // ============================================================
-
-    const handleDelete = async (id) => {
-        const confirmed =
-            window.confirm(
-                "Are you sure you want to delete this payment?"
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
-        try {
-            setError("");
-
-            const response =
-                await fetch(
-                    `${API_URL}/${id}`,
-                    {
-                        method: "DELETE"
-                    }
-                );
-
-            const result =
-                await response.json();
-
-            console.log(
-                "Delete Payment response:",
-                result
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Delete failed (${response.status})`
-                );
-            }
-
-            await fetchPayments();
-        } catch (err) {
-            console.error(
-                "Error deleting payment:",
-                err
-            );
-
-            setError(
-                err.message ||
-                "Unable to delete payment."
+                err.message || "Failed to load payment details."
             );
         }
     };
-
-    // ============================================================
-    // CLOSE VIEW MODAL
-    // ============================================================
-
-    const closeViewModal = () => {
-        setShowViewModal(false);
-        setSelectedPayment(null);
-        setSelectedPaymentAllocations([]);
-    };
-
-    // ============================================================
-    // CLOSE FORM MODAL
-    // ============================================================
 
     const closeFormModal = () => {
         if (saving) {
@@ -616,922 +242,760 @@ function Payment() {
         }
 
         setShowFormModal(false);
-        setEditingId(null);
+        setEditingPayment(null);
+        setFormData(initialFormData);
         setFormError("");
-
-        setFormData({
-            customerId: "",
-            paymentDate: "",
-            totalAmountReceived: "",
-            paymentMode: "CASH",
-            referenceNumber: "",
-            receivedBy: "",
-            remarks: ""
-        });
+        setFormSuccess("");
     };
 
-    // ============================================================
-    // RENDER
-    // ============================================================
+    const handleFormChange = (event) => {
+        const { name, value } = event.target;
+
+        setFormData((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
+
+    const validateForm = () => {
+        const customerId = Number(formData.customerId);
+        const totalAmountReceived = Number(
+            formData.totalAmountReceived
+        );
+
+        if (!formData.customerId || customerId <= 0) {
+            return "Customer ID is required and must be greater than 0.";
+        }
+
+        if (!formData.paymentDate) {
+            return "Payment date is required.";
+        }
+
+        if (
+            !formData.totalAmountReceived ||
+            totalAmountReceived <= 0
+        ) {
+            return "Total amount received is required and must be greater than 0.";
+        }
+
+        if (!PAYMENT_MODES.includes(formData.paymentMode)) {
+            return "Please select a valid payment mode.";
+        }
+
+        if (!formData.receivedBy.trim()) {
+            return "Received by is required.";
+        }
+
+        if (formData.receivedBy.trim().length > 100) {
+            return "Received by cannot exceed 100 characters.";
+        }
+
+        if (formData.referenceNumber.trim().length > 100) {
+            return "Reference number cannot exceed 100 characters.";
+        }
+
+        return "";
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        setFormError("");
+        setFormSuccess("");
+
+        const validationError = validateForm();
+
+        if (validationError) {
+            setFormError(validationError);
+            return;
+        }
+
+        const payload = {
+            customerId: Number(formData.customerId),
+            paymentDate: formData.paymentDate,
+            totalAmountReceived: Number(
+                formData.totalAmountReceived
+            ),
+            paymentMode: formData.paymentMode,
+            referenceNumber:
+                formData.referenceNumber.trim() === ""
+                    ? null
+                    : formData.referenceNumber.trim(),
+            receivedBy: formData.receivedBy.trim(),
+            remarks:
+                formData.remarks.trim() === ""
+                    ? null
+                    : formData.remarks.trim(),
+        };
+
+        setSaving(true);
+
+        try {
+            const isEditing = !!editingPayment;
+
+            if (isEditing) {
+                await apiPut(
+                    `/api/payments/${editingPayment.paymentId}`,
+                    payload
+                );
+            } else {
+                await apiPost("/api/payments", payload);
+            }
+            setFormSuccess(
+                isEditing
+                    ? "Payment updated successfully."
+                    : "Payment created successfully."
+            );
+
+            await fetchPaymentsAndAllocations();
+
+            setTimeout(() => {
+                setShowFormModal(false);
+                setEditingPayment(null);
+                setFormData(initialFormData);
+                setFormError("");
+                setFormSuccess("");
+            }, 700);
+        } catch (err) {
+            setFormError(
+                err.message ||
+                    (editingPayment
+                        ? "Failed to update payment."
+                        : "Failed to create payment.")
+            );
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const openDeleteModal = (payment) => {
+        setDeletingId(payment.paymentId);
+    };
+
+    const closeDeleteModal = () => {
+        if (deleting) {
+            return;
+        }
+
+        setDeletingId(null);
+    };
+
+    const confirmDelete = async () => {
+        if (!deletingId) {
+            return;
+        }
+
+        setDeleting(true);
+        setError("");
+
+        try {
+            await apiDelete(`/api/payments/${deletingId}`);
+
+            setDeletingId(null);
+
+            await fetchPaymentsAndAllocations();
+        } catch (err) {
+            setError(
+                err.message || "Failed to delete payment."
+            );
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Payments</h2>
+                    <p>Loading payment records...</p>
+                </section>
+            </div>
+        );
+    }
 
     return (
-        <div className="module-container">
-
-            {/* ==================================================
-                HEADER
-            ================================================== */}
-
-            <div className="module-header">
-
-                <h1>Payments</h1>
-
-                <p>
-                    Manage customer payments and payment records
-                </p>
-
-            </div>
-
-            {/* ==================================================
-                SEARCH + ADD
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
-
+        <div className="page">
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-
                         <h2>Payments</h2>
-
-                        <p>
-                            Manage customer payment records
-                        </p>
-
+                        <p>Manage customer payment records.</p>
                     </div>
 
                     <button
                         type="button"
+                        className="action-btn view-btn"
                         onClick={handleAdd}
-                        className="primary-button"
                     >
                         Add Payment
                     </button>
-
                 </div>
 
-                <div className="search-section">
-
-                    <label>
-                        Search Payments
-                    </label>
+                <div className="fld production-search">
+                    <label>Search Payments</label>
 
                     <input
                         type="text"
-                        value={searchKeyword}
+                        value={searchTerm}
                         onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
+                            setSearchTerm(event.target.value)
                         }
                         placeholder="Search by payment ID, customer ID, mode..."
                     />
-
                 </div>
+            </section>
 
-            </div>
+            <section className="card">
+                <h2>Payment List</h2>
 
-            {/* ==================================================
-                ERROR
-            ================================================== */}
+                <p>
+                    {filteredPayments.length} payment
+                    {filteredPayments.length === 1 ? "" : "s"}
+                </p>
 
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
-
-            {/* ==================================================
-                PAYMENT LIST
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
-
-                    <div>
-
-                        <h2>Payment List</h2>
-
-                        <p>
-                            {filteredPayments.length} payment(s)
-                        </p>
-
+                {error && (
+                    <div className="form-error">
+                        {error}
                     </div>
+                )}
 
-                </div>
-
-                {loading ? (
-
-                    <p>
-                        Loading payments...
-                    </p>
-
-                ) : filteredPayments.length === 0 ? (
-
-                    <p>
-                        No payments found.
-                    </p>
-
+                {filteredPayments.length === 0 ? (
+                    <p>No payment records found.</p>
                 ) : (
-
-                    <div className="table-container">
-
-                        <table className="data-table">
-
+                    <div className="table-wrap">
+                        <table>
                             <thead>
-
                                 <tr>
-
                                     <th>ID</th>
-
                                     <th>CUSTOMER ID</th>
-
                                     <th>PAYMENT DATE</th>
-
                                     <th>AMOUNT</th>
-
                                     <th>PAYMENT MODE</th>
-
                                     <th>RECEIVED BY</th>
-
                                     <th>ALLOCATED</th>
-
                                     <th>UNALLOCATED</th>
-
                                     <th>STATUS</th>
-
                                     <th>ACTIONS</th>
-
                                 </tr>
-
                             </thead>
 
                             <tbody>
+                                {filteredPayments.map((payment) => {
+                                    const totalAllocated =
+                                        getTotalAllocated(
+                                            payment.paymentId
+                                        );
 
-                                {filteredPayments.map(
-                                    (payment) => {
+                                    const unallocatedAmount =
+                                        getUnallocatedAmount(payment);
 
-                                        const totalAllocated =
-                                            getTotalAllocatedAmount(
+                                    return (
+                                        <tr
+                                            key={
                                                 payment.paymentId
-                                            );
-
-                                        const unallocatedAmount =
-                                            getUnallocatedAmount(
-                                                payment
-                                            );
-
-                                        return (
-
-                                            <tr
-                                                key={
+                                            }
+                                        >
+                                            <td>
+                                                {
                                                     payment.paymentId
                                                 }
-                                            >
+                                            </td>
 
-                                                <td>
-                                                    {
-                                                        payment.paymentId
-                                                    }
-                                                </td>
+                                            <td>
+                                                {
+                                                    payment.customerId
+                                                }
+                                            </td>
 
-                                                <td>
-                                                    {
-                                                        payment.customerId
-                                                    }
-                                                </td>
+                                            <td>
+                                                {formatDate(
+                                                    payment.paymentDate
+                                                )}
+                                            </td>
 
-                                                <td>
-                                                    {
-                                                        payment.paymentDate
-                                                    }
-                                                </td>
+                                            <td>
+                                                {formatCurrency(
+                                                    payment.totalAmountReceived
+                                                )}
+                                            </td>
 
-                                                <td>
-                                                    ₹{" "}
-                                                    {Number(
-                                                        payment.totalAmountReceived ||
-                                                        0
-                                                    ).toFixed(2)}
-                                                </td>
+                                            <td>
+                                                {
+                                                    payment.paymentMode
+                                                }
+                                            </td>
 
-                                                <td>
-                                                    {
-                                                        payment.paymentMode
-                                                    }
-                                                </td>
+                                            <td>
+                                                {
+                                                    payment.receivedBy
+                                                }
+                                            </td>
 
-                                                <td>
-                                                    {
-                                                        payment.receivedBy
-                                                    }
-                                                </td>
+                                            <td>
+                                                {formatCurrency(
+                                                    totalAllocated
+                                                )}
+                                            </td>
 
-                                                <td>
-                                                    ₹{" "}
-                                                    {totalAllocated.toFixed(
-                                                        2
-                                                    )}
-                                                </td>
+                                            <td>
+                                                {formatCurrency(
+                                                    unallocatedAmount
+                                                )}
+                                            </td>
 
-                                                <td>
-                                                    ₹{" "}
-                                                    {unallocatedAmount.toFixed(
-                                                        2
-                                                    )}
-                                                </td>
+                                            <td>
+                                                {
+                                                    payment.recordStatus
+                                                }
+                                            </td>
 
-                                                <td>
-                                                    <strong>
-                                                        {
-                                                            payment.recordStatus
-                                                        }
-                                                    </strong>
-                                                </td>
-
-                                                <td>
-
+                                            <td>
+                                                <div className="table-actions">
                                                     <button
                                                         type="button"
+                                                        className="action-btn view-btn"
                                                         onClick={() =>
                                                             handleView(
-                                                                payment.paymentId
+                                                                payment
                                                             )
                                                         }
                                                     >
                                                         View
                                                     </button>
 
-                                                    {" "}
-
                                                     <button
                                                         type="button"
+                                                        className="action-btn edit-btn"
                                                         onClick={() =>
                                                             handleEdit(
-                                                                payment.paymentId
+                                                                payment
                                                             )
                                                         }
                                                     >
                                                         Edit
                                                     </button>
 
-                                                    {" "}
-
                                                     <button
                                                         type="button"
+                                                        className="action-btn delete-btn"
                                                         onClick={() =>
-                                                            handleDelete(
-                                                                payment.paymentId
+                                                            openDeleteModal(
+                                                                payment
                                                             )
                                                         }
                                                     >
                                                         Delete
                                                     </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                        );
-                                    }
-                                )}
-
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
-
                         </table>
-
                     </div>
-
                 )}
+            </section>
 
-            </div>
+            <ViewModal
+                isOpen={!!selectedPayment || viewLoading || !!viewError}
+                onClose={closeViewModal}
+                title="Payment Details"
+                subtitle={
+                    selectedPayment
+                        ? `Payment ID: ${selectedPayment.paymentId}`
+                        : "Payment information"
+                }
+                loading={viewLoading}
+                error={viewError}
+                size="lg"
+                footer={
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={closeViewModal}
+                    >
+                        Close
+                    </button>
+                }
+            >
+                {selectedPayment && !viewLoading && (
+                    <>
+                        <DetailGrid>
+                            <DetailItem
+                                label="Payment ID"
+                                value={
+                                    selectedPayment.paymentId
+                                }
+                            />
 
-            {/* ==================================================
-                VIEW PAYMENT MODAL
-            ================================================== */}
+                            <DetailItem
+                                label="Customer ID"
+                                value={
+                                    selectedPayment.customerId
+                                }
+                            />
 
-            {showViewModal &&
-                selectedPayment && (
+                            <DetailItem
+                                label="Payment Date"
+                                value={formatDate(
+                                    selectedPayment.paymentDate
+                                )}
+                            />
 
-                    <div className="modal-overlay">
+                            <DetailItem
+                                label="Total Amount Received"
+                                value={formatCurrency(
+                                    selectedPayment.totalAmountReceived
+                                )}
+                            />
 
-                        <div className="modal-content">
+                            <DetailItem
+                                label="Total Allocated"
+                                value={formatCurrency(
+                                    getTotalAllocated(
+                                        selectedPayment.paymentId
+                                    )
+                                )}
+                            />
 
-                            <div className="modal-header">
-
-                                <h2>
-                                    Payment Details
-                                </h2>
-
-                                <button
-                                    type="button"
-                                    onClick={closeViewModal}
-                                >
-                                    X
-                                </button>
-
-                            </div>
-
-                            {/* ======================================
-                                PAYMENT INFORMATION
-                            ====================================== */}
-
-                            <div className="details-grid">
-
-                                <div>
-
-                                    <strong>
-                                        Payment ID
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.paymentId
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Customer ID
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.customerId
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Payment Date
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.paymentDate
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Total Amount Received
-                                    </strong>
-
-                                    <span>
-                                        ₹{" "}
-                                        {Number(
-                                            selectedPayment.totalAmountReceived ||
+                            <DetailItem
+                                label="Unallocated Amount"
+                                value={formatCurrency(
+                                    Number(
+                                        selectedPayment.totalAmountReceived ||
                                             0
-                                        ).toFixed(2)}
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Total Allocated
-                                    </strong>
-
-                                    <span>
-                                        ₹{" "}
-                                        {getTotalAllocatedAmount(
+                                    ) -
+                                        getTotalAllocated(
                                             selectedPayment.paymentId
-                                        ).toFixed(2)}
-                                    </span>
+                                        )
+                                )}
+                            />
 
-                                </div>
+                            <DetailItem
+                                label="Payment Mode"
+                                value={
+                                    selectedPayment.paymentMode
+                                }
+                            />
 
-                                <div>
+                            <DetailItem
+                                label="Reference Number"
+                                value={
+                                    selectedPayment.referenceNumber ||
+                                    "-"
+                                }
+                            />
 
-                                    <strong>
-                                        Unallocated Amount
-                                    </strong>
+                            <DetailItem
+                                label="Received By"
+                                value={
+                                    selectedPayment.receivedBy ||
+                                    "-"
+                                }
+                            />
 
-                                    <span>
-                                        ₹{" "}
-                                        {getUnallocatedAmount(
-                                            selectedPayment
-                                        ).toFixed(2)}
-                                    </span>
+                            <DetailItem
+                                label="Record Status"
+                                value={
+                                    selectedPayment.recordStatus
+                                }
+                            />
 
-                                </div>
+                            <DetailItem
+                                label="Created At"
+                                value={formatDateTime(
+                                    selectedPayment.createdAt
+                                )}
+                            />
 
-                                <div>
+                            <DetailItem
+                                label="Remarks"
+                                value={
+                                    selectedPayment.remarks ||
+                                    "-"
+                                }
+                            />
+                        </DetailGrid>
 
-                                    <strong>
-                                        Payment Mode
-                                    </strong>
+                        <div style={{ marginTop: "24px" }}>
+                            <h3>Payment Allocations</h3>
 
-                                    <span>
-                                        {
-                                            selectedPayment.paymentMode
-                                        }
-                                    </span>
+                            <p>
+                                {selectedAllocations.length} active
+                                allocation
+                                {selectedAllocations.length === 1
+                                    ? ""
+                                    : "s"}
+                            </p>
 
-                                </div>
+                            {selectedAllocations.length === 0 ? (
+                                <p>
+                                    No active payment allocations
+                                    found.
+                                </p>
+                            ) : (
+                                <div className="table-wrap">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    ALLOCATION ID
+                                                </th>
+                                                <th>ORDER ID</th>
+                                                <th>
+                                                    ALLOCATION DATE
+                                                </th>
+                                                <th>
+                                                    ALLOCATED AMOUNT
+                                                </th>
+                                                <th>STATUS</th>
+                                            </tr>
+                                        </thead>
 
-                                <div>
-
-                                    <strong>
-                                        Reference Number
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.referenceNumber ||
-                                            "-"
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Received By
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.receivedBy
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Record Status
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.recordStatus
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        Created At
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.createdAt
-                                                ? new Date(
-                                                    selectedPayment.createdAt
-                                                ).toLocaleString()
-                                                : "-"
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <div className="full-width">
-
-                                    <strong>
-                                        Remarks
-                                    </strong>
-
-                                    <span>
-                                        {
-                                            selectedPayment.remarks ||
-                                            "-"
-                                        }
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                            {/* ======================================
-                                PAYMENT ALLOCATIONS
-                            ====================================== */}
-
-                            <div className="module-card">
-
-                                <div className="section-header">
-
-                                    <div>
-
-                                        <h3>
-                                            Payment Allocations
-                                        </h3>
-
-                                        <p>
-                                            {
-                                                selectedPaymentAllocations.length
-                                            } active allocation(s)
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                {selectedPaymentAllocations.length ===
-                                0 ? (
-
-                                    <p>
-                                        No active allocations found for
-                                        this payment.
-                                    </p>
-
-                                ) : (
-
-                                    <div className="table-container">
-
-                                        <table className="data-table">
-
-                                            <thead>
-
-                                                <tr>
-
-                                                    <th>
-                                                        ALLOCATION ID
-                                                    </th>
-
-                                                    <th>
-                                                        ORDER ID
-                                                    </th>
-
-                                                    <th>
-                                                        ALLOCATION DATE
-                                                    </th>
-
-                                                    <th>
-                                                        ALLOCATED AMOUNT
-                                                    </th>
-
-                                                    <th>
-                                                        STATUS
-                                                    </th>
-
-                                                </tr>
-
-                                            </thead>
-
-                                            <tbody>
-
-                                                {selectedPaymentAllocations.map(
-                                                    (allocation) => (
-
-                                                        <tr
-                                                            key={
+                                        <tbody>
+                                            {selectedAllocations.map(
+                                                (
+                                                    allocation
+                                                ) => (
+                                                    <tr
+                                                        key={
+                                                            allocation.paymentAllocationId
+                                                        }
+                                                    >
+                                                        <td>
+                                                            {
                                                                 allocation.paymentAllocationId
                                                             }
-                                                        >
+                                                        </td>
 
-                                                            <td>
-                                                                {
-                                                                    allocation.paymentAllocationId
-                                                                }
-                                                            </td>
+                                                        <td>
+                                                            {
+                                                                allocation.orderId
+                                                            }
+                                                        </td>
 
-                                                            <td>
-                                                                {
-                                                                    allocation.orderId
-                                                                }
-                                                            </td>
+                                                        <td>
+                                                            {formatDate(
+                                                                allocation.allocationDate
+                                                            )}
+                                                        </td>
 
-                                                            <td>
-                                                                {
-                                                                    allocation.allocationDate
-                                                                }
-                                                            </td>
+                                                        <td>
+                                                            {formatCurrency(
+                                                                allocation.allocatedAmount
+                                                            )}
+                                                        </td>
 
-                                                            <td>
-                                                                ₹{" "}
-                                                                {Number(
-                                                                    allocation.allocatedAmount ||
-                                                                    0
-                                                                ).toFixed(2)}
-                                                            </td>
-
-                                                            <td>
-                                                                <strong>
-                                                                    {
-                                                                        allocation.recordStatus
-                                                                    }
-                                                                </strong>
-                                                            </td>
-
-                                                        </tr>
-
-                                                    )
-                                                )}
-
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-
-                                )}
-
-                            </div>
-
-                            <div className="modal-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeViewModal}
-                                >
-                                    Close
-                                </button>
-
-                            </div>
-
+                                                        <td>
+                                                            {
+                                                                allocation.recordStatus
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
-
-                    </div>
-
+                    </>
                 )}
-
-            {/* ==================================================
-                CREATE / UPDATE MODAL
-            ================================================== */}
-
-            {showFormModal && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-
-                                {editingId
-                                    ? "Update Payment"
-                                    : "Add Payment"}
-
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeFormModal}
-                                disabled={saving}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-                        {formError && (
-                            <div className="error-message">
-                                {formError}
-                            </div>
-                        )}
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="form-grid"
-                        >
-
-                            {/* CUSTOMER ID */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Customer ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="customerId"
-                                    value={
-                                        formData.customerId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* PAYMENT DATE */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Payment Date *
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="paymentDate"
-                                    value={
-                                        formData.paymentDate
-                                    }
-                                    onChange={handleChange}
-                                    required
-                                />
-
-                            </div>
-
-                            {/* TOTAL AMOUNT */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Total Amount Received *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="totalAmountReceived"
-                                    value={
-                                        formData.totalAmountReceived
-                                    }
-                                    onChange={handleChange}
-                                    min="0.01"
-                                    step="0.01"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* PAYMENT MODE */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Payment Mode *
-                                </label>
-
-                                <select
-                                    name="paymentMode"
-                                    value={
-                                        formData.paymentMode
-                                    }
-                                    onChange={handleChange}
-                                    required
-                                >
-
-                                    <option value="CASH">
-                                        CASH
-                                    </option>
-
-                                    <option value="UPI">
-                                        UPI
-                                    </option>
-
-                                    <option value="BANK_TRANSFER">
-                                        BANK TRANSFER
-                                    </option>
-
-                                    <option value="CHEQUE">
-                                        CHEQUE
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                            {/* REFERENCE NUMBER */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Reference Number
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="referenceNumber"
-                                    value={
-                                        formData.referenceNumber
-                                    }
-                                    onChange={handleChange}
-                                    maxLength={100}
-                                    placeholder="UPI / cheque / bank reference"
-                                />
-
-                            </div>
-
-                            {/* RECEIVED BY */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Received By *
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="receivedBy"
-                                    value={
-                                        formData.receivedBy
-                                    }
-                                    onChange={handleChange}
-                                    maxLength={100}
-                                    required
-                                />
-
-                            </div>
-
-                            {/* RECORD STATUS */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Record Status
-                                </label>
-
-                                <input
-                                    type="text"
-                                    value="ACTIVE"
-                                    disabled
-                                />
-
-                                <small>
-                                    New payments are automatically
-                                    created with ACTIVE status
-                                    by the backend.
-                                </small>
-
-                            </div>
-
-                            {/* REMARKS */}
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Remarks
-                                </label>
-
-                                <textarea
-                                    name="remarks"
-                                    value={
-                                        formData.remarks
-                                    }
-                                    onChange={handleChange}
-                                    rows={4}
-                                    placeholder="Enter remarks..."
-                                />
-
-                            </div>
-
-                            {/* FORM ACTIONS */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeFormModal}
-                                    disabled={saving}
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="primary-button"
-                                >
-
-                                    {saving
-                                        ? "Saving..."
-                                        : editingId
-                                            ? "Update Payment"
-                                            : "Create Payment"}
-
-                                </button>
-
-                            </div>
-
-                        </form>
-
+            </ViewModal>
+
+            <FormModal
+                isOpen={showFormModal}
+                onClose={closeFormModal}
+                title={
+                    editingPayment
+                        ? "Edit Payment"
+                        : "Add Payment"
+                }
+                subtitle={
+                    editingPayment
+                        ? `Update Payment ID: ${editingPayment.paymentId}`
+                        : "Enter customer payment details."
+                }
+                onSubmit={handleSubmit}
+                submitLabel={
+                    editingPayment
+                        ? "Update Payment"
+                        : "Add Payment"
+                }
+                cancelLabel="Cancel"
+                saving={saving}
+                error={formError}
+                success={formSuccess}
+                size="lg"
+            >
+                <div className="edit-form-grid">
+                    <div className="fld">
+                        <label htmlFor="customerId">
+                            Customer ID
+                        </label>
+
+                        <input
+                            id="customerId"
+                            name="customerId"
+                            type="number"
+                            min="1"
+                            value={formData.customerId}
+                            onChange={handleFormChange}
+                            required
+                        />
                     </div>
 
+                    <div className="fld">
+                        <label htmlFor="paymentDate">
+                            Payment Date
+                        </label>
+
+                        <input
+                            id="paymentDate"
+                            name="paymentDate"
+                            type="date"
+                            value={formData.paymentDate}
+                            onChange={handleFormChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="totalAmountReceived">
+                            Total Amount Received
+                        </label>
+
+                        <input
+                            id="totalAmountReceived"
+                            name="totalAmountReceived"
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            value={
+                                formData.totalAmountReceived
+                            }
+                            onChange={handleFormChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="paymentMode">
+                            Payment Mode
+                        </label>
+
+                        <select
+                            id="paymentMode"
+                            name="paymentMode"
+                            value={formData.paymentMode}
+                            onChange={handleFormChange}
+                            required
+                        >
+                            {PAYMENT_MODES.map((mode) => (
+                                <option
+                                    key={mode}
+                                    value={mode}
+                                >
+                                    {mode}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="referenceNumber">
+                            Reference Number
+                        </label>
+
+                        <input
+                            id="referenceNumber"
+                            name="referenceNumber"
+                            type="text"
+                            maxLength="100"
+                            value={
+                                formData.referenceNumber
+                            }
+                            onChange={handleFormChange}
+                            placeholder="Optional"
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="receivedBy">
+                            Received By
+                        </label>
+
+                        <input
+                            id="receivedBy"
+                            name="receivedBy"
+                            type="text"
+                            maxLength="100"
+                            value={formData.receivedBy}
+                            onChange={handleFormChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="recordStatus">
+                            Record Status
+                        </label>
+
+                        <input
+                            id="recordStatus"
+                            type="text"
+                            value="ACTIVE"
+                            disabled
+                        />
+
+                        <small>
+                            Payment records are managed using
+                            soft-delete status.
+                        </small>
+                    </div>
+
+                    <div className="fld edit-full">
+                        <label htmlFor="remarks">
+                            Remarks
+                        </label>
+
+                        <textarea
+                            id="remarks"
+                            name="remarks"
+                            rows="4"
+                            value={formData.remarks}
+                            onChange={handleFormChange}
+                            placeholder="Optional remarks"
+                        />
+                    </div>
                 </div>
+            </FormModal>
 
-            )}
-
+            <DeleteConfirmModal
+                isOpen={!!deletingId}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
+                title="Delete Payment"
+                subtitle="Please confirm this action"
+                message="Are you sure you want to delete this payment?"
+                itemName={
+                    deletingId
+                        ? `Payment ID: ${deletingId}`
+                        : ""
+                }
+                confirming={deleting}
+                error=""
+            />
         </div>
     );
 }

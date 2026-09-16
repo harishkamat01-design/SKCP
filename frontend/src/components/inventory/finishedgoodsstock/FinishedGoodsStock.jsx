@@ -1,35 +1,104 @@
 import { useEffect, useMemo, useState } from "react";
 
-function FinishedGoodsStock() {
-    const API_URL =
-        "http://localhost:8080/api/finished-goods-stock";
+import {
+    apiGet,
+    apiPost,
+    apiPut,
+    apiDelete,
+} from "../../../services/api";
 
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
+
+function FinishedGoodsStock() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [stockList, setStockList] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    const [selectedStock, setSelectedStock] = useState(null);
+    // ============================================================
+    // VIEW MODAL
+    // ============================================================
 
-    const [showViewModal, setShowViewModal] = useState(false);
-    const [showFormModal, setShowFormModal] = useState(false);
+    const [selectedStock, setSelectedStock] =
+        useState(null);
 
-    const [editingId, setEditingId] = useState(null);
+    const [viewLoading, setViewLoading] =
+        useState(false);
 
-    const [formData, setFormData] = useState({
+    const [viewError, setViewError] =
+        useState("");
+
+    // ============================================================
+    // ADD FINISHED GOODS STOCK MODAL
+    // ============================================================
+
+    const [showAddModal, setShowAddModal] =
+        useState(false);
+
+    const [addForm, setAddForm] = useState({
         productId: "",
         currentStockLevel: "",
         minimumStockLevel: "",
-        notes: ""
+        notes: "",
     });
 
-    const [formError, setFormError] = useState("");
-    const [saving, setSaving] = useState(false);
+    const [addLoading, setAddLoading] =
+        useState(false);
+
+    const [addError, setAddError] =
+        useState("");
+
+    // ============================================================
+    // EDIT FINISHED GOODS STOCK MODAL
+    // ============================================================
+
+    const [editingStock, setEditingStock] =
+        useState(null);
+
+    const [editForm, setEditForm] = useState({
+        currentStockLevel: "",
+        minimumStockLevel: "",
+        notes: "",
+    });
+
+    const [editLoading, setEditLoading] =
+        useState(false);
+
+    const [editError, setEditError] =
+        useState("");
+
+    // ============================================================
+    // DELETE MODAL
+    // ============================================================
+
+    const [deletingStock, setDeletingStock] =
+        useState(null);
+
+    const [deleteLoading, setDeleteLoading] =
+        useState(false);
+
+    const [deleteError, setDeleteError] =
+        useState("");
+
+    // ============================================================
+    // INITIAL LOAD
+    // ============================================================
+
+    useEffect(() => {
+        fetchStock();
+    }, []);
 
     // ============================================================
     // FETCH ALL FINISHED GOODS STOCK
@@ -40,15 +109,9 @@ function FinishedGoodsStock() {
             setLoading(true);
             setError("");
 
-            const response = await fetch(API_URL);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch finished goods stock (${response.status})`
-                );
-            }
-
-            const result = await response.json();
+            const result = await apiGet(
+                "/api/finished-goods-stock"
+            );
 
             console.log(
                 "Finished Goods Stock API response:",
@@ -71,19 +134,12 @@ function FinishedGoodsStock() {
     };
 
     // ============================================================
-    // INITIAL LOAD
-    // ============================================================
-
-    useEffect(() => {
-        fetchStock();
-    }, []);
-
-    // ============================================================
     // SEARCH
     // ============================================================
 
     const filteredStock = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+        const keyword =
+            searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
             return stockList;
@@ -91,7 +147,9 @@ function FinishedGoodsStock() {
 
         return stockList.filter((stock) => {
             return (
-                String(stock.finishedGoodsStockId || "")
+                String(
+                    stock.finishedGoodsStockId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
@@ -99,11 +157,22 @@ function FinishedGoodsStock() {
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.currentStockLevel || "")
+                String(
+                    stock.productName || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.minimumStockLevel || "")
+                String(
+                    stock.currentStockLevel || ""
+                )
+                    .toLowerCase()
+                    .includes(keyword) ||
+
+                String(
+                    stock.minimumStockLevel || ""
+                    
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
@@ -111,9 +180,7 @@ function FinishedGoodsStock() {
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.recordStatus || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
+                
 
                 String(stock.notes || "")
                     .toLowerCase()
@@ -126,161 +193,153 @@ function FinishedGoodsStock() {
     // VIEW FINISHED GOODS STOCK
     // ============================================================
 
-    const handleView = async (id) => {
+    const handleView = async (stock) => {
+        setViewError("");
+        setViewLoading(true);
+        setSelectedStock(null);
+
         try {
-            setError("");
-
-            const response = await fetch(
-                `${API_URL}/${id}`
+            const result = await apiGet(
+                `/api/finished-goods-stock/${stock.finishedGoodsStockId}`
             );
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch finished goods stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
 
             console.log(
                 "Finished Goods Stock details:",
                 result
             );
 
+
             setSelectedStock(result.data);
-            setShowViewModal(true);
         } catch (err) {
             console.error(
                 "Error fetching finished goods stock details:",
                 err
             );
 
-            setError(
-                "Unable to load finished goods stock details."
+            setViewError(
+                err.message ||
+                    "Unable to load finished goods stock details."
             );
+        } finally {
+            setViewLoading(false);
         }
     };
 
+    const closeViewModal = () => {
+        if (viewLoading) {
+            return;
+        }
+
+        setSelectedStock(null);
+        setViewError("");
+    };
+
     // ============================================================
-    // OPEN CREATE FORM
+    // ADD FINISHED GOODS STOCK
     // ============================================================
 
-    const handleAdd = () => {
-        setEditingId(null);
+    const openAddModal = () => {
+        setAddError("");
 
-        setFormData({
+        setAddForm({
             productId: "",
             currentStockLevel: "",
             minimumStockLevel: "",
-            notes: ""
+            notes: "",
         });
 
-        setFormError("");
-        setShowFormModal(true);
+        setShowAddModal(true);
     };
 
-    // ============================================================
-    // OPEN EDIT FORM
-    // ============================================================
-
-    const handleEdit = async (id) => {
-        try {
-            setFormError("");
-            setError("");
-
-            const response = await fetch(
-                `${API_URL}/${id}`
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch finished goods stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
-
-            const stock = result.data;
-
-            setEditingId(id);
-
-            setFormData({
-                productId: stock.productId ?? "",
-                currentStockLevel:
-                    stock.currentStockLevel ?? "",
-                minimumStockLevel:
-                    stock.minimumStockLevel ?? "",
-                notes: stock.notes ?? ""
-            });
-
-            setShowFormModal(true);
-        } catch (err) {
-            console.error(
-                "Error loading finished goods stock for edit:",
-                err
-            );
-
-            setError(
-                "Unable to load the finished goods stock record for editing."
-            );
+    const closeAddModal = () => {
+        if (addLoading) {
+            return;
         }
+
+        setShowAddModal(false);
+        setAddError("");
+
+        setAddForm({
+            productId: "",
+            currentStockLevel: "",
+            minimumStockLevel: "",
+            notes: "",
+        });
     };
 
-    // ============================================================
-    // FORM CHANGE
-    // ============================================================
-
-    const handleChange = (event) => {
+    const handleAddChange = (event) => {
         const { name, value } = event.target;
 
-        setFormData((previous) => ({
+        setAddForm((previous) => ({
             ...previous,
-            [name]: value
+            [name]: value,
         }));
     };
 
     // ============================================================
-    // CREATE / UPDATE
+    // CREATE FINISHED GOODS STOCK
     // ============================================================
 
-    const handleSubmit = async (event) => {
+    const handleCreateStock = async (event) => {
         event.preventDefault();
 
-        setFormError("");
+        setAddError("");
 
         // --------------------------------------------------------
-        // BASIC FRONTEND VALIDATION
+        // VALIDATION
         // --------------------------------------------------------
 
-        if (!formData.productId) {
-            setFormError("Product ID is required.");
+        if (!addForm.productId) {
+            setAddError(
+                "Product ID is required."
+            );
             return;
         }
 
-        if (Number(formData.productId) <= 0) {
-            setFormError("Product ID must be greater than zero.");
+        if (Number(addForm.productId) <= 0) {
+            setAddError(
+                "Product ID must be greater than zero."
+            );
             return;
         }
 
-        if (formData.currentStockLevel === "") {
-            setFormError("Current stock level is required.");
+        if (
+            addForm.currentStockLevel === "" ||
+            Number.isNaN(
+                Number(addForm.currentStockLevel)
+            )
+        ) {
+            setAddError(
+                "Current stock level is required."
+            );
             return;
         }
 
-        if (Number(formData.currentStockLevel) < 0) {
-            setFormError(
+        if (
+            Number(addForm.currentStockLevel) < 0
+        ) {
+            setAddError(
                 "Current stock level cannot be negative."
             );
             return;
         }
 
-        if (formData.minimumStockLevel === "") {
-            setFormError("Minimum stock level is required.");
+        if (
+            addForm.minimumStockLevel === "" ||
+            Number.isNaN(
+                Number(addForm.minimumStockLevel)
+            )
+        ) {
+            setAddError(
+                "Minimum stock level is required."
+            );
             return;
         }
 
-        if (Number(formData.minimumStockLevel) < 0) {
-            setFormError(
+        if (
+            Number(addForm.minimumStockLevel) < 0
+        ) {
+            setAddError(
                 "Minimum stock level cannot be negative."
             );
             return;
@@ -290,120 +349,305 @@ function FinishedGoodsStock() {
         // REQUEST BODY
         // --------------------------------------------------------
 
-        const requestBody = {
-            productId: Number(formData.productId),
+        const payload = {
+            productId:
+                Number(addForm.productId),
 
             currentStockLevel:
-                Number(formData.currentStockLevel),
+                Number(addForm.currentStockLevel),
 
             minimumStockLevel:
-                Number(formData.minimumStockLevel),
+                Number(addForm.minimumStockLevel),
 
             notes:
-                formData.notes.trim() === ""
-                    ? null
-                    : formData.notes.trim()
+                addForm.notes.trim() || null,
         };
 
-        console.log(
-            "Finished Goods Stock request body:",
-            requestBody
-        );
-
         try {
-            setSaving(true);
-
-            const url = editingId
-                ? `${API_URL}/${editingId}`
-                : API_URL;
-
-            const method = editingId ? "PUT" : "POST";
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const result = await response.json();
+            setAddLoading(true);
 
             console.log(
-                "Save Finished Goods Stock response:",
+                "Creating finished goods stock with payload:",
+                payload
+            );
+
+            const result = await apiPost(
+                "/api/finished-goods-stock",
+                payload
+            );
+
+            console.log(
+                "Finished Goods Stock created:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Request failed (${response.status})`
-                );
-            }
 
-            setShowFormModal(false);
+            setShowAddModal(false);
 
-            setEditingId(null);
-
-            setFormData({
+            setAddForm({
                 productId: "",
                 currentStockLevel: "",
                 minimumStockLevel: "",
-                notes: ""
+                notes: "",
             });
 
             await fetchStock();
         } catch (err) {
             console.error(
-                "Error saving finished goods stock:",
+                "Error creating finished goods stock:",
                 err
             );
 
-            setFormError(
+            setAddError(
                 err.message ||
-                "Unable to save finished goods stock."
+                    "Unable to create finished goods stock."
             );
         } finally {
-            setSaving(false);
+            setAddLoading(false);
         }
     };
 
     // ============================================================
-    // DELETE / SOFT DELETE
+    // EDIT FINISHED GOODS STOCK
     // ============================================================
 
-    const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this finished goods stock record?"
-        );
+    const handleEdit = async (stock) => {
+        setEditError("");
+        setEditLoading(false);
 
-        if (!confirmed) {
+        try {
+            const result = await apiGet(
+                `/api/finished-goods-stock/${stock.finishedGoodsStockId}`
+            );
+
+            console.log(
+                "Finished Goods Stock edit details:",
+                result
+            );
+
+
+            const stockData = result.data;
+
+            setEditingStock(stockData);
+
+            setEditForm({
+                currentStockLevel:
+                    stockData.currentStockLevel ?? "",
+
+                minimumStockLevel:
+                    stockData.minimumStockLevel ?? "",
+
+                notes:
+                    stockData.notes || "",
+            });
+        } catch (err) {
+            console.error(
+                "Error loading finished goods stock for edit:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to load the finished goods stock record for editing."
+            );
+
+            setEditingStock(stock);
+        }
+    };
+
+    const closeEditModal = () => {
+        if (editLoading) {
+            return;
+        }
+
+        setEditingStock(null);
+        setEditError("");
+
+        setEditForm({
+            currentStockLevel: "",
+            minimumStockLevel: "",
+            notes: "",
+        });
+    };
+
+    const handleEditChange = (event) => {
+        const { name, value } = event.target;
+
+        setEditForm((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
+
+    // ============================================================
+    // UPDATE FINISHED GOODS STOCK
+    // ============================================================
+
+    const handleUpdateStock = async (event) => {
+        event.preventDefault();
+
+        if (!editingStock) {
+            return;
+        }
+
+        setEditError("");
+
+        // --------------------------------------------------------
+        // VALIDATION
+        // --------------------------------------------------------
+
+        if (
+            editForm.currentStockLevel === "" ||
+            Number.isNaN(
+                Number(editForm.currentStockLevel)
+            )
+        ) {
+            setEditError(
+                "Current stock level is required."
+            );
+            return;
+        }
+
+        if (
+            Number(editForm.currentStockLevel) < 0
+        ) {
+            setEditError(
+                "Current stock level cannot be negative."
+            );
+            return;
+        }
+
+        if (
+            editForm.minimumStockLevel === "" ||
+            Number.isNaN(
+                Number(editForm.minimumStockLevel)
+            )
+        ) {
+            setEditError(
+                "Minimum stock level is required."
+            );
+            return;
+        }
+
+        if (
+            Number(editForm.minimumStockLevel) < 0
+        ) {
+            setEditError(
+                "Minimum stock level cannot be negative."
+            );
+            return;
+        }
+
+        // --------------------------------------------------------
+        // REQUEST BODY
+        // --------------------------------------------------------
+
+        const payload = {
+            currentStockLevel:
+                Number(
+                    editForm.currentStockLevel
+                ),
+
+            minimumStockLevel:
+                Number(
+                    editForm.minimumStockLevel
+                ),
+
+            notes:
+                editForm.notes.trim() || null,
+        };
+
+        try {
+            setEditLoading(true);
+
+            console.log(
+                "Updating finished goods stock with payload:",
+                payload
+            );
+
+            const result = await apiPut(
+                `/api/finished-goods-stock/${editingStock.finishedGoodsStockId}`,
+                payload
+            );
+
+            console.log(
+                "Finished Goods Stock updated:",
+                result
+            );
+
+
+            setEditingStock(null);
+
+            setEditForm({
+                currentStockLevel: "",
+                minimumStockLevel: "",
+                notes: "",
+            });
+
+            await fetchStock();
+        } catch (err) {
+            console.error(
+                "Error updating finished goods stock:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to update finished goods stock."
+            );
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    // ============================================================
+    // DELETE FINISHED GOODS STOCK
+    // ============================================================
+
+    const handleDelete = (stock) => {
+        setDeleteError("");
+        setDeletingStock(stock);
+    };
+
+    const closeDeleteModal = () => {
+        if (deleteLoading) {
+            return;
+        }
+
+        setDeletingStock(null);
+        setDeleteError("");
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deletingStock) {
             return;
         }
 
         try {
-            setError("");
+            setDeleteLoading(true);
+            setDeleteError("");
 
-            const response = await fetch(
-                `${API_URL}/${id}`,
-                {
-                    method: "DELETE"
-                }
+            console.log(
+                "Deleting finished goods stock ID:",
+                deletingStock.finishedGoodsStockId
             );
 
-            const result = await response.json();
+            const result = await apiDelete(
+                `/api/finished-goods-stock/${deletingStock.finishedGoodsStockId}`
+            );
 
             console.log(
                 "Delete Finished Goods Stock response:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Delete failed (${response.status})`
-                );
-            }
+
+            console.log(
+                "Finished Goods Stock deleted:",
+                result
+            );
+
+            setDeletingStock(null);
 
             await fetchStock();
         } catch (err) {
@@ -412,691 +656,726 @@ function FinishedGoodsStock() {
                 err
             );
 
-            setError(
+            setDeleteError(
                 err.message ||
-                "Unable to delete finished goods stock."
+                    "Unable to delete finished goods stock."
             );
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
     // ============================================================
-    // CLOSE VIEW MODAL
+    // LOADING
     // ============================================================
 
-    const closeViewModal = () => {
-        setShowViewModal(false);
-        setSelectedStock(null);
-    };
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>
+                        Finished Goods Stock
+                    </h2>
+
+                    <p>
+                        Loading finished goods
+                        stock records...
+                    </p>
+                </section>
+            </div>
+        );
+    }
 
     // ============================================================
-    // CLOSE FORM MODAL
-    // ============================================================
-
-    const closeFormModal = () => {
-        if (saving) {
-            return;
-        }
-
-        setShowFormModal(false);
-        setEditingId(null);
-        setFormError("");
-
-        setFormData({
-            productId: "",
-            currentStockLevel: "",
-            minimumStockLevel: "",
-            notes: ""
-        });
-    };
-
-    // ============================================================
-    // RENDER
+    // MAIN UI
     // ============================================================
 
     return (
-        <div className="module-container">
+        <>
+            {/* ====================================================
+                FINISHED GOODS STOCK HEADER
+            ==================================================== */}
 
-            {/* ==================================================
-                HEADER
-            ================================================== */}
-
-            <div className="module-header">
-
-                <h1>Finished Goods Stock</h1>
-
-                <p>
-                    Manage finished goods stock levels and records
-                </p>
-
-            </div>
-
-
-            {/* ==================================================
-                SEARCH + ADD
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
-
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent:
+                            "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-
-                        <h2>Finished Goods Stock</h2>
+                        <h2>
+                            Finished Goods Stock
+                        </h2>
 
                         <p>
-                            Manage available finished product
-                            inventory
+                            Manage available
+                            finished product
+                            inventory.
                         </p>
-
                     </div>
 
                     <button
                         type="button"
-                        onClick={handleAdd}
-                        className="primary-button"
+                        className="action-btn view-btn"
+                        onClick={
+                            openAddModal
+                        }
                     >
-                        Add Finished Goods Stock
+                        + Add Finished Goods Stock
                     </button>
-
                 </div>
 
-
-                <div className="search-section">
-
-                    <label>
+                <div className="fld production-search">
+                    <label htmlFor="finished-goods-stock-search">
                         Search Finished Goods Stock
                     </label>
 
                     <input
+                        id="finished-goods-stock-search"
                         type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
+                        placeholder="Search by product, stock level, status..."
+                        value={
+                            searchKeyword
+                        }
+                        onChange={(
+                            event
+                        ) =>
                             setSearchKeyword(
-                                event.target.value
+                                event.target
+                                    .value
                             )
                         }
-                        placeholder="Search by product, stock level, status..."
                     />
-
                 </div>
+            </section>
 
-            </div>
-
-
-            {/* ==================================================
-                ERROR
-            ================================================== */}
-
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
-
-
-            {/* ==================================================
+            {/* ====================================================
                 FINISHED GOODS STOCK LIST
-            ================================================== */}
+            ==================================================== */}
 
-            <div className="module-card">
+            <section className="card">
+                <h2>
+                    Finished Goods Stock List
+                </h2>
 
-                <div className="section-header">
+                <p>
+                    {
+                        filteredStock.length
+                    }{" "}
+                    finished goods stock
+                    record(s)
+                </p>
 
-                    <div>
-
-                        <h2>
-                            Finished Goods Stock List
-                        </h2>
-
-                        <p>
-                            {filteredStock.length} finished goods
-                            stock record(s)
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                {loading ? (
-
-                    <p>
-                        Loading finished goods stock...
+                {error && (
+                    <p className="form-error">
+                        {error}
                     </p>
-
-                ) : filteredStock.length === 0 ? (
-
-                    <p>
-                        No finished goods stock records found.
-                    </p>
-
-                ) : (
-
-                    <div className="table-container">
-
-                        <table className="data-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>ID</th>
-
-                                    <th>PRODUCT ID</th>
-
-                                    <th>CURRENT STOCK</th>
-
-                                    <th>MINIMUM STOCK</th>
-
-                                    <th>STATUS</th>
-
-                                    <th>LAST UPDATED</th>
-
-                                    <th>RECORD STATUS</th>
-
-                                    <th>ACTIONS</th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                {filteredStock.map((stock) => (
-
-                                    <tr
-                                        key={
-                                            stock.finishedGoodsStockId
-                                        }
-                                    >
-
-                                        <td>
-                                            {
-                                                stock.finishedGoodsStockId
-                                            }
-                                        </td>
-
-
-                                        <td>
-                                            {
-                                                stock.productId
-                                            }
-                                        </td>
-
-
-                                        <td>
-                                            {
-                                                stock.currentStockLevel
-                                            }
-                                        </td>
-
-
-                                        <td>
-                                            {
-                                                stock.minimumStockLevel
-                                            }
-                                        </td>
-
-
-                                        <td>
-                                            <strong>
-                                                {
-                                                    stock.status
-                                                }
-                                            </strong>
-                                        </td>
-
-
-                                        <td>
-                                            {
-                                                stock.lastUpdatedDate ||
-                                                "-"
-                                            }
-                                        </td>
-
-
-                                        <td>
-                                            {
-                                                stock.recordStatus ||
-                                                "ACTIVE"
-                                            }
-                                        </td>
-
-
-                                        <td>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleView(
-                                                        stock.finishedGoodsStockId
-                                                    )
-                                                }
-                                            >
-                                                View
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        stock.finishedGoodsStockId
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        stock.finishedGoodsStockId
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                ))}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
                 )}
 
-            </div>
+                {!error &&
+                    filteredStock.length ===
+                        0 && (
+                        <p>
+                            No finished goods
+                            stock records
+                            found.
+                        </p>
+                    )}
 
+                {!error &&
+                    filteredStock.length >
+                        0 && (
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            ID
+                                        </th>
 
-            {/* ==================================================
-                VIEW MODAL
-            ================================================== */}
+                                        <th>
+                                            PRODUCT
+                                        </th>
 
-            {showViewModal && selectedStock && (
+                                        <th>
+                                            CURRENT STOCK
+                                        </th>
 
-                <div className="modal-overlay">
+                                        <th>
+                                            MINIMUM STOCK
+                                        </th>
 
-                    <div className="modal-content">
+                                        <th>
+                                            STATUS
+                                        </th>
 
-                        <div className="modal-header">
+                                        <th>
+                                            LAST UPDATED
+                                        </th>
 
-                            <h2>
-                                Finished Goods Stock Details
-                            </h2>
+                                       
 
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                X
-                            </button>
+                                        <th>
+                                            ACTIONS
+                                        </th>
+                                    </tr>
+                                </thead>
 
+                                <tbody>
+                                    {filteredStock.map(
+                                        (
+                                            stock
+                                        ) => (
+                                            <tr
+                                                key={
+                                                    stock.finishedGoodsStockId
+                                                }
+                                            >
+                                                <td>
+                                                    {
+                                                        stock.finishedGoodsStockId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <strong>
+                                                        {
+                                                            stock.productName ||
+                                                            `Product ${stock.productId}`
+                                                        }
+                                                    </strong>
+
+                                                    <br />
+
+                                                    <small>
+                                                        Product ID:{" "}
+                                                        {
+                                                            stock.productId
+                                                        }
+                                                    </small>
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.currentStockLevel
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.minimumStockLevel
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.status ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.lastUpdatedDate ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                
+
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
+                    )}
+            </section>
 
+            {/* ====================================================
+                VIEW FINISHED GOODS STOCK MODAL
+            ==================================================== */}
 
-                        <div className="details-grid">
+            <ViewModal
+                isOpen={
+                    !!selectedStock ||
+                    viewLoading ||
+                    !!viewError
+                }
+                onClose={
+                    closeViewModal
+                }
+                title="Finished Goods Stock Details"
+                subtitle="View finished goods stock information"
+                loading={
+                    viewLoading
+                }
+                error={
+                    viewError
+                }
+                size="lg"
+                footer={
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={
+                            closeViewModal
+                        }
+                        disabled={
+                            viewLoading
+                        }
+                    >
+                        Close
+                    </button>
+                }
+            >
+                {selectedStock && (
+                    <DetailGrid>
+                        <DetailItem
+                            label="Finished Goods Stock ID"
+                            value={
+                                selectedStock.finishedGoodsStockId
+                            }
+                        />
 
-                            <div>
+                        <DetailItem
+                            label="Product ID"
+                            value={
+                                selectedStock.productId
+                            }
+                        />
 
-                                <strong>
-                                    Finished Goods Stock ID
-                                </strong>
+                        <DetailItem
+                            label="Product"
+                            value={
+                                selectedStock.productName ||
+                                `Product ${selectedStock.productId}`
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.finishedGoodsStockId
-                                    }
-                                </span>
+                        <DetailItem
+                            label="Current Stock Level"
+                            value={
+                                selectedStock.currentStockLevel
+                            }
+                        />
 
-                            </div>
+                        <DetailItem
+                            label="Minimum Stock Level"
+                            value={
+                                selectedStock.minimumStockLevel
+                            }
+                        />
 
+                        <DetailItem
+                            label="Stock Status"
+                            value={
+                                selectedStock.status ||
+                                "-"
+                            }
+                        />
 
-                            <div>
+                        <DetailItem
+                            label="Last Updated Date"
+                            value={
+                                selectedStock.lastUpdatedDate ||
+                                "-"
+                            }
+                        />
 
-                                <strong>
-                                    Product ID
-                                </strong>
+                        
 
-                                <span>
-                                    {
-                                        selectedStock.productId
-                                    }
-                                </span>
+                        <DetailItem
+                            label="Created At"
+                            value={
+                                selectedStock.createdAt
+                                    ? new Date(
+                                          selectedStock.createdAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
 
-                            </div>
+                        <DetailItem
+                            label="Updated At"
+                            value={
+                                selectedStock.updatedAt
+                                    ? new Date(
+                                          selectedStock.updatedAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
 
+                        <DetailItem
+                            label="Notes"
+                            value={
+                                selectedStock.notes ||
+                                "-"
+                            }
+                            fullWidth
+                        />
+                    </DetailGrid>
+                )}
+            </ViewModal>
 
-                            <div>
+            {/* ====================================================
+                ADD FINISHED GOODS STOCK MODAL
+            ==================================================== */}
 
-                                <strong>
-                                    Current Stock Level
-                                </strong>
+            <FormModal
+                isOpen={
+                    showAddModal
+                }
+                onClose={
+                    closeAddModal
+                }
+                title="Add Finished Goods Stock"
+                subtitle="Record new finished goods stock information"
+                onSubmit={
+                    handleCreateStock
+                }
+                submitLabel="Add Finished Goods Stock"
+                cancelLabel="Cancel"
+                saving={
+                    addLoading
+                }
+                error={
+                    addError
+                }
+                size="lg"
+            >
+                <div className="edit-form-grid">
+                    <div className="fld">
+                        <label htmlFor="add-finished-goods-product-id">
+                            Product ID
+                        </label>
 
-                                <span>
-                                    {
-                                        selectedStock.currentStockLevel
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div>
-
-                                <strong>
-                                    Minimum Stock Level
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.minimumStockLevel
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div>
-
-                                <strong>
-                                    Stock Status
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.status
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div>
-
-                                <strong>
-                                    Last Updated Date
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.lastUpdatedDate ||
-                                        "-"
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div>
-
-                                <strong>
-                                    Record Status
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.recordStatus ||
-                                        "ACTIVE"
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div>
-
-                                <strong>
-                                    Created At
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.createdAt
-                                            ? new Date(
-                                                selectedStock.createdAt
-                                            ).toLocaleString()
-                                            : "-"
-                                    }
-                                </span>
-
-                            </div>
-
-
-                            <div className="full-width">
-
-                                <strong>
-                                    Notes
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.notes ||
-                                        "-"
-                                    }
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div className="modal-actions">
-
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
+                        <input
+                            id="add-finished-goods-product-id"
+                            type="number"
+                            name="productId"
+                            min="1"
+                            value={
+                                addForm.productId
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter product ID"
+                            required
+                        />
                     </div>
 
-                </div>
+                    <div className="fld">
+                        <label htmlFor="add-finished-goods-current-stock">
+                            Current Stock Level
+                        </label>
 
-            )}
-
-
-            {/* ==================================================
-                CREATE / UPDATE MODAL
-            ================================================== */}
-
-            {showFormModal && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-                                {editingId
-                                    ? "Update Finished Goods Stock"
-                                    : "Add Finished Goods Stock"}
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeFormModal}
-                                disabled={saving}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-
-                        {formError && (
-
-                            <div className="error-message">
-                                {formError}
-                            </div>
-
-                        )}
-
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="form-grid"
-                        >
-
-                            {/* ==================================================
-                                PRODUCT ID
-                            ================================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Product ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="productId"
-                                    value={
-                                        formData.productId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                    disabled={!!editingId}
-                                />
-
-                                {editingId && (
-
-                                    <small>
-                                        Product ID cannot be
-                                        changed during update.
-                                    </small>
-
-                                )}
-
-                            </div>
-
-
-                            {/* ==================================================
-                                CURRENT STOCK LEVEL
-                            ================================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Current Stock Level *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="currentStockLevel"
-                                    value={
-                                        formData.currentStockLevel
-                                    }
-                                    onChange={handleChange}
-                                    min="0"
-                                    required
-                                />
-
-                            </div>
-
-
-                            {/* ==================================================
-                                MINIMUM STOCK LEVEL
-                            ================================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Minimum Stock Level *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="minimumStockLevel"
-                                    value={
-                                        formData.minimumStockLevel
-                                    }
-                                    onChange={handleChange}
-                                    min="0"
-                                    required
-                                />
-
-                            </div>
-
-
-                            {/* ==================================================
-                                NOTES
-                            ================================================== */}
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Notes
-                                </label>
-
-                                <textarea
-                                    name="notes"
-                                    value={
-                                        formData.notes
-                                    }
-                                    onChange={handleChange}
-                                    maxLength={255}
-                                    rows={4}
-                                    placeholder="Enter notes..."
-                                />
-
-                            </div>
-
-
-                            {/* ==================================================
-                                FORM ACTIONS
-                            ================================================== */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeFormModal}
-                                    disabled={saving}
-                                >
-                                    Cancel
-                                </button>
-
-
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="primary-button"
-                                >
-                                    {saving
-                                        ? "Saving..."
-                                        : editingId
-                                            ? "Update Finished Goods Stock"
-                                            : "Create Finished Goods Stock"}
-                                </button>
-
-                            </div>
-
-                        </form>
-
+                        <input
+                            id="add-finished-goods-current-stock"
+                            type="number"
+                            name="currentStockLevel"
+                            min="0"
+                            step="0.01"
+                            value={
+                                addForm.currentStockLevel
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter current stock level"
+                            required
+                        />
                     </div>
 
+                    <div className="fld">
+                        <label htmlFor="add-finished-goods-minimum-stock">
+                            Minimum Stock Level
+                        </label>
+
+                        <input
+                            id="add-finished-goods-minimum-stock"
+                            type="number"
+                            name="minimumStockLevel"
+                            min="0"
+                            step="0.01"
+                            value={
+                                addForm.minimumStockLevel
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter minimum stock level"
+                            required
+                        />
+                    </div>
+
+                    <div className="fld edit-full">
+                        <label htmlFor="add-finished-goods-notes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="add-finished-goods-notes"
+                            name="notes"
+                            rows="3"
+                            maxLength="255"
+                            value={
+                                addForm.notes
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter notes"
+                        />
+                    </div>
                 </div>
+            </FormModal>
 
-            )}
+            {/* ====================================================
+                EDIT FINISHED GOODS STOCK MODAL
+            ==================================================== */}
 
-        </div>
+            <FormModal
+                isOpen={
+                    !!editingStock
+                }
+                onClose={
+                    closeEditModal
+                }
+                title="Edit Finished Goods Stock"
+                subtitle="Update finished goods stock information"
+                onSubmit={
+                    handleUpdateStock
+                }
+                submitLabel="Update Finished Goods Stock"
+                cancelLabel="Cancel"
+                saving={
+                    editLoading
+                }
+                error={
+                    editError
+                }
+                size="lg"
+            >
+                {editingStock && (
+                    <div className="edit-form-grid">
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-stock-id">
+                                Finished Goods Stock ID
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-stock-id"
+                                type="text"
+                                value={
+                                    editingStock.finishedGoodsStockId
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-product-id">
+                                Product ID
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-product-id"
+                                type="text"
+                                value={
+                                    editingStock.productId
+                                }
+                                disabled
+                            />
+
+                            <small>
+                                Product ID cannot be
+                                changed during update.
+                            </small>
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-current-stock">
+                                Current Stock Level
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-current-stock"
+                                type="number"
+                                name="currentStockLevel"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    editForm.currentStockLevel
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-minimum-stock">
+                                Minimum Stock Level
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-minimum-stock"
+                                type="number"
+                                name="minimumStockLevel"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    editForm.minimumStockLevel
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-status">
+                                Status
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-status"
+                                type="text"
+                                value={
+                                    editingStock.status ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                   
+
+                        <div className="fld">
+                            <label htmlFor="edit-finished-goods-last-updated">
+                                Last Updated Date
+                            </label>
+
+                            <input
+                                id="edit-finished-goods-last-updated"
+                                type="text"
+                                value={
+                                    editingStock.lastUpdatedDate ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld edit-full">
+                            <label htmlFor="edit-finished-goods-notes">
+                                Notes
+                            </label>
+
+                            <textarea
+                                id="edit-finished-goods-notes"
+                                name="notes"
+                                rows="3"
+                                maxLength="255"
+                                value={
+                                    editForm.notes
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                placeholder="Enter notes"
+                            />
+                        </div>
+                    </div>
+                )}
+            </FormModal>
+
+            {/* ====================================================
+                DELETE CONFIRMATION MODAL
+            ==================================================== */}
+
+            <DeleteConfirmModal
+                isOpen={
+                    !!deletingStock
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    handleConfirmDelete
+                }
+                title="Delete Finished Goods Stock"
+                subtitle="Please confirm this action"
+                message="Are you sure you want to delete this finished goods stock record?"
+                itemName={
+                    deletingStock
+                        ? `Finished Goods Stock ID: ${deletingStock.finishedGoodsStockId} — ${
+                              deletingStock.productName ||
+                              `Product ${deletingStock.productId}`
+                          }`
+                        : ""
+                }
+                confirming={
+                    deleteLoading
+                }
+                error={
+                    deleteError
+                }
+            />
+        </>
     );
 }
 

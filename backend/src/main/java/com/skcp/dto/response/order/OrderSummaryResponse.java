@@ -1,3 +1,4 @@
+
 package com.skcp.dto.response.order;
 
 import java.time.LocalDate;
@@ -92,7 +93,9 @@ public class OrderSummaryResponse {
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
-}
+} 
+
+
 
 
 /*

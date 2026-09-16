@@ -1,4 +1,4 @@
-package com.skcp.dto.response.asset;
+
 
 /*
  * Lightweight response DTO used for asset lists and search results.
@@ -13,7 +13,7 @@ package com.skcp.dto.response.asset;
  *      ↓
  * Asset List / Search
  */
-
+package com.skcp.dto.response.asset;
 public class AssetSummaryResponse
 {
     private Integer assetId;

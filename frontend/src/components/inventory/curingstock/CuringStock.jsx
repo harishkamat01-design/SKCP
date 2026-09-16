@@ -1,68 +1,86 @@
 import { useEffect, useMemo, useState } from "react";
 
-function CuringStock() {
-    const API_URL = "http://localhost:8080/api/curing-stock";
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
 
+import {
+    apiGet,
+    apiPost,
+    apiPut,
+    apiDelete,
+} from "../../../services/api";
+
+function CuringStock() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [stockList, setStockList] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const [searchKeyword, setSearchKeyword] = useState("");
 
+    // ============================================================
+    // VIEW MODAL
+    // ============================================================
+
     const [selectedStock, setSelectedStock] = useState(null);
 
-    const [showViewModal, setShowViewModal] = useState(false);
-    const [showFormModal, setShowFormModal] = useState(false);
+    const [viewLoading, setViewLoading] = useState(false);
 
-    const [editingId, setEditingId] = useState(null);
+    const [viewError, setViewError] = useState("");
 
-    const [formData, setFormData] = useState({
+    // ============================================================
+    // ADD CURING STOCK MODAL
+    // ============================================================
+
+    const [showAddModal, setShowAddModal] = useState(false);
+
+    const [addForm, setAddForm] = useState({
         productionId: "",
         productId: "",
         quantity: "",
         productionDate: "",
-        remarks: ""
+        remarks: "",
     });
 
-    const [formError, setFormError] = useState("");
-    const [saving, setSaving] = useState(false);
+    const [addLoading, setAddLoading] = useState(false);
+
+    const [addError, setAddError] = useState("");
 
     // ============================================================
-    // FETCH ALL CURING STOCK
+    // EDIT CURING STOCK MODAL
     // ============================================================
 
-    const fetchStock = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    const [editingStock, setEditingStock] = useState(null);
 
-            const response = await fetch(API_URL);
+    const [editForm, setEditForm] = useState({
+        productId: "",
+        quantity: "",
+        productionDate: "",
+        remarks: "",
+    });
 
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch curing stock (${response.status})`
-                );
-            }
+    const [editLoading, setEditLoading] = useState(false);
 
-            const result = await response.json();
+    const [editError, setEditError] = useState("");
 
-            console.log("Curing Stock API response:", result);
+    // ============================================================
+    // DELETE MODAL
+    // ============================================================
 
-            setStockList(result.data || []);
-        } catch (err) {
-            console.error("Error fetching curing stock:", err);
+    const [deletingStock, setDeletingStock] = useState(null);
 
-            setError(
-                "Unable to load curing stock. Please try again."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    const [deleteError, setDeleteError] = useState("");
 
     // ============================================================
     // INITIAL LOAD
@@ -73,11 +91,43 @@ function CuringStock() {
     }, []);
 
     // ============================================================
+    // FETCH ALL CURING STOCK
+    // ============================================================
+
+    const fetchStock = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const result = await apiGet("/api/curing-stock");
+
+            console.log(
+                "Curing Stock API response:",
+                result
+            );
+
+            setStockList(result.data || []);
+        } catch (err) {
+            console.error(
+                "Error fetching curing stock:",
+                err
+            );
+
+            setError(
+                "Unable to load curing stock. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ============================================================
     // SEARCH
     // ============================================================
 
     const filteredStock = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+        const keyword =
+            searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
             return stockList;
@@ -85,39 +135,51 @@ function CuringStock() {
 
         return stockList.filter((stock) => {
             return (
-                String(stock.curingStockId || "")
+                String(
+                    stock.curingStockId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.productionId || "")
+                String(
+                    stock.productionId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.productId || "")
+                String(
+                    stock.productId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.productName || "")
+                String(
+                    stock.productName || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.quantity || "")
+                String(
+                    stock.quantity || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.productionDate || "")
+                String(
+                    stock.productionDate || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.expectedReadyDate || "")
+                String(
+                    stock.expectedReadyDate || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.status || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(stock.recordStatus || "")
+                String(
+                    stock.status || ""
+                )
                     .toLowerCase()
                     .includes(keyword)
             );
@@ -128,144 +190,138 @@ function CuringStock() {
     // VIEW CURING STOCK
     // ============================================================
 
-    const handleView = async (id) => {
+    const handleView = async (stock) => {
+        setViewError("");
+        setViewLoading(true);
+        setSelectedStock(null);
+
         try {
-            setError("");
+            const result = await apiGet(
+                `/api/curing-stock/${stock.curingStockId}`
+            );
 
-            const response = await fetch(`${API_URL}/${id}`);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch curing stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
-
-            console.log("Curing Stock details:", result);
+            console.log(
+                "Curing Stock details:",
+                result
+            );
 
             setSelectedStock(result.data);
-            setShowViewModal(true);
         } catch (err) {
-            console.error("Error fetching curing stock details:", err);
-
-            setError(
-                "Unable to load curing stock details."
+            console.error(
+                "Error fetching curing stock details:",
+                err
             );
+
+            setViewError(
+                err.message ||
+                    "Unable to load curing stock details."
+            );
+        } finally {
+            setViewLoading(false);
         }
     };
 
+    const closeViewModal = () => {
+        if (viewLoading) {
+            return;
+        }
+
+        setSelectedStock(null);
+        setViewError("");
+    };
+
     // ============================================================
-    // OPEN CREATE FORM
+    // ADD CURING STOCK
     // ============================================================
 
-    const handleAdd = () => {
-        setEditingId(null);
+    const openAddModal = () => {
+        setAddError("");
 
-        setFormData({
+        setAddForm({
             productionId: "",
             productId: "",
             quantity: "",
             productionDate: "",
-            remarks: ""
+            remarks: "",
         });
 
-        setFormError("");
-        setShowFormModal(true);
+        setShowAddModal(true);
     };
 
-    // ============================================================
-    // OPEN EDIT FORM
-    // ============================================================
-
-    const handleEdit = async (id) => {
-        try {
-            setFormError("");
-            setError("");
-
-            const response = await fetch(`${API_URL}/${id}`);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch curing stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
-
-            const stock = result.data;
-
-            setEditingId(id);
-
-            setFormData({
-                productionId: stock.productionId ?? "",
-                productId: stock.productId ?? "",
-                quantity: stock.quantity ?? "",
-                productionDate: stock.productionDate ?? "",
-                remarks: stock.remarks ?? ""
-            });
-
-            setShowFormModal(true);
-        } catch (err) {
-            console.error(
-                "Error loading curing stock for edit:",
-                err
-            );
-
-            setError(
-                "Unable to load the curing stock record for editing."
-            );
+    const closeAddModal = () => {
+        if (addLoading) {
+            return;
         }
+
+        setShowAddModal(false);
+        setAddError("");
+
+        setAddForm({
+            productionId: "",
+            productId: "",
+            quantity: "",
+            productionDate: "",
+            remarks: "",
+        });
     };
 
-    // ============================================================
-    // FORM CHANGE
-    // ============================================================
-
-    const handleChange = (event) => {
+    const handleAddChange = (event) => {
         const { name, value } = event.target;
 
-        setFormData((previous) => ({
+        setAddForm((previous) => ({
             ...previous,
-            [name]: value
+            [name]: value,
         }));
     };
 
     // ============================================================
-    // CREATE / UPDATE
+    // CREATE CURING STOCK
     // ============================================================
 
-    const handleSubmit = async (event) => {
+    const handleCreateStock = async (event) => {
         event.preventDefault();
 
-        setFormError("");
+        setAddError("");
 
         // --------------------------------------------------------
-        // BASIC FRONTEND VALIDATION
+        // VALIDATION
         // --------------------------------------------------------
 
-        if (!formData.productionId) {
-            setFormError("Production ID is required.");
+        if (!addForm.productionId) {
+            setAddError(
+                "Please enter a production ID."
+            );
             return;
         }
 
-        if (!formData.productId) {
-            setFormError("Product ID is required.");
+        if (!addForm.productId) {
+            setAddError(
+                "Please enter a product ID."
+            );
             return;
         }
 
-        if (formData.quantity === "") {
-            setFormError("Quantity is required.");
+        if (
+            addForm.quantity === "" ||
+            Number.isNaN(Number(addForm.quantity))
+        ) {
+            setAddError(
+                "Please enter a valid quantity."
+            );
             return;
         }
 
-        if (Number(formData.quantity) < 0) {
-            setFormError("Quantity cannot be negative.");
+        if (Number(addForm.quantity) < 0) {
+            setAddError(
+                "Quantity cannot be negative."
+            );
             return;
         }
 
-        if (!formData.productionDate) {
-            setFormError("Production date is required.");
+        if (!addForm.productionDate) {
+            setAddError(
+                "Please enter a production date."
+            );
             return;
         }
 
@@ -273,122 +329,298 @@ function CuringStock() {
         // REQUEST BODY
         // --------------------------------------------------------
 
-        const requestBody = editingId
-            ? {
-                  productId: Number(formData.productId),
-                  quantity: Number(formData.quantity),
-                  productionDate: formData.productionDate,
-                  remarks:
-                      formData.remarks.trim() === ""
-                          ? null
-                          : formData.remarks.trim()
-              }
-            : {
-                  productionId: Number(formData.productionId),
-                  productId: Number(formData.productId),
-                  quantity: Number(formData.quantity),
-                  productionDate: formData.productionDate,
-                  remarks:
-                      formData.remarks.trim() === ""
-                          ? null
-                          : formData.remarks.trim()
-              };
+        const payload = {
+            productionId:
+                Number(addForm.productionId),
+
+            productId:
+                Number(addForm.productId),
+
+            quantity:
+                Number(addForm.quantity),
+
+            productionDate:
+                addForm.productionDate,
+
+            remarks:
+                addForm.remarks.trim() || null,
+        };
 
         try {
-            setSaving(true);
-
-            const url = editingId
-                ? `${API_URL}/${editingId}`
-                : API_URL;
-
-            const method = editingId ? "PUT" : "POST";
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const result = await response.json();
+            setAddLoading(true);
 
             console.log(
-                "Save Curing Stock response:",
+                "Creating curing stock with payload:",
+                payload
+            );
+
+            const result = await apiPost(
+                "/api/curing-stock",
+                payload
+            );
+
+            console.log(
+                "Curing Stock created:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Request failed (${response.status})`
-                );
-            }
+            setShowAddModal(false);
 
-            setShowFormModal(false);
-
-            setEditingId(null);
-
-            setFormData({
+            setAddForm({
                 productionId: "",
                 productId: "",
                 quantity: "",
                 productionDate: "",
-                remarks: ""
+                remarks: "",
             });
 
             await fetchStock();
         } catch (err) {
             console.error(
-                "Error saving curing stock:",
+                "Error creating curing stock:",
                 err
             );
 
-            setFormError(
+            setAddError(
                 err.message ||
-                "Unable to save curing stock."
+                    "Unable to create curing stock."
             );
         } finally {
-            setSaving(false);
+            setAddLoading(false);
         }
     };
 
     // ============================================================
-    // DELETE / SOFT DELETE
+    // EDIT CURING STOCK
     // ============================================================
 
-    const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this curing stock record?"
-        );
+    const handleEdit = async (stock) => {
+        setEditError("");
+        setEditLoading(false);
 
-        if (!confirmed) {
+        try {
+            const result = await apiGet(
+                `/api/curing-stock/${stock.curingStockId}`
+            );
+
+            console.log(
+                "Curing Stock edit details:",
+                result
+            );
+
+            const stockData = result.data;
+
+            setEditingStock(stockData);
+
+            setEditForm({
+                productId:
+                    stockData.productId ?? "",
+
+                quantity:
+                    stockData.quantity ?? "",
+
+                productionDate:
+                    stockData.productionDate ?? "",
+
+                remarks:
+                    stockData.remarks || "",
+            });
+        } catch (err) {
+            console.error(
+                "Error loading curing stock for edit:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to load the curing stock record for editing."
+            );
+
+            setEditingStock(stock);
+        }
+    };
+
+    const closeEditModal = () => {
+        if (editLoading) {
+            return;
+        }
+
+        setEditingStock(null);
+        setEditError("");
+
+        setEditForm({
+            productId: "",
+            quantity: "",
+            productionDate: "",
+            remarks: "",
+        });
+    };
+
+    const handleEditChange = (event) => {
+        const { name, value } = event.target;
+
+        setEditForm((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
+
+    // ============================================================
+    // UPDATE CURING STOCK
+    // ============================================================
+
+    const handleUpdateStock = async (event) => {
+        event.preventDefault();
+
+        if (!editingStock) {
+            return;
+        }
+
+        setEditError("");
+
+        // --------------------------------------------------------
+        // VALIDATION
+        // --------------------------------------------------------
+
+        if (!editForm.productId) {
+            setEditError(
+                "Please enter a product ID."
+            );
+            return;
+        }
+
+        if (
+            editForm.quantity === "" ||
+            Number.isNaN(Number(editForm.quantity))
+        ) {
+            setEditError(
+                "Please enter a valid quantity."
+            );
+            return;
+        }
+
+        if (Number(editForm.quantity) < 0) {
+            setEditError(
+                "Quantity cannot be negative."
+            );
+            return;
+        }
+
+        if (!editForm.productionDate) {
+            setEditError(
+                "Please enter a production date."
+            );
+            return;
+        }
+
+        // --------------------------------------------------------
+        // REQUEST BODY
+        // --------------------------------------------------------
+
+        const payload = {
+            productId:
+                Number(editForm.productId),
+
+            quantity:
+                Number(editForm.quantity),
+
+            productionDate:
+                editForm.productionDate,
+
+            remarks:
+                editForm.remarks.trim() || null,
+        };
+
+        try {
+            setEditLoading(true);
+
+            console.log(
+                "Updating curing stock with payload:",
+                payload
+            );
+
+            const result = await apiPut(
+                `/api/curing-stock/${editingStock.curingStockId}`,
+                payload
+            );
+
+            console.log(
+                "Curing Stock updated:",
+                result
+            );
+
+            setEditingStock(null);
+
+            setEditForm({
+                productId: "",
+                quantity: "",
+                productionDate: "",
+                remarks: "",
+            });
+
+            await fetchStock();
+        } catch (err) {
+            console.error(
+                "Error updating curing stock:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to update curing stock."
+            );
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    // ============================================================
+    // DELETE CURING STOCK
+    // ============================================================
+
+    const handleDelete = (stock) => {
+        setDeleteError("");
+        setDeletingStock(stock);
+    };
+
+    const closeDeleteModal = () => {
+        if (deleteLoading) {
+            return;
+        }
+
+        setDeletingStock(null);
+        setDeleteError("");
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deletingStock) {
             return;
         }
 
         try {
-            setError("");
+            setDeleteLoading(true);
+            setDeleteError("");
 
-            const response = await fetch(
-                `${API_URL}/${id}`,
-                {
-                    method: "DELETE"
-                }
+            console.log(
+                "Deleting curing stock ID:",
+                deletingStock.curingStockId
             );
 
-            const result = await response.json();
+            const result = await apiDelete(
+                `/api/curing-stock/${deletingStock.curingStockId}`
+            );
 
             console.log(
                 "Delete Curing Stock response:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Delete failed (${response.status})`
-                );
-            }
+            console.log(
+                "Curing Stock deleted:",
+                result
+            );
+
+            setDeletingStock(null);
 
             await fetchStock();
         } catch (err) {
@@ -397,672 +629,821 @@ function CuringStock() {
                 err
             );
 
-            setError(
+            setDeleteError(
                 err.message ||
-                "Unable to delete curing stock."
+                    "Unable to delete curing stock."
             );
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
     // ============================================================
-    // CLOSE MODALS
+    // LOADING
     // ============================================================
 
-    const closeViewModal = () => {
-        setShowViewModal(false);
-        setSelectedStock(null);
-    };
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Curing Stock</h2>
 
-    const closeFormModal = () => {
-        if (saving) {
-            return;
-        }
-
-        setShowFormModal(false);
-        setEditingId(null);
-        setFormError("");
-
-        setFormData({
-            productionId: "",
-            productId: "",
-            quantity: "",
-            productionDate: "",
-            remarks: ""
-        });
-    };
+                    <p>
+                        Loading curing stock
+                        records...
+                    </p>
+                </section>
+            </div>
+        );
+    }
 
     // ============================================================
-    // RENDER
+    // MAIN UI
     // ============================================================
 
     return (
-        <div className="module-container">
+        <>
+            {/* ====================================================
+                CURING STOCK HEADER
+            ==================================================== */}
 
-            {/* ==================================================
-                HEADER
-            ================================================== */}
-
-            <div className="module-header">
-                <h1>Curing Stock</h1>
-
-                <p>
-                    Manage curing stock information and records
-                </p>
-            </div>
-
-            {/* ==================================================
-                SEARCH + ADD
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
-
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent:
+                            "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-                        <h2>Curing Stock</h2>
+                        <h2>
+                            Curing Stock
+                        </h2>
 
                         <p>
-                            Manage blocks currently undergoing
-                            curing
+                            Manage blocks currently
+                            undergoing curing.
                         </p>
                     </div>
 
                     <button
                         type="button"
-                        onClick={handleAdd}
-                        className="primary-button"
+                        className="action-btn view-btn"
+                        onClick={
+                            openAddModal
+                        }
                     >
-                        Add Curing Stock
+                        + Add Curing Stock
                     </button>
-
                 </div>
 
-                <div className="search-section">
-
-                    <label>
+                <div className="fld production-search">
+                    <label htmlFor="curing-stock-search">
                         Search Curing Stock
                     </label>
 
                     <input
+                        id="curing-stock-search"
                         type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
+                        placeholder="Search by product, production ID, status..."
+                        value={
+                            searchKeyword
+                        }
+                        onChange={(
+                            event
+                        ) =>
                             setSearchKeyword(
-                                event.target.value
+                                event.target
+                                    .value
                             )
                         }
-                        placeholder="Search by product, production ID, status..."
                     />
-
                 </div>
+            </section>
 
-            </div>
-
-            {/* ==================================================
-                ERROR
-            ================================================== */}
-
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
-
-            {/* ==================================================
+            {/* ====================================================
                 CURING STOCK LIST
-            ================================================== */}
+            ==================================================== */}
 
-            <div className="module-card">
+            <section className="card">
+                <h2>
+                    Curing Stock List
+                </h2>
 
-                <div className="section-header">
+                <p>
+                    {
+                        filteredStock.length
+                    }{" "}
+                    curing stock
+                    record(s)
+                </p>
 
-                    <div>
-                        <h2>Curing Stock List</h2>
-
-                        <p>
-                            {filteredStock.length} curing
-                            stock record(s)
-                        </p>
-                    </div>
-
-                </div>
-
-                {loading ? (
-                    <p>Loading curing stock...</p>
-                ) : filteredStock.length === 0 ? (
-                    <p>
-                        No curing stock records found.
+                {error && (
+                    <p className="form-error">
+                        {error}
                     </p>
-                ) : (
-                    <div className="table-container">
-
-                        <table className="data-table">
-
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>PRODUCTION ID</th>
-                                    <th>PRODUCT</th>
-                                    <th>QUANTITY</th>
-                                    <th>PRODUCTION DATE</th>
-                                    <th>EXPECTED READY</th>
-                                    <th>STATUS</th>
-                                    <th>RECORD STATUS</th>
-                                    <th>ACTIONS</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                {filteredStock.map((stock) => (
-                                    <tr
-                                        key={
-                                            stock.curingStockId
-                                        }
-                                    >
-
-                                        <td>
-                                            {
-                                                stock.curingStockId
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.productionId
-                                            }
-                                        </td>
-
-                                        <td>
-                                            <strong>
-                                                {
-                                                    stock.productName ||
-                                                    `Product ${stock.productId}`
-                                                }
-                                            </strong>
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.quantity
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.productionDate
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.expectedReadyDate
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.status
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.recordStatus
-                                            }
-                                        </td>
-
-                                        <td>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleView(
-                                                        stock.curingStockId
-                                                    )
-                                                }
-                                            >
-                                                View
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        stock.curingStockId
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        stock.curingStockId
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-                                ))}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
                 )}
 
-            </div>
+                {!error &&
+                    filteredStock.length ===
+                        0 && (
+                        <p>
+                            No curing stock
+                            records found.
+                        </p>
+                    )}
 
-            {/* ==================================================
-                VIEW MODAL
-            ================================================== */}
+                {!error &&
+                    filteredStock.length >
+                        0 && (
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            ID
+                                        </th>
 
-            {showViewModal && selectedStock && (
+                                        <th>
+                                            PRODUCTION ID
+                                        </th>
 
-                <div className="modal-overlay">
+                                        <th>
+                                            PRODUCT
+                                        </th>
 
-                    <div className="modal-content">
+                                        <th>
+                                            QUANTITY
+                                        </th>
 
-                        <div className="modal-header">
+                                        <th>
+                                            PRODUCTION DATE
+                                        </th>
 
-                            <h2>
-                                Curing Stock Details
-                            </h2>
+                                        <th>
+                                            EXPECTED READY
+                                        </th>
 
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                X
-                            </button>
+                                        <th>
+                                            STATUS
+                                        </th>
 
+                                        <th>
+                                            ACTIONS
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {filteredStock.map(
+                                        (
+                                            stock
+                                        ) => (
+                                            <tr
+                                                key={
+                                                    stock.curingStockId
+                                                }
+                                            >
+                                                <td>
+                                                    {
+                                                        stock.curingStockId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.productionId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <strong>
+                                                        {
+                                                            stock.productName ||
+                                                            `Product ${stock.productId}`
+                                                        }
+                                                    </strong>
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.quantity
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.productionDate
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.expectedReadyDate ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.status ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
+                    )}
+            </section>
 
-                        <div className="details-grid">
+            {/* ====================================================
+                VIEW CURING STOCK MODAL
+            ==================================================== */}
 
-                            <div>
-                                <strong>
-                                    Curing Stock ID
-                                </strong>
+            <ViewModal
+                isOpen={
+                    !!selectedStock ||
+                    viewLoading ||
+                    !!viewError
+                }
+                onClose={
+                    closeViewModal
+                }
+                title="Curing Stock Details"
+                subtitle="View curing stock information"
+                loading={
+                    viewLoading
+                }
+                error={
+                    viewError
+                }
+                size="lg"
+                footer={
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={
+                            closeViewModal
+                        }
+                        disabled={
+                            viewLoading
+                        }
+                    >
+                        Close
+                    </button>
+                }
+            >
+                {selectedStock && (
+                    <DetailGrid>
+                        <DetailItem
+                            label="Curing Stock ID"
+                            value={
+                                selectedStock.curingStockId
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.curingStockId
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Production ID"
+                            value={
+                                selectedStock.productionId
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Production ID
-                                </strong>
+                        <DetailItem
+                            label="Product ID"
+                            value={
+                                selectedStock.productId
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.productionId
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Product"
+                            value={
+                                selectedStock.productName ||
+                                `Product ${selectedStock.productId}`
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Product ID
-                                </strong>
+                        <DetailItem
+                            label="Quantity"
+                            value={
+                                selectedStock.quantity
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.productId
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Production Date"
+                            value={
+                                selectedStock.productionDate ||
+                                "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Quantity
-                                </strong>
+                        <DetailItem
+                            label="Expected Ready Date"
+                            value={
+                                selectedStock.expectedReadyDate ||
+                                "-"
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.quantity
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Status"
+                            value={
+                                selectedStock.status ||
+                                "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Production Date
-                                </strong>
+                        <DetailItem
+                            label="Created At"
+                            value={
+                                selectedStock.createdAt
+                                    ? new Date(
+                                          selectedStock.createdAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.productionDate
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Updated At"
+                            value={
+                                selectedStock.updatedAt
+                                    ? new Date(
+                                          selectedStock.updatedAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Expected Ready Date
-                                </strong>
+                        <DetailItem
+                            label="Remarks"
+                            value={
+                                selectedStock.remarks ||
+                                "-"
+                            }
+                            fullWidth
+                        />
+                    </DetailGrid>
+                )}
+            </ViewModal>
 
-                                <span>
-                                    {
-                                        selectedStock.expectedReadyDate
-                                    }
-                                </span>
-                            </div>
+            {/* ====================================================
+                ADD CURING STOCK MODAL
+            ==================================================== */}
 
-                            <div>
-                                <strong>
-                                    Status
-                                </strong>
+            <FormModal
+                isOpen={
+                    showAddModal
+                }
+                onClose={
+                    closeAddModal
+                }
+                title="Add Curing Stock"
+                subtitle="Record new curing stock information"
+                onSubmit={
+                    handleCreateStock
+                }
+                submitLabel="Add Curing Stock"
+                cancelLabel="Cancel"
+                saving={
+                    addLoading
+                }
+                error={
+                    addError
+                }
+                size="lg"
+            >
+                <div className="edit-form-grid">
+                    <div className="fld">
+                        <label htmlFor="add-curing-production-id">
+                            Production ID
+                        </label>
 
-                                <span>
-                                    {
-                                        selectedStock.status
-                                    }
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>
-                                    Record Status
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.recordStatus
-                                    }
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>
-                                    Created At
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.createdAt
-                                            ? new Date(
-                                                selectedStock.createdAt
-                                            ).toLocaleString()
-                                            : "-"
-                                    }
-                                </span>
-                            </div>
-
-                            <div className="full-width">
-
-                                <strong>
-                                    Remarks
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.remarks ||
-                                        "-"
-                                    }
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div className="modal-actions">
-
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
+                        <input
+                            id="add-curing-production-id"
+                            type="number"
+                            name="productionId"
+                            min="1"
+                            value={
+                                addForm.productionId
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter production ID"
+                            required
+                        />
                     </div>
 
-                </div>
+                    <div className="fld">
+                        <label htmlFor="add-curing-product-id">
+                            Product ID
+                        </label>
 
-            )}
-
-            {/* ==================================================
-                CREATE / UPDATE MODAL
-            ================================================== */}
-
-            {showFormModal && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-                                {editingId
-                                    ? "Update Curing Stock"
-                                    : "Add Curing Stock"}
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeFormModal}
-                                disabled={saving}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-                        {formError && (
-                            <div className="error-message">
-                                {formError}
-                            </div>
-                        )}
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="form-grid"
-                        >
-
-                            {/* PRODUCTION ID */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Production ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="productionId"
-                                    value={
-                                        formData.productionId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                    disabled={!!editingId}
-                                />
-
-                                {editingId && (
-                                    <small>
-                                        Production ID cannot
-                                        be changed during update.
-                                    </small>
-                                )}
-
-                            </div>
-
-                            {/* PRODUCT ID */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Product ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="productId"
-                                    value={
-                                        formData.productId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* QUANTITY */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Quantity *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    value={
-                                        formData.quantity
-                                    }
-                                    onChange={handleChange}
-                                    min="0"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* PRODUCTION DATE */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Production Date *
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="productionDate"
-                                    value={
-                                        formData.productionDate
-                                    }
-                                    onChange={handleChange}
-                                    required
-                                />
-
-                            </div>
-
-                            {/* EXPECTED READY DATE */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Expected Ready Date
-                                </label>
-
-                                <input
-                                    type="text"
-                                    value={
-                                        formData.productionDate
-                                            ? (() => {
-                                                const date =
-                                                    new Date(
-                                                        `${formData.productionDate}T00:00:00`
-                                                    );
-
-                                                date.setDate(
-                                                    date.getDate() + 3
-                                                );
-
-                                                return date
-                                                    .toISOString()
-                                                    .split("T")[0];
-                                            })()
-                                            : "-"
-                                    }
-                                    disabled
-                                />
-
-                                <small>
-                                    Calculated automatically
-                                    by the backend as
-                                    Production Date + 3 days.
-                                </small>
-
-                            </div>
-
-                            {/* REMARKS */}
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Remarks
-                                </label>
-
-                                <textarea
-                                    name="remarks"
-                                    value={
-                                        formData.remarks
-                                    }
-                                    onChange={handleChange}
-                                    maxLength={255}
-                                    rows={4}
-                                    placeholder="Enter remarks..."
-                                />
-
-                            </div>
-
-                            {/* FORM ACTIONS */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeFormModal}
-                                    disabled={saving}
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="primary-button"
-                                >
-                                    {saving
-                                        ? "Saving..."
-                                        : editingId
-                                            ? "Update Curing Stock"
-                                            : "Create Curing Stock"}
-                                </button>
-
-                            </div>
-
-                        </form>
-
+                        <input
+                            id="add-curing-product-id"
+                            type="number"
+                            name="productId"
+                            min="1"
+                            value={
+                                addForm.productId
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter product ID"
+                            required
+                        />
                     </div>
 
+                    <div className="fld">
+                        <label htmlFor="add-curing-quantity">
+                            Quantity
+                        </label>
+
+                        <input
+                            id="add-curing-quantity"
+                            type="number"
+                            name="quantity"
+                            min="0"
+                            step="0.01"
+                            value={
+                                addForm.quantity
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter quantity"
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="add-curing-production-date">
+                            Production Date
+                        </label>
+
+                        <input
+                            id="add-curing-production-date"
+                            type="date"
+                            name="productionDate"
+                            value={
+                                addForm.productionDate
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="add-curing-expected-ready-date">
+                            Expected Ready Date
+                        </label>
+
+                        <input
+                            id="add-curing-expected-ready-date"
+                            type="text"
+                            value={
+                                addForm.productionDate
+                                    ? (() => {
+                                          const date =
+                                              new Date(
+                                                  `${addForm.productionDate}T00:00:00`
+                                              );
+
+                                          date.setDate(
+                                              date.getDate() +
+                                                  3
+                                          );
+
+                                          return date
+                                              .toISOString()
+                                              .split(
+                                                  "T"
+                                              )[0];
+                                      })()
+                                    : "-"
+                            }
+                            disabled
+                        />
+
+                        <small>
+                            Calculated automatically
+                            as Production Date + 3
+                            days.
+                        </small>
+                    </div>
+
+                    <div className="fld edit-full">
+                        <label htmlFor="add-curing-remarks">
+                            Remarks
+                        </label>
+
+                        <textarea
+                            id="add-curing-remarks"
+                            name="remarks"
+                            rows="3"
+                            maxLength="255"
+                            value={
+                                addForm.remarks
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter remarks"
+                        />
+                    </div>
                 </div>
+            </FormModal>
 
-            )}
+            {/* ====================================================
+                EDIT CURING STOCK MODAL
+            ==================================================== */}
 
-        </div>
+            <FormModal
+                isOpen={
+                    !!editingStock
+                }
+                onClose={
+                    closeEditModal
+                }
+                title="Edit Curing Stock"
+                subtitle="Update curing stock information"
+                onSubmit={
+                    handleUpdateStock
+                }
+                submitLabel="Update Curing Stock"
+                cancelLabel="Cancel"
+                saving={
+                    editLoading
+                }
+                error={
+                    editError
+                }
+                size="lg"
+            >
+                {editingStock && (
+                    <div className="edit-form-grid">
+                        <div className="fld">
+                            <label htmlFor="edit-curing-stock-id">
+                                Curing Stock ID
+                            </label>
+
+                            <input
+                                id="edit-curing-stock-id"
+                                type="text"
+                                value={
+                                    editingStock.curingStockId
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-production-id">
+                                Production ID
+                            </label>
+
+                            <input
+                                id="edit-curing-production-id"
+                                type="text"
+                                value={
+                                    editingStock.productionId
+                                }
+                                disabled
+                            />
+
+                            <small>
+                                Production ID cannot be
+                                changed during update.
+                            </small>
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-product-id">
+                                Product ID
+                            </label>
+
+                            <input
+                                id="edit-curing-product-id"
+                                type="number"
+                                name="productId"
+                                min="1"
+                                value={
+                                    editForm.productId
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-quantity">
+                                Quantity
+                            </label>
+
+                            <input
+                                id="edit-curing-quantity"
+                                type="number"
+                                name="quantity"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    editForm.quantity
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-production-date">
+                                Production Date
+                            </label>
+
+                            <input
+                                id="edit-curing-production-date"
+                                type="date"
+                                name="productionDate"
+                                value={
+                                    editForm.productionDate
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-expected-ready-date">
+                                Expected Ready Date
+                            </label>
+
+                            <input
+                                id="edit-curing-expected-ready-date"
+                                type="text"
+                                value={
+                                    editForm.productionDate
+                                        ? (() => {
+                                              const date =
+                                                  new Date(
+                                                      `${editForm.productionDate}T00:00:00`
+                                                  );
+
+                                              date.setDate(
+                                                  date.getDate() +
+                                                      3
+                                              );
+
+                                              return date
+                                                  .toISOString()
+                                                  .split(
+                                                      "T"
+                                                  )[0];
+                                          })()
+                                        : "-"
+                                }
+                                disabled
+                            />
+
+                            <small>
+                                Calculated automatically
+                                as Production Date + 3
+                                days.
+                            </small>
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-curing-status">
+                                Status
+                            </label>
+
+                            <input
+                                id="edit-curing-status"
+                                type="text"
+                                value={
+                                    editingStock.status ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld edit-full">
+                            <label htmlFor="edit-curing-remarks">
+                                Remarks
+                            </label>
+
+                            <textarea
+                                id="edit-curing-remarks"
+                                name="remarks"
+                                rows="3"
+                                maxLength="255"
+                                value={
+                                    editForm.remarks
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                placeholder="Enter remarks"
+                            />
+                        </div>
+                    </div>
+                )}
+            </FormModal>
+
+            {/* ====================================================
+                DELETE CONFIRMATION MODAL
+            ==================================================== */}
+
+            <DeleteConfirmModal
+                isOpen={
+                    !!deletingStock
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    handleConfirmDelete
+                }
+                title="Delete Curing Stock"
+                subtitle="Please confirm this action"
+                message="Are you sure you want to delete this curing stock record?"
+                itemName={
+                    deletingStock
+                        ? `Curing Stock ID: ${deletingStock.curingStockId} — ${
+                              deletingStock.productName ||
+                              `Product ${deletingStock.productId}`
+                          }`
+                        : ""
+                }
+                confirming={
+                    deleteLoading
+                }
+                error={
+                    deleteError
+                }
+            />
+        </>
     );
 }
 

@@ -1,70 +1,104 @@
 import { useEffect, useMemo, useState } from "react";
 
+import {
+    apiGet,
+    apiPost,
+    apiPut,
+    apiDelete,
+} from "../../../services/api";
+
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
+
 function Order() {
-    const API_URL = "http://localhost:8080/api/orders";
 
     // ============================================================
     // STATE
     // ============================================================
 
     const [orderList, setOrderList] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const [showViewModal, setShowViewModal] = useState(false);
-    const [showFormModal, setShowFormModal] = useState(false);
+    // ============================================================
+    // VIEW MODAL
+    // ============================================================
 
-    const [editingId, setEditingId] = useState(null);
+    const [selectedOrder, setSelectedOrder] =
+        useState(null);
 
-    const [formData, setFormData] = useState({
+    const [viewLoading, setViewLoading] =
+        useState(false);
+
+    const [viewError, setViewError] =
+        useState("");
+
+
+    // ============================================================
+    // ADD ORDER MODAL
+    // ============================================================
+
+    const [showAddModal, setShowAddModal] =
+        useState(false);
+
+    const [addForm, setAddForm] = useState({
+        customerId: "",
+        orderDate: "",
+        expectedDeliveryDate: "",
+        remarks: "",
+    });
+
+    const [addLoading, setAddLoading] =
+        useState(false);
+
+    const [addError, setAddError] =
+        useState("");
+
+
+    // ============================================================
+    // EDIT ORDER MODAL
+    // ============================================================
+
+    const [editingOrder, setEditingOrder] =
+        useState(null);
+
+    const [editForm, setEditForm] = useState({
         customerId: "",
         orderDate: "",
         expectedDeliveryDate: "",
         orderStatus: "PENDING",
-        remarks: ""
+        remarks: "",
     });
 
-    const [formError, setFormError] = useState("");
-    const [saving, setSaving] = useState(false);
+    const [editLoading, setEditLoading] =
+        useState(false);
+
+    const [editError, setEditError] =
+        useState("");
+
 
     // ============================================================
-    // FETCH ALL ORDERS
+    // DELETE MODAL
     // ============================================================
 
-    const fetchOrders = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    const [deletingOrder, setDeletingOrder] =
+        useState(null);
 
-            const response = await fetch(API_URL);
+    const [deleteLoading, setDeleteLoading] =
+        useState(false);
 
-            const result = await response.json();
+    const [deleteError, setDeleteError] =
+        useState("");
 
-            console.log("Orders API response:", result);
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Failed to fetch orders (${response.status})`
-                );
-            }
-
-            setOrderList(result.data || []);
-        } catch (err) {
-            console.error("Error fetching orders:", err);
-
-            setError(
-                err.message ||
-                "Unable to load orders. Please try again."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // ============================================================
     // INITIAL LOAD
@@ -74,984 +108,1397 @@ function Order() {
         fetchOrders();
     }, []);
 
+
+    // ============================================================
+    // FETCH ALL ORDERS
+    // ============================================================
+
+    const fetchOrders = async () => {
+
+        try {
+
+            setLoading(true);
+            setError("");
+
+            const result = await apiGet("/api/orders");
+
+            console.log(
+                "Orders API response:",
+                result
+            );
+
+            setOrderList(result.data || []);
+
+        } catch (err) {
+
+            console.error(
+                "Error fetching orders:",
+                err
+            );
+
+            setError(
+                err.message ||
+                "Unable to load orders. Please try again."
+            );
+
+        } finally {
+
+            setLoading(false);
+        }
+    };
+
+
     // ============================================================
     // SEARCH
     // ============================================================
 
     const filteredOrders = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+
+        const keyword =
+            searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
             return orderList;
         }
 
         return orderList.filter((order) => {
+
             return (
-                String(order.orderId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
 
-                String(order.customerId || "")
+                String(
+                    order.orderId || ""
+                )
                     .toLowerCase()
-                    .includes(keyword) ||
+                    .includes(keyword)
 
-                String(order.orderDate || "")
+                ||
+
+                String(
+                    order.customerId || ""
+                )
                     .toLowerCase()
-                    .includes(keyword) ||
+                    .includes(keyword)
 
-                String(order.expectedDeliveryDate || "")
+                ||
+
+                String(
+                    order.orderDate || ""
+                )
                     .toLowerCase()
-                    .includes(keyword) ||
+                    .includes(keyword)
 
-                String(order.orderStatus || "")
+                ||
+
+                String(
+                    order.expectedDeliveryDate || ""
+                )
+                    .toLowerCase()
+                    .includes(keyword)
+
+                ||
+
+                String(
+                    order.orderStatus || ""
+                )
                     .toLowerCase()
                     .includes(keyword)
             );
         });
+
     }, [orderList, searchKeyword]);
+
 
     // ============================================================
     // VIEW ORDER
     // ============================================================
 
-    const handleView = async (id) => {
+    const handleView = async (order) => {
+
+        setViewError("");
+        setViewLoading(true);
+        setSelectedOrder(null);
+
         try {
-            setError("");
 
-            const response = await fetch(`${API_URL}/${id}`);
+            const result = await apiGet(
+                `/api/orders/${order.orderId}`
+            );
 
-            const result = await response.json();
-
-            console.log("Order details:", result);
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Failed to fetch order details (${response.status})`
-                );
-            }
+            console.log(
+                "Order details:",
+                result
+            );
 
             setSelectedOrder(result.data);
-            setShowViewModal(true);
-        } catch (err) {
-            console.error("Error fetching order details:", err);
 
-            setError(
+        } catch (err) {
+
+            console.error(
+                "Error fetching order details:",
+                err
+            );
+
+            setViewError(
                 err.message ||
                 "Unable to load order details."
             );
+
+        } finally {
+
+            setViewLoading(false);
         }
     };
 
+
+    const closeViewModal = () => {
+
+        if (viewLoading) {
+            return;
+        }
+
+        setSelectedOrder(null);
+        setViewError("");
+    };
+
+
     // ============================================================
-    // OPEN CREATE FORM
+    // ADD ORDER
     // ============================================================
 
-    const handleAdd = () => {
-        setEditingId(null);
+    const openAddModal = () => {
 
-        setFormData({
+        setAddError("");
+
+        setAddForm({
             customerId: "",
             orderDate: "",
             expectedDeliveryDate: "",
-            orderStatus: "PENDING",
-            remarks: ""
+            remarks: "",
         });
 
-        setFormError("");
-        setShowFormModal(true);
+        setShowAddModal(true);
     };
 
+
+    const closeAddModal = () => {
+
+        if (addLoading) {
+            return;
+        }
+
+        setShowAddModal(false);
+        setAddError("");
+
+        setAddForm({
+            customerId: "",
+            orderDate: "",
+            expectedDeliveryDate: "",
+            remarks: "",
+        });
+    };
+
+
+    const handleAddChange = (event) => {
+
+        const {
+            name,
+            value,
+        } = event.target;
+
+        setAddForm((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
+
+
     // ============================================================
-    // OPEN EDIT FORM
+    // CREATE ORDER
     // ============================================================
 
-    const handleEdit = async (id) => {
+    const handleCreateOrder = async (event) => {
+
+        event.preventDefault();
+
+        setAddError("");
+
+
+        // --------------------------------------------------------
+        // VALIDATION
+        // --------------------------------------------------------
+
+        if (!addForm.customerId) {
+
+            setAddError(
+                "Please enter a customer ID."
+            );
+
+            return;
+        }
+
+        if (!addForm.orderDate) {
+
+            setAddError(
+                "Please enter an order date."
+            );
+
+            return;
+        }
+
+        if (
+            addForm.expectedDeliveryDate &&
+            addForm.expectedDeliveryDate <
+                addForm.orderDate
+        ) {
+
+            setAddError(
+                "Expected delivery date cannot be before order date."
+            );
+
+            return;
+        }
+
+
+        // --------------------------------------------------------
+        // REQUEST BODY
+        // --------------------------------------------------------
+
+        const payload = {
+
+            customerId:
+                Number(addForm.customerId),
+
+            orderDate:
+                addForm.orderDate,
+
+            expectedDeliveryDate:
+                addForm.expectedDeliveryDate || null,
+
+            remarks:
+                addForm.remarks.trim() || null,
+        };
+
+
         try {
-            setFormError("");
-            setError("");
 
-            const response = await fetch(`${API_URL}/${id}`);
+            setAddLoading(true);
 
-            const result = await response.json();
+            console.log(
+                "Creating order with payload:",
+                payload
+            );
 
-            console.log("Order details for edit:", result);
+            const result = await apiPost(
+                "/api/orders",
+                payload
+            );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Failed to fetch order details (${response.status})`
-                );
-            }
+            console.log(
+                "Order created:",
+                result
+            );
 
-            const order = result.data;
+                        setShowAddModal(false);
 
-            setEditingId(id);
-
-            setFormData({
-                customerId: order.customerId ?? "",
-                orderDate: order.orderDate ?? "",
-                expectedDeliveryDate:
-                    order.expectedDeliveryDate ?? "",
-                orderStatus: order.orderStatus ?? "PENDING",
-                remarks: order.remarks ?? ""
+            setAddForm({
+                customerId: "",
+                orderDate: "",
+                expectedDeliveryDate: "",
+                remarks: "",
             });
 
-            setShowFormModal(true);
+            await fetchOrders();
+
         } catch (err) {
+
+            console.error(
+                "Error creating order:",
+                err
+            );
+
+            setAddError(
+                err.message ||
+                "Unable to create order."
+            );
+
+        } finally {
+
+            setAddLoading(false);
+        }
+    };
+
+
+    // ============================================================
+    // EDIT ORDER
+    // ============================================================
+
+    const handleEdit = async (order) => {
+
+        setEditError("");
+        setEditLoading(false);
+
+        try {
+
+            const result = await apiGet(
+                `/api/orders/${order.orderId}`
+            );
+
+            console.log(
+                "Order edit details:",
+                result
+            );
+
+            const orderData =
+                result.data;
+
+            setEditingOrder(
+                orderData
+            );
+
+            setEditForm({
+
+                customerId:
+                    orderData.customerId ?? "",
+
+                orderDate:
+                    orderData.orderDate ?? "",
+
+                expectedDeliveryDate:
+                    orderData.expectedDeliveryDate ?? "",
+
+                orderStatus:
+                    orderData.orderStatus ||
+                    "PENDING",
+
+                remarks:
+                    orderData.remarks || "",
+            });
+
+        } catch (err) {
+
             console.error(
                 "Error loading order for edit:",
                 err
             );
 
-            setError(
+            setEditError(
                 err.message ||
                 "Unable to load the order record for editing."
             );
+
+            setEditingOrder(order);
         }
     };
 
-    // ============================================================
-    // FORM CHANGE
-    // ============================================================
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
+    const closeEditModal = () => {
 
-        setFormData((previous) => ({
+        if (editLoading) {
+            return;
+        }
+
+        setEditingOrder(null);
+        setEditError("");
+
+        setEditForm({
+            customerId: "",
+            orderDate: "",
+            expectedDeliveryDate: "",
+            orderStatus: "PENDING",
+            remarks: "",
+        });
+    };
+
+
+    const handleEditChange = (event) => {
+
+        const {
+            name,
+            value,
+        } = event.target;
+
+        setEditForm((previous) => ({
             ...previous,
-            [name]: value
+            [name]: value,
         }));
     };
 
+
     // ============================================================
-    // CREATE / UPDATE
+    // UPDATE ORDER
     // ============================================================
 
-    const handleSubmit = async (event) => {
+    const handleUpdateOrder = async (event) => {
+
         event.preventDefault();
 
-        setFormError("");
-
-        // --------------------------------------------------------
-        // BASIC FRONTEND VALIDATION
-        // --------------------------------------------------------
-
-        if (!formData.customerId) {
-            setFormError("Customer ID is required.");
+        if (!editingOrder) {
             return;
         }
 
-        if (!formData.orderDate) {
-            setFormError("Order date is required.");
+        setEditError("");
+
+
+        // --------------------------------------------------------
+        // VALIDATION
+        // --------------------------------------------------------
+
+        if (!editForm.customerId) {
+
+            setEditError(
+                "Please enter a customer ID."
+            );
+
+            return;
+        }
+
+        if (!editForm.orderDate) {
+
+            setEditError(
+                "Please enter an order date."
+            );
+
             return;
         }
 
         if (
-            formData.expectedDeliveryDate &&
-            formData.expectedDeliveryDate < formData.orderDate
+            editForm.expectedDeliveryDate &&
+            editForm.expectedDeliveryDate <
+                editForm.orderDate
         ) {
-            setFormError(
+
+            setEditError(
                 "Expected delivery date cannot be before order date."
             );
+
             return;
         }
 
         if (
-            editingId &&
             ![
                 "PENDING",
                 "PARTIAL",
                 "COMPLETED",
-                "CANCELLED"
-            ].includes(formData.orderStatus)
+                "CANCELLED",
+            ].includes(
+                editForm.orderStatus
+            )
         ) {
-            setFormError("Invalid order status.");
+
+            setEditError(
+                "Invalid order status."
+            );
+
             return;
         }
+
 
         // --------------------------------------------------------
         // REQUEST BODY
         // --------------------------------------------------------
-        //
-        // CREATE:
-        // OrderCreateRequest does NOT contain orderStatus.
-        //
-        // UPDATE:
-        // OrderUpdateRequest REQUIRES orderStatus.
-        //
-        // --------------------------------------------------------
 
-        const requestBody = editingId
-            ? {
-                customerId: Number(formData.customerId),
-                orderDate: formData.orderDate,
-                expectedDeliveryDate:
-                    formData.expectedDeliveryDate || null,
-                orderStatus: formData.orderStatus,
-                remarks:
-                    formData.remarks.trim() === ""
-                        ? null
-                        : formData.remarks.trim()
-            }
-            : {
-                customerId: Number(formData.customerId),
-                orderDate: formData.orderDate,
-                expectedDeliveryDate:
-                    formData.expectedDeliveryDate || null,
-                remarks:
-                    formData.remarks.trim() === ""
-                        ? null
-                        : formData.remarks.trim()
-            };
+        const payload = {
+
+            customerId:
+                Number(editForm.customerId),
+
+            orderDate:
+                editForm.orderDate,
+
+            expectedDeliveryDate:
+                editForm.expectedDeliveryDate ||
+                null,
+
+            orderStatus:
+                editForm.orderStatus,
+
+            remarks:
+                editForm.remarks.trim() ||
+                null,
+        };
+
 
         try {
-            setSaving(true);
 
-            const url = editingId
-                ? `${API_URL}/${editingId}`
-                : API_URL;
-
-            const method = editingId
-                ? "PUT"
-                : "POST";
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const result = await response.json();
+            setEditLoading(true);
 
             console.log(
-                "Save Order response:",
+                "Updating order with payload:",
+                payload
+            );
+
+            const result = await apiPut(
+                `/api/orders/${editingOrder.orderId}`,
+                payload
+            );
+
+            console.log(
+                "Order updated:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Request failed (${response.status})`
-                );
-            }
+                        setEditingOrder(null);
 
-            setShowFormModal(false);
-            setEditingId(null);
-
-            setFormData({
+            setEditForm({
                 customerId: "",
                 orderDate: "",
                 expectedDeliveryDate: "",
                 orderStatus: "PENDING",
-                remarks: ""
+                remarks: "",
             });
 
             await fetchOrders();
+
         } catch (err) {
+
             console.error(
-                "Error saving order:",
+                "Error updating order:",
                 err
             );
 
-            setFormError(
+            setEditError(
                 err.message ||
-                "Unable to save order."
+                "Unable to update order."
             );
+
         } finally {
-            setSaving(false);
+
+            setEditLoading(false);
         }
     };
 
+
     // ============================================================
-    // DELETE / SOFT DELETE
+    // DELETE ORDER
     // ============================================================
 
-    const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this order?"
-        );
+    const handleDelete = (order) => {
 
-        if (!confirmed) {
+        setDeleteError("");
+        setDeletingOrder(order);
+    };
+
+
+    const closeDeleteModal = () => {
+
+        if (deleteLoading) {
+            return;
+        }
+
+        setDeletingOrder(null);
+        setDeleteError("");
+    };
+
+
+    const handleConfirmDelete = async () => {
+
+        if (!deletingOrder) {
             return;
         }
 
         try {
-            setError("");
 
-            const response = await fetch(
-                `${API_URL}/${id}`,
-                {
-                    method: "DELETE"
-                }
+            setDeleteLoading(true);
+            setDeleteError("");
+
+            console.log(
+                "Deleting order ID:",
+                deletingOrder.orderId
             );
 
-            const result = await response.json();
+            const result = await apiDelete(
+                `/api/orders/${deletingOrder.orderId}`
+            );
 
             console.log(
                 "Delete Order response:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Delete failed (${response.status})`
-                );
-            }
+                        console.log(
+                "Order deleted:",
+                result
+            );
+
+            setDeletingOrder(null);
 
             await fetchOrders();
+
         } catch (err) {
+
             console.error(
                 "Error deleting order:",
                 err
             );
 
-            setError(
+            setDeleteError(
                 err.message ||
                 "Unable to delete order."
             );
+
+        } finally {
+
+            setDeleteLoading(false);
         }
     };
 
-    // ============================================================
-    // CLOSE VIEW MODAL
-    // ============================================================
-
-    const closeViewModal = () => {
-        setShowViewModal(false);
-        setSelectedOrder(null);
-    };
 
     // ============================================================
-    // CLOSE FORM MODAL
+    // LOADING
     // ============================================================
 
-    const closeFormModal = () => {
-        if (saving) {
-            return;
-        }
+    if (loading) {
 
-        setShowFormModal(false);
-        setEditingId(null);
-        setFormError("");
+        return (
+            <div className="page">
 
-        setFormData({
-            customerId: "",
-            orderDate: "",
-            expectedDeliveryDate: "",
-            orderStatus: "PENDING",
-            remarks: ""
-        });
-    };
+                <section className="card">
+
+                    <h2>
+                        Orders
+                    </h2>
+
+                    <p>
+                        Loading order records...
+                    </p>
+
+                </section>
+
+            </div>
+        );
+    }
+
 
     // ============================================================
-    // RENDER
+    // MAIN UI
     // ============================================================
 
     return (
-        <div className="module-container">
+        <>
+            {/* ====================================================
+                ORDER HEADER
+            ==================================================== */}
 
-            {/* ==================================================
-                HEADER
-            ================================================== */}
+            <section className="card">
 
-            <div className="module-header">
-
-                <h1>Orders</h1>
-
-                <p>
-                    Manage customer orders and order records
-                </p>
-
-            </div>
-
-            {/* ==================================================
-                SEARCH + ADD
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent:
+                            "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
 
                     <div>
 
-                        <h2>Orders</h2>
+                        <h2>
+                            Orders
+                        </h2>
 
                         <p>
                             Manage customer orders
+                            and order records.
                         </p>
 
                     </div>
 
                     <button
                         type="button"
-                        onClick={handleAdd}
-                        className="primary-button"
+                        className="action-btn view-btn"
+                        onClick={
+                            openAddModal
+                        }
                     >
-                        Add Order
+                        + Add Order
                     </button>
 
                 </div>
 
-                <div className="search-section">
 
-                    <label>
+                <div className="fld production-search">
+
+                    <label htmlFor="order-search">
                         Search Orders
                     </label>
 
                     <input
+                        id="order-search"
                         type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
+                        placeholder="Search by order ID, customer ID, status..."
+                        value={
+                            searchKeyword
+                        }
+                        onChange={(
+                            event
+                        ) =>
                             setSearchKeyword(
                                 event.target.value
                             )
                         }
-                        placeholder="Search by order ID, customer ID, status..."
                     />
 
                 </div>
 
-            </div>
+            </section>
 
-            {/* ==================================================
-                ERROR
-            ================================================== */}
 
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
-
-            {/* ==================================================
+            {/* ====================================================
                 ORDER LIST
-            ================================================== */}
+            ==================================================== */}
 
-            <div className="module-card">
+            <section className="card">
 
-                <div className="section-header">
+                <h2>
+                    Order List
+                </h2>
 
-                    <div>
+                <p>
+                    {
+                        filteredOrders.length
+                    }{" "}
+                    order(s)
+                </p>
 
-                        <h2>Order List</h2>
 
+                {error && (
+                    <p className="form-error">
+                        {error}
+                    </p>
+                )}
+
+
+                {!error &&
+                    filteredOrders.length ===
+                        0 && (
                         <p>
-                            {filteredOrders.length} order(s)
+                            No orders found.
                         </p>
+                    )}
+
+
+                {!error &&
+                    filteredOrders.length >
+                        0 && (
+
+                        <div className="table-wrap">
+
+                            <table>
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            ID
+                                        </th>
+
+                                        <th>
+                                            CUSTOMER ID
+                                        </th>
+
+                                        <th>
+                                            ORDER DATE
+                                        </th>
+
+                                        <th>
+                                            EXPECTED DELIVERY
+                                        </th>
+
+                                        <th>
+                                            STATUS
+                                        </th>
+
+                                        <th>
+                                            ACTIONS
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {filteredOrders.map(
+                                        (
+                                            order
+                                        ) => (
+
+                                            <tr
+                                                key={
+                                                    order.orderId
+                                                }
+                                            >
+
+                                                <td>
+                                                    {
+                                                        order.orderId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        order.customerId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        order.orderDate
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        order.expectedDeliveryDate ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        order.orderStatus ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+
+                                                    <div className="table-actions">
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    order
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    order
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    order
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+                                        )
+                                    )}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    )}
+
+            </section>
+
+
+            {/* ====================================================
+                VIEW ORDER MODAL
+            ==================================================== */}
+
+            <ViewModal
+                isOpen={
+                    !!selectedOrder ||
+                    viewLoading ||
+                    !!viewError
+                }
+                onClose={
+                    closeViewModal
+                }
+                title="Order Details"
+                subtitle="View order information"
+                loading={
+                    viewLoading
+                }
+                error={
+                    viewError
+                }
+                size="lg"
+                footer={
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={
+                            closeViewModal
+                        }
+                        disabled={
+                            viewLoading
+                        }
+                    >
+                        Close
+                    </button>
+                }
+            >
+
+                {selectedOrder && (
+
+                    <DetailGrid>
+
+                        <DetailItem
+                            label="Order ID"
+                            value={
+                                selectedOrder.orderId
+                            }
+                        />
+
+                        <DetailItem
+                            label="Customer ID"
+                            value={
+                                selectedOrder.customerId
+                            }
+                        />
+
+                        <DetailItem
+                            label="Order Date"
+                            value={
+                                selectedOrder.orderDate ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Expected Delivery Date"
+                            value={
+                                selectedOrder.expectedDeliveryDate ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Order Status"
+                            value={
+                                selectedOrder.orderStatus ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Created At"
+                            value={
+                                selectedOrder.createdAt
+                                    ? new Date(
+                                          selectedOrder.createdAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Remarks"
+                            value={
+                                selectedOrder.remarks ||
+                                "-"
+                            }
+                            fullWidth
+                        />
+
+                    </DetailGrid>
+                )}
+
+            </ViewModal>
+
+
+            {/* ====================================================
+                ADD ORDER MODAL
+            ==================================================== */}
+
+            <FormModal
+                isOpen={
+                    showAddModal
+                }
+                onClose={
+                    closeAddModal
+                }
+                title="Add Order"
+                subtitle="Create a new customer order"
+                onSubmit={
+                    handleCreateOrder
+                }
+                submitLabel="Add Order"
+                cancelLabel="Cancel"
+                saving={
+                    addLoading
+                }
+                error={
+                    addError
+                }
+                size="lg"
+            >
+
+                <div className="edit-form-grid">
+
+                    <div className="fld">
+
+                        <label htmlFor="add-order-customer-id">
+                            Customer ID
+                        </label>
+
+                        <input
+                            id="add-order-customer-id"
+                            type="number"
+                            name="customerId"
+                            min="1"
+                            value={
+                                addForm.customerId
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter customer ID"
+                            required
+                        />
+
+                    </div>
+
+
+                    <div className="fld">
+
+                        <label htmlFor="add-order-date">
+                            Order Date
+                        </label>
+
+                        <input
+                            id="add-order-date"
+                            type="date"
+                            name="orderDate"
+                            value={
+                                addForm.orderDate
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            required
+                        />
+
+                    </div>
+
+
+                    <div className="fld">
+
+                        <label htmlFor="add-order-expected-delivery">
+                            Expected Delivery Date
+                        </label>
+
+                        <input
+                            id="add-order-expected-delivery"
+                            type="date"
+                            name="expectedDeliveryDate"
+                            value={
+                                addForm.expectedDeliveryDate
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            min={
+                                addForm.orderDate ||
+                                undefined
+                            }
+                        />
+
+                    </div>
+
+
+                    <div className="fld">
+
+                        <label htmlFor="add-order-status">
+                            Order Status
+                        </label>
+
+                        <input
+                            id="add-order-status"
+                            type="text"
+                            value="PENDING"
+                            disabled
+                        />
+
+                        <small>
+                            New orders are automatically
+                            created with PENDING status
+                            by the backend.
+                        </small>
+
+                    </div>
+
+
+                    <div className="fld edit-full">
+
+                        <label htmlFor="add-order-remarks">
+                            Remarks
+                        </label>
+
+                        <textarea
+                            id="add-order-remarks"
+                            name="remarks"
+                            rows="3"
+                            maxLength="255"
+                            value={
+                                addForm.remarks
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter remarks"
+                        />
 
                     </div>
 
                 </div>
 
-                {loading ? (
-                    <p>
-                        Loading orders...
-                    </p>
-                ) : filteredOrders.length === 0 ? (
-                    <p>
-                        No orders found.
-                    </p>
-                ) : (
-                    <div className="table-container">
+            </FormModal>
 
-                        <table className="data-table">
 
-                            <thead>
+            {/* ====================================================
+                EDIT ORDER MODAL
+            ==================================================== */}
 
-                                <tr>
+            <FormModal
+                isOpen={
+                    !!editingOrder
+                }
+                onClose={
+                    closeEditModal
+                }
+                title="Edit Order"
+                subtitle="Update order information"
+                onSubmit={
+                    handleUpdateOrder
+                }
+                submitLabel="Update Order"
+                cancelLabel="Cancel"
+                saving={
+                    editLoading
+                }
+                error={
+                    editError
+                }
+                size="lg"
+            >
 
-                                    <th>ID</th>
+                {editingOrder && (
 
-                                    <th>CUSTOMER ID</th>
+                    <div className="edit-form-grid">
 
-                                    <th>ORDER DATE</th>
+                        <div className="fld">
 
-                                    <th>EXPECTED DELIVERY</th>
+                            <label htmlFor="edit-order-id">
+                                Order ID
+                            </label>
 
-                                    <th>STATUS</th>
+                            <input
+                                id="edit-order-id"
+                                type="text"
+                                value={
+                                    editingOrder.orderId
+                                }
+                                disabled
+                            />
 
-                                    <th>ACTIONS</th>
+                        </div>
 
-                                </tr>
 
-                            </thead>
+                        <div className="fld">
 
-                            <tbody>
+                            <label htmlFor="edit-order-customer-id">
+                                Customer ID
+                            </label>
 
-                                {filteredOrders.map((order) => (
+                            <input
+                                id="edit-order-customer-id"
+                                type="number"
+                                name="customerId"
+                                min="1"
+                                value={
+                                    editForm.customerId
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
 
-                                    <tr
-                                        key={order.orderId}
-                                    >
+                        </div>
 
-                                        <td>
-                                            {order.orderId}
-                                        </td>
 
-                                        <td>
-                                            {order.customerId}
-                                        </td>
+                        <div className="fld">
 
-                                        <td>
-                                            {order.orderDate}
-                                        </td>
+                            <label htmlFor="edit-order-date">
+                                Order Date
+                            </label>
 
-                                        <td>
-                                            {order.expectedDeliveryDate ||
-                                                "-"}
-                                        </td>
+                            <input
+                                id="edit-order-date"
+                                type="date"
+                                name="orderDate"
+                                value={
+                                    editForm.orderDate
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
 
-                                        <td>
-                                            <strong>
-                                                {order.orderStatus}
-                                            </strong>
-                                        </td>
+                        </div>
 
-                                        <td>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleView(
-                                                        order.orderId
-                                                    )
-                                                }
-                                            >
-                                                View
-                                            </button>
+                        <div className="fld">
 
-                                            {" "}
+                            <label htmlFor="edit-order-expected-delivery">
+                                Expected Delivery Date
+                            </label>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        order.orderId
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
+                            <input
+                                id="edit-order-expected-delivery"
+                                type="date"
+                                name="expectedDeliveryDate"
+                                value={
+                                    editForm.expectedDeliveryDate
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                min={
+                                    editForm.orderDate ||
+                                    undefined
+                                }
+                            />
 
-                                            {" "}
+                        </div>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        order.orderId
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
 
-                                        </td>
+                        <div className="fld">
 
-                                    </tr>
+                            <label htmlFor="edit-order-status">
+                                Order Status
+                            </label>
 
-                                ))}
+                            <select
+                                id="edit-order-status"
+                                name="orderStatus"
+                                value={
+                                    editForm.orderStatus
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            >
 
-                            </tbody>
+                                <option value="PENDING">
+                                    PENDING
+                                </option>
 
-                        </table>
+                                <option value="PARTIAL">
+                                    PARTIAL
+                                </option>
+
+                                <option value="COMPLETED">
+                                    COMPLETED
+                                </option>
+
+                                <option value="CANCELLED">
+                                    CANCELLED
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div className="fld edit-full">
+
+                            <label htmlFor="edit-order-remarks">
+                                Remarks
+                            </label>
+
+                            <textarea
+                                id="edit-order-remarks"
+                                name="remarks"
+                                rows="3"
+                                maxLength="255"
+                                value={
+                                    editForm.remarks
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                placeholder="Enter remarks"
+                            />
+
+                        </div>
 
                     </div>
                 )}
 
-            </div>
-
-            {/* ==================================================
-                VIEW ORDER MODAL
-            ================================================== */}
-
-            {showViewModal && selectedOrder && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-                                Order Details
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-                        <div className="details-grid">
-
-                            <div>
-
-                                <strong>
-                                    Order ID
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.orderId}
-                                </span>
-
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Customer ID
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.customerId}
-                                </span>
-
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Order Date
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.orderDate}
-                                </span>
-
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Expected Delivery Date
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedOrder.expectedDeliveryDate ||
-                                        "-"
-                                    }
-                                </span>
-
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Order Status
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.orderStatus}
-                                </span>
-
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    Created At
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.createdAt
-                                        ? new Date(
-                                            selectedOrder.createdAt
-                                        ).toLocaleString()
-                                        : "-"}
-                                </span>
-
-                            </div>
-
-                            <div className="full-width">
-
-                                <strong>
-                                    Remarks
-                                </strong>
-
-                                <span>
-                                    {selectedOrder.remarks ||
-                                        "-"}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div className="modal-actions">
-
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            )}
-
-            {/* ==================================================
-                CREATE / UPDATE MODAL
-            ================================================== */}
-
-            {showFormModal && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-
-                                {editingId
-                                    ? "Update Order"
-                                    : "Add Order"}
-
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeFormModal}
-                                disabled={saving}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-                        {formError && (
-                            <div className="error-message">
-                                {formError}
-                            </div>
-                        )}
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="form-grid"
-                        >
-
-                            {/* ==================================
-                                CUSTOMER ID
-                            ================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Customer ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="customerId"
-                                    value={
-                                        formData.customerId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* ==================================
-                                ORDER DATE
-                            ================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Order Date *
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="orderDate"
-                                    value={
-                                        formData.orderDate
-                                    }
-                                    onChange={handleChange}
-                                    required
-                                />
-
-                                <small>
-                                    Leave unchanged during
-                                    update unless required.
-                                </small>
-
-                            </div>
-
-                            {/* ==================================
-                                EXPECTED DELIVERY DATE
-                            ================================== */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Expected Delivery Date
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="expectedDeliveryDate"
-                                    value={
-                                        formData.expectedDeliveryDate
-                                    }
-                                    onChange={handleChange}
-                                    min={
-                                        formData.orderDate ||
-                                        undefined
-                                    }
-                                />
-
-                            </div>
-
-                            {/* ==================================
-                                ORDER STATUS
-                            ================================== */}
-
-                            {editingId && (
-
-                                <div className="form-group">
-
-                                    <label>
-                                        Order Status *
-                                    </label>
-
-                                    <select
-                                        name="orderStatus"
-                                        value={
-                                            formData.orderStatus
-                                        }
-                                        onChange={handleChange}
-                                        required
-                                    >
-
-                                        <option value="PENDING">
-                                            PENDING
-                                        </option>
-
-                                        <option value="PARTIAL">
-                                            PARTIAL
-                                        </option>
-
-                                        <option value="COMPLETED">
-                                            COMPLETED
-                                        </option>
-
-                                        <option value="CANCELLED">
-                                            CANCELLED
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                            )}
-
-                            {/* ==================================
-                                CREATE STATUS INFORMATION
-                            ================================== */}
-
-                            {!editingId && (
-
-                                <div className="form-group">
-
-                                    <label>
-                                        Order Status
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value="PENDING"
-                                        disabled
-                                    />
-
-                                    <small>
-                                        New orders are automatically
-                                        created with PENDING status
-                                        by the backend.
-                                    </small>
-
-                                </div>
-
-                            )}
-
-                            {/* ==================================
-                                REMARKS
-                            ================================== */}
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Remarks
-                                </label>
-
-                                <textarea
-                                    name="remarks"
-                                    value={
-                                        formData.remarks
-                                    }
-                                    onChange={handleChange}
-                                    maxLength={255}
-                                    rows={4}
-                                    placeholder="Enter remarks..."
-                                />
-
-                            </div>
-
-                            {/* ==================================
-                                FORM ACTIONS
-                            ================================== */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeFormModal}
-                                    disabled={saving}
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="primary-button"
-                                >
-
-                                    {saving
-                                        ? "Saving..."
-                                        : editingId
-                                            ? "Update Order"
-                                            : "Create Order"}
-
-                                </button>
-
-                            </div>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-            )}
-
-        </div>
+            </FormModal>
+
+
+            {/* ====================================================
+                DELETE CONFIRMATION MODAL
+            ==================================================== */}
+
+            <DeleteConfirmModal
+                isOpen={
+                    !!deletingOrder
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    handleConfirmDelete
+                }
+                title="Delete Order"
+                subtitle="Please confirm this action"
+                message="Are you sure you want to delete this order?"
+                itemName={
+                    deletingOrder
+                        ? `Order ID: ${deletingOrder.orderId} — Customer ID: ${deletingOrder.customerId}`
+                        : ""
+                }
+                confirming={
+                    deleteLoading
+                }
+                error={
+                    deleteError
+                }
+            />
+
+        </>
     );
 }
 

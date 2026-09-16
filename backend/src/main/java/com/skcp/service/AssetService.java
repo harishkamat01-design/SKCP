@@ -5,6 +5,7 @@ import com.skcp.dto.request.asset.AssetUpdateRequest;
 import com.skcp.dto.response.asset.AssetResponse;
 import com.skcp.dto.response.asset.AssetSummaryResponse;
 import com.skcp.entity.Asset;
+import com.skcp.exception.DuplicateResourceException;
 import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.mapper.AssetMapper;
 import com.skcp.repository.AssetRepository;
@@ -16,7 +17,6 @@ import java.util.List;
 @Service
 public class AssetService
 {
-
     // ============================================================
     // DEPENDENCY
     // ============================================================
@@ -68,10 +68,10 @@ public class AssetService
     // CREATE ASSET
     // ============================================================
 
-        public AssetResponse createAsset(
-                AssetCreateRequest request
-        )
-        {
+    public AssetResponse createAsset(
+            AssetCreateRequest request
+    )
+    {
         Asset asset = AssetMapper.toEntity(request);
 
         // Backend-controlled field
@@ -80,7 +80,7 @@ public class AssetService
         Asset savedAsset = assetRepository.save(asset);
 
         return AssetMapper.toResponse(savedAsset);
-}
+    }
 
 
     // ============================================================
@@ -105,8 +105,7 @@ public class AssetService
         );
 
         /*
-         * Notice that AssetMapper.updateEntity()
-         * does NOT update:
+         * AssetMapper.updateEntity() does NOT update:
          *
          * - assetId
          * - status
@@ -136,59 +135,26 @@ public class AssetService
                 );
 
         /*
+         * Prevent repeated soft deletion.
+         *
+         * If the asset is already inactive,
+         * return a duplicate/conflict response.
+         */
+        if ("INACTIVE".equals(asset.getStatus()))
+        {
+            throw new DuplicateResourceException(
+                    "Asset is already inactive with id: " + id
+            );
+        }
+
+        /*
          * Do NOT physically delete the asset.
          *
          * Assets are business records that may be useful
          * for historical maintenance and operational analysis.
          */
-
         asset.setStatus("INACTIVE");
 
         assetRepository.save(asset);
     }
 }
-
-
-
-
-/*
-package com.skcp.service;
-
-import com.skcp.entity.Asset;
-import com.skcp.repository.AssetRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class AssetService {
-
-    // Dependency Injection
-    private final AssetRepository assetRepository;
-
-    // Constructor Injection
-    public AssetService(AssetRepository assetRepository) {
-        this.assetRepository = assetRepository;
-    }
-
-    // Get all assets
-    public List<Asset> getAllAssets() {
-        return assetRepository.findAll();
-    }
-
-    // Save asset
-    public Asset saveAsset(Asset asset) {
-        return assetRepository.save(asset);
-    }
-
-    // Find asset by ID
-    public Asset getAssetById(Integer id) {
-        return assetRepository.findById(id).orElse(null);
-    }
-
-    // Delete asset
-    public void deleteAsset(Integer id) {
-        assetRepository.deleteById(id);
-    }
-}
-*/

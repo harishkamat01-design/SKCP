@@ -144,7 +144,9 @@ CREATE TABLE raw_material
 
     material_category VARCHAR(50) NOT NULL,
 
-    description TEXT,
+    description VARCHAR(255),
+
+    unit VARCHAR(20) NOT NULL,
 
     status VARCHAR(10)
         NOT NULL
@@ -218,7 +220,7 @@ CREATE TABLE asset
     status VARCHAR(20)
         NOT NULL
         DEFAULT 'ACTIVE'
-        CHECK (status IN ('ACTIVE', 'MAINTENANCE', 'OUT_OF_SERVICE')),
+        CHECK (status IN ('ACTIVE', 'MAINTENANCE', 'OUT_OF_SERVICE','INACTIVE')),
 
     last_maintenance_date DATE,
 
@@ -536,7 +538,11 @@ CREATE TABLE finished_goods_stock
 
     record_status VARCHAR(20)
         NOT NULL
-        DEFAULT 'ACTIVE',
+        DEFAULT 'ACTIVE'
+        CHECK (
+            record_status IN
+            ('ACTIVE', 'INACTIVE')
+        ),
 
     CONSTRAINT fk_finished_goods_stock_product
         FOREIGN KEY (product_id)

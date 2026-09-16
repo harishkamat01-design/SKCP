@@ -1,217 +1,336 @@
 import { useEffect, useState } from "react";
+import { apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
+
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import { DetailGrid, DetailItem } from "../../ui/common/DetailGrid";
+
+const initialForm = {
+  customerName: "",
+  mobileNumber: "",
+  alternateMobile: "",
+  address: "",
+  village: "",
+  city: "",
+  pincode: "",
+  gstNumber: "",
+  remarks: "",
+};
 
 function Customer() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [customers, setCustomers] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // View Modal state
+  // ---------------------------------------------------------------------------
+  // VIEW
+  // ---------------------------------------------------------------------------
+
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [viewLoading, setViewLoading] = useState(false);
   const [viewError, setViewError] = useState("");
 
-  // Edit Modal state
+  // ---------------------------------------------------------------------------
+  // ADD
+  // ---------------------------------------------------------------------------
+
+  const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
+  const [addForm, setAddForm] = useState(initialForm);
+  const [addSaving, setAddSaving] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [addSuccess, setAddSuccess] = useState("");
+
+  // ---------------------------------------------------------------------------
+  // EDIT
+  // ---------------------------------------------------------------------------
+
   const [editingCustomer, setEditingCustomer] = useState(null);
+  const [editForm, setEditForm] = useState(initialForm);
   const [editLoading, setEditLoading] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
 
-  // Edit form state
-  const [editForm, setEditForm] = useState({
-    customerName: "",
-    mobileNumber: "",
-    alternateMobile: "",
-    address: "",
-    village: "",
-    city: "",
-    pincode: "",
-    gstNumber: "",
-    remarks: "",
-  });
+  // ---------------------------------------------------------------------------
+  // DELETE
+  // ---------------------------------------------------------------------------
 
-  // Add Customer Modal state
-  const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
-  const [addSaving, setAddSaving] = useState(false);
-  const [addError, setAddError] = useState("");
-  const [addSuccess, setAddSuccess] = useState("");
-
-  // Delete Customer state
-  const [deletingCustomerId, setDeletingCustomerId] = useState(null);
+  const [deletingCustomer, setDeletingCustomer] = useState(null);
+  const [deleteSaving, setDeleteSaving] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  // Add Customer form state
-  const [addForm, setAddForm] = useState({
-    customerName: "",
-    mobileNumber: "",
-    alternateMobile: "",
-    address: "",
-    village: "",
-    city: "",
-    pincode: "",
-    gstNumber: "",
-    remarks: "",
-  });
+  // ---------------------------------------------------------------------------
+  // INITIAL LOAD
+  // ---------------------------------------------------------------------------
 
-  // =========================================================
-  // FETCH CUSTOMERS
-  // =========================================================
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // GET ALL CUSTOMERS
+  // ---------------------------------------------------------------------------
 
   const fetchCustomers = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:8080/api/customers");
+      const result = await apiGet("/api/customers");
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch customers (${response.status})`);
-      }
-
-      const result = await response.json();
-
-      console.log("Customer API response:", result);
-      console.log("Customer API data:", result.data);
-
-      setCustomers(result.data || []);
+      setCustomers(result?.data || []);
     } catch (err) {
       console.error("Error fetching customers:", err);
-      setError("Unable to load customers. Please try again.");
+      setError(err.message || "Failed to load customers.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  // =========================================================
-  // SEARCH / FILTER
-  // =========================================================
+  // ---------------------------------------------------------------------------
+  // SEARCH
+  // ---------------------------------------------------------------------------
 
   const filteredCustomers = customers.filter((customer) => {
-    const keyword = searchKeyword.toLowerCase();
+    const keyword = searchKeyword.trim().toLowerCase();
 
-    const customerName = customer.customerName?.toLowerCase() || "";
-
-    const mobileNumber = customer.mobileNumber?.toString() || "";
+    if (!keyword) {
+      return true;
+    }
 
     return (
-      customerName.includes(keyword) || mobileNumber.includes(searchKeyword)
+      String(customer.customerName || "")
+        .toLowerCase()
+        .includes(keyword) ||
+      String(customer.mobileNumber || "")
+        .toLowerCase()
+        .includes(keyword)
     );
   });
 
-  // =========================================================
+  // ---------------------------------------------------------------------------
+  // FORM HELPERS
+  // ---------------------------------------------------------------------------
+
+  const handleAddFormChange = (event) => {
+    const { name, value } = event.target;
+
+    setAddForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handleEditFormChange = (event) => {
+    const { name, value } = event.target;
+
+    setEditForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const resetAddForm = () => {
+    setAddForm(initialForm);
+    setAddError("");
+    setAddSuccess("");
+  };
+
+  const resetEditForm = () => {
+    setEditForm(initialForm);
+    setEditError("");
+    setEditSuccess("");
+  };
+
+  // ---------------------------------------------------------------------------
+  // VALIDATION
+  // ---------------------------------------------------------------------------
+
+  const validateCustomerForm = (form) => {
+    if (!form.customerName.trim()) {
+      return "Customer name is required.";
+    }
+
+    if (!form.mobileNumber.trim()) {
+      return "Mobile number is required.";
+    }
+
+    return "";
+  };
+
+  const buildCustomerPayload = (form) => ({
+    customerName: form.customerName.trim(),
+    mobileNumber: form.mobileNumber.trim(),
+    alternateMobile: form.alternateMobile.trim() || null,
+    address: form.address.trim() || null,
+    village: form.village.trim() || null,
+    city: form.city.trim() || null,
+    pincode: form.pincode.trim() || null,
+    gstNumber: form.gstNumber.trim() || null,
+    remarks: form.remarks.trim() || null,
+  });
+
+  // ---------------------------------------------------------------------------
   // VIEW CUSTOMER
-  // =========================================================
+  // ---------------------------------------------------------------------------
 
-  const handleViewCustomer = async (customerId) => {
+  const handleViewCustomer = async (customer) => {
+    setSelectedCustomer(null);
+    setViewError("");
+    setViewLoading(true);
+
     try {
-      setViewLoading(true);
-      setViewError("");
-      setSelectedCustomer(null);
-
-      const response = await fetch(
-        `http://localhost:8080/api/customers/${customerId}`,
+      const result = await apiGet(
+        `/api/customers/${customer.customerId}`
       );
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch customer (${response.status})`);
-      }
-
-      const result = await response.json();
-
-      console.log("Customer View API response:", result);
-      console.log("Customer View API data:", result.data);
-
-      setSelectedCustomer(result.data);
+      setSelectedCustomer(result?.data || null);
     } catch (err) {
       console.error("Error fetching customer details:", err);
-      setViewError("Unable to load customer details. Please try again.");
+      setViewError(err.message || "Failed to load customer details.");
     } finally {
       setViewLoading(false);
     }
   };
 
-  const handleCloseCustomerModal = () => {
+  const closeViewModal = () => {
+    if (viewLoading) {
+      return;
+    }
+
     setSelectedCustomer(null);
     setViewError("");
-    setViewLoading(false);
   };
 
-  // =========================================================
-  // EDIT CUSTOMER
-  // =========================================================
+  // ---------------------------------------------------------------------------
+  // OPEN ADD
+  // ---------------------------------------------------------------------------
 
-  const handleEditCustomer = async (customerId) => {
+  const openAddCustomerModal = () => {
+    resetAddForm();
+    setShowAddCustomerModal(true);
+  };
+
+  const closeAddCustomerModal = () => {
+    if (addSaving) {
+      return;
+    }
+
+    setShowAddCustomerModal(false);
+    resetAddForm();
+  };
+
+  // ---------------------------------------------------------------------------
+  // CREATE CUSTOMER
+  // ---------------------------------------------------------------------------
+
+  const handleCreateCustomer = async (event) => {
+    event.preventDefault();
+
+    const validationError = validateCustomerForm(addForm);
+
+    if (validationError) {
+      setAddError(validationError);
+      return;
+    }
+
     try {
-      setEditLoading(true);
-      setEditError("");
-      setEditSuccess("");
-      setEditingCustomer(null);
+      setAddSaving(true);
+      setAddError("");
+      setAddSuccess("");
 
-      const response = await fetch(
-        `http://localhost:8080/api/customers/${customerId}`,
+      const payload = buildCustomerPayload(addForm);
+
+      const result = await apiPost("/api/customers", payload);
+
+      setAddSuccess(
+        result?.message || "Customer created successfully."
       );
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch customer (${response.status})`);
+      await fetchCustomers();
+
+      setTimeout(() => {
+        setShowAddCustomerModal(false);
+        resetAddForm();
+      }, 700);
+    } catch (err) {
+      console.error("Error creating customer:", err);
+      setAddError(err.message || "Failed to create customer.");
+    } finally {
+      setAddSaving(false);
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // OPEN EDIT
+  // ---------------------------------------------------------------------------
+
+  const handleEditCustomer = async (customer) => {
+    setEditingCustomer(customer);
+    setEditLoading(true);
+    setEditError("");
+    setEditSuccess("");
+
+    try {
+      const result = await apiGet(
+        `/api/customers/${customer.customerId}`
+      );
+
+      const data = result?.data;
+
+      if (!data) {
+        throw new Error("Customer details were not found.");
       }
 
-      const result = await response.json();
-      const customer = result.data;
-
-      console.log("Customer Edit API response:", result);
-      console.log("Customer Edit API data:", customer);
-
-      setEditingCustomer(customer);
+      setEditingCustomer(data);
 
       setEditForm({
-        customerName: customer.customerName || "",
-        mobileNumber: customer.mobileNumber || "",
-        alternateMobile: customer.alternateMobile || "",
-        address: customer.address || "",
-        village: customer.village || "",
-        city: customer.city || "",
-        pincode: customer.pincode || "",
-        gstNumber: customer.gstNumber || "",
-        remarks: customer.remarks || "",
+        customerName: data.customerName || "",
+        mobileNumber: data.mobileNumber || "",
+        alternateMobile: data.alternateMobile || "",
+        address: data.address || "",
+        village: data.village || "",
+        city: data.city || "",
+        pincode: data.pincode || "",
+        gstNumber: data.gstNumber || "",
+        remarks: data.remarks || "",
       });
     } catch (err) {
-      console.error("Error loading customer for edit:", err);
-      setEditError("Unable to load customer details. Please try again.");
+      console.error("Error fetching customer for edit:", err);
+      setEditError(err.message || "Failed to load customer details.");
     } finally {
       setEditLoading(false);
     }
   };
 
-  const handleEditChange = (event) => {
-    const { name, value } = event.target;
+  const closeEditCustomerModal = () => {
+    if (editSaving) {
+      return;
+    }
 
-    setEditForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
-
-  const handleCloseEditModal = () => {
     setEditingCustomer(null);
-    setEditError("");
-    setEditSuccess("");
-    setEditLoading(false);
-    setEditSaving(false);
+    resetEditForm();
   };
 
-  // =========================================================
+  // ---------------------------------------------------------------------------
   // UPDATE CUSTOMER
-  // =========================================================
+  // ---------------------------------------------------------------------------
 
   const handleUpdateCustomer = async (event) => {
     event.preventDefault();
 
+    const validationError = validateCustomerForm(editForm);
+
+    if (validationError) {
+      setEditError(validationError);
+      return;
+    }
+
     if (!editingCustomer?.customerId) {
+      setEditError("Customer ID is missing.");
       return;
     }
 
@@ -220,992 +339,749 @@ function Customer() {
       setEditError("");
       setEditSuccess("");
 
-      const response = await fetch(
-        `http://localhost:8080/api/customers/${editingCustomer.customerId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editForm),
-        },
+      const payload = buildCustomerPayload(editForm);
+
+      const result = await apiPut(
+        `/api/customers/${editingCustomer.customerId}`,
+        payload
       );
 
-      const result = await response.json();
+      setEditSuccess(
+        result?.message || "Customer updated successfully."
+      );
 
-      console.log("Customer Update API response:", result);
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || `Failed to update customer (${response.status})`,
-        );
-      }
-
-      setEditSuccess("Customer updated successfully.");
-
-      // Refresh customer list after successful update
       await fetchCustomers();
 
-      // Close edit modal shortly after success
       setTimeout(() => {
-        handleCloseEditModal();
+        setEditingCustomer(null);
+        resetEditForm();
       }, 700);
     } catch (err) {
       console.error("Error updating customer:", err);
-
-      setEditError(
-        err.message || "Unable to update customer. Please try again.",
-      );
+      setEditError(err.message || "Failed to update customer.");
     } finally {
       setEditSaving(false);
     }
   };
 
-  // =========================================================
-  // ADD CUSTOMER
-  // =========================================================
+  // ---------------------------------------------------------------------------
+  // DELETE CUSTOMER
+  // ---------------------------------------------------------------------------
 
-  const handleOpenAddCustomerModal = () => {
-    setAddError("");
-    setAddSuccess("");
-
-    setAddForm({
-      customerName: "",
-      mobileNumber: "",
-      alternateMobile: "",
-      address: "",
-      village: "",
-      city: "",
-      pincode: "",
-      gstNumber: "",
-      remarks: "",
-    });
-
-    setShowAddCustomerModal(true);
+  const handleDeleteCustomer = (customer) => {
+    setDeletingCustomer(customer);
+    setDeleteError("");
   };
 
-  const handleCloseAddCustomerModal = () => {
-    if (addSaving) {
+  const closeDeleteCustomerModal = () => {
+    if (deleteSaving) {
       return;
     }
 
-    setShowAddCustomerModal(false);
-    setAddError("");
-    setAddSuccess("");
+    setDeletingCustomer(null);
+    setDeleteError("");
   };
 
-  const handleAddChange = (event) => {
-    const { name, value } = event.target;
-
-    setAddForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
-
-  const handleCreateCustomer = async (event) => {
-    event.preventDefault();
+  const confirmDeleteCustomer = async () => {
+    if (!deletingCustomer?.customerId) {
+      setDeleteError("Customer ID is missing.");
+      return;
+    }
 
     try {
-      setAddSaving(true);
-      setAddError("");
-      setAddSuccess("");
+      setDeleteSaving(true);
+      setDeleteError("");
 
-      const response = await fetch("http://localhost:8080/api/customers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(addForm),
-      });
-
-      const result = await response.json();
-
-      console.log("Customer Create API response:", result);
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || `Failed to create customer (${response.status})`,
-        );
-      }
-
-      setAddSuccess("Customer created successfully.");
+      await apiDelete(
+        `/api/customers/${deletingCustomer.customerId}`
+      );
 
       await fetchCustomers();
 
-      setTimeout(() => {
-        setShowAddCustomerModal(false);
-        setAddSuccess("");
-      }, 700);
+      setDeletingCustomer(null);
     } catch (err) {
-      console.error("Error creating customer:", err);
-
-      setAddError(
-        err.message || "Unable to create customer. Please try again.",
-      );
+      console.error("Error deleting customer:", err);
+      setDeleteError(err.message || "Failed to delete customer.");
     } finally {
-      setAddSaving(false);
+      setDeleteSaving(false);
     }
   };
 
-    // =========================================================
-    // DELETE CUSTOMER
-    // =========================================================
+  // ---------------------------------------------------------------------------
+  // DISPLAY HELPERS
+  // ---------------------------------------------------------------------------
 
-    const handleDeleteCustomer = async (customerId, customerName) => {
-      const confirmed = window.confirm(
-        `Are you sure you want to delete customer "${customerName}"?`,
-      );
-
-      if (!confirmed) {
-        return;
-      }
-
-      try {
-        setDeletingCustomerId(customerId);
-        setDeleteError("");
-
-        const response = await fetch(
-          `http://localhost:8080/api/customers/${customerId}`,
-          {
-            method: "DELETE",
-          },
-        );
-
-        const result = await response.json();
-
-        console.log("Customer Delete API response:", result);
-
-        if (!response.ok) {
-          throw new Error(
-            result.message || `Failed to delete customer (${response.status})`,
-          );
-        }
-
-        // Remove deleted customer immediately from the frontend list
-        setCustomers((previousCustomers) =>
-          previousCustomers.filter(
-            (customer) => customer.customerId !== customerId,
-          ),
-        );
-      } catch (err) {
-        console.error("Error deleting customer:", err);
-
-        setDeleteError(
-          err.message || "Unable to delete customer. Please try again.",
-        );
-      } finally {
-        setDeletingCustomerId(null);
-      }
-    };
-
-
-  // =========================================================
-  // DATE FORMATTER
-  // =========================================================
-
-  const formatCreatedAt = (createdAt) => {
-    if (!createdAt) {
-      return "-";
+  const formatCreatedAt = (value) => {
+    if (!value) {
+      return "—";
     }
 
-    const date = new Date(createdAt);
+    const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return createdAt;
+      return value;
     }
 
     return date.toLocaleString();
   };
 
+  const getStatusLabel = (customer) => {
+    const status = String(customer?.status || "").toUpperCase();
+
+    return status || "—";
+  };
+
+  const getStatusClass = (customer) => {
+    const status = String(customer?.status || "").toUpperCase();
+
+    return status === "ACTIVE" ? "bg" : "br";
+  };
+
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+
   return (
     <section className="section active">
-      {/* =====================================================
-                PAGE HEADER
-        ===================================================== */}
-        <div className="card">
-        <div className="card-head customer-page-header">
-            <div>
-            <div className="card-title">Customers</div>
+      {/* ================================================================== */}
+      {/* PAGE HEADER */}
+      {/* ================================================================== */}
 
-            <div className="kpi-sub">
-                Manage customer information and records
-            </div>
-            </div>
-
-            <button
-            type="button"
-            className="btn primary"
-            onClick={handleOpenAddCustomerModal}
-            >
-            + Add Customer
-            </button>
+      <div className="card-head customer-page-header">
+        <div>
+          <h2>Customers</h2>
+          <p>Manage customer information and records.</p>
         </div>
 
-        <div className="fld customer-search">
-            <label htmlFor="customer-search">Search Customer</label>
+        <button
+          type="button"
+          className="btn primary"
+          onClick={openAddCustomerModal}
+        >
+          + Add Customer
+        </button>
+      </div>
 
-            <input
-            id="customer-search"
-            type="text"
-            placeholder="Search by name or mobile number..."
-            value={searchKeyword}
-            onChange={(event) => setSearchKeyword(event.target.value)}
-            />
-        </div>
-        </div>
+      {/* ================================================================== */}
+      {/* SEARCH */}
+      {/* ================================================================== */}
 
-      {/* =====================================================
-                CUSTOMER TABLE
-         ===================================================== */}
+      <div className="fld customer-search">
+        <label htmlFor="customer-search">
+          Search Customers
+        </label>
+
+        <input
+          id="customer-search"
+          type="text"
+          value={searchKeyword}
+          onChange={(event) => setSearchKeyword(event.target.value)}
+          placeholder="Search by customer name or mobile..."
+        />
+      </div>
+
+      {/* ================================================================== */}
+      {/* CUSTOMER LIST */}
+      {/* ================================================================== */}
 
       <div className="card">
         <div className="card-head">
           <div>
-            <div className="card-title">Customer List</div>
-
-            <div className="kpi-sub">
-              {loading
-                ? "Loading customers..."
-                : `${filteredCustomers.length} customer(s)`}
-            </div>
+            <h3>Customer List</h3>
+            <p>
+              {filteredCustomers.length} customer
+              {filteredCustomers.length === 1 ? "" : "s"}
+            </p>
           </div>
         </div>
-          {deleteError && (
-            <div className="alert e show">
-              {deleteError}
-            </div>
-          )}
-        {/* Loading */}
+
         {loading && (
           <div className="empty-state">
             <p>Loading customers...</p>
           </div>
         )}
 
-        {/* Error */}
         {!loading && error && (
-          <div className="empty-state">
-            <p>{error}</p>
+          <div className="alert e show">
+            {error}
           </div>
         )}
 
-        {/* Table */}
-        {!loading && !error && (
-          <div className="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Customer</th>
-                  <th>Mobile</th>
-                  <th>Village</th>
-                  <th>City</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.customerId}>
-                    <td>{customer.customerId}</td>
-
-                    <td>
-                      <strong>{customer.customerName}</strong>
-                    </td>
-
-                    <td>{customer.mobileNumber}</td>
-
-                    <td className="mu">{customer.village || "-"}</td>
-
-                    <td className="mu">{customer.city || "-"}</td>
-
-                    <td>
-                      <span
-                        className={
-                          customer.status === "ACTIVE" ? "badge bg" : "badge br"
-                        }
-                      >
-                        {customer.status}
-                      </span>
-                    </td>
-
-                    <td>
-                     <div className="customer-action-buttons">
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleViewCustomer(customer.customerId)
-                          }
-                        >
-                          View
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn sm customer-edit-btn"
-                          onClick={() =>
-                            handleEditCustomer(customer.customerId)
-                          }
-                          disabled={deletingCustomerId === customer.customerId}
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn sm customer-delete-btn"
-                          onClick={() =>
-                            handleDeleteCustomer(
-                              customer.customerId,
-                              customer.customerName,
-                            )
-                          }
-                          disabled={deletingCustomerId === customer.customerId}
-                        >
-                          {deletingCustomerId === customer.customerId
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && !error && filteredCustomers.length === 0 && (
-          <div className="empty-state">
-            <p>No customers found.</p>
-          </div>
-        )}
-      </div>
-
-      {/* =====================================================
-                CUSTOMER VIEW MODAL
-                ===================================================== */}
-
-      {(viewLoading || viewError || selectedCustomer) && (
-        <div
-          className="customer-modal-overlay"
-          onClick={handleCloseCustomerModal}
-        >
-          <div
-            className="customer-modal"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="customer-modal-header">
-              <div>
-                <div className="customer-modal-title">Customer Details</div>
-
-                <div className="customer-modal-subtitle">
-                  View customer information
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="customer-modal-close"
-                onClick={handleCloseCustomerModal}
-                aria-label="Close"
-              >
-                ×
-              </button>
+        {!loading &&
+          !error &&
+          filteredCustomers.length === 0 && (
+            <div className="empty-state">
+              <p>
+                {searchKeyword
+                  ? "No customers match your search."
+                  : "No customers found."}
+              </p>
             </div>
+          )}
 
-            <div className="customer-modal-body">
-              {viewLoading && (
-                <div className="empty-state">
-                  <p>Loading customer details...</p>
-                </div>
-              )}
+        {!loading &&
+          !error &&
+          filteredCustomers.length > 0 && (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Mobile</th>
+                    <th>Village</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-              {!viewLoading && viewError && (
-                <div className="empty-state">
-                  <p>{viewError}</p>
-                </div>
-              )}
+                <tbody>
+                  {filteredCustomers.map((customer) => (
+                    <tr key={customer.customerId}>
+                      <td>{customer.customerId}</td>
 
-              {!viewLoading && !viewError && selectedCustomer && (
-                <>
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Basic Information
-                    </div>
+                      <td>
+                        <strong>
+                          {customer.customerName || "—"}
+                        </strong>
+                      </td>
 
-                    <div className="customer-modal-grid">
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">
-                          Customer ID
+                      <td>
+                        {customer.mobileNumber || "—"}
+                      </td>
+
+                      <td>
+                        {customer.village || "—"}
+                      </td>
+
+                      <td>
+                        {customer.city || "—"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`badge ${getStatusClass(
+                            customer
+                          )}`}
+                        >
+                          {getStatusLabel(customer)}
                         </span>
+                      </td>
 
-                        <span className="customer-modal-value">
-                          {selectedCustomer.customerId ?? "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">
-                          Customer Name
-                        </span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.customerName || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">
-                          Mobile Number
-                        </span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.mobileNumber || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">
-                          Alternate Mobile
-                        </span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.alternateMobile || "-"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Address Information
-                    </div>
-
-                    <div className="customer-modal-grid">
-                      <div className="customer-modal-field customer-modal-field-full">
-                        <span className="customer-modal-label">Address</span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.address || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">Village</span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.village || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">City</span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.city || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">Pincode</span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.pincode || "-"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Business Information
-                    </div>
-
-                    <div className="customer-modal-grid">
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">GST Number</span>
-
-                        <span className="customer-modal-value">
-                          {selectedCustomer.gstNumber || "-"}
-                        </span>
-                      </div>
-
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">Status</span>
-
-                        <span className="customer-modal-value">
-                          <span
-                            className={
-                              selectedCustomer.status === "ACTIVE"
-                                ? "badge bg"
-                                : "badge br"
+                      <td>
+                        <div className="customer-action-buttons">
+                          <button
+                            type="button"
+                            className="btn sm"
+                            onClick={() =>
+                              handleViewCustomer(customer)
                             }
                           >
-                            {selectedCustomer.status || "-"}
-                          </span>
-                        </span>
-                      </div>
+                            View
+                          </button>
 
-                      <div className="customer-modal-field customer-modal-field-full">
-                        <span className="customer-modal-label">Remarks</span>
+                          <button
+                            type="button"
+                            className="btn sm customer-edit-btn"
+                            onClick={() =>
+                              handleEditCustomer(customer)
+                            }
+                          >
+                            Edit
+                          </button>
 
-                        <span className="customer-modal-value">
-                          {selectedCustomer.remarks || "-"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      System Information
-                    </div>
-
-                    <div className="customer-modal-grid">
-                      <div className="customer-modal-field">
-                        <span className="customer-modal-label">Created At</span>
-
-                        <span className="customer-modal-value">
-                          {formatCreatedAt(selectedCustomer.createdAt)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+                          <button
+                            type="button"
+                            className="btn sm customer-delete-btn"
+                            onClick={() =>
+                              handleDeleteCustomer(customer)
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
+      </div>
 
-            <div className="customer-modal-footer">
-              <button
-                type="button"
-                className="btn"
-                onClick={handleCloseCustomerModal}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ================================================================== */}
+      {/* VIEW CUSTOMER */}
+      {/* ================================================================== */}
 
-      {/* =====================================================
-                CUSTOMER EDIT MODAL
-                ===================================================== */}
-
-      {(editLoading || editError || editingCustomer) && (
-        <div className="customer-modal-overlay" onClick={handleCloseEditModal}>
-          <div
-            className="customer-modal customer-edit-modal"
-            onClick={(event) => event.stopPropagation()}
+      <ViewModal
+        isOpen={
+          Boolean(selectedCustomer) ||
+          viewLoading ||
+          Boolean(viewError)
+        }
+        onClose={closeViewModal}
+        title="Customer Details"
+        subtitle="View customer information"
+        loading={viewLoading}
+        error={viewError}
+        size="lg"
+        footer={
+          <button
+            type="button"
+            className="btn"
+            onClick={closeViewModal}
           >
-            <div className="customer-modal-header">
-              <div>
-                <div className="customer-modal-title">Edit Customer</div>
+            Close
+          </button>
+        }
+      >
+        {selectedCustomer && (
+          <DetailGrid>
+            <DetailItem
+              label="Customer ID"
+              value={selectedCustomer.customerId}
+            />
 
-                <div className="customer-modal-subtitle">
-                  Update customer information
-                </div>
-              </div>
+            <DetailItem
+              label="Customer Name"
+              value={selectedCustomer.customerName}
+            />
 
-              <button
-                type="button"
-                className="customer-modal-close"
-                onClick={handleCloseEditModal}
-                aria-label="Close"
-              >
-                ×
-              </button>
+            <DetailItem
+              label="Mobile Number"
+              value={selectedCustomer.mobileNumber}
+            />
+
+            <DetailItem
+              label="Alternate Mobile"
+              value={selectedCustomer.alternateMobile}
+            />
+
+            <DetailItem
+              label="Village"
+              value={selectedCustomer.village}
+            />
+
+            <DetailItem
+              label="City"
+              value={selectedCustomer.city}
+            />
+
+            <DetailItem
+              label="Pincode"
+              value={selectedCustomer.pincode}
+            />
+
+            <DetailItem
+              label="GST Number"
+              value={selectedCustomer.gstNumber}
+            />
+
+            <DetailItem
+              label="Record Status"
+              value={getStatusLabel(selectedCustomer)}
+            />
+
+            <DetailItem
+              label="Created At"
+              value={formatCreatedAt(
+                selectedCustomer.createdAt
+              )}
+            />
+
+            <DetailItem
+              label="Address"
+              value={selectedCustomer.address}
+              fullWidth
+            />
+
+            <DetailItem
+              label="Remarks"
+              value={selectedCustomer.remarks}
+              fullWidth
+            />
+          </DetailGrid>
+        )}
+      </ViewModal>
+
+      {/* ================================================================== */}
+      {/* ADD CUSTOMER */}
+      {/* ================================================================== */}
+
+      <FormModal
+        isOpen={showAddCustomerModal}
+        onClose={closeAddCustomerModal}
+        title="Add Customer"
+        subtitle="Enter customer information"
+        onSubmit={handleCreateCustomer}
+        submitLabel="Add Customer"
+        cancelLabel="Cancel"
+        saving={addSaving}
+        error={addError}
+        success={addSuccess}
+        size="lg"
+      >
+        <div className="form-section">
+          <h4>Customer Information</h4>
+
+          <div className="form-grid">
+            <div className="fld">
+              <label htmlFor="add-customer-name">
+                Customer Name <span className="required">*</span>
+              </label>
+
+              <input
+                id="add-customer-name"
+                name="customerName"
+                type="text"
+                value={addForm.customerName}
+                onChange={handleAddFormChange}
+                placeholder="Enter customer name"
+              />
             </div>
 
-            <form
-              onSubmit={handleUpdateCustomer}
-              className="customer-modal-body"
-            >
-              {editLoading && (
-                <div className="empty-state">
-                  <p>Loading customer details...</p>
-                </div>
-              )}
+            <div className="fld">
+              <label htmlFor="add-mobile-number">
+                Mobile Number <span className="required">*</span>
+              </label>
 
-              {!editLoading && editError && (
-                <div className="empty-state">
-                  <p>{editError}</p>
-                </div>
-              )}
-
-              {!editLoading && !editError && editingCustomer && (
-                <>
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Customer Information
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="fld">
-                        <label htmlFor="edit-customer-name">
-                          Customer Name
-                        </label>
-
-                        <input
-                          id="edit-customer-name"
-                          name="customerName"
-                          type="text"
-                          value={editForm.customerName}
-                          onChange={handleEditChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-mobile-number">
-                          Mobile Number
-                        </label>
-
-                        <input
-                          id="edit-mobile-number"
-                          name="mobileNumber"
-                          type="text"
-                          value={editForm.mobileNumber}
-                          onChange={handleEditChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-alternate-mobile">
-                          Alternate Mobile
-                        </label>
-
-                        <input
-                          id="edit-alternate-mobile"
-                          name="alternateMobile"
-                          type="text"
-                          value={editForm.alternateMobile}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-gst-number">GST Number</label>
-
-                        <input
-                          id="edit-gst-number"
-                          name="gstNumber"
-                          type="text"
-                          value={editForm.gstNumber}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Address Information
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="fld f-full">
-                        <label htmlFor="edit-address">Address</label>
-
-                        <textarea
-                          id="edit-address"
-                          name="address"
-                          value={editForm.address}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-village">Village</label>
-
-                        <input
-                          id="edit-village"
-                          name="village"
-                          type="text"
-                          value={editForm.village}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-city">City</label>
-
-                        <input
-                          id="edit-city"
-                          name="city"
-                          type="text"
-                          value={editForm.city}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-
-                      <div className="fld">
-                        <label htmlFor="edit-pincode">Pincode</label>
-
-                        <input
-                          id="edit-pincode"
-                          name="pincode"
-                          type="text"
-                          value={editForm.pincode}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="customer-modal-section">
-                    <div className="customer-modal-section-title">
-                      Additional Information
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="fld f-full">
-                        <label htmlFor="edit-remarks">Remarks</label>
-
-                        <textarea
-                          id="edit-remarks"
-                          name="remarks"
-                          value={editForm.remarks}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {editSuccess && (
-                    <div className="alert s show">{editSuccess}</div>
-                  )}
-
-                  {editError && <div className="alert e show">{editError}</div>}
-
-                  <div className="customer-modal-footer">
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={handleCloseEditModal}
-                      disabled={editSaving}
-                    >
-                      Cancel
-                    </button>
-
-                    <button
-                      type="submit"
-                      className="btn primary"
-                      disabled={editSaving}
-                    >
-                      {editSaving ? "Saving..." : "Save Changes"}
-                    </button>
-                  </div>
-                </>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================
-            ADD CUSTOMER MODAL
-            ===================================================== */}
-
-      {showAddCustomerModal && (
-        <div
-          className="customer-modal-overlay"
-          onClick={handleCloseAddCustomerModal}
-        >
-          <div
-            className="customer-modal customer-edit-modal"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="customer-modal-header">
-              <div>
-                <div className="customer-modal-title">Add Customer</div>
-
-                <div className="customer-modal-subtitle">
-                  Enter customer information
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="customer-modal-close"
-                onClick={handleCloseAddCustomerModal}
-                disabled={addSaving}
-                aria-label="Close"
-              >
-                ×
-              </button>
+              <input
+                id="add-mobile-number"
+                name="mobileNumber"
+                type="text"
+                value={addForm.mobileNumber}
+                onChange={handleAddFormChange}
+                placeholder="Enter mobile number"
+              />
             </div>
 
-            <form
-              onSubmit={handleCreateCustomer}
-              className="customer-modal-body"
-            >
-              <div className="customer-modal-section">
-                <div className="customer-modal-section-title">
-                  Customer Information
-                </div>
+            <div className="fld">
+              <label htmlFor="add-alternate-mobile">
+                Alternate Mobile
+              </label>
 
-                <div className="form-grid">
-                  <div className="fld">
-                    <label htmlFor="add-customer-name">Customer Name</label>
+              <input
+                id="add-alternate-mobile"
+                name="alternateMobile"
+                type="text"
+                value={addForm.alternateMobile}
+                onChange={handleAddFormChange}
+                placeholder="Enter alternate mobile"
+              />
+            </div>
 
-                    <input
-                      id="add-customer-name"
-                      name="customerName"
-                      type="text"
-                      value={addForm.customerName}
-                      onChange={handleAddChange}
-                      required
-                    />
-                  </div>
+            <div className="fld">
+              <label htmlFor="add-gst-number">
+                GST Number
+              </label>
 
-                  <div className="fld">
-                    <label htmlFor="add-mobile-number">Mobile Number</label>
-
-                    <input
-                      id="add-mobile-number"
-                      name="mobileNumber"
-                      type="text"
-                      value={addForm.mobileNumber}
-                      onChange={handleAddChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="fld">
-                    <label htmlFor="add-alternate-mobile">
-                      Alternate Mobile
-                    </label>
-
-                    <input
-                      id="add-alternate-mobile"
-                      name="alternateMobile"
-                      type="text"
-                      value={addForm.alternateMobile}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-
-                  <div className="fld">
-                    <label htmlFor="add-gst-number">GST Number</label>
-
-                    <input
-                      id="add-gst-number"
-                      name="gstNumber"
-                      type="text"
-                      value={addForm.gstNumber}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="customer-modal-section">
-                <div className="customer-modal-section-title">
-                  Address Information
-                </div>
-
-                <div className="form-grid">
-                  <div className="fld f-full">
-                    <label htmlFor="add-address">Address</label>
-
-                    <textarea
-                      id="add-address"
-                      name="address"
-                      value={addForm.address}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-
-                  <div className="fld">
-                    <label htmlFor="add-village">Village</label>
-
-                    <input
-                      id="add-village"
-                      name="village"
-                      type="text"
-                      value={addForm.village}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-
-                  <div className="fld">
-                    <label htmlFor="add-city">City</label>
-
-                    <input
-                      id="add-city"
-                      name="city"
-                      type="text"
-                      value={addForm.city}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-
-                  <div className="fld">
-                    <label htmlFor="add-pincode">Pincode</label>
-
-                    <input
-                      id="add-pincode"
-                      name="pincode"
-                      type="text"
-                      value={addForm.pincode}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="customer-modal-section">
-                <div className="customer-modal-section-title">
-                  Additional Information
-                </div>
-
-                <div className="form-grid">
-                  <div className="fld f-full">
-                    <label htmlFor="add-remarks">Remarks</label>
-
-                    <textarea
-                      id="add-remarks"
-                      name="remarks"
-                      value={addForm.remarks}
-                      onChange={handleAddChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {addSuccess && <div className="alert s show">{addSuccess}</div>}
-
-              {addError && <div className="alert e show">{addError}</div>}
-
-              <div className="customer-modal-footer">
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={handleCloseAddCustomerModal}
-                  disabled={addSaving}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="btn primary"
-                  disabled={addSaving}
-                >
-                  {addSaving ? "Saving..." : "Add Customer"}
-                </button>
-              </div>
-            </form>
+              <input
+                id="add-gst-number"
+                name="gstNumber"
+                type="text"
+                value={addForm.gstNumber}
+                onChange={handleAddFormChange}
+                placeholder="Enter GST number"
+              />
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="form-section">
+          <h4>Address Information</h4>
+
+          <div className="form-grid">
+            <div className="fld">
+              <label htmlFor="add-village">
+                Village
+              </label>
+
+              <input
+                id="add-village"
+                name="village"
+                type="text"
+                value={addForm.village}
+                onChange={handleAddFormChange}
+                placeholder="Enter village"
+              />
+            </div>
+
+            <div className="fld">
+              <label htmlFor="add-city">
+                City
+              </label>
+
+              <input
+                id="add-city"
+                name="city"
+                type="text"
+                value={addForm.city}
+                onChange={handleAddFormChange}
+                placeholder="Enter city"
+              />
+            </div>
+
+            <div className="fld">
+              <label htmlFor="add-pincode">
+                Pincode
+              </label>
+
+              <input
+                id="add-pincode"
+                name="pincode"
+                type="text"
+                value={addForm.pincode}
+                onChange={handleAddFormChange}
+                placeholder="Enter pincode"
+              />
+            </div>
+
+            <div className="fld full">
+              <label htmlFor="add-address">
+                Address
+              </label>
+
+              <textarea
+                id="add-address"
+                name="address"
+                value={addForm.address}
+                onChange={handleAddFormChange}
+                placeholder="Enter address"
+                rows="3"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h4>Additional Information</h4>
+
+          <div className="form-grid">
+            <div className="fld full">
+              <label htmlFor="add-remarks">
+                Remarks
+              </label>
+
+              <textarea
+                id="add-remarks"
+                name="remarks"
+                value={addForm.remarks}
+                onChange={handleAddFormChange}
+                placeholder="Enter remarks"
+                rows="3"
+              />
+            </div>
+          </div>
+        </div>
+      </FormModal>
+
+      {/* ================================================================== */}
+      {/* EDIT CUSTOMER */}
+      {/* ================================================================== */}
+
+      <FormModal
+        isOpen={Boolean(editingCustomer)}
+        onClose={closeEditCustomerModal}
+        title="Edit Customer"
+        subtitle={
+          editingCustomer?.customerId
+            ? `Customer ID: ${editingCustomer.customerId}`
+            : "Update customer information"
+        }
+        onSubmit={handleUpdateCustomer}
+        submitLabel="Save Changes"
+        cancelLabel="Cancel"
+        saving={editSaving}
+        error={editError}
+        success={editSuccess}
+        size="lg"
+      >
+        {editLoading ? (
+          <div className="empty-state">
+            <p>Loading customer details...</p>
+          </div>
+        ) : (
+          <>
+            <div className="form-section">
+              <h4>Customer Information</h4>
+
+              <div className="form-grid">
+                <div className="fld">
+                  <label htmlFor="edit-customer-name">
+                    Customer Name{" "}
+                    <span className="required">*</span>
+                  </label>
+
+                  <input
+                    id="edit-customer-name"
+                    name="customerName"
+                    type="text"
+                    value={editForm.customerName}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter customer name"
+                  />
+                </div>
+
+                <div className="fld">
+                  <label htmlFor="edit-mobile-number">
+                    Mobile Number{" "}
+                    <span className="required">*</span>
+                  </label>
+
+                  <input
+                    id="edit-mobile-number"
+                    name="mobileNumber"
+                    type="text"
+                    value={editForm.mobileNumber}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter mobile number"
+                  />
+                </div>
+
+                <div className="fld">
+                  <label htmlFor="edit-alternate-mobile">
+                    Alternate Mobile
+                  </label>
+
+                  <input
+                    id="edit-alternate-mobile"
+                    name="alternateMobile"
+                    type="text"
+                    value={editForm.alternateMobile}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter alternate mobile"
+                  />
+                </div>
+
+                <div className="fld">
+                  <label htmlFor="edit-gst-number">
+                    GST Number
+                  </label>
+
+                  <input
+                    id="edit-gst-number"
+                    name="gstNumber"
+                    type="text"
+                    value={editForm.gstNumber}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter GST number"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Address Information</h4>
+
+              <div className="form-grid">
+                <div className="fld">
+                  <label htmlFor="edit-village">
+                    Village
+                  </label>
+
+                  <input
+                    id="edit-village"
+                    name="village"
+                    type="text"
+                    value={editForm.village}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter village"
+                  />
+                </div>
+
+                <div className="fld">
+                  <label htmlFor="edit-city">
+                    City
+                  </label>
+
+                  <input
+                    id="edit-city"
+                    name="city"
+                    type="text"
+                    value={editForm.city}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter city"
+                  />
+                </div>
+
+                <div className="fld">
+                  <label htmlFor="edit-pincode">
+                    Pincode
+                  </label>
+
+                  <input
+                    id="edit-pincode"
+                    name="pincode"
+                    type="text"
+                    value={editForm.pincode}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter pincode"
+                  />
+                </div>
+
+                <div className="fld full">
+                  <label htmlFor="edit-address">
+                    Address
+                  </label>
+
+                  <textarea
+                    id="edit-address"
+                    name="address"
+                    value={editForm.address}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter address"
+                    rows="3"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Additional Information</h4>
+
+              <div className="form-grid">
+                <div className="fld full">
+                  <label htmlFor="edit-remarks">
+                    Remarks
+                  </label>
+
+                  <textarea
+                    id="edit-remarks"
+                    name="remarks"
+                    value={editForm.remarks}
+                    onChange={handleEditFormChange}
+                    placeholder="Enter remarks"
+                    rows="3"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </FormModal>
+
+      {/* ================================================================== */}
+      {/* DELETE CUSTOMER */}
+      {/* ================================================================== */}
+
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingCustomer)}
+        onClose={closeDeleteCustomerModal}
+        onConfirm={confirmDeleteCustomer}
+        title="Delete Customer"
+        subtitle="Please confirm this action"
+        message="Are you sure you want to deactivate this customer record?"
+        itemName={
+          deletingCustomer
+            ? `${deletingCustomer.customerName || "Customer"} (ID: ${
+                deletingCustomer.customerId
+              })`
+            : ""
+        }
+        confirming={deleteSaving}
+        error={deleteError}
+      />
     </section>
   );
 }

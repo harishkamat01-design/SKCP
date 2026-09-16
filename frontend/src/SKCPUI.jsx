@@ -309,7 +309,7 @@ const submitPay = () => {
     <div className="theme-toggle" onClick={() => setIsDark(prev => !prev)}>
       <i className="ti ti-sun" id="theme-icon" style={{fontSize:"14px",color:"var(--text2)"}}></i>
       <span className="tt-label" id="theme-label">Light Mode</span>
-      <div className="sw" id="theme-sw"></div>
+      <div className="sw" id="theme-sw"></div>  
     </div>
     <div style={{padding:"6px 14px 12px",fontSize:"10px",color:"var(--text3)",textAlign:"center"}}>Bhosari MIDC · Pimpri-Chinchwad · 411026<br /><span style={{color:"var(--green-t)"}}>● System Online</span></div>
   </div>

@@ -366,22 +366,22 @@ public class AttendanceService
     }
 
 
-    // ============================================================
-    // DELETE ATTENDANCE — SOFT DELETE
-    // ============================================================
+        // ============================================================
+        // DELETE ATTENDANCE — SOFT DELETE
+        // ============================================================
 
-    @Transactional
-    public void deleteAttendance(
-            Integer id
-    )
-    {
+        @Transactional
+        public void deleteAttendance(
+                Integer id
+        )
+        {
+        // --------------------------------------------------------
+        // FIND RECORD BY ID
+        // --------------------------------------------------------
 
         Attendance attendance =
                 attendanceRepository
-                        .findByAttendanceIdAndStatus(
-                                id,
-                                RecordStatus.ACTIVE
-                        )
+                        .findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Attendance not found with id: "
@@ -389,20 +389,21 @@ public class AttendanceService
                                 )
                         );
 
+        // --------------------------------------------------------
+        // CHECK CURRENT STATUS
+        // --------------------------------------------------------
 
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT use:
-         *
-         * attendanceRepository.delete(...)
-         *
-         * or:
-         *
-         * attendanceRepository.deleteById(...)
-         *
-         * Attendance follows SKCP Soft Delete.
-         */
+        if (attendance.getStatus() == RecordStatus.INACTIVE)
+        {
+                throw new IllegalStateException(
+                        "Attendance is already inactive with id: "
+                                + id
+                );
+        }
+
+        // --------------------------------------------------------
+        // SOFT DELETE
+        // --------------------------------------------------------
 
         attendance.setStatus(
                 RecordStatus.INACTIVE
@@ -411,7 +412,7 @@ public class AttendanceService
         attendanceRepository.save(
                 attendance
         );
-    }
+        }
 
 
     // ============================================================

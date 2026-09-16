@@ -1,67 +1,95 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+    apiGet,
+    apiPost,
+    apiPut,
+    apiDelete,
+} from "../../../services/api";
+
+import ViewModal from "../../ui/common/ViewModal";
+import FormModal from "../../ui/common/FormModal";
+import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
 
 function RawMaterialStock() {
-    const API_URL = "http://localhost:8080/api/raw-material-stock";
-
     // ============================================================
     // STATE
     // ============================================================
 
     const [stockList, setStockList] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    const [selectedStock, setSelectedStock] = useState(null);
+    // ============================================================
+    // VIEW MODAL
+    // ============================================================
 
-    const [showViewModal, setShowViewModal] = useState(false);
-    const [showFormModal, setShowFormModal] = useState(false);
+    const [selectedStock, setSelectedStock] =
+        useState(null);
 
-    const [editingId, setEditingId] = useState(null);
+    const [viewLoading, setViewLoading] =
+        useState(false);
 
-    const [formData, setFormData] = useState({
+    const [viewError, setViewError] =
+        useState("");
+
+    // ============================================================
+    // ADD STOCK MODAL
+    // ============================================================
+
+    const [showAddModal, setShowAddModal] =
+        useState(false);
+
+    const [addForm, setAddForm] = useState({
         rawMaterialId: "",
         currentStockLevel: "",
         minimumStockLevel: "",
-        notes: ""
+        notes: "",
     });
 
-    const [formError, setFormError] = useState("");
-    const [saving, setSaving] = useState(false);
+    const [addLoading, setAddLoading] =
+        useState(false);
+
+    const [addError, setAddError] =
+        useState("");
 
     // ============================================================
-    // FETCH ALL RAW MATERIAL STOCK
+    // EDIT STOCK MODAL
     // ============================================================
 
-    const fetchStock = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    const [editingStock, setEditingStock] =
+        useState(null);
 
-            const response = await fetch(API_URL);
+    const [editForm, setEditForm] = useState({
+        currentStockLevel: "",
+        minimumStockLevel: "",
+        notes: "",
+    });
 
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch raw material stock (${response.status})`
-                );
-            }
+    const [editLoading, setEditLoading] =
+        useState(false);
 
-            const result = await response.json();
+    const [editError, setEditError] =
+        useState("");
 
-            console.log("Raw Material Stock API response:", result);
+    // ============================================================
+    // DELETE MODAL
+    // ============================================================
 
-            setStockList(result.data || []);
-        } catch (err) {
-            console.error("Error fetching raw material stock:", err);
+    const [deletingStock, setDeletingStock] =
+        useState(null);
 
-            setError(
-                "Unable to load raw material stock. Please try again."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [deleteLoading, setDeleteLoading] =
+        useState(false);
+
+    const [deleteError, setDeleteError] =
+        useState("");
 
     // ============================================================
     // INITIAL LOAD
@@ -72,11 +100,45 @@ function RawMaterialStock() {
     }, []);
 
     // ============================================================
+    // FETCH ALL RAW MATERIAL STOCK
+    // ============================================================
+
+    const fetchStock = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const result = await apiGet(
+                "/api/raw-material-stock"
+            );
+
+            console.log(
+                "Raw Material Stock API response:",
+                result
+            );
+
+            setStockList(result.data || []);
+        } catch (err) {
+            console.error(
+                "Error fetching raw material stock:",
+                err
+            );
+
+            setError(
+                "Unable to load raw material stock. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ============================================================
     // SEARCH
     // ============================================================
 
     const filteredStock = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+        const keyword =
+            searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
             return stockList;
@@ -84,27 +146,51 @@ function RawMaterialStock() {
 
         return stockList.filter((stock) => {
             return (
-                String(stock.rawMaterialStockId || "")
+                String(
+                    stock.rawMaterialStockId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.rawMaterialId || "")
+                String(
+                    stock.rawMaterialId || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.rawMaterialName || "")
+                String(
+                    stock.rawMaterialName || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.rawMaterialUnit || "")
+                String(
+                    stock.rawMaterialUnit || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.stockStatus || "")
+                String(
+                    stock.currentStockLevel || ""
+                )
                     .toLowerCase()
                     .includes(keyword) ||
 
-                String(stock.recordStatus || "")
+                String(
+                    stock.minimumStockLevel || ""
+                )
+                    .toLowerCase()
+                    .includes(keyword) ||
+
+                String(
+                    stock.stockStatus || ""
+                )
+                    .toLowerCase()
+                    .includes(keyword) ||
+
+                String(
+                    stock.recordStatus || ""
+                )
                     .toLowerCase()
                     .includes(keyword)
             );
@@ -115,141 +201,146 @@ function RawMaterialStock() {
     // VIEW STOCK
     // ============================================================
 
-    const handleView = async (id) => {
+    const handleView = async (stock) => {
+        setViewError("");
+        setViewLoading(true);
+        setSelectedStock(null);
+
         try {
-            setError("");
+            const result = await apiGet(
+                `/api/raw-material-stock/${stock.rawMaterialStockId}`
+            );
 
-            const response = await fetch(`${API_URL}/${id}`);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
-
-            console.log("Raw Material Stock details:", result);
+            console.log(
+                "Raw Material Stock details:",
+                result
+            );
 
             setSelectedStock(result.data);
-            setShowViewModal(true);
         } catch (err) {
-            console.error("Error fetching stock details:", err);
-
-            setError(
-                "Unable to load raw material stock details."
+            console.error(
+                "Error fetching stock details:",
+                err
             );
+
+            setViewError(
+                err.message ||
+                    "Unable to load raw material stock details."
+            );
+        } finally {
+            setViewLoading(false);
         }
     };
 
+    const closeViewModal = () => {
+        if (viewLoading) {
+            return;
+        }
+
+        setSelectedStock(null);
+        setViewError("");
+    };
+
     // ============================================================
-    // OPEN CREATE FORM
+    // ADD STOCK
     // ============================================================
 
-    const handleAdd = () => {
-        setEditingId(null);
+    const openAddModal = () => {
+        setAddError("");
 
-        setFormData({
+        setAddForm({
             rawMaterialId: "",
             currentStockLevel: "",
             minimumStockLevel: "",
-            notes: ""
+            notes: "",
         });
 
-        setFormError("");
-        setShowFormModal(true);
+        setShowAddModal(true);
     };
 
-    // ============================================================
-    // OPEN EDIT FORM
-    // ============================================================
-
-    const handleEdit = async (id) => {
-        try {
-            setFormError("");
-            setError("");
-
-            const response = await fetch(`${API_URL}/${id}`);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch stock details (${response.status})`
-                );
-            }
-
-            const result = await response.json();
-
-            const stock = result.data;
-
-            setEditingId(id);
-
-            setFormData({
-                rawMaterialId: stock.rawMaterialId ?? "",
-                currentStockLevel:
-                    stock.currentStockLevel ?? "",
-                minimumStockLevel:
-                    stock.minimumStockLevel ?? "",
-                notes: stock.notes ?? ""
-            });
-
-            setShowFormModal(true);
-        } catch (err) {
-            console.error("Error loading stock for edit:", err);
-
-            setError(
-                "Unable to load the stock record for editing."
-            );
+    const closeAddModal = () => {
+        if (addLoading) {
+            return;
         }
+
+        setShowAddModal(false);
+        setAddError("");
+
+        setAddForm({
+            rawMaterialId: "",
+            currentStockLevel: "",
+            minimumStockLevel: "",
+            notes: "",
+        });
     };
 
-    // ============================================================
-    // FORM CHANGE
-    // ============================================================
-
-    const handleChange = (event) => {
+    const handleAddChange = (event) => {
         const { name, value } = event.target;
 
-        setFormData((previous) => ({
+        setAddForm((previous) => ({
             ...previous,
-            [name]: value
+            [name]: value,
         }));
     };
 
     // ============================================================
-    // CREATE / UPDATE
+    // CREATE STOCK
     // ============================================================
 
-    const handleSubmit = async (event) => {
+    const handleCreateStock = async (event) => {
         event.preventDefault();
 
-        setFormError("");
+        setAddError("");
 
         // --------------------------------------------------------
-        // BASIC FRONTEND VALIDATION
+        // VALIDATION
         // --------------------------------------------------------
 
-        if (!formData.rawMaterialId) {
-            setFormError("Raw material ID is required.");
+        if (!addForm.rawMaterialId) {
+            setAddError(
+                "Please enter a raw material ID."
+            );
             return;
         }
 
-        if (formData.currentStockLevel === "") {
-            setFormError("Current stock level is required.");
+        if (
+            addForm.currentStockLevel === "" ||
+            Number.isNaN(
+                Number(addForm.currentStockLevel)
+            )
+        ) {
+            setAddError(
+                "Please enter a valid current stock level."
+            );
             return;
         }
 
-        if (Number(formData.currentStockLevel) < 0) {
-            setFormError(
+        if (
+            Number(addForm.currentStockLevel) < 0
+        ) {
+            setAddError(
                 "Current stock level cannot be negative."
             );
             return;
         }
 
         if (
-            formData.minimumStockLevel !== "" &&
-            Number(formData.minimumStockLevel) < 0
+            addForm.minimumStockLevel !== "" &&
+            Number.isNaN(
+                Number(addForm.minimumStockLevel)
+            )
         ) {
-            setFormError(
+            setAddError(
+                "Please enter a valid minimum stock level."
+            );
+            return;
+        }
+
+        if (
+            addForm.minimumStockLevel !== "" &&
+            Number(addForm.minimumStockLevel) < 0
+        ) {
+            setAddError(
                 "Minimum stock level cannot be negative."
             );
             return;
@@ -259,112 +350,310 @@ function RawMaterialStock() {
         // REQUEST BODY
         // --------------------------------------------------------
 
-        const requestBody = {
-            rawMaterialId: Number(formData.rawMaterialId),
-            currentStockLevel: Number(
-                formData.currentStockLevel
-            ),
+        const payload = {
+            rawMaterialId:
+                Number(addForm.rawMaterialId),
+
+            currentStockLevel:
+                Number(addForm.currentStockLevel),
+
             minimumStockLevel:
-                formData.minimumStockLevel === ""
+                addForm.minimumStockLevel === ""
                     ? null
-                    : Number(formData.minimumStockLevel),
+                    : Number(
+                          addForm.minimumStockLevel
+                      ),
+
             notes:
-                formData.notes.trim() === ""
-                    ? null
-                    : formData.notes.trim()
+                addForm.notes.trim() || null,
         };
 
         try {
-            setSaving(true);
+            setAddLoading(true);
 
-            const url = editingId
-                ? `${API_URL}/${editingId}`
-                : API_URL;
+            console.log(
+                "Creating raw material stock with payload:",
+                payload
+            );
 
-            const method = editingId ? "PUT" : "POST";
+            const result = await apiPost(
+                "/api/raw-material-stock",
+                payload
+            );
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
+            console.log(
+                "Raw Material Stock created:",
+                result
+            );
 
-            const result = await response.json();
+            setShowAddModal(false);
 
-            console.log("Save Raw Material Stock response:", result);
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Request failed (${response.status})`
-                );
-            }
-
-            setShowFormModal(false);
-
-            setEditingId(null);
-
-            setFormData({
+            setAddForm({
                 rawMaterialId: "",
                 currentStockLevel: "",
                 minimumStockLevel: "",
-                notes: ""
+                notes: "",
             });
 
             await fetchStock();
         } catch (err) {
             console.error(
-                "Error saving raw material stock:",
+                "Error creating raw material stock:",
                 err
             );
 
-            setFormError(
+            setAddError(
                 err.message ||
-                "Unable to save raw material stock."
+                    "Unable to create raw material stock."
             );
         } finally {
-            setSaving(false);
+            setAddLoading(false);
         }
     };
 
     // ============================================================
-    // DELETE / SOFT DELETE
+    // EDIT STOCK
     // ============================================================
 
-    const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this raw material stock record?"
-        );
+    const handleEdit = async (stock) => {
+        setEditError("");
+        setEditLoading(false);
 
-        if (!confirmed) {
+        try {
+            const result = await apiGet(
+                `/api/raw-material-stock/${stock.rawMaterialStockId}`
+            );
+
+            console.log(
+                "Raw Material Stock edit details:",
+                result
+            );
+
+            const stockData = result.data;
+
+            setEditingStock(stockData);
+
+            setEditForm({
+                currentStockLevel:
+                    stockData.currentStockLevel ??
+                    "",
+
+                minimumStockLevel:
+                    stockData.minimumStockLevel ??
+                    "",
+
+                notes:
+                    stockData.notes || "",
+            });
+        } catch (err) {
+            console.error(
+                "Error loading stock for edit:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to load the stock record for editing."
+            );
+
+            setEditingStock(stock);
+        }
+    };
+
+    const closeEditModal = () => {
+        if (editLoading) {
+            return;
+        }
+
+        setEditingStock(null);
+        setEditError("");
+
+        setEditForm({
+            currentStockLevel: "",
+            minimumStockLevel: "",
+            notes: "",
+        });
+    };
+
+    const handleEditChange = (event) => {
+        const { name, value } = event.target;
+
+        setEditForm((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
+
+    // ============================================================
+    // UPDATE STOCK
+    // ============================================================
+
+    const handleUpdateStock = async (event) => {
+        event.preventDefault();
+
+        if (!editingStock) {
+            return;
+        }
+
+        setEditError("");
+
+        // --------------------------------------------------------
+        // VALIDATION
+        // --------------------------------------------------------
+
+        if (
+            editForm.currentStockLevel === "" ||
+            Number.isNaN(
+                Number(editForm.currentStockLevel)
+            )
+        ) {
+            setEditError(
+                "Please enter a valid current stock level."
+            );
+            return;
+        }
+
+        if (
+            Number(editForm.currentStockLevel) < 0
+        ) {
+            setEditError(
+                "Current stock level cannot be negative."
+            );
+            return;
+        }
+
+        if (
+            editForm.minimumStockLevel !== "" &&
+            Number.isNaN(
+                Number(editForm.minimumStockLevel)
+            )
+        ) {
+            setEditError(
+                "Please enter a valid minimum stock level."
+            );
+            return;
+        }
+
+        if (
+            editForm.minimumStockLevel !== "" &&
+            Number(editForm.minimumStockLevel) < 0
+        ) {
+            setEditError(
+                "Minimum stock level cannot be negative."
+            );
+            return;
+        }
+
+        // --------------------------------------------------------
+        // REQUEST BODY
+        // --------------------------------------------------------
+
+        const payload = {
+            currentStockLevel:
+                Number(
+                    editForm.currentStockLevel
+                ),
+
+            minimumStockLevel:
+                editForm.minimumStockLevel === ""
+                    ? null
+                    : Number(
+                          editForm.minimumStockLevel
+                      ),
+
+            notes:
+                editForm.notes.trim() || null,
+        };
+
+        try {
+            setEditLoading(true);
+
+            console.log(
+                "Updating raw material stock with payload:",
+                payload
+            );
+
+            const result = await apiPut(
+                `/api/raw-material-stock/${editingStock.rawMaterialStockId}`,
+                payload
+            );
+
+            console.log(
+                "Raw Material Stock updated:",
+                result
+            );
+
+            setEditingStock(null);
+
+            setEditForm({
+                currentStockLevel: "",
+                minimumStockLevel: "",
+                notes: "",
+            });
+
+            await fetchStock();
+        } catch (err) {
+            console.error(
+                "Error updating raw material stock:",
+                err
+            );
+
+            setEditError(
+                err.message ||
+                    "Unable to update raw material stock."
+            );
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    // ============================================================
+    // DELETE STOCK
+    // ============================================================
+
+    const handleDelete = (stock) => {
+        setDeleteError("");
+        setDeletingStock(stock);
+    };
+
+    const closeDeleteModal = () => {
+        if (deleteLoading) {
+            return;
+        }
+
+        setDeletingStock(null);
+        setDeleteError("");
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deletingStock) {
             return;
         }
 
         try {
-            setError("");
+            setDeleteLoading(true);
+            setDeleteError("");
 
-            const response = await fetch(
-                `${API_URL}/${id}`,
-                {
-                    method: "DELETE"
-                }
+            console.log(
+                "Deleting raw material stock ID:",
+                deletingStock.rawMaterialStockId
             );
 
-            const result = await response.json();
+            const result = await apiDelete(
+                `/api/raw-material-stock/${deletingStock.rawMaterialStockId}`
+            );
 
             console.log(
                 "Delete Raw Material Stock response:",
                 result
             );
 
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                    `Delete failed (${response.status})`
-                );
-            }
+            console.log(
+                "Raw Material Stock deleted:",
+                result
+            );
+
+            setDeletingStock(null);
 
             await fetchStock();
         } catch (err) {
@@ -373,603 +662,747 @@ function RawMaterialStock() {
                 err
             );
 
-            setError(
+            setDeleteError(
                 err.message ||
-                "Unable to delete raw material stock."
+                    "Unable to delete raw material stock."
             );
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
     // ============================================================
-    // CLOSE MODALS
+    // LOADING
     // ============================================================
 
-    const closeViewModal = () => {
-        setShowViewModal(false);
-        setSelectedStock(null);
-    };
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>
+                        Raw Material Stock
+                    </h2>
 
-    const closeFormModal = () => {
-        if (saving) {
-            return;
-        }
-
-        setShowFormModal(false);
-        setEditingId(null);
-        setFormError("");
-
-        setFormData({
-            rawMaterialId: "",
-            currentStockLevel: "",
-            minimumStockLevel: "",
-            notes: ""
-        });
-    };
+                    <p>
+                        Loading raw material
+                        stock records...
+                    </p>
+                </section>
+            </div>
+        );
+    }
 
     // ============================================================
-    // RENDER
+    // MAIN UI
     // ============================================================
 
     return (
-        <div className="module-container">
+        <>
+            {/* ====================================================
+                RAW MATERIAL STOCK HEADER
+            ==================================================== */}
 
-            {/* ==================================================
-                HEADER
-            ================================================== */}
-
-            <div className="module-header">
-                <h1>Raw Material Stock</h1>
-
-                <p>
-                    Manage raw material stock information and records
-                </p>
-            </div>
-
-            {/* ==================================================
-                SEARCH + ADD
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent:
+                            "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-                        <h2>Raw Material Stock</h2>
+                        <h2>
+                            Raw Material Stock
+                        </h2>
 
                         <p>
-                            Manage current stock and minimum stock levels
+                            Manage raw material
+                            stock information
+                            and records.
                         </p>
                     </div>
 
                     <button
                         type="button"
-                        onClick={handleAdd}
-                        className="primary-button"
+                        className="action-btn view-btn"
+                        onClick={
+                            openAddModal
+                        }
                     >
-                        Add Stock
+                        + Add Stock
                     </button>
                 </div>
 
-                <div className="search-section">
-
-                    <label>
+                <div className="fld production-search">
+                    <label htmlFor="raw-material-stock-search">
                         Search Raw Material Stock
                     </label>
 
                     <input
+                        id="raw-material-stock-search"
                         type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(event.target.value)
+                        placeholder="Search by raw material, unit, stock level or status..."
+                        value={
+                            searchKeyword
                         }
-                        placeholder="Search by raw material, unit, stock status..."
+                        onChange={(
+                            event
+                        ) =>
+                            setSearchKeyword(
+                                event.target
+                                    .value
+                            )
+                        }
                     />
-
                 </div>
+            </section>
 
-            </div>
+            {/* ====================================================
+                RAW MATERIAL STOCK LIST
+            ==================================================== */}
 
-            {/* ==================================================
-                ERROR
-            ================================================== */}
+            <section className="card">
+                <h2>
+                    Raw Material Stock List
+                </h2>
 
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
+                <p>
+                    {
+                        filteredStock.length
+                    }{" "}
+                    stock record(s)
+                </p>
 
-            {/* ==================================================
-                STOCK LIST
-            ================================================== */}
-
-            <div className="module-card">
-
-                <div className="section-header">
-                    <div>
-                        <h2>Raw Material Stock List</h2>
-
-                        <p>
-                            {filteredStock.length} stock record(s)
-                        </p>
-                    </div>
-                </div>
-
-                {loading ? (
-                    <p>Loading raw material stock...</p>
-                ) : filteredStock.length === 0 ? (
-                    <p>
-                        No raw material stock records found.
+                {error && (
+                    <p className="form-error">
+                        {error}
                     </p>
-                ) : (
-                    <div className="table-container">
-
-                        <table className="data-table">
-
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>RAW MATERIAL</th>
-                                    <th>UNIT</th>
-                                    <th>CURRENT STOCK</th>
-                                    <th>MINIMUM STOCK</th>
-                                    <th>STOCK STATUS</th>
-                                    <th>STATUS</th>
-                                    <th>ACTIONS</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                {filteredStock.map((stock) => (
-                                    <tr
-                                        key={
-                                            stock.rawMaterialStockId
-                                        }
-                                    >
-
-                                        <td>
-                                            {
-                                                stock.rawMaterialStockId
-                                            }
-                                        </td>
-
-                                        <td>
-                                            <strong>
-                                                {
-                                                    stock.rawMaterialName
-                                                }
-                                            </strong>
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.rawMaterialUnit
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.currentStockLevel
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.minimumStockLevel ??
-                                                "-"
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.stockStatus
-                                            }
-                                        </td>
-
-                                        <td>
-                                            {
-                                                stock.recordStatus
-                                            }
-                                        </td>
-
-                                        <td>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleView(
-                                                        stock.rawMaterialStockId
-                                                    )
-                                                }
-                                            >
-                                                View
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        stock.rawMaterialStockId
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-
-                                            {" "}
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        stock.rawMaterialStockId
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-                                ))}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
                 )}
 
-            </div>
+                {!error &&
+                    filteredStock.length ===
+                        0 && (
+                        <p>
+                            No raw material
+                            stock records
+                            found.
+                        </p>
+                    )}
 
-            {/* ==================================================
-                VIEW MODAL
-            ================================================== */}
+                {!error &&
+                    filteredStock.length >
+                        0 && (
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            ID
+                                        </th>
 
-            {showViewModal && selectedStock && (
+                                        <th>
+                                            RAW MATERIAL
+                                        </th>
 
-                <div className="modal-overlay">
+                                        <th>
+                                            UNIT
+                                        </th>
 
-                    <div className="modal-content">
+                                        <th>
+                                            CURRENT STOCK
+                                        </th>
 
-                        <div className="modal-header">
+                                        <th>
+                                            MINIMUM STOCK
+                                        </th>
 
-                            <h2>
-                                Raw Material Stock Details
-                            </h2>
+                                        <th>
+                                            STOCK STATUS
+                                        </th>
 
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                X
-                            </button>
+                                        <th>
+                                            STATUS
+                                        </th>
 
+                                        <th>
+                                            ACTIONS
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {filteredStock.map(
+                                        (
+                                            stock
+                                        ) => (
+                                            <tr
+                                                key={
+                                                    stock.rawMaterialStockId
+                                                }
+                                            >
+                                                <td>
+                                                    {
+                                                        stock.rawMaterialStockId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <strong>
+                                                        {
+                                                            stock.rawMaterialName
+                                                        }
+                                                    </strong>
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.rawMaterialUnit ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.currentStockLevel
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.minimumStockLevel ??
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.stockStatus ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.recordStatus ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    stock
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
+                    )}
+            </section>
 
-                        <div className="details-grid">
+            {/* ====================================================
+                VIEW RAW MATERIAL STOCK MODAL
+            ==================================================== */}
 
-                            <div>
-                                <strong>
-                                    Stock ID
-                                </strong>
+            <ViewModal
+                isOpen={
+                    !!selectedStock ||
+                    viewLoading ||
+                    !!viewError
+                }
+                onClose={
+                    closeViewModal
+                }
+                title="Raw Material Stock Details"
+                subtitle="View raw material stock information"
+                loading={
+                    viewLoading
+                }
+                error={
+                    viewError
+                }
+                size="lg"
+                footer={
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={
+                            closeViewModal
+                        }
+                        disabled={
+                            viewLoading
+                        }
+                    >
+                        Close
+                    </button>
+                }
+            >
+                {selectedStock && (
+                    <DetailGrid>
+                        <DetailItem
+                            label="Stock ID"
+                            value={
+                                selectedStock.rawMaterialStockId
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.rawMaterialStockId
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Raw Material ID"
+                            value={
+                                selectedStock.rawMaterialId
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Raw Material ID
-                                </strong>
+                        <DetailItem
+                            label="Raw Material"
+                            value={
+                                selectedStock.rawMaterialName
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.rawMaterialId
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Unit"
+                            value={
+                                selectedStock.rawMaterialUnit ||
+                                "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Raw Material
-                                </strong>
+                        <DetailItem
+                            label="Current Stock Level"
+                            value={
+                                selectedStock.currentStockLevel
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.rawMaterialName
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Minimum Stock Level"
+                            value={
+                                selectedStock.minimumStockLevel ??
+                                "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Unit
-                                </strong>
+                        <DetailItem
+                            label="Stock Status"
+                            value={
+                                selectedStock.stockStatus ||
+                                "-"
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.rawMaterialUnit ||
-                                        "-"
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Record Status"
+                            value={
+                                selectedStock.recordStatus ||
+                                "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Current Stock Level
-                                </strong>
+                        <DetailItem
+                            label="Last Updated"
+                            value={
+                                selectedStock.lastUpdatedDate ||
+                                "-"
+                            }
+                        />
 
-                                <span>
-                                    {
-                                        selectedStock.currentStockLevel
-                                    }
-                                </span>
-                            </div>
+                        <DetailItem
+                            label="Created At"
+                            value={
+                                selectedStock.createdAt
+                                    ? new Date(
+                                          selectedStock.createdAt
+                                      ).toLocaleString(
+                                          "en-IN"
+                                      )
+                                    : "-"
+                            }
+                        />
 
-                            <div>
-                                <strong>
-                                    Minimum Stock Level
-                                </strong>
+                        <DetailItem
+                            label="Notes"
+                            value={
+                                selectedStock.notes ||
+                                "-"
+                            }
+                            fullWidth
+                        />
+                    </DetailGrid>
+                )}
+            </ViewModal>
 
-                                <span>
-                                    {
-                                        selectedStock.minimumStockLevel ??
-                                        "-"
-                                    }
-                                </span>
-                            </div>
+            {/* ====================================================
+                ADD RAW MATERIAL STOCK MODAL
+            ==================================================== */}
 
-                            <div>
-                                <strong>
-                                    Stock Status
-                                </strong>
+            <FormModal
+                isOpen={
+                    showAddModal
+                }
+                onClose={
+                    closeAddModal
+                }
+                title="Add Raw Material Stock"
+                subtitle="Record new raw material stock information"
+                onSubmit={
+                    handleCreateStock
+                }
+                submitLabel="Add Stock"
+                cancelLabel="Cancel"
+                saving={
+                    addLoading
+                }
+                error={
+                    addError
+                }
+                size="lg"
+            >
+                <div className="edit-form-grid">
+                    <div className="fld">
+                        <label htmlFor="add-raw-material-id">
+                            Raw Material ID
+                        </label>
 
-                                <span>
-                                    {
-                                        selectedStock.stockStatus
-                                    }
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>
-                                    Record Status
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.recordStatus
-                                    }
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>
-                                    Last Updated
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.lastUpdatedDate ||
-                                        "-"
-                                    }
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>
-                                    Created At
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.createdAt
-                                            ? new Date(
-                                                selectedStock.createdAt
-                                            ).toLocaleString()
-                                            : "-"
-                                    }
-                                </span>
-                            </div>
-
-                            <div className="full-width">
-
-                                <strong>
-                                    Notes
-                                </strong>
-
-                                <span>
-                                    {
-                                        selectedStock.notes ||
-                                        "-"
-                                    }
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div className="modal-actions">
-
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
+                        <input
+                            id="add-raw-material-id"
+                            type="number"
+                            name="rawMaterialId"
+                            min="1"
+                            value={
+                                addForm.rawMaterialId
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter raw material ID"
+                            required
+                        />
                     </div>
 
-                </div>
+                    <div className="fld">
+                        <label htmlFor="add-current-stock-level">
+                            Current Stock Level
+                        </label>
 
-            )}
-
-            {/* ==================================================
-                CREATE / UPDATE MODAL
-            ================================================== */}
-
-            {showFormModal && (
-
-                <div className="modal-overlay">
-
-                    <div className="modal-content">
-
-                        <div className="modal-header">
-
-                            <h2>
-                                {editingId
-                                    ? "Update Raw Material Stock"
-                                    : "Add Raw Material Stock"}
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeFormModal}
-                                disabled={saving}
-                            >
-                                X
-                            </button>
-
-                        </div>
-
-                        {formError && (
-                            <div className="error-message">
-                                {formError}
-                            </div>
-                        )}
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="form-grid"
-                        >
-
-                            {/* RAW MATERIAL ID */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Raw Material ID *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="rawMaterialId"
-                                    value={
-                                        formData.rawMaterialId
-                                    }
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* CURRENT STOCK */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Current Stock Level *
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="currentStockLevel"
-                                    value={
-                                        formData.currentStockLevel
-                                    }
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.01"
-                                    required
-                                />
-
-                            </div>
-
-                            {/* MINIMUM STOCK */}
-
-                            <div className="form-group">
-
-                                <label>
-                                    Minimum Stock Level
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="minimumStockLevel"
-                                    value={
-                                        formData.minimumStockLevel
-                                    }
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.01"
-                                />
-
-                            </div>
-
-                            {/* NOTES */}
-
-                            <div className="form-group full-width">
-
-                                <label>
-                                    Notes
-                                </label>
-
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    maxLength={1000}
-                                    rows={4}
-                                    placeholder="Enter notes..."
-                                />
-
-                            </div>
-
-                            {/* FORM ACTIONS */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={closeFormModal}
-                                    disabled={saving}
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="primary-button"
-                                >
-                                    {saving
-                                        ? "Saving..."
-                                        : editingId
-                                            ? "Update Stock"
-                                            : "Create Stock"}
-                                </button>
-
-                            </div>
-
-                        </form>
-
+                        <input
+                            id="add-current-stock-level"
+                            type="number"
+                            name="currentStockLevel"
+                            min="0"
+                            step="0.01"
+                            value={
+                                addForm.currentStockLevel
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter current stock"
+                            required
+                        />
                     </div>
 
+                    <div className="fld">
+                        <label htmlFor="add-minimum-stock-level">
+                            Minimum Stock Level
+                        </label>
+
+                        <input
+                            id="add-minimum-stock-level"
+                            type="number"
+                            name="minimumStockLevel"
+                            min="0"
+                            step="0.01"
+                            value={
+                                addForm.minimumStockLevel
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter minimum stock"
+                        />
+                    </div>
+
+                    <div className="fld edit-full">
+                        <label htmlFor="add-raw-material-stock-notes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="add-raw-material-stock-notes"
+                            name="notes"
+                            rows="3"
+                            maxLength="1000"
+                            value={
+                                addForm.notes
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            placeholder="Enter notes"
+                        />
+                    </div>
                 </div>
+            </FormModal>
 
-            )}
+            {/* ====================================================
+                EDIT RAW MATERIAL STOCK MODAL
+            ==================================================== */}
 
-        </div>
+            <FormModal
+                isOpen={
+                    !!editingStock
+                }
+                onClose={
+                    closeEditModal
+                }
+                title="Edit Raw Material Stock"
+                subtitle="Update raw material stock information"
+                onSubmit={
+                    handleUpdateStock
+                }
+                submitLabel="Update Stock"
+                cancelLabel="Cancel"
+                saving={
+                    editLoading
+                }
+                error={
+                    editError
+                }
+                size="lg"
+            >
+                {editingStock && (
+                    <div className="edit-form-grid">
+                        <div className="fld">
+                            <label htmlFor="edit-raw-material-stock-id">
+                                Stock ID
+                            </label>
+
+                            <input
+                                id="edit-raw-material-stock-id"
+                                type="text"
+                                value={
+                                    editingStock.rawMaterialStockId
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-raw-material-id">
+                                Raw Material ID
+                            </label>
+
+                            <input
+                                id="edit-raw-material-id"
+                                type="text"
+                                value={
+                                    editingStock.rawMaterialId
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-raw-material-name">
+                                Raw Material
+                            </label>
+
+                            <input
+                                id="edit-raw-material-name"
+                                type="text"
+                                value={
+                                    editingStock.rawMaterialName ||
+                                    ""
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-raw-material-unit">
+                                Unit
+                            </label>
+
+                            <input
+                                id="edit-raw-material-unit"
+                                type="text"
+                                value={
+                                    editingStock.rawMaterialUnit ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-current-stock-level">
+                                Current Stock Level
+                            </label>
+
+                            <input
+                                id="edit-current-stock-level"
+                                type="number"
+                                name="currentStockLevel"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    editForm.currentStockLevel
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-minimum-stock-level">
+                                Minimum Stock Level
+                            </label>
+
+                            <input
+                                id="edit-minimum-stock-level"
+                                type="number"
+                                name="minimumStockLevel"
+                                min="0"
+                                step="0.01"
+                                value={
+                                    editForm.minimumStockLevel
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-stock-status">
+                                Stock Status
+                            </label>
+
+                            <input
+                                id="edit-stock-status"
+                                type="text"
+                                value={
+                                    editingStock.stockStatus ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="edit-record-status">
+                                Record Status
+                            </label>
+
+                            <input
+                                id="edit-record-status"
+                                type="text"
+                                value={
+                                    editingStock.recordStatus ||
+                                    "-"
+                                }
+                                disabled
+                            />
+                        </div>
+
+                        <div className="fld edit-full">
+                            <label htmlFor="edit-raw-material-stock-notes">
+                                Notes
+                            </label>
+
+                            <textarea
+                                id="edit-raw-material-stock-notes"
+                                name="notes"
+                                rows="3"
+                                maxLength="1000"
+                                value={
+                                    editForm.notes
+                                }
+                                onChange={
+                                    handleEditChange
+                                }
+                                placeholder="Enter notes"
+                            />
+                        </div>
+                    </div>
+                )}
+            </FormModal>
+
+            {/* ====================================================
+                DELETE CONFIRMATION MODAL
+            ==================================================== */}
+
+            <DeleteConfirmModal
+                isOpen={
+                    !!deletingStock
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    handleConfirmDelete
+                }
+                title="Delete Raw Material Stock"
+                subtitle="Please confirm this action"
+                message="Are you sure you want to delete this raw material stock record?"
+                itemName={
+                    deletingStock
+                        ? `Stock ID: ${deletingStock.rawMaterialStockId} — ${
+                              deletingStock.rawMaterialName ||
+                              "Raw Material"
+                          }`
+                        : ""
+                }
+                confirming={
+                    deleteLoading
+                }
+                error={
+                    deleteError
+                }
+            />
+        </>
     );
 }
 

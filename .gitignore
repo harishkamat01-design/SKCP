@@ -96,3 +96,11 @@ Desktop.ini
 # Misc
 # ==========================================================
 *.orig
+
+# ==========================================================
+# SKCP Local Development Backups
+# ==========================================================
+
+frontend/src/**/*backup*
+frontend/src/**/*before-*
+frontend/src/**/*corrupted*
