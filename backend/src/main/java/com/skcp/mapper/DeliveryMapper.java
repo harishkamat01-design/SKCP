@@ -142,6 +142,21 @@ public class DeliveryMapper {
             response.setOrderId(
                     delivery.getOrder().getOrderId()
             );
+
+            if (delivery.getOrder().getCustomer() != null) {
+
+                response.setCustomerId(
+                        delivery.getOrder()
+                                .getCustomer()
+                                .getCustomerId()
+                );
+
+                response.setCustomerName(
+                        delivery.getOrder()
+                                .getCustomer()
+                                .getCustomerName()
+                );
+            }
         }
 
         response.setDeliveryDate(
@@ -215,6 +230,21 @@ public class DeliveryMapper {
             response.setOrderId(
                     delivery.getOrder().getOrderId()
             );
+
+            if (delivery.getOrder().getCustomer() != null) {
+
+                response.setCustomerId(
+                        delivery.getOrder()
+                                .getCustomer()
+                                .getCustomerId()
+                );
+
+                response.setCustomerName(
+                        delivery.getOrder()
+                                .getCustomer()
+                                .getCustomerName()
+                );
+            }
         }
 
         response.setDeliveryDate(

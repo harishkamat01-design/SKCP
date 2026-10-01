@@ -15,12 +15,17 @@ import {
     apiDelete,
 } from "../../../services/api";
 
+import Pagination from "../../../components/ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+
 function CuringStock() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [stockList, setStockList] = useState([]);
+    const [productList, setProductList] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -99,14 +104,26 @@ function CuringStock() {
             setLoading(true);
             setError("");
 
-            const result = await apiGet("/api/curing-stock");
+            const result = await apiGet(
+                "/api/curing-stock"
+            );
+
+            const productResult = await apiGet(
+                "/api/products"
+            );
 
             console.log(
                 "Curing Stock API response:",
                 result
             );
 
+            console.log(
+                "Products API response:",
+                productResult
+            );
+
             setStockList(result.data || []);
+            setProductList(productResult.data || []);
         } catch (err) {
             console.error(
                 "Error fetching curing stock:",
@@ -122,6 +139,32 @@ function CuringStock() {
     };
 
     // ============================================================
+    // COMBINE CURING STOCK WITH PRODUCT DETAILS
+    // ============================================================
+
+    const stockWithProductDetails = useMemo(() => {
+        return stockList.map((stock) => {
+            const product = productList.find(
+                (item) =>
+                    item.productId === stock.productId
+            );
+
+            return {
+                ...stock,
+
+                productName:
+                    stock.productName ||
+                    product?.productName ||
+                    "-",
+
+                size:
+                    product?.size ||
+                    "-",
+            };
+        });
+    }, [stockList, productList]);
+
+    // ============================================================
     // SEARCH
     // ============================================================
 
@@ -130,61 +173,101 @@ function CuringStock() {
             searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
-            return stockList;
+            return stockWithProductDetails;
         }
 
-        return stockList.filter((stock) => {
-            return (
-                String(
-                    stock.curingStockId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+        return stockWithProductDetails.filter(
+            (stock) => {
+                return (
+                    String(
+                        stock.curingStockId || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.productionId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productionId || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.productId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productId || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.productName || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productName || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.quantity || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.size || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.productionDate || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.quantity || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.expectedReadyDate || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productionDate || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.status || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword)
-            );
-        });
-    }, [stockList, searchKeyword]);
+                    String(
+                        stock.expectedReadyDate || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
+
+                    String(
+                        stock.status || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword)
+                );
+            }
+        );
+    }, [
+        stockWithProductDetails,
+        searchKeyword,
+    ]);
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredStock,
+        "curingStockId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(sortedRecords, 10);
 
     // ============================================================
     // VIEW CURING STOCK
@@ -205,7 +288,22 @@ function CuringStock() {
                 result
             );
 
-            setSelectedStock(result.data);
+            const product = productList.find(
+                (item) =>
+                    item.productId ===
+                    result.data?.productId
+            );
+
+            setSelectedStock({
+                ...result.data,
+                productName:
+                    result.data?.productName ||
+                    product?.productName ||
+                    "-",
+                size:
+                    product?.size ||
+                    "-",
+            });
         } catch (err) {
             console.error(
                 "Error fetching curing stock details:",
@@ -410,7 +508,22 @@ function CuringStock() {
 
             const stockData = result.data;
 
-            setEditingStock(stockData);
+            const product = productList.find(
+                (item) =>
+                    item.productId ===
+                    stockData?.productId
+            );
+
+            setEditingStock({
+                ...stockData,
+                productName:
+                    stockData?.productName ||
+                    product?.productName ||
+                    "-",
+                size:
+                    product?.size ||
+                    "-",
+            });
 
             setEditForm({
                 productId:
@@ -705,22 +818,39 @@ function CuringStock() {
                         Search Curing Stock
                     </label>
 
-                    <input
-                        id="curing-stock-search"
-                        type="text"
-                        placeholder="Search by product, production ID, status..."
-                        value={
-                            searchKeyword
-                        }
-                        onChange={(
-                            event
-                        ) =>
-                            setSearchKeyword(
-                                event.target
-                                    .value
-                            )
-                        }
-                    />
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginTop: "10px",
+                        }}
+                    >
+                        <input
+                            id="curing-stock-search"
+                            type="text"
+                            placeholder="Search by product, size, production ID, status..."
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                            style={{
+                                width: "20%",
+                            }}
+                        />
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={() =>
+                                setSearchKeyword("")
+                            }
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -764,31 +894,163 @@ function CuringStock() {
                                 <thead>
                                     <tr>
                                         <th>
-                                            ID
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "curingStockId"
+                                                    )
+                                                }
+                                            >
+                                                ID{" "}
+                                                {sortKey ===
+                                                    "curingStockId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            PRODUCTION ID
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "productionId"
+                                                    )
+                                                }
+                                            >
+                                                PRODUCTION ID{" "}
+                                                {sortKey ===
+                                                    "productionId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            PRODUCT
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "productName"
+                                                    )
+                                                }
+                                            >
+                                                PRODUCT{" "}
+                                                {sortKey ===
+                                                    "productName" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            QUANTITY
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "size"
+                                                    )
+                                                }
+                                            >
+                                                SIZE{" "}
+                                                {sortKey ===
+                                                    "size" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            PRODUCTION DATE
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "quantity"
+                                                    )
+                                                }
+                                            >
+                                                QUANTITY{" "}
+                                                {sortKey ===
+                                                    "quantity" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            EXPECTED READY
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "productionDate"
+                                                    )
+                                                }
+                                            >
+                                                PRODUCTION DATE{" "}
+                                                {sortKey ===
+                                                    "productionDate" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            STATUS
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "expectedReadyDate"
+                                                    )
+                                                }
+                                            >
+                                                EXPECTED READY{" "}
+                                                {sortKey ===
+                                                    "expectedReadyDate" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
+                                        </th>
+
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "status"
+                                                    )
+                                                }
+                                            >
+                                                STATUS{" "}
+                                                {sortKey ===
+                                                    "status" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
@@ -798,7 +1060,7 @@ function CuringStock() {
                                 </thead>
 
                                 <tbody>
-                                    {filteredStock.map(
+                                    {paginatedRecords.map(
                                         (
                                             stock
                                         ) => (
@@ -826,6 +1088,13 @@ function CuringStock() {
                                                             `Product ${stock.productId}`
                                                         }
                                                     </strong>
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        stock.size ||
+                                                        "-"
+                                                    }
                                                 </td>
 
                                                 <td>
@@ -898,6 +1167,27 @@ function CuringStock() {
                                     )}
                                 </tbody>
                             </table>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={
+                                    pageSize
+                                }
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
                         </div>
                     )}
             </section>
@@ -967,6 +1257,14 @@ function CuringStock() {
                             value={
                                 selectedStock.productName ||
                                 `Product ${selectedStock.productId}`
+                            }
+                        />
+
+                        <DetailItem
+                            label="Size"
+                            value={
+                                selectedStock.size ||
+                                "-"
                             }
                         />
 

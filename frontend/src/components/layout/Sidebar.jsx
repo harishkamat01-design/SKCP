@@ -263,13 +263,22 @@ export default function Sidebar({
             {isKannada ? "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್" : "Dashboard"}
           </button>
 
+            <button
+          className={`nav-item ${
+            isActive("reports") ? "active" : ""
+          }`}
+          onClick={() => setActiveSection("reports")}
+        >
+          {isKannada ? "SKCP ವರದಿಗಳು" : "SKCP Reports"}
+        </button>
+
           <button
             className={`nav-item ${
-              isActive("reports") ? "active" : ""
+              isActive("statements") ? "active" : ""
             }`}
-            onClick={() => setActiveSection("reports")}
+            onClick={() => setActiveSection("statements")}
           >
-            {isKannada ? "ವರದಿಗಳು" : "Reports"}
+            {isKannada ? "ಹೇಳಿಕೆಗಳು" : "Statements"}
           </button>
 
           <button

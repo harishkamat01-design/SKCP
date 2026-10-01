@@ -20,6 +20,10 @@ public class PaymentAllocationSummaryResponse {
 
     private Integer orderId;
 
+    private Integer customerId;
+
+    private String customerName;
+
 
     // ============================================================
     // ALLOCATION DETAILS
@@ -28,6 +32,8 @@ public class PaymentAllocationSummaryResponse {
     private BigDecimal allocatedAmount;
 
     private LocalDate allocationDate;
+
+    private String allocationStatus;
 
 
     // ============================================================
@@ -65,6 +71,22 @@ public class PaymentAllocationSummaryResponse {
         this.orderId = orderId;
     }
 
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
     public BigDecimal getAllocatedAmount() {
         return allocatedAmount;
     }
@@ -79,6 +101,14 @@ public class PaymentAllocationSummaryResponse {
 
     public void setAllocationDate(LocalDate allocationDate) {
         this.allocationDate = allocationDate;
+    }
+
+    public String getAllocationStatus() {
+        return allocationStatus;
+    }
+
+    public void setAllocationStatus(String allocationStatus) {
+        this.allocationStatus = allocationStatus;
     }
 
     public String getRecordStatus() {

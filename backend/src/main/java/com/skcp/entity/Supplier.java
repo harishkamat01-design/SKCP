@@ -30,6 +30,9 @@ public class Supplier {
     @Column(name = "gst_number", length = 30)
     private String gstNumber;
 
+    @Column(name = "remarks", length = 500)
+    private String remarks;
+
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
@@ -106,6 +109,15 @@ public class Supplier {
     public void setGstNumber(String gstNumber) {
         this.gstNumber = gstNumber;
     }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
 
     public String getStatus() {
         return status;

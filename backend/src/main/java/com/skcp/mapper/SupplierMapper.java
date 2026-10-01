@@ -23,6 +23,7 @@ public class SupplierMapper
         supplier.setWhatsapp(request.getWhatsapp());
         supplier.setAddress(request.getAddress());
         supplier.setGstNumber(request.getGstNumber());
+        supplier.setRemarks(request.getRemarks());
 
         return supplier;
     }
@@ -43,6 +44,7 @@ public class SupplierMapper
         supplier.setWhatsapp(request.getWhatsapp());
         supplier.setAddress(request.getAddress());
         supplier.setGstNumber(request.getGstNumber());
+        supplier.setRemarks(request.getRemarks());
 
         /*
          * Notice that supplierId, status and createdAt
@@ -68,6 +70,7 @@ public class SupplierMapper
         response.setWhatsapp(supplier.getWhatsapp());
         response.setAddress(supplier.getAddress());
         response.setGstNumber(supplier.getGstNumber());
+        response.setRemarks(supplier.getRemarks());
         response.setStatus(supplier.getStatus());
         response.setCreatedAt(supplier.getCreatedAt());
 
@@ -89,6 +92,7 @@ public class SupplierMapper
         response.setSupplierId(supplier.getSupplierId());
         response.setSupplierName(supplier.getSupplierName());
         response.setPhone(supplier.getPhone());
+        response.setRemarks(supplier.getRemarks());
         response.setStatus(supplier.getStatus());
 
         return response;

@@ -36,6 +36,9 @@ public class SupplierUpdateRequest
     )
     private String gstNumber;
 
+    @Size(max = 500, message = "Remarks must not exceed 500 characters")
+    private String remarks;
+
 
     // Default constructor
     public SupplierUpdateRequest()
@@ -107,6 +110,16 @@ public class SupplierUpdateRequest
         this.gstNumber = normalizedGstNumber == null
                 ? null
                 : normalizedGstNumber.toUpperCase();
+    }
+
+    public String getRemarks()
+    {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks)
+    {
+        this.remarks = normalize(remarks);
     }
 
 

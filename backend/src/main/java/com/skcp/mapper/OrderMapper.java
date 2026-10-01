@@ -1,4 +1,3 @@
-
 package com.skcp.mapper;
 
 import com.skcp.dto.request.order.OrderCreateRequest;
@@ -87,6 +86,10 @@ public class OrderMapper {
             response.setCustomerId(
                     order.getCustomer().getCustomerId()
             );
+
+            response.setCustomerName(
+                    order.getCustomer().getCustomerName()
+            );
         }
 
         response.setOrderDate(
@@ -131,6 +134,10 @@ public class OrderMapper {
 
             response.setCustomerId(
                     order.getCustomer().getCustomerId()
+            );
+
+            response.setCustomerName(
+                    order.getCustomer().getCustomerName()
             );
         }
 

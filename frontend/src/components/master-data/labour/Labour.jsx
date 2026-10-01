@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     apiGet,
@@ -11,6 +11,10 @@ import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
 import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
 import { DetailGrid, DetailItem } from "../../ui/common/DetailGrid";
+
+import Pagination from "../../ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
 
 function Labour() {
 
@@ -87,16 +91,15 @@ function Labour() {
     // SEARCH
     // ============================================================
 
-    const filteredLabours = labours.filter((labour) => {
-
+    const filteredLabours = useMemo(() => {
         const keyword =
             searchKeyword.toLowerCase().trim();
 
         if (!keyword) {
-            return true;
+            return labours;
         }
 
-        return (
+        return labours.filter((labour) => (
             String(labour.labourId || "")
                 .toLowerCase()
                 .includes(keyword) ||
@@ -116,8 +119,62 @@ function Labour() {
             labour.status
                 ?.toLowerCase()
                 .includes(keyword)
-        );
-    });
+        ));
+    }, [labours, searchKeyword]);
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort
+    } = useTableSort(
+        filteredLabours,
+        "labourId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // CLEAR SEARCH
+    // ============================================================
+
+    const handleClearSearch = () => {
+        setSearchKeyword("");
+    };
+
+    // ============================================================
+    // SORT INDICATOR
+    // ============================================================
+
+    const getSortIndicator = (columnKey) => {
+        if (sortKey !== columnKey) {
+            return "";
+        }
+
+        return sortDirection === "asc"
+            ? " ▲"
+            : " ▼";
+    };
 
     // ============================================================
     // FORM INPUT HANDLER
@@ -173,7 +230,6 @@ function Labour() {
                 );
 
             setSelectedLabour(result?.data || null);
-
             setShowViewModal(true);
 
         } catch (err) {
@@ -525,17 +581,30 @@ function Labour() {
                         Search Labour
                     </label>
 
-                    <input
-                        id="labour-search"
-                        type="text"
-                        placeholder="Search by labour name, mobile, skill type or status..."
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
-                        }
-                    />
+                    <div className="search-action-row">
+
+                        <input
+                            id="labour-search"
+                            type="text"
+                            placeholder="Search by labour name, mobile, skill type or status..."
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                        />
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={handleClearSearch}
+                            disabled={!searchKeyword}
+                        >
+                            Clear
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -617,142 +686,230 @@ function Labour() {
 
                 {!loading && !error && (
 
-                    <div className="tbl-wrap">
+                    <>
 
-                        <table>
+                        <div className="tbl-wrap">
 
-                            <thead>
+                            <table>
 
-                                <tr>
+                                <thead>
 
-                                    <th>ID</th>
-                                    <th>Labour</th>
-                                    <th>Phone</th>
-                                    <th>Skill Type</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <tr>
 
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                                {filteredLabours.map(
-                                    (labour) => (
-
-                                        <tr
-                                            key={
-                                                labour.labourId
+                                        <th
+                                            onClick={() =>
+                                                handleSort("labourId")
                                             }
+                                            style={{
+                                                cursor: "pointer"
+                                            }}
                                         >
+                                            ID
+                                            {getSortIndicator(
+                                                "labourId"
+                                            )}
+                                        </th>
 
-                                            <td>
-                                                {
+                                        <th
+                                            onClick={() =>
+                                                handleSort("labourName")
+                                            }
+                                            style={{
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            Labour
+                                            {getSortIndicator(
+                                                "labourName"
+                                            )}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort("phone")
+                                            }
+                                            style={{
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            Phone
+                                            {getSortIndicator(
+                                                "phone"
+                                            )}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort("skillType")
+                                            }
+                                            style={{
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            Skill Type
+                                            {getSortIndicator(
+                                                "skillType"
+                                            )}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort("status")
+                                            }
+                                            style={{
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            Status
+                                            {getSortIndicator(
+                                                "status"
+                                            )}
+                                        </th>
+
+                                        <th>
+                                            Actions
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {paginatedRecords.map(
+                                        (labour) => (
+
+                                            <tr
+                                                key={
                                                     labour.labourId
                                                 }
-                                            </td>
+                                            >
 
-                                            <td>
-
-                                                <strong>
+                                                <td>
                                                     {
-                                                        labour.labourName
+                                                        labour.labourId
                                                     }
-                                                </strong>
+                                                </td>
 
-                                            </td>
+                                                <td>
 
-                                            <td>
-                                                {
-                                                    labour.phone ||
-                                                    "-"
-                                                }
-                                            </td>
+                                                    <strong>
+                                                        {
+                                                            labour.labourName
+                                                        }
+                                                    </strong>
 
-                                            <td>
-                                                {
-                                                    labour.skillType ||
-                                                    "-"
-                                                }
-                                            </td>
+                                                </td>
 
-                                            <td>
-
-                                                <span
-                                                    className={
-                                                        labour.status ===
-                                                        "ACTIVE"
-                                                            ? "badge bg"
-                                                            : "badge br"
-                                                    }
-                                                >
+                                                <td>
                                                     {
-                                                        labour.status
+                                                        labour.phone ||
+                                                        "-"
                                                     }
-                                                </span>
+                                                </td>
 
-                                            </td>
+                                                <td>
+                                                    {
+                                                        labour.skillType ||
+                                                        "-"
+                                                    }
+                                                </td>
 
-                                            <td>
+                                                <td>
 
-                                                <div className="action-buttons">
-
-                                                    <button
-                                                        type="button"
-                                                        className="btn sm"
-                                                        onClick={() =>
-                                                            handleViewLabour(
-                                                                labour
-                                                            )
+                                                    <span
+                                                        className={
+                                                            labour.status ===
+                                                            "ACTIVE"
+                                                                ? "badge bg"
+                                                                : "badge br"
                                                         }
                                                     >
-                                                        View
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        className="btn sm"
-                                                        onClick={() =>
-                                                            handleEditLabour(
-                                                                labour
-                                                            )
+                                                        {
+                                                            labour.status
                                                         }
-                                                    >
-                                                        Edit
-                                                    </button>
+                                                    </span>
 
-                                                    {labour.status ===
-                                                        "ACTIVE" && (
+                                                </td>
+
+                                                <td>
+
+                                                    <div className="action-buttons">
 
                                                         <button
                                                             type="button"
                                                             className="btn sm"
                                                             onClick={() =>
-                                                                handleDeleteLabour(
+                                                                handleViewLabour(
                                                                     labour
                                                                 )
                                                             }
                                                         >
-                                                            Delete
+                                                            View
                                                         </button>
 
-                                                    )}
+                                                        <button
+                                                            type="button"
+                                                            className="btn sm"
+                                                            onClick={() =>
+                                                                handleEditLabour(
+                                                                    labour
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
 
-                                                </div>
+                                                        {labour.status ===
+                                                            "ACTIVE" && (
 
-                                            </td>
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleDeleteLabour(
+                                                                        labour
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
 
-                                        </tr>
+                                                        )}
 
-                                    )
-                                )}
+                                                    </div>
 
-                            </tbody>
+                                                </td>
 
-                        </table>
+                                            </tr>
 
-                    </div>
+                                        )
+                                    )}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {/* Pagination */}
+
+                        {totalRecords > 0 && (
+
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalRecords={totalRecords}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
+
+                        )}
+
+                    </>
                 )}
 
                 {/* Empty State */}

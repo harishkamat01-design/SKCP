@@ -15,12 +15,17 @@ import {
     DetailItem,
 } from "../../ui/common/DetailGrid";
 
+import Pagination from "../../../components/ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+
 function FinishedGoodsStock() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [stockList, setStockList] = useState([]);
+    const [productList, setProductList] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -113,12 +118,27 @@ function FinishedGoodsStock() {
                 "/api/finished-goods-stock"
             );
 
+            const productResult = await apiGet(
+                "/api/products"
+            );
+
+            setProductList(
+                productResult.data || []
+            );
+
             console.log(
                 "Finished Goods Stock API response:",
                 result
             );
 
-            setStockList(result.data || []);
+            console.log(
+                "Products API response:",
+                productResult
+            );
+
+            setStockList(
+                result.data || []
+            );
         } catch (err) {
             console.error(
                 "Error fetching finished goods stock:",
@@ -134,6 +154,28 @@ function FinishedGoodsStock() {
     };
 
     // ============================================================
+    // COMBINE STOCK WITH PRODUCT DETAILS
+    // ============================================================
+
+    const stockWithProductDetails = useMemo(() => {
+        return stockList.map((stock) => {
+            const product = productList.find(
+                (item) =>
+                    item.productId ===
+                    stock.productId
+            );
+
+            return {
+                ...stock,
+                productName:
+                    product?.productName || "-",
+                size:
+                    product?.size || "-",
+            };
+        });
+    }, [stockList, productList]);
+
+    // ============================================================
     // SEARCH
     // ============================================================
 
@@ -142,52 +184,98 @@ function FinishedGoodsStock() {
             searchKeyword.trim().toLowerCase();
 
         if (!keyword) {
-            return stockList;
+            return stockWithProductDetails;
         }
 
-        return stockList.filter((stock) => {
-            return (
-                String(
-                    stock.finishedGoodsStockId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+        return stockWithProductDetails.filter(
+            (stock) => {
+                return (
+                    String(
+                        stock.finishedGoodsStockId || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(stock.productId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productId || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.productName || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.productName || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.currentStockLevel || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.size || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(
-                    stock.minimumStockLevel || ""
-                    
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.currentStockLevel || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(stock.status || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
+                    String(
+                        stock.minimumStockLevel || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                
+                    String(
+                        stock.status || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword) ||
 
-                String(stock.notes || "")
-                    .toLowerCase()
-                    .includes(keyword)
-            );
-        });
-    }, [stockList, searchKeyword]);
+                    String(
+                        stock.notes || ""
+                    )
+                        .toLowerCase()
+                        .includes(keyword)
+                );
+            }
+        );
+    }, [
+        stockWithProductDetails,
+        searchKeyword,
+    ]);
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredStock,
+        "finishedGoodsStockId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
 
     // ============================================================
     // VIEW FINISHED GOODS STOCK
@@ -207,7 +295,6 @@ function FinishedGoodsStock() {
                 "Finished Goods Stock details:",
                 result
             );
-
 
             setSelectedStock(result.data);
         } catch (err) {
@@ -268,7 +355,10 @@ function FinishedGoodsStock() {
     };
 
     const handleAddChange = (event) => {
-        const { name, value } = event.target;
+        const {
+            name,
+            value,
+        } = event.target;
 
         setAddForm((previous) => ({
             ...previous,
@@ -296,7 +386,9 @@ function FinishedGoodsStock() {
             return;
         }
 
-        if (Number(addForm.productId) <= 0) {
+        if (
+            Number(addForm.productId) <= 0
+        ) {
             setAddError(
                 "Product ID must be greater than zero."
             );
@@ -306,7 +398,9 @@ function FinishedGoodsStock() {
         if (
             addForm.currentStockLevel === "" ||
             Number.isNaN(
-                Number(addForm.currentStockLevel)
+                Number(
+                    addForm.currentStockLevel
+                )
             )
         ) {
             setAddError(
@@ -316,7 +410,9 @@ function FinishedGoodsStock() {
         }
 
         if (
-            Number(addForm.currentStockLevel) < 0
+            Number(
+                addForm.currentStockLevel
+            ) < 0
         ) {
             setAddError(
                 "Current stock level cannot be negative."
@@ -327,7 +423,9 @@ function FinishedGoodsStock() {
         if (
             addForm.minimumStockLevel === "" ||
             Number.isNaN(
-                Number(addForm.minimumStockLevel)
+                Number(
+                    addForm.minimumStockLevel
+                )
             )
         ) {
             setAddError(
@@ -337,7 +435,9 @@ function FinishedGoodsStock() {
         }
 
         if (
-            Number(addForm.minimumStockLevel) < 0
+            Number(
+                addForm.minimumStockLevel
+            ) < 0
         ) {
             setAddError(
                 "Minimum stock level cannot be negative."
@@ -354,10 +454,14 @@ function FinishedGoodsStock() {
                 Number(addForm.productId),
 
             currentStockLevel:
-                Number(addForm.currentStockLevel),
+                Number(
+                    addForm.currentStockLevel
+                ),
 
             minimumStockLevel:
-                Number(addForm.minimumStockLevel),
+                Number(
+                    addForm.minimumStockLevel
+                ),
 
             notes:
                 addForm.notes.trim() || null,
@@ -380,7 +484,6 @@ function FinishedGoodsStock() {
                 "Finished Goods Stock created:",
                 result
             );
-
 
             setShowAddModal(false);
 
@@ -425,20 +528,25 @@ function FinishedGoodsStock() {
                 result
             );
 
+            const stockData =
+                result.data;
 
-            const stockData = result.data;
-
-            setEditingStock(stockData);
+            setEditingStock(
+                stockData
+            );
 
             setEditForm({
                 currentStockLevel:
-                    stockData.currentStockLevel ?? "",
+                    stockData.currentStockLevel ??
+                    "",
 
                 minimumStockLevel:
-                    stockData.minimumStockLevel ?? "",
+                    stockData.minimumStockLevel ??
+                    "",
 
                 notes:
-                    stockData.notes || "",
+                    stockData.notes ||
+                    "",
             });
         } catch (err) {
             console.error(
@@ -471,7 +579,10 @@ function FinishedGoodsStock() {
     };
 
     const handleEditChange = (event) => {
-        const { name, value } = event.target;
+        const {
+            name,
+            value,
+        } = event.target;
 
         setEditForm((previous) => ({
             ...previous,
@@ -483,7 +594,9 @@ function FinishedGoodsStock() {
     // UPDATE FINISHED GOODS STOCK
     // ============================================================
 
-    const handleUpdateStock = async (event) => {
+    const handleUpdateStock = async (
+        event
+    ) => {
         event.preventDefault();
 
         if (!editingStock) {
@@ -499,7 +612,9 @@ function FinishedGoodsStock() {
         if (
             editForm.currentStockLevel === "" ||
             Number.isNaN(
-                Number(editForm.currentStockLevel)
+                Number(
+                    editForm.currentStockLevel
+                )
             )
         ) {
             setEditError(
@@ -509,7 +624,9 @@ function FinishedGoodsStock() {
         }
 
         if (
-            Number(editForm.currentStockLevel) < 0
+            Number(
+                editForm.currentStockLevel
+            ) < 0
         ) {
             setEditError(
                 "Current stock level cannot be negative."
@@ -520,7 +637,9 @@ function FinishedGoodsStock() {
         if (
             editForm.minimumStockLevel === "" ||
             Number.isNaN(
-                Number(editForm.minimumStockLevel)
+                Number(
+                    editForm.minimumStockLevel
+                )
             )
         ) {
             setEditError(
@@ -530,7 +649,9 @@ function FinishedGoodsStock() {
         }
 
         if (
-            Number(editForm.minimumStockLevel) < 0
+            Number(
+                editForm.minimumStockLevel
+            ) < 0
         ) {
             setEditError(
                 "Minimum stock level cannot be negative."
@@ -554,7 +675,8 @@ function FinishedGoodsStock() {
                 ),
 
             notes:
-                editForm.notes.trim() || null,
+                editForm.notes.trim() ||
+                null,
         };
 
         try {
@@ -574,7 +696,6 @@ function FinishedGoodsStock() {
                 "Finished Goods Stock updated:",
                 result
             );
-
 
             setEditingStock(null);
 
@@ -618,52 +739,53 @@ function FinishedGoodsStock() {
         setDeleteError("");
     };
 
-    const handleConfirmDelete = async () => {
-        if (!deletingStock) {
-            return;
-        }
+    const handleConfirmDelete =
+        async () => {
+            if (!deletingStock) {
+                return;
+            }
 
-        try {
-            setDeleteLoading(true);
-            setDeleteError("");
+            try {
+                setDeleteLoading(true);
+                setDeleteError("");
 
-            console.log(
-                "Deleting finished goods stock ID:",
-                deletingStock.finishedGoodsStockId
-            );
+                console.log(
+                    "Deleting finished goods stock ID:",
+                    deletingStock.finishedGoodsStockId
+                );
 
-            const result = await apiDelete(
-                `/api/finished-goods-stock/${deletingStock.finishedGoodsStockId}`
-            );
+                const result =
+                    await apiDelete(
+                        `/api/finished-goods-stock/${deletingStock.finishedGoodsStockId}`
+                    );
 
-            console.log(
-                "Delete Finished Goods Stock response:",
-                result
-            );
+                console.log(
+                    "Delete Finished Goods Stock response:",
+                    result
+                );
 
+                console.log(
+                    "Finished Goods Stock deleted:",
+                    result
+                );
 
-            console.log(
-                "Finished Goods Stock deleted:",
-                result
-            );
+                setDeletingStock(null);
 
-            setDeletingStock(null);
+                await fetchStock();
+            } catch (err) {
+                console.error(
+                    "Error deleting finished goods stock:",
+                    err
+                );
 
-            await fetchStock();
-        } catch (err) {
-            console.error(
-                "Error deleting finished goods stock:",
-                err
-            );
-
-            setDeleteError(
-                err.message ||
-                    "Unable to delete finished goods stock."
-            );
-        } finally {
-            setDeleteLoading(false);
-        }
-    };
+                setDeleteError(
+                    err.message ||
+                        "Unable to delete finished goods stock."
+                );
+            } finally {
+                setDeleteLoading(false);
+            }
+        };
 
     // ============================================================
     // LOADING
@@ -735,22 +857,45 @@ function FinishedGoodsStock() {
                         Search Finished Goods Stock
                     </label>
 
-                    <input
-                        id="finished-goods-stock-search"
-                        type="text"
-                        placeholder="Search by product, stock level, status..."
-                        value={
-                            searchKeyword
-                        }
-                        onChange={(
-                            event
-                        ) =>
-                            setSearchKeyword(
-                                event.target
-                                    .value
-                            )
-                        }
-                    />
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginTop: "10px",
+                        }}
+                    >
+                        <input
+                            id="finished-goods-stock-search"
+                            type="text"
+                            placeholder="Search by product, stock level, status..."
+                            value={
+                                searchKeyword
+                            }
+                            onChange={(
+                                event
+                            ) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                            style={{
+                                width: "20%",
+                            }}
+                        />
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={() =>
+                                setSearchKeyword(
+                                    ""
+                                )
+                            }
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -795,30 +940,128 @@ function FinishedGoodsStock() {
                                 <thead>
                                     <tr>
                                         <th>
-                                            ID
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "finishedGoodsStockId"
+                                                    )
+                                                }
+                                            >
+                                                ID{" "}
+                                                {sortKey ===
+                                                    "finishedGoodsStockId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            PRODUCT
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "productName"
+                                                    )
+                                                }
+                                            >
+                                                PRODUCT{" "}
+                                                {sortKey ===
+                                                    "productName" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            CURRENT STOCK
+                                            SIZE
                                         </th>
 
                                         <th>
-                                            MINIMUM STOCK
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "currentStockLevel"
+                                                    )
+                                                }
+                                            >
+                                                CURRENT STOCK{" "}
+                                                {sortKey ===
+                                                    "currentStockLevel" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            STATUS
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "minimumStockLevel"
+                                                    )
+                                                }
+                                            >
+                                                MINIMUM STOCK{" "}
+                                                {sortKey ===
+                                                    "minimumStockLevel" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
                                         <th>
-                                            LAST UPDATED
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "status"
+                                                    )
+                                                }
+                                            >
+                                                STATUS{" "}
+                                                {sortKey ===
+                                                    "status" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
                                         </th>
 
-                                       
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "lastUpdatedDate"
+                                                    )
+                                                }
+                                            >
+                                                LAST UPDATED{" "}
+                                                {sortKey ===
+                                                    "lastUpdatedDate" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? "▲"
+                                                        : "▼")}
+                                            </button>
+                                        </th>
 
                                         <th>
                                             ACTIONS
@@ -827,7 +1070,7 @@ function FinishedGoodsStock() {
                                 </thead>
 
                                 <tbody>
-                                    {filteredStock.map(
+                                    {paginatedRecords.map(
                                         (
                                             stock
                                         ) => (
@@ -849,15 +1092,13 @@ function FinishedGoodsStock() {
                                                             `Product ${stock.productId}`
                                                         }
                                                     </strong>
+                                                </td>
 
-                                                    <br />
-
-                                                    <small>
-                                                        Product ID:{" "}
-                                                        {
-                                                            stock.productId
-                                                        }
-                                                    </small>
+                                                <td>
+                                                    {
+                                                        stock.size ||
+                                                        "-"
+                                                    }
                                                 </td>
 
                                                 <td>
@@ -885,8 +1126,6 @@ function FinishedGoodsStock() {
                                                         "-"
                                                     }
                                                 </td>
-
-                                                
 
                                                 <td>
                                                     <div className="table-actions">
@@ -932,6 +1171,27 @@ function FinishedGoodsStock() {
                                     )}
                                 </tbody>
                             </table>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={
+                                    pageSize
+                                }
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
                         </div>
                     )}
             </section>
@@ -1026,8 +1286,6 @@ function FinishedGoodsStock() {
                                 "-"
                             }
                         />
-
-                        
 
                         <DetailItem
                             label="Created At"
@@ -1301,8 +1559,6 @@ function FinishedGoodsStock() {
                                 disabled
                             />
                         </div>
-
-                   
 
                         <div className="fld">
                             <label htmlFor="edit-finished-goods-last-updated">

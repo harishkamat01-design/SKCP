@@ -74,7 +74,8 @@ CREATE TABLE supplier
     whatsapp VARCHAR(20),
     address TEXT,
     gst_number VARCHAR(30),
-
+    remarks VARCHAR(500),
+    
     status VARCHAR(10)
         NOT NULL
         DEFAULT 'ACTIVE'

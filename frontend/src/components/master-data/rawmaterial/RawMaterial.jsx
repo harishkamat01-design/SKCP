@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   apiGet,
   apiPost,
@@ -12,6 +12,9 @@ import {
   DetailGrid,
   DetailItem,
 } from "../../ui/common/DetailGrid";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+import Pagination from "../../ui/Pagination";
 
 function RawMaterial() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -82,8 +85,6 @@ function RawMaterial() {
 
       const result = await apiGet("/api/raw-materials");
 
-      console.log("Raw Material API response:", result);
-
       setRawMaterials(
         Array.isArray(result?.data) ? result.data : [],
       );
@@ -107,28 +108,89 @@ function RawMaterial() {
   // SEARCH
   // =========================================================
 
-  const filteredRawMaterials = rawMaterials.filter((material) => {
+  const filteredRawMaterials = useMemo(() => {
     const keyword = searchKeyword.trim().toLowerCase();
 
     if (!keyword) {
-      return true;
+      return rawMaterials;
     }
 
-    const materialName =
-      material.materialName?.toLowerCase() || "";
+    return rawMaterials.filter((material) => {
+      const rawMaterialId = String(
+        material.rawMaterialId ?? "",
+      ).toLowerCase();
 
-    const materialCategory =
-      material.materialCategory?.toLowerCase() || "";
+      const materialName =
+        material.materialName?.toLowerCase() || "";
 
-    const unit =
-      material.unit?.toLowerCase() || "";
+      const materialCategory =
+        material.materialCategory?.toLowerCase() || "";
 
-    return (
-      materialName.includes(keyword) ||
-      materialCategory.includes(keyword) ||
-      unit.includes(keyword)
-    );
-  });
+      const unit =
+        material.unit?.toLowerCase() || "";
+
+      const status =
+        material.status?.toLowerCase() || "";
+
+      return (
+        rawMaterialId.includes(keyword) ||
+        materialName.includes(keyword) ||
+        materialCategory.includes(keyword) ||
+        unit.includes(keyword) ||
+        status.includes(keyword)
+      );
+    });
+  }, [rawMaterials, searchKeyword]);
+
+  const handleClearSearch = () => {
+    setSearchKeyword("");
+  };
+
+  // =========================================================
+  // SORTING
+  // =========================================================
+
+  const {
+    sortKey,
+    sortDirection,
+    sortedRecords,
+    handleSort,
+  } = useTableSort(
+    filteredRawMaterials,
+    "rawMaterialId",
+    "desc",
+  );
+
+  // =========================================================
+  // PAGINATION
+  // =========================================================
+
+  const {
+    currentPage,
+    pageSize,
+    totalPages,
+    totalRecords,
+    paginatedRecords,
+    handlePageChange,
+    handlePageSizeChange,
+  } = usePagination(
+    sortedRecords,
+    10,
+  );
+
+  // =========================================================
+  // SORT ICON
+  // =========================================================
+
+  const getSortIndicator = (key) => {
+    if (sortKey !== key) {
+      return "";
+    }
+
+    return sortDirection === "asc"
+      ? "▲"
+      : "▼";
+  };
 
   // =========================================================
   // VIEW RAW MATERIAL
@@ -142,11 +204,6 @@ function RawMaterial() {
 
       const result = await apiGet(
         `/api/raw-materials/${rawMaterialId}`,
-      );
-
-      console.log(
-        "Raw Material View API response:",
-        result,
       );
 
       setSelectedRawMaterial(result?.data || null);
@@ -184,11 +241,6 @@ function RawMaterial() {
 
       const result = await apiGet(
         `/api/raw-materials/${rawMaterialId}`,
-      );
-
-      console.log(
-        "Raw Material Edit API response:",
-        result,
       );
 
       const rawMaterial = result?.data;
@@ -248,11 +300,6 @@ function RawMaterial() {
       const result = await apiPut(
         `/api/raw-materials/${editingRawMaterial.rawMaterialId}`,
         editForm,
-      );
-
-      console.log(
-        "Raw Material Update API response:",
-        result,
       );
 
       const updatedRawMaterial = result?.data;
@@ -342,11 +389,6 @@ function RawMaterial() {
         addForm,
       );
 
-      console.log(
-        "Raw Material Create API response:",
-        result,
-      );
-
       const createdRawMaterial = result?.data;
 
       if (!createdRawMaterial) {
@@ -417,13 +459,8 @@ function RawMaterial() {
       setDeleteSaving(true);
       setDeleteError("");
 
-      const result = await apiDelete(
+      await apiDelete(
         `/api/raw-materials/${deletingRawMaterial.rawMaterialId}`,
-      );
-
-      console.log(
-        "Raw Material Delete API response:",
-        result,
       );
 
       setRawMaterials((previousRawMaterials) =>
@@ -507,15 +544,28 @@ function RawMaterial() {
             Search Raw Material
           </label>
 
-          <input
-            id="raw-material-search"
-            type="text"
-            placeholder="Search by material, category or unit..."
-            value={searchKeyword}
-            onChange={(event) =>
-              setSearchKeyword(event.target.value)
-            }
-          />
+          <div className="search-action-row">
+
+            <input
+              id="raw-material-search"
+              type="text"
+              placeholder="Search by ID, material, category, unit or status..."
+              value={searchKeyword}
+              onChange={(event) =>
+                setSearchKeyword(event.target.value)
+              }
+            />
+
+            <button
+              type="button"
+              className="btn secondary"
+              onClick={handleClearSearch}
+              disabled={!searchKeyword}
+            >
+              Clear
+            </button>
+
+          </div>
 
         </div>
 
@@ -537,7 +587,7 @@ function RawMaterial() {
             <div className="kpi-sub">
               {loading
                 ? "Loading raw materials..."
-                : `${filteredRawMaterials.length} raw material(s)`}
+                : `${totalRecords} raw material(s)`}
             </div>
           </div>
 
@@ -561,133 +611,204 @@ function RawMaterial() {
           </div>
         )}
 
-        {!loading && !error && (
-          <div className="tbl-wrap">
+        {!loading &&
+          !error &&
+          totalRecords > 0 && (
+            <div className="tbl-wrap">
 
-            <table>
+              <table>
 
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Material</th>
-                  <th>Category</th>
-                  <th>Unit</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+                <thead>
+                  <tr>
 
-              <tbody>
-
-                {filteredRawMaterials.map((material) => (
-
-                  <tr key={material.rawMaterialId}>
-
-                    <td>
-                      {material.rawMaterialId}
-                    </td>
-
-                    <td>
-                      <strong>
-                        {material.materialName || "-"}
-                      </strong>
-                    </td>
-
-                    <td>
-                      {material.materialCategory || "-"}
-                    </td>
-
-                    <td>
-                      {material.unit || "-"}
-                    </td>
-
-                    <td>
-                      <span
-                        className={
-                          material.status === "ACTIVE"
-                            ? "badge bg"
-                            : "badge br"
-                        }
-                      >
-                        {material.status || "-"}
+                    <th
+                      onClick={() =>
+                        handleSort("rawMaterialId")
+                      }
+                    >
+                      ID{" "}
+                      <span className="sort-indicator">
+                        {getSortIndicator("rawMaterialId")}
                       </span>
-                    </td>
+                    </th>
 
-                    <td>
+                    <th
+                      onClick={() =>
+                        handleSort("materialName")
+                      }
+                    >
+                      Material{" "}
+                      <span className="sort-indicator">
+                        {getSortIndicator("materialName")}
+                      </span>
+                    </th>
 
-                      <div className="action-buttons">
+                    <th
+                      onClick={() =>
+                        handleSort("materialCategory")
+                      }
+                    >
+                      Category{" "}
+                      <span className="sort-indicator">
+                        {getSortIndicator("materialCategory")}
+                      </span>
+                    </th>
 
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleViewRawMaterial(
-                              material.rawMaterialId,
-                            )
-                          }
-                        >
-                          View
-                        </button>
+                    <th
+                      onClick={() =>
+                        handleSort("unit")
+                      }
+                    >
+                      Unit{" "}
+                      <span className="sort-indicator">
+                        {getSortIndicator("unit")}
+                      </span>
+                    </th>
 
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleEditRawMaterial(
-                              material.rawMaterialId,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingRawMaterial?.rawMaterialId ===
-                              material.rawMaterialId
-                          }
-                        >
-                          Edit
-                        </button>
+                    <th
+                      onClick={() =>
+                        handleSort("status")
+                      }
+                    >
+                      Status{" "}
+                      <span className="sort-indicator">
+                        {getSortIndicator("status")}
+                      </span>
+                    </th>
 
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleOpenDeleteRawMaterial(
-                              material,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingRawMaterial?.rawMaterialId ===
-                              material.rawMaterialId
-                          }
-                        >
-                          {deleteSaving &&
-                          deletingRawMaterial?.rawMaterialId ===
-                            material.rawMaterialId
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
-
-                      </div>
-
-                    </td>
+                    <th>Actions</th>
 
                   </tr>
+                </thead>
 
-                ))}
+                <tbody>
 
-              </tbody>
+                  {paginatedRecords.map((material) => (
 
-            </table>
+                    <tr key={material.rawMaterialId}>
 
-          </div>
-        )}
+                      <td>
+                        {material.rawMaterialId}
+                      </td>
+
+                      <td>
+                        <strong>
+                          {material.materialName || "-"}
+                        </strong>
+                      </td>
+
+                      <td>
+                        {material.materialCategory || "-"}
+                      </td>
+
+                      <td>
+                        {material.unit || "-"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            material.status === "ACTIVE"
+                              ? "badge bg"
+                              : "badge br"
+                          }
+                        >
+                          {material.status || "-"}
+                        </span>
+                      </td>
+
+                      <td>
+
+                        <div className="action-buttons">
+
+                          <button
+                            type="button"
+                            className="btn sm"
+                            onClick={() =>
+                              handleViewRawMaterial(
+                                material.rawMaterialId,
+                              )
+                            }
+                          >
+                            View
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn sm"
+                            onClick={() =>
+                              handleEditRawMaterial(
+                                material.rawMaterialId,
+                              )
+                            }
+                            disabled={
+                              deleteSaving &&
+                              deletingRawMaterial?.rawMaterialId ===
+                                material.rawMaterialId
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn sm"
+                            onClick={() =>
+                              handleOpenDeleteRawMaterial(
+                                material,
+                              )
+                            }
+                            disabled={
+                              deleteSaving &&
+                              deletingRawMaterial?.rawMaterialId ===
+                                material.rawMaterialId
+                            }
+                          >
+                            {deleteSaving &&
+                            deletingRawMaterial?.rawMaterialId ===
+                              material.rawMaterialId
+                              ? "Deleting..."
+                              : "Delete"}
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
 
         {!loading &&
           !error &&
-          filteredRawMaterials.length === 0 && (
+          totalRecords === 0 && (
             <div className="empty-state">
-              <p>No raw materials found.</p>
+              <p>
+                {searchKeyword
+                  ? "No raw materials match your search."
+                  : "No raw materials found."}
+              </p>
             </div>
+          )}
+
+        {!loading &&
+          !error &&
+          totalRecords > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalRecords={totalRecords}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
           )}
 
       </div>
@@ -885,6 +1006,7 @@ function RawMaterial() {
                       <option value="LITRE">
                         LITRE
                       </option>
+
                     </select>
 
                   </div>
@@ -909,6 +1031,7 @@ function RawMaterial() {
                       <option value="INACTIVE">
                         INACTIVE
                       </option>
+
                     </select>
 
                   </div>
@@ -1043,6 +1166,7 @@ function RawMaterial() {
                 <option value="LITRE">
                   LITRE
                 </option>
+
               </select>
 
             </div>

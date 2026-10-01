@@ -14,6 +14,10 @@ import {
     DetailItem,
 } from "../../ui/common/DetailGrid";
 
+import Pagination from "../../../components/ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+
 function RawMaterialStock() {
     // ============================================================
     // STATE
@@ -196,6 +200,33 @@ function RawMaterialStock() {
             );
         });
     }, [stockList, searchKeyword]);
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredStock,
+        "rawMaterialStockId",
+        "desc"
+    );
+
+           
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+
 
     // ============================================================
     // VIEW STOCK
@@ -736,7 +767,7 @@ function RawMaterialStock() {
                     </button>
                 </div>
 
-                <div className="fld production-search">
+                {/*<div className="fld production-search">
                     <label htmlFor="raw-material-stock-search">
                         Search Raw Material Stock
                     </label>
@@ -757,7 +788,36 @@ function RawMaterialStock() {
                             )
                         }
                     />
+                </div> */}
+
+                <div className="search-action-row">
+                    <div
+                        className="search-container"
+                        style={{
+                            width: "15%",
+                        }}
+                    >
+                        <input
+                            type="text"
+                            placeholder="Search raw material stock..."
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(event.target.value)
+                            }
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={() => setSearchKeyword("")}
+                    >
+                        Clear
+                    </button>
                 </div>
+
+
+
             </section>
 
             {/* ====================================================
@@ -798,43 +858,97 @@ function RawMaterialStock() {
                         <div className="table-wrap">
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>
+                                <tr>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("rawMaterialStockId")}
+                                        >
                                             ID
-                                        </th>
+                                            {sortKey === "rawMaterialStockId" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("rawMaterialName")}
+                                        >
                                             RAW MATERIAL
-                                        </th>
+                                            {sortKey === "rawMaterialName" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("rawMaterialUnit")}
+                                        >
                                             UNIT
-                                        </th>
+                                            {sortKey === "rawMaterialUnit" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("currentStockLevel")}
+                                        >
                                             CURRENT STOCK
-                                        </th>
+                                            {sortKey === "currentStockLevel" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("minimumStockLevel")}
+                                        >
                                             MINIMUM STOCK
-                                        </th>
+                                            {sortKey === "minimumStockLevel" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("stockStatus")}
+                                        >
                                             STOCK STATUS
-                                        </th>
+                                            {sortKey === "stockStatus" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() => handleSort("recordStatus")}
+                                        >
                                             STATUS
-                                        </th>
+                                            {sortKey === "recordStatus" &&
+                                                (sortDirection === "asc" ? " ▲" : " ▼")}
+                                        </button>
+                                    </th>
 
-                                        <th>
-                                            ACTIONS
-                                        </th>
-                                    </tr>
-                                </thead>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
 
                                 <tbody>
-                                    {filteredStock.map(
+                                    {paginatedRecords.map(
                                         (
                                             stock
                                         ) => (
@@ -935,6 +1049,19 @@ function RawMaterialStock() {
                                     )}
                                 </tbody>
                             </table>
+
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    totalRecords={totalRecords}
+                                    pageSize={pageSize}
+                                    onPageChange={handlePageChange}
+                                    onPageSizeChange={handlePageSizeChange}
+                                />
+
+
+
+
                         </div>
                     )}
             </section>

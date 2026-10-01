@@ -25,6 +25,7 @@ import PaymentAllocation from "./components/payment/paymentallocation/PaymentAll
 
 import Dashboard from "./components/application/dashboard/Dashboard";
 import Reports from "./components/application/reports/Reports";
+import Statements from "./components/application/statements/Statements";
 import Settings from "./components/application/settings/Settings";
 import AboutUs from "./components/application/aboutus/AboutUs";
 
@@ -34,6 +35,7 @@ function App()
 {
 
     const [activeSection, setActiveSection] = useState("dashboard");
+    const [paymentContext, setPaymentContext] = useState(null);
     const [isDark, setIsDark] = useState(() => localStorage.getItem("skcp_theme") === "dark");
     const [currentLang, setCurrentLang] = useState("en");
 
@@ -57,6 +59,22 @@ function App()
     );
     localStorage.setItem("skcp_theme", isDark ? "dark" : "light");
   }, [isDark]);
+
+
+  const handleOpenPayment = (context) => {
+      console.log("OPEN PAYMENT CONTEXT:", context);
+
+      setPaymentContext(context);
+      setActiveSection("payment");
+  };
+
+  const handleSectionChange = (section) => {
+      if (section === "payment") {
+          setPaymentContext(null);
+      }
+
+      setActiveSection(section);
+  };
 
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -97,13 +115,21 @@ function App()
         return <FinishedGoodsStock />;
 
       case "order":
-        return <Order />;
+        return (
+        <Order
+            onOpenPayment={handleOpenPayment}
+        />
+        );
 
       case "delivery":
         return <Delivery />;
 
       case "payment":
-        return <Payment />;
+        return (
+        <Payment
+            paymentContext={paymentContext}
+        />
+        );
 
       case "payment-allocation":
         return <PaymentAllocation />;
@@ -113,6 +139,9 @@ function App()
 
       case "reports":
         return <Reports />;
+
+      case "statements":
+        return <Statements />;
 
       case "settings":
         return <Settings />;
@@ -171,7 +200,7 @@ function App()
       setIsDark={setIsDark}
       currentLang={currentLang}
       setCurrentLang={setCurrentLang}
-      setActiveSection={setActiveSection}
+      setActiveSection={handleSectionChange}
       activeSection={activeSection}
       onLogout={handleLogout}   
 

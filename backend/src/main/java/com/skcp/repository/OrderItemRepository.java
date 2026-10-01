@@ -19,4 +19,11 @@ public interface OrderItemRepository
             Integer orderItemId,
             String recordStatus
     );
+
+
+    // Get all OrderItems for an Order by Record Status
+    List<OrderItem> findByOrderOrderIdAndRecordStatus(
+            Integer orderId,
+            String recordStatus
+    );
 }

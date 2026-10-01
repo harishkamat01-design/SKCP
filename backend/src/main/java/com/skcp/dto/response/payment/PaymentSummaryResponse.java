@@ -9,6 +9,8 @@ public class PaymentSummaryResponse {
 
     private Integer customerId;
 
+    private String customerName;
+
     private LocalDate paymentDate;
 
     private BigDecimal totalAmountReceived;
@@ -17,11 +19,13 @@ public class PaymentSummaryResponse {
 
     private String receivedBy;
 
+    private String paymentStatus;
+
     private String recordStatus;
 
-    
+    // ==========================
     // Default Constructor
-    
+    // ==========================
 
     public PaymentSummaryResponse() {
     }
@@ -44,6 +48,14 @@ public class PaymentSummaryResponse {
 
     public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public LocalDate getPaymentDate() {
@@ -76,6 +88,14 @@ public class PaymentSummaryResponse {
 
     public void setReceivedBy(String receivedBy) {
         this.receivedBy = receivedBy;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public String getRecordStatus() {

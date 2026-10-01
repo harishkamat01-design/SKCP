@@ -10,10 +10,12 @@ import com.skcp.exception.DuplicateResourceException;
 import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.mapper.PaymentMapper;
 import com.skcp.repository.CustomerRepository;
+import com.skcp.repository.PaymentAllocationRepository;
 import com.skcp.repository.PaymentRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final CustomerRepository customerRepository;
     private final PaymentMapper paymentMapper;
-
+    private final PaymentAllocationRepository paymentAllocationRepository;
 
     // ============================================================
     // CONSTRUCTOR INJECTION
@@ -36,11 +38,13 @@ public class PaymentService {
     public PaymentService(
             PaymentRepository paymentRepository,
             CustomerRepository customerRepository,
-            PaymentMapper paymentMapper) {
+            PaymentMapper paymentMapper,
+            PaymentAllocationRepository paymentAllocationRepository) {
 
         this.paymentRepository = paymentRepository;
         this.customerRepository = customerRepository;
         this.paymentMapper = paymentMapper;
+        this.paymentAllocationRepository = paymentAllocationRepository;
     }
 
 
@@ -51,11 +55,24 @@ public class PaymentService {
     public List<PaymentSummaryResponse> getAllPayments() {
 
         return paymentRepository.findAll()
-                .stream()
-                .filter(payment ->
-                        "ACTIVE".equals(payment.getRecordStatus()))
-                .map(paymentMapper::toSummaryResponse)
-                .collect(Collectors.toList());
+        .stream()
+        .filter(payment ->
+                "ACTIVE".equals(
+                        payment.getRecordStatus()
+                )
+        )
+        .map(payment -> {
+
+            PaymentSummaryResponse response =
+                    paymentMapper.toSummaryResponse(payment);
+
+            response.setPaymentStatus(
+                    calculatePaymentStatus(payment)
+            );
+
+            return response;
+        })
+        .collect(Collectors.toList());
     }
 
 
@@ -86,7 +103,14 @@ public class PaymentService {
         }
 
 
-        return paymentMapper.toResponse(payment);
+        PaymentResponse response =
+        paymentMapper.toResponse(payment);
+
+        response.setPaymentStatus(
+                calculatePaymentStatus(payment)
+        );
+
+        return response;
     }
 
 
@@ -148,7 +172,14 @@ public class PaymentService {
         // Entity → Response DTO
         // --------------------------------------------------------
 
-        return paymentMapper.toResponse(savedPayment);
+        PaymentResponse response =
+        paymentMapper.toResponse(savedPayment);
+
+        response.setPaymentStatus(
+                calculatePaymentStatus(savedPayment)
+        );
+
+        return response;
     }
 
 
@@ -222,8 +253,15 @@ public class PaymentService {
         // Entity → Response DTO
         // --------------------------------------------------------
 
-        return paymentMapper.toResponse(updatedPayment);
-    }
+        PaymentResponse response =
+        paymentMapper.toResponse(updatedPayment);
+
+        response.setPaymentStatus(
+                calculatePaymentStatus(updatedPayment)
+        );
+
+        return response;
+        }
 
 
     // ============================================================
@@ -272,6 +310,45 @@ public class PaymentService {
 
         paymentRepository.save(payment);
     }
+
+
+        private String calculatePaymentStatus(Payment payment) {
+
+        BigDecimal totalReceived =
+                payment.getTotalAmountReceived();
+
+        BigDecimal totalAllocated =
+                paymentAllocationRepository.findAll()
+                        .stream()
+                        .filter(allocation ->
+                                allocation.getPayment() != null
+                                        && allocation.getPayment()
+                                        .getPaymentId()
+                                        .equals(payment.getPaymentId())
+                                        && "ACTIVE".equals(
+                                        allocation.getRecordStatus()
+                                )
+                        )
+                        .map(allocation ->
+                                allocation.getAllocatedAmount()
+                        )
+                        .filter(amount -> amount != null)
+                        .reduce(
+                                BigDecimal.ZERO,
+                                BigDecimal::add
+                        );
+
+        if (totalAllocated.compareTo(BigDecimal.ZERO) == 0) {
+                return "PENDING";
+        }
+
+        if (totalAllocated.compareTo(totalReceived) < 0) {
+                return "PARTIALLY_ALLOCATED";
+        }
+
+        return "PAID";
+        }
+
 }
 
 

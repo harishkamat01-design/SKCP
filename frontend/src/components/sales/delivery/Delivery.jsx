@@ -15,6 +15,10 @@ import {
     apiDelete,
 } from "../../../services/api";
 
+import useTableSort from "../../../hooks/useTableSort";
+import usePagination from "../../../hooks/usePagination";
+import Pagination from "../../ui/Pagination";
+
 const DELIVERY_STATUSES = [
     "PENDING",
     "IN_PROGRESS",
@@ -50,13 +54,28 @@ function Delivery() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // ------------------------------------------------------------
+    // FILTER STATE
+    // ------------------------------------------------------------
+
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [filterError, setFilterError] = useState("");
+
+    // ------------------------------------------------------------
+    // VIEW STATE
+    // ------------------------------------------------------------
 
     const [selectedDelivery, setSelectedDelivery] = useState(null);
 
     const [showViewModal, setShowViewModal] = useState(false);
     const [showFormModal, setShowFormModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    // ------------------------------------------------------------
+    // FORM STATE
+    // ------------------------------------------------------------
 
     const [editingId, setEditingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
@@ -75,18 +94,19 @@ function Delivery() {
 
     const formatDate = (dateValue) =>
         dateValue
-            ? new Date(`${dateValue}T00:00:00`).toLocaleDateString(
-                  "en-GB",
-                  {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                  }
-              )
+            ? new Date(
+                  `${dateValue}T00:00:00`
+              ).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+              })
             : "-";
 
     const formatCurrency = (amount) =>
-        amount === null || amount === undefined || amount === ""
+        amount === null ||
+        amount === undefined ||
+        amount === ""
             ? "-"
             : `₹ ${Number(amount).toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
@@ -102,36 +122,39 @@ function Delivery() {
     // FETCH ALL DELIVERIES
     // ============================================================
 
-        const fetchDeliveries = async () => {
-            try {
-                setLoading(true);
-                setError("");
+    const fetchDeliveries = async () => {
+        try {
+            setLoading(true);
+            setError("");
 
-                const result = await apiGet("/api/deliveries");
+            const result = await apiGet("/api/deliveries");
 
-                console.log("Deliveries API response:", result);
+            console.log(
+                "Deliveries API response:",
+                result
+            );
 
-                setDeliveryList(
-                    Array.isArray(result?.data)
-                        ? result.data
-                        : Array.isArray(result)
-                        ? result
-                        : []
-                );
-            } catch (err) {
-                console.error(
-                    "Error fetching deliveries:",
-                    err
-                );
+            setDeliveryList(
+                Array.isArray(result?.data)
+                    ? result.data
+                    : Array.isArray(result)
+                    ? result
+                    : []
+            );
+        } catch (err) {
+            console.error(
+                "Error fetching deliveries:",
+                err
+            );
 
-                setError(
-                    err.message ||
-                        "Unable to load deliveries. Please try again."
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
+            setError(
+                err.message ||
+                    "Unable to load deliveries. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // ============================================================
     // INITIAL LOAD
@@ -142,91 +165,196 @@ function Delivery() {
     }, []);
 
     // ============================================================
-    // SEARCH
+    // DATE FILTER HANDLERS
+    // ============================================================
+
+    const handleDateFromChange = (event) => {
+        const value = event.target.value;
+
+        setDateFrom(value);
+
+        if (dateTo && value > dateTo) {
+            setFilterError(
+                "From date cannot be later than To date."
+            );
+        } else {
+            setFilterError("");
+        }
+    };
+
+    const handleDateToChange = (event) => {
+        const value = event.target.value;
+
+        setDateTo(value);
+
+        if (dateFrom && dateFrom > value) {
+            setFilterError(
+                "From date cannot be later than To date."
+            );
+        } else {
+            setFilterError("");
+        }
+    };
+
+    // ============================================================
+    // CLEAR ALL FILTERS
+    // ============================================================
+
+    const handleClearFilters = () => {
+        setSearchKeyword("");
+        setDateFrom("");
+        setDateTo("");
+        setFilterError("");
+    };
+
+    // ============================================================
+    // FILTER
     // ============================================================
 
     const filteredDeliveries = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+        const keyword = searchKeyword
+            .trim()
+            .toLowerCase();
 
-        if (!keyword) {
-            return deliveryList;
+        if (
+            dateFrom &&
+            dateTo &&
+            dateFrom > dateTo
+        ) {
+            return [];
         }
 
         return deliveryList.filter((delivery) => {
+            const searchableText = [
+                delivery.deliveryId,
+                delivery.orderId,
+                delivery.customerName,
+                delivery.deliveryDate,
+                delivery.tripNumber,
+                delivery.totalTrips,
+                delivery.vehicleType,
+                delivery.vehicleNumber,
+                delivery.driverName,
+                delivery.transportMode,
+                delivery.transportCost,
+                delivery.deliveryStatus,
+            ]
+                .filter(
+                    (value) =>
+                        value !== null &&
+                        value !== undefined
+                )
+                .join(" ")
+                .toLowerCase();
+
+            const matchesSearch =
+                !keyword ||
+                searchableText.includes(keyword);
+
+            const deliveryDate = delivery.deliveryDate
+                ? String(
+                      delivery.deliveryDate
+                  ).slice(0, 10)
+                : "";
+
+            const matchesFrom =
+                !dateFrom ||
+                deliveryDate >= dateFrom;
+
+            const matchesTo =
+                !dateTo ||
+                deliveryDate <= dateTo;
+
             return (
-                String(delivery.deliveryId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.orderId || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.deliveryDate || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.tripNumber || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.totalTrips || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.vehicleType || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.vehicleNumber || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.driverName || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.transportMode || "")
-                    .toLowerCase()
-                    .includes(keyword) ||
-
-                String(delivery.deliveryStatus || "")
-                    .toLowerCase()
-                    .includes(keyword)
+                matchesSearch &&
+                matchesFrom &&
+                matchesTo
             );
         });
-    }, [deliveryList, searchKeyword]);
+    }, [
+        deliveryList,
+        searchKeyword,
+        dateFrom,
+        dateTo,
+    ]);
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredDeliveries,
+        "deliveryId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords: paginatedDeliveries,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // SORT INDICATOR
+    // ============================================================
+
+    const getSortIndicator = (key) =>
+        sortKey === key
+            ? sortDirection === "asc"
+                ? " ↑"
+                : " ↓"
+            : "";
 
     // ============================================================
     // VIEW DELIVERY
     // ============================================================
 
-        const handleView = async (id) => {
-            try {
-                setError("");
+    const handleView = async (id) => {
+        try {
+            setError("");
 
-                const result = await apiGet(
-                    `/api/deliveries/${id}`
-                );
+            const result = await apiGet(
+                `/api/deliveries/${id}`
+            );
 
-                console.log("Delivery details:", result);
+            console.log(
+                "Delivery details:",
+                result
+            );
 
-                const delivery = result?.data || result;
+            const delivery =
+                result?.data || result;
 
-                setSelectedDelivery(delivery);
-                setShowViewModal(true);
-            } catch (err) {
-                console.error(
-                    "Error fetching delivery details:",
-                    err
-                );
+            setSelectedDelivery(delivery);
+            setShowViewModal(true);
+        } catch (err) {
+            console.error(
+                "Error fetching delivery details:",
+                err
+            );
 
-                setError(
-                    err.message ||
-                        "Unable to load delivery details."
-                );
-            }
-        };
+            setError(
+                err.message ||
+                    "Unable to load delivery details."
+            );
+        }
+    };
 
     // ============================================================
     // OPEN CREATE FORM
@@ -258,13 +386,13 @@ function Delivery() {
             );
 
             const delivery =
-
                 result?.data || result;
 
             setEditingId(id);
 
             setFormData({
-                orderId: delivery.orderId ?? "",
+                orderId:
+                    delivery.orderId ?? "",
                 deliveryDate:
                     delivery.deliveryDate ?? "",
                 tripNumber:
@@ -307,7 +435,8 @@ function Delivery() {
     // ============================================================
 
     const handleChange = (event) => {
-        const { name, value } = event.target;
+        const { name, value } =
+            event.target;
 
         setFormData((previous) => ({
             ...previous,
@@ -329,7 +458,9 @@ function Delivery() {
         // --------------------------------------------------------
 
         if (!formData.orderId) {
-            setFormError("Order ID is required.");
+            setFormError(
+                "Order ID is required."
+            );
             return;
         }
 
@@ -385,7 +516,9 @@ function Delivery() {
             return;
         }
 
-        if (!formData.transportMode.trim()) {
+        if (
+            !formData.transportMode.trim()
+        ) {
             setFormError(
                 "Transport mode is required."
             );
@@ -409,7 +542,9 @@ function Delivery() {
             return;
         }
 
-        if (formData.vehicleNumber.length > 20) {
+        if (
+            formData.vehicleNumber.length > 20
+        ) {
             setFormError(
                 "Vehicle number must not exceed 20 characters."
             );
@@ -423,7 +558,9 @@ function Delivery() {
             return;
         }
 
-        if (formData.transportMode.length > 20) {
+        if (
+            formData.transportMode.length > 20
+        ) {
             setFormError(
                 "Transport mode must not exceed 20 characters."
             );
@@ -447,16 +584,20 @@ function Delivery() {
         // --------------------------------------------------------
 
         const requestBody = {
-            orderId: Number(formData.orderId),
+            orderId: Number(
+                formData.orderId
+            ),
 
             deliveryDate:
                 formData.deliveryDate,
 
-            tripNumber:
-                Number(formData.tripNumber),
+            tripNumber: Number(
+                formData.tripNumber
+            ),
 
-            totalTrips:
-                Number(formData.totalTrips),
+            totalTrips: Number(
+                formData.totalTrips
+            ),
 
             vehicleType:
                 formData.vehicleType.trim() === ""
@@ -479,7 +620,9 @@ function Delivery() {
             transportCost:
                 formData.transportCost === ""
                     ? null
-                    : Number(formData.transportCost),
+                    : Number(
+                          formData.transportCost
+                      ),
 
             remarks:
                 formData.remarks.trim() === ""
@@ -530,7 +673,6 @@ function Delivery() {
             setFormError("");
 
             await fetchDeliveries();
-            
         } catch (err) {
             console.error(
                 "Error saving delivery:",
@@ -570,27 +712,14 @@ function Delivery() {
             setDeleteError("");
             setError("");
 
-            const response = await fetch(
-                `${API_URL}/${deletingId}`,
-                {
-                    method: "DELETE",
-                }
+            const result = await apiDelete(
+                `/api/deliveries/${deletingId}`
             );
-
-            const result =
-                await response.json();
 
             console.log(
                 "Delete Delivery response:",
                 result
             );
-
-            if (!response.ok) {
-                throw new Error(
-                    result.message ||
-                        `Delete failed (${response.status})`
-                );
-            }
 
             setShowDeleteModal(false);
             setDeletingId(null);
@@ -632,7 +761,9 @@ function Delivery() {
         setShowFormModal(false);
         setEditingId(null);
         setFormError("");
-        setFormData(getInitialFormData());
+        setFormData(
+            getInitialFormData()
+        );
     };
 
     // ============================================================
@@ -673,7 +804,7 @@ function Delivery() {
     return (
         <div className="page">
             {/* ==================================================
-                HEADER + SEARCH
+                HEADER + SEARCH + FILTERS
             ================================================== */}
 
             <section className="card">
@@ -705,22 +836,117 @@ function Delivery() {
                     </button>
                 </div>
 
-                <div className="fld production-search">
-                    <label>
-                        Search Deliveries
-                    </label>
+                {/* ------------------------------------------------
+                    FILTER ROW
+                ------------------------------------------------ */}
 
-                    <input
-                        type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
+                    {/* SEARCH */}
+
+                    <div
+                        className="fld production-search"
+                        style={{
+                            flex:
+                                "2 1 320px",
+                        }}
+                    >
+                        <label>
+                            Search Deliveries
+                        </label>
+
+                        <input
+                            type="text"
+                            value={
+                                searchKeyword
+                            }
+                            onChange={(event) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                            placeholder="Search by customer, delivery ID, order ID, vehicle, driver, status..."
+                        />
+                    </div>
+
+                    {/* DATE FROM */}
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex:
+                                "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="deliveryDateFrom">
+                            Date From
+                        </label>
+
+                        <input
+                            id="deliveryDateFrom"
+                            type="date"
+                            value={dateFrom}
+                            onChange={
+                                handleDateFromChange
+                            }
+                        />
+                    </div>
+
+                    {/* DATE TO */}
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex:
+                                "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="deliveryDateTo">
+                            Date To
+                        </label>
+
+                        <input
+                            id="deliveryDateTo"
+                            type="date"
+                            value={dateTo}
+                            onChange={
+                                handleDateToChange
+                            }
+                        />
+                    </div>
+
+                    {/* CLEAR */}
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearFilters
                         }
-                        placeholder="Search by delivery ID, order ID, vehicle, driver, status..."
-                    />
+                    >
+                        Clear
+                    </button>
                 </div>
+
+                {/* FILTER ERROR */}
+
+                {filterError && (
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
+                        {filterError}
+                    </div>
+                )}
             </section>
 
             {/* ==================================================
@@ -731,8 +957,8 @@ function Delivery() {
                 <h2>Delivery List</h2>
 
                 <p>
-                    {filteredDeliveries.length} delivery
-                    {filteredDeliveries.length === 1
+                    {totalRecords} delivery
+                    {totalRecords === 1
                         ? ""
                         : "ies"}
                 </p>
@@ -743,7 +969,8 @@ function Delivery() {
                     </div>
                 )}
 
-                {filteredDeliveries.length === 0 ? (
+                {filterError ? null : totalRecords ===
+                  0 ? (
                     <p>
                         No delivery records found.
                     </p>
@@ -752,26 +979,124 @@ function Delivery() {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "deliveryId"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        ID
+                                        {getSortIndicator(
+                                            "deliveryId"
+                                        )}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "orderId"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
                                         ORDER ID
+                                        {getSortIndicator(
+                                            "orderId"
+                                        )}
                                     </th>
-                                    <th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "customerName"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        CUSTOMER
+                                        {getSortIndicator(
+                                            "customerName"
+                                        )}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "deliveryDate"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
                                         DELIVERY DATE
+                                        {getSortIndicator(
+                                            "deliveryDate"
+                                        )}
                                     </th>
-                                    <th>TRIP</th>
+
+                                    <th>
+                                        TRIP
+                                    </th>
+
                                     <th>
                                         VEHICLE
                                     </th>
+
                                     <th>
                                         DRIVER
                                     </th>
+
                                     <th>
                                         TRANSPORT MODE
                                     </th>
-                                    <th>
-                                        STATUS
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "transportCost"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        TRANSPORT COST
+                                        {getSortIndicator(
+                                            "transportCost"
+                                        )}
                                     </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "deliveryStatus"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        STATUS
+                                        {getSortIndicator(
+                                            "deliveryStatus"
+                                        )}
+                                    </th>
+
                                     <th>
                                         ACTIONS
                                     </th>
@@ -779,7 +1104,7 @@ function Delivery() {
                             </thead>
 
                             <tbody>
-                                {filteredDeliveries.map(
+                                {paginatedDeliveries.map(
                                     (delivery) => (
                                         <tr
                                             key={
@@ -799,6 +1124,11 @@ function Delivery() {
                                             </td>
 
                                             <td>
+                                                {delivery.customerName ||
+                                                    "-"}
+                                            </td>
+
+                                            <td>
                                                 {formatDate(
                                                     delivery.deliveryDate
                                                 )}
@@ -815,8 +1145,10 @@ function Delivery() {
                                             </td>
 
                                             <td>
-                                                {delivery.vehicleType ||
-                                                    "-"}
+                                                {
+                                                    delivery.vehicleType ||
+                                                    "-"
+                                                }
 
                                                 {delivery.vehicleNumber
                                                     ? ` (${delivery.vehicleNumber})`
@@ -831,6 +1163,12 @@ function Delivery() {
                                             <td>
                                                 {delivery.transportMode ||
                                                     "-"}
+                                            </td>
+
+                                            <td>
+                                                {formatCurrency(
+                                                    delivery.transportCost
+                                                )}
                                             </td>
 
                                             <td>
@@ -883,6 +1221,29 @@ function Delivery() {
                                 )}
                             </tbody>
                         </table>
+
+                        {/* ------------------------------------------------
+                            PAGINATION
+                        ------------------------------------------------ */}
+
+                        <Pagination
+                            currentPage={
+                                currentPage
+                            }
+                            totalPages={
+                                totalPages
+                            }
+                            totalRecords={
+                                totalRecords
+                            }
+                            pageSize={pageSize}
+                            onPageChange={
+                                handlePageChange
+                            }
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
                     </div>
                 )}
             </section>
@@ -905,7 +1266,9 @@ function Delivery() {
                     <button
                         type="button"
                         className="btn"
-                        onClick={closeViewModal}
+                        onClick={
+                            closeViewModal
+                        }
                     >
                         Close
                     </button>
@@ -924,6 +1287,14 @@ function Delivery() {
                             label="Order ID"
                             value={
                                 selectedDelivery.orderId
+                            }
+                        />
+
+                        <DetailItem
+                            label="Customer Name"
+                            value={
+                                selectedDelivery.customerName ||
+                                "-"
                             }
                         />
 
@@ -1246,7 +1617,9 @@ function Delivery() {
                                 value={
                                     formData.deliveryStatus
                                 }
-                                onChange={handleChange}
+                                onChange={
+                                    handleChange
+                                }
                                 required
                             >
                                 {DELIVERY_STATUSES.map(
@@ -1317,8 +1690,12 @@ function Delivery() {
 
             <DeleteConfirmModal
                 isOpen={showDeleteModal}
-                onClose={closeDeleteModal}
-                onConfirm={confirmDelete}
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    confirmDelete
+                }
                 title="Delete Delivery"
                 subtitle="Please confirm this action"
                 message="Are you sure you want to delete this delivery?"
@@ -1327,7 +1704,9 @@ function Delivery() {
                         ? `Delivery ID: ${deletingId}`
                         : ""
                 }
-                confirming={confirmingDelete}
+                confirming={
+                    confirmingDelete
+                }
                 error={deleteError}
             />
         </div>

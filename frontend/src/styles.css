@@ -4910,7 +4910,7 @@ td.mu {
 
 /* Slight readability layer behind the login card */
 .skcp-login-card::before {
-  content: "";
+  content: ""; 
   position: absolute;
   inset: -14px;
   z-index: -1;
@@ -4950,4 +4950,91 @@ td.mu {
   .skcp-login-card {
     width: 92vw;
   }
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-page-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.pagination-page-size {
+    min-width: 70px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 14px;
+}
+
+.pagination-page-size-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pagination-controls {
+        flex-wrap: wrap;
+    }
+}
+
+.search-action-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.search-action-row input {
+    flex: 1;
+}
+
+.search-action-row .btn {
+    flex-shrink: 0;
+}
+
+.table-sort-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
 }

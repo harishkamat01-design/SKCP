@@ -32,13 +32,33 @@ public class SupplierService
     // GET ALL SUPPLIERS
     // ============================================================
 
-    public List<SupplierSummaryResponse> getAllSuppliers()
+    /*public List<SupplierSummaryResponse> getAllSuppliers()
     {
         return supplierRepository.findAll()
                 .stream()
                 .map(SupplierMapper::toSummaryResponse)
                 .toList();
-    }
+    }*/
+
+                public List<SupplierSummaryResponse> getAllSuppliers()
+                {
+                List<Supplier> suppliers = supplierRepository.findAll();
+
+                suppliers.forEach(supplier ->
+                        System.out.println(
+                                "SUPPLIER DEBUG -> ID: "
+                                + supplier.getSupplierId()
+                                + " | NAME: "
+                                + supplier.getSupplierName()
+                                + " | REMARKS: "
+                                + supplier.getRemarks()
+                        )
+                );
+
+                return suppliers.stream()
+                        .map(SupplierMapper::toSummaryResponse)
+                        .toList();
+                }
 
 
     // ============================================================

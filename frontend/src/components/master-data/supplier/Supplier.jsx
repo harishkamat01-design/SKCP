@@ -1,1041 +1,1225 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
+
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+import Pagination from "../../ui/Pagination";
+
 import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
 import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+
 import {
-  DetailGrid,
-  DetailItem,
+    DetailGrid,
+    DetailItem,
 } from "../../ui/common/DetailGrid";
 
 function Supplier() {
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [suppliers, setSuppliers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [suppliers, setSuppliers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-  // =========================================================
-  // VIEW SUPPLIER STATE
-  // =========================================================
+    // VIEW state
+    const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [viewLoading, setViewLoading] = useState(false);
+    const [viewError, setViewError] = useState("");
 
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [viewLoading, setViewLoading] = useState(false);
-  const [viewError, setViewError] = useState("");
+    // EDIT state
+    const [editingSupplier, setEditingSupplier] = useState(null);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editSaving, setEditSaving] = useState(false);
+    const [editError, setEditError] = useState("");
+    const [editSuccess, setEditSuccess] = useState("");
 
-  // =========================================================
-  // EDIT SUPPLIER STATE
-  // =========================================================
-
-  const [editingSupplier, setEditingSupplier] = useState(null);
-  const [editLoading, setEditLoading] = useState(false);
-  const [editSaving, setEditSaving] = useState(false);
-  const [editError, setEditError] = useState("");
-  const [editSuccess, setEditSuccess] = useState("");
-
-  const [editForm, setEditForm] = useState({
-    supplierName: "",
-    contactPerson: "",
-    phone: "",
-    whatsapp: "",
-    address: "",
-    gstNumber: "",
-  });
-
-  // =========================================================
-  // ADD SUPPLIER STATE
-  // =========================================================
-
-  const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
-  const [addSaving, setAddSaving] = useState(false);
-  const [addError, setAddError] = useState("");
-  const [addSuccess, setAddSuccess] = useState("");
-
-  const [addForm, setAddForm] = useState({
-    supplierName: "",
-    contactPerson: "",
-    phone: "",
-    whatsapp: "",
-    address: "",
-    gstNumber: "",
-  });
-
-  // =========================================================
-  // DELETE SUPPLIER STATE
-  // =========================================================
-
-  const [deletingSupplier, setDeletingSupplier] = useState(null);
-  const [deleteSaving, setDeleteSaving] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
-
-  // =========================================================
-  // FETCH SUPPLIERS
-  // =========================================================
-
-  const fetchSuppliers = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const result = await apiGet("/api/suppliers");
-
-      console.log("Supplier API response:", result);
-
-      setSuppliers(
-        Array.isArray(result?.data) ? result.data : [],
-      );
-    } catch (err) {
-      console.error("Error fetching suppliers:", err);
-      setError("Unable to load suppliers. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
-  // =========================================================
-  // SEARCH
-  // =========================================================
-
-  const filteredSuppliers = suppliers.filter((supplier) => {
-    const keyword = searchKeyword.trim().toLowerCase();
-
-    if (!keyword) {
-      return true;
-    }
-
-    const supplierName =
-      supplier.supplierName?.toLowerCase() || "";
-
-    const phone =
-      supplier.phone?.toString().toLowerCase() || "";
-
-    const contactPerson =
-      supplier.contactPerson?.toLowerCase() || "";
-
-    const whatsapp =
-      supplier.whatsapp?.toString().toLowerCase() || "";
-
-    const gstNumber =
-      supplier.gstNumber?.toLowerCase() || "";
-
-    return (
-      supplierName.includes(keyword) ||
-      phone.includes(keyword) ||
-      contactPerson.includes(keyword) ||
-      whatsapp.includes(keyword) ||
-      gstNumber.includes(keyword)
-    );
-  });
-
-  // =========================================================
-  // VIEW SUPPLIER
-  // =========================================================
-
-  const handleViewSupplier = async (supplierId) => {
-    try {
-      setSelectedSupplier(null);
-      setViewLoading(true);
-      setViewError("");
-
-      const result = await apiGet(`/api/suppliers/${supplierId}`);
-
-      console.log("Supplier View API response:", result);
-
-      setSelectedSupplier(result?.data || null);
-    } catch (err) {
-      console.error("Error fetching supplier details:", err);
-
-      setViewError(
-        err.message ||
-          "Unable to load supplier details. Please try again.",
-      );
-    } finally {
-      setViewLoading(false);
-    }
-  };
-
-  const handleCloseSupplierModal = () => {
-    setSelectedSupplier(null);
-    setViewLoading(false);
-    setViewError("");
-  };
-
-  // =========================================================
-  // EDIT SUPPLIER
-  // =========================================================
-
-  const handleEditSupplier = async (supplierId) => {
-    try {
-      setEditingSupplier(null);
-      setEditLoading(true);
-      setEditError("");
-      setEditSuccess("");
-
-      const result = await apiGet(`/api/suppliers/${supplierId}`);
-
-      console.log("Supplier Edit API response:", result);
-
-      const supplier = result?.data;
-
-      if (!supplier) {
-        throw new Error("Supplier details were not found.");
-      }
-
-      setEditingSupplier(supplier);
-
-      setEditForm({
-        supplierName: supplier.supplierName || "",
-        contactPerson: supplier.contactPerson || "",
-        phone: supplier.phone || "",
-        whatsapp: supplier.whatsapp || "",
-        address: supplier.address || "",
-        gstNumber: supplier.gstNumber || "",
-      });
-    } catch (err) {
-      console.error("Error loading supplier for edit:", err);
-
-      setEditError(
-        err.message ||
-          "Unable to load supplier. Please try again.",
-      );
-    } finally {
-      setEditLoading(false);
-    }
-  };
-
-  const handleEditChange = (event) => {
-    const { name, value } = event.target;
-
-    setEditForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
-
-  const handleUpdateSupplier = async (event) => {
-    event.preventDefault();
-
-    if (!editingSupplier) {
-      return;
-    }
-
-    try {
-      setEditSaving(true);
-      setEditError("");
-      setEditSuccess("");
-
-      const result = await apiPut(
-        `/api/suppliers/${editingSupplier.supplierId}`,
-        editForm,
-      );
-
-      console.log("Supplier Update API response:", result);
-
-      const updatedSupplier = result?.data;
-
-      if (!updatedSupplier) {
-        throw new Error("Updated supplier data was not returned.");
-      }
-
-      setSuppliers((previousSuppliers) =>
-        previousSuppliers.map((supplier) =>
-          supplier.supplierId === updatedSupplier.supplierId
-            ? updatedSupplier
-            : supplier,
-        ),
-      );
-
-      setEditSuccess("Supplier updated successfully.");
-
-      setTimeout(() => {
-        handleCloseEditModal();
-      }, 700);
-    } catch (err) {
-      console.error("Error updating supplier:", err);
-
-      setEditError(
-        err.message ||
-          "Unable to update supplier. Please try again.",
-      );
-    } finally {
-      setEditSaving(false);
-    }
-  };
-
-  const handleCloseEditModal = () => {
-    setEditingSupplier(null);
-    setEditLoading(false);
-    setEditSaving(false);
-    setEditError("");
-    setEditSuccess("");
-  };
-
-  // =========================================================
-  // ADD SUPPLIER
-  // =========================================================
-
-  const handleOpenAddSupplierModal = () => {
-    setAddError("");
-    setAddSuccess("");
-
-    setAddForm({
-      supplierName: "",
-      contactPerson: "",
-      phone: "",
-      whatsapp: "",
-      address: "",
-      gstNumber: "",
+    const [editForm, setEditForm] = useState({
+        supplierName: "",
+        contactPerson: "",
+        phone: "",
+        whatsapp: "",
+        address: "",
+        gstNumber: "",
+        remarks: "",
     });
 
-    setShowAddSupplierModal(true);
-  };
+    // ADD state
+    const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
+    const [addSaving, setAddSaving] = useState(false);
+    const [addError, setAddError] = useState("");
+    const [addSuccess, setAddSuccess] = useState("");
 
-  const handleAddChange = (event) => {
-    const { name, value } = event.target;
+    const [addForm, setAddForm] = useState({
+        supplierName: "",
+        contactPerson: "",
+        phone: "",
+        whatsapp: "",
+        address: "",
+        gstNumber: "",
+        remarks: "",
+    });
 
-    setAddForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
+    // DELETE state
+    const [deletingSupplier, setDeletingSupplier] = useState(null);
+    const [deleteSaving, setDeleteSaving] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
 
-  const handleCreateSupplier = async (event) => {
+    // ============================================================
+    // FETCH SUPPLIERS
+    // ============================================================
+
+    const fetchSuppliers = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const result = await apiGet("/api/suppliers");
+
+            setSuppliers(result?.data || []);
+        } catch (err) {
+            console.error("Error fetching suppliers:", err);
+            setError(
+                err?.message ||
+                    "Failed to load suppliers."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchSuppliers();
+    }, []);
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
+
+    const filteredSuppliers = useMemo(() => {
+        const keyword = searchKeyword
+            .trim()
+            .toLowerCase();
+
+        if (!keyword) {
+            return suppliers;
+        }
+
+        return suppliers.filter((supplier) => {
+            return [
+                supplier.supplierId,
+                supplier.supplierName,
+                supplier.phone,
+                supplier.contactPerson,
+                supplier.whatsapp,
+                supplier.gstNumber,
+                supplier.remarks,
+                supplier.status,
+            ].some((value) =>
+                String(value ?? "")
+                    .toLowerCase()
+                    .includes(keyword)
+            );
+        });
+    }, [suppliers, searchKeyword]);
+
+    // ============================================================
+    // CLEAR SEARCH
+    // ============================================================
+
+    const handleClearSearch = () => {
+        setSearchKeyword("");
+    };
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredSuppliers,
+        "supplierId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // VIEW SUPPLIER
+    // ============================================================
+
+    const handleViewSupplier = async (supplierId) => {
+        try {
+            setViewLoading(true);
+            setViewError("");
+            setSelectedSupplier(null);
+
+            const result = await apiGet(
+                `/api/suppliers/${supplierId}`
+            );
+
+            setSelectedSupplier(result?.data || null);
+        } catch (err) {
+            console.error("Error fetching supplier:", err);
+
+            setViewError(
+                err?.message ||
+                    "Failed to load supplier details."
+            );
+        } finally {
+            setViewLoading(false);
+        }
+    };
+
+    const closeViewModal = () => {
+        setSelectedSupplier(null);
+        setViewError("");
+    };
+
+    // ============================================================
+    // EDIT SUPPLIER
+    // ============================================================
+
+    const handleEditSupplier = async (supplierId) => {
+        try {
+            setEditLoading(true);
+            setEditError("");
+            setEditSuccess("");
+            setEditingSupplier(null);
+
+            const result = await apiGet(
+                `/api/suppliers/${supplierId}`
+            );
+
+            const supplier = result?.data;
+
+            setEditingSupplier(supplier);
+
+            setEditForm({
+                supplierName:
+                    supplier?.supplierName || "",
+                contactPerson:
+                    supplier?.contactPerson || "",
+                phone:
+                    supplier?.phone || "",
+                whatsapp:
+                    supplier?.whatsapp || "",
+                address:
+                    supplier?.address || "",
+                gstNumber:
+                    supplier?.gstNumber || "",
+                remarks:
+                    supplier?.remarks || "",
+            });
+        } catch (err) {
+            console.error(
+                "Error fetching supplier for edit:",
+                err
+            );
+
+            setEditError(
+                err?.message ||
+                    "Failed to load supplier."
+            );
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    const handleEditChange = (event) => {
+        const { name, value } = event.target;
+
+        setEditForm((previousForm) => ({
+            ...previousForm,
+            [name]: value,
+        }));
+    };
+
+    const handleEditSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      setAddSaving(true);
-      setAddError("");
-      setAddSuccess("");
+        setEditSaving(true);
+        setEditError("");
+        setEditSuccess("");
 
-      const result = await apiPost(
-        "/api/suppliers",
-        addForm,
-      );
+        await apiPut(
+            `/api/suppliers/${editingSupplier.supplierId}`,
+            editForm
+        );
 
-      console.log("Supplier Create API response:", result);
+            setEditSuccess(
+                "Supplier updated successfully."
+            );
 
-      const createdSupplier = result?.data;
+            await fetchSuppliers();
+        } catch (err) {
+            console.error(
+                "Error updating supplier:",
+                err
+            );
 
-      if (!createdSupplier) {
-        throw new Error("Created supplier data was not returned.");
-      }
+            setEditError(
+                err?.message ||
+                    "Failed to update supplier."
+            );
+        } finally {
+            setEditSaving(false);
+        }
+    };
 
-      setSuppliers((previousSuppliers) => [
-        ...previousSuppliers,
-        createdSupplier,
-      ]);
+    const closeEditModal = () => {
+        setEditingSupplier(null);
+        setEditError("");
+        setEditSuccess("");
+    };
 
-      setAddSuccess("Supplier created successfully.");
+    // ============================================================
+    // ADD SUPPLIER
+    // ============================================================
 
-      setTimeout(() => {
-        handleCloseAddSupplierModal();
-      }, 700);
-    } catch (err) {
-      console.error("Error creating supplier:", err);
+    const handleOpenAddSupplier = () => {
+        setAddForm({
+            supplierName: "",
+            contactPerson: "",
+            phone: "",
+            whatsapp: "",
+            address: "",
+            gstNumber: "",
+            remarks: "",
+        });
 
-      setAddError(
-        err.message ||
-          "Unable to create supplier. Please try again.",
-      );
-    } finally {
-      setAddSaving(false);
-    }
-  };
+        setAddError("");
+        setAddSuccess("");
+        setShowAddSupplierModal(true);
+    };
 
-  const handleCloseAddSupplierModal = () => {
-    setShowAddSupplierModal(false);
-    setAddSaving(false);
-    setAddError("");
-    setAddSuccess("");
-  };
+    const handleAddChange = (event) => {
+        const { name, value } = event.target;
 
-  // =========================================================
-  // DELETE SUPPLIER
-  // =========================================================
+        setAddForm((previousForm) => ({
+            ...previousForm,
+            [name]: value,
+        }));
+    };
 
-  const handleOpenDeleteSupplier = (supplier) => {
-    setDeleteError("");
-    setDeletingSupplier(supplier);
-  };
+    const handleAddSubmit = async () => {
+        try {
+            setAddSaving(true);
+            setAddError("");
+            setAddSuccess("");
 
-  const handleCloseDeleteSupplier = () => {
-    if (deleteSaving) {
-      return;
-    }
+            await apiPost(
+                "/api/suppliers",
+                addForm
+            );
 
-    setDeletingSupplier(null);
-    setDeleteSaving(false);
-    setDeleteError("");
-  };
+            setAddSuccess(
+                "Supplier added successfully."
+            );
 
-  const handleConfirmDeleteSupplier = async () => {
-    if (!deletingSupplier) {
-      return;
-    }
+            await fetchSuppliers();
 
-    try {
-      setDeleteSaving(true);
-      setDeleteError("");
+            setAddForm({
+                supplierName: "",
+                contactPerson: "",
+                phone: "",
+                whatsapp: "",
+                address: "",
+                gstNumber: "",
+                remarks: "",
+            });
+        } catch (err) {
+            console.error(
+                "Error adding supplier:",
+                err
+            );
 
-      const result = await apiDelete(
-        `/api/suppliers/${deletingSupplier.supplierId}`,
-      );
+            setAddError(
+                err?.message ||
+                    "Failed to add supplier."
+            );
+        } finally {
+            setAddSaving(false);
+        }
+    };
 
-      console.log("Supplier Delete API response:", result);
+    const closeAddModal = () => {
+        setShowAddSupplierModal(false);
+        setAddError("");
+        setAddSuccess("");
+    };
 
-      setSuppliers((previousSuppliers) =>
-        previousSuppliers.filter(
-          (supplier) =>
-            supplier.supplierId !==
-            deletingSupplier.supplierId,
-        ),
-      );
+    // ============================================================
+    // DELETE SUPPLIER
+    // ============================================================
 
-      setDeletingSupplier(null);
-    } catch (err) {
-      console.error("Error deleting supplier:", err);
+    const handleDeleteSupplier = (supplier) => {
+        setDeletingSupplier(supplier);
+        setDeleteError("");
+    };
 
-      setDeleteError(
-        err.message ||
-          "Unable to delete supplier. Please try again.",
-      );
-    } finally {
-      setDeleteSaving(false);
-    }
-  };
+    const confirmDelete = async () => {
+        try {
+            setDeleteSaving(true);
+            setDeleteError("");
 
-  // =========================================================
-  // DATE FORMATTER
-  // =========================================================
+            await apiDelete(
+                `/api/suppliers/${deletingSupplier.supplierId}`
+            );
 
-  const formatCreatedAt = (value) => {
-    if (!value) {
-      return "-";
-    }
+            setDeletingSupplier(null);
 
-    try {
-      return new Date(value).toLocaleString("en-IN");
-    } catch {
-      return value;
-    }
-  };
+            await fetchSuppliers();
+        } catch (err) {
+            console.error(
+                "Error deleting supplier:",
+                err
+            );
 
-  // =========================================================
-  // UI
-  // =========================================================
+            setDeleteError(
+                err?.message ||
+                    "Failed to delete supplier."
+            );
+        } finally {
+            setDeleteSaving(false);
+        }
+    };
 
-  return (
-    <section className="section active">
+    const closeDeleteModal = () => {
+        setDeletingSupplier(null);
+        setDeleteError("");
+    };
 
-      {/* =====================================================
-          PAGE HEADER
-          ===================================================== */}
+    // ============================================================
+    // FORMAT CREATED AT
+    // ============================================================
 
-      <div className="card">
-        <div className="card-head">
+    const formatCreatedAt = (value) => {
+        if (!value) {
+            return "-";
+        }
 
-          <div>
-            <div className="card-title">
-              Suppliers
-            </div>
+        return new Date(value).toLocaleString(
+            "en-IN"
+        );
+    };
 
-            <div className="kpi-sub">
-              Manage supplier information and records
-            </div>
-          </div>
+    // ============================================================
+    // RENDER
+    // ============================================================
 
-          <button
-            type="button"
-            className="btn primary"
-            onClick={handleOpenAddSupplierModal}
-          >
-            + Add Supplier
-          </button>
+    return (
+        <section className="section active">
+            {/* ================================================== */}
+            {/* HEADER */}
+            {/* ================================================== */}
 
-        </div>
+            <div className="card">
+                <div className="card-head">
+                    <div>
+                        <h2 className="card-title">
+                            Suppliers
+                        </h2>
 
-        <div className="fld customer-search">
-          <label htmlFor="supplier-search">
-            Search Supplier
-          </label>
+                        <div className="kpi-sub">
+                            Manage supplier information
+                        </div>
+                    </div>
 
-          <input
-            id="supplier-search"
-            type="text"
-            placeholder="Search by name, mobile, contact person or GST number..."
-            value={searchKeyword}
-            onChange={(event) =>
-              setSearchKeyword(event.target.value)
-            }
-          />
-        </div>
-      </div>
-
-      {/* =====================================================
-          SUPPLIER LIST
-          ===================================================== */}
-
-      <div className="card">
-
-        <div className="card-head">
-
-          <div>
-            <div className="card-title">
-              Supplier List
-            </div>
-
-            <div className="kpi-sub">
-              {loading
-                ? "Loading suppliers..."
-                : `${filteredSuppliers.length} supplier(s)`}
-            </div>
-          </div>
-
-        </div>
-
-        {loading && (
-          <div className="empty-state">
-            <p>Loading suppliers...</p>
-          </div>
-        )}
-
-        {!loading && error && (
-          <div className="empty-state">
-            <p>{error}</p>
-          </div>
-        )}
-
-        {!loading && !error && deleteError && (
-          <div className="alert e show">
-            {deleteError}
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="tbl-wrap">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Supplier</th>
-                  <th>Phone</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {filteredSuppliers.map((supplier) => (
-
-                  <tr key={supplier.supplierId}>
-
-                    <td>
-                      {supplier.supplierId}
-                    </td>
-
-                    <td>
-                      <strong>
-                        {supplier.supplierName || "-"}
-                      </strong>
-                    </td>
-
-                    <td>
-                      {supplier.phone || "-"}
-                    </td>
-
-                    <td>
-                      <span
-                        className={
-                          supplier.status === "ACTIVE"
-                            ? "badge bg"
-                            : "badge br"
+                    <button
+                        type="button"
+                        className="btn primary"
+                        onClick={
+                            handleOpenAddSupplier
                         }
-                      >
-                        {supplier.status || "-"}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="action-buttons">
-
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleViewSupplier(
-                              supplier.supplierId,
-                            )
-                          }
-                        >
-                          View
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleEditSupplier(
-                              supplier.supplierId,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingSupplier?.supplierId ===
-                              supplier.supplierId
-                          }
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn sm"
-                          onClick={() =>
-                            handleOpenDeleteSupplier(
-                              supplier,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingSupplier?.supplierId ===
-                              supplier.supplierId
-                          }
-                        >
-                          {deleteSaving &&
-                          deletingSupplier?.supplierId ===
-                            supplier.supplierId
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
-
-                      </div>
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-        )}
-
-        {!loading &&
-          !error &&
-          filteredSuppliers.length === 0 && (
-            <div className="empty-state">
-              <p>No suppliers found.</p>
+                    >
+                        + Add Supplier
+                    </button>
+                </div>
             </div>
-          )}
 
-      </div>
+            {/* ================================================== */}
+            {/* SEARCH */}
+            {/* ================================================== */}
 
-      {/* =====================================================
-          VIEW SUPPLIER
-          ===================================================== */}
+            <div className="card">
+                <div
+                    className="customer-search"
+                    style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Search suppliers..."
+                        value={searchKeyword}
+                        onChange={(event) =>
+                            setSearchKeyword(
+                                event.target.value
+                            )
+                        }
+                    />
 
-      <ViewModal
-        isOpen={
-          viewLoading ||
-          !!viewError ||
-          !!selectedSupplier
-        }
-        onClose={handleCloseSupplierModal}
-        title="Supplier Details"
-        subtitle="View supplier information"
-        loading={viewLoading}
-        error={viewError}
-        size="lg"
-        footer={
-          <button
-            type="button"
-            className="btn"
-            onClick={handleCloseSupplierModal}
-          >
-            Close
-          </button>
-        }
-      >
-        {!viewLoading &&
-          !viewError &&
-          selectedSupplier && (
-            <DetailGrid>
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearSearch
+                        }
+                        disabled={!searchKeyword}
+                    >
+                        Clear
+                    </button>
+                </div>
+            </div>
 
-              <DetailItem
-                label="Supplier ID"
-                value={selectedSupplier.supplierId}
-              />
+            {/* ================================================== */}
+            {/* SUPPLIER LIST */}
+            {/* ================================================== */}
 
-              <DetailItem
-                label="Supplier Name"
-                value={selectedSupplier.supplierName}
-              />
+            <div className="card">
+                <div className="card-head">
+                    <div>
+                        <h3 className="card-title">
+                            Supplier List
+                        </h3>
 
-              <DetailItem
-                label="Contact Person"
-                value={selectedSupplier.contactPerson}
-              />
+                        <div className="kpi-sub">
+                            Showing {totalRecords}{" "}
+                            records
+                        </div>
+                    </div>
+                </div>
 
-              <DetailItem
-                label="Phone"
-                value={selectedSupplier.phone}
-              />
-
-              <DetailItem
-                label="WhatsApp"
-                value={selectedSupplier.whatsapp}
-              />
-
-              <DetailItem
-                label="GST Number"
-                value={selectedSupplier.gstNumber}
-              />
-
-              <DetailItem
-                label="Status"
-                value={
-                  <span
-                    className={
-                      selectedSupplier.status === "ACTIVE"
-                        ? "badge bg"
-                        : "badge br"
-                    }
-                  >
-                    {selectedSupplier.status || "-"}
-                  </span>
-                }
-              />
-
-              <DetailItem
-                label="Created At"
-                value={formatCreatedAt(
-                  selectedSupplier.createdAt,
+                {loading && (
+                    <div className="empty-state">
+                        Loading suppliers...
+                    </div>
                 )}
-              />
 
-              <DetailItem
-                label="Address"
-                value={selectedSupplier.address}
-                fullWidth
-              />
+                {!loading && error && (
+                    <div className="alert e show">
+                        {error}
+                    </div>
+                )}
 
-            </DetailGrid>
-          )}
-      </ViewModal>
+                {!loading &&
+                    !error &&
+                    totalRecords === 0 && (
+                        <div className="empty-state">
+                            No suppliers found.
+                        </div>
+                    )}
 
-      {/* =====================================================
-          EDIT SUPPLIER
-          ===================================================== */}
+                {!loading &&
+                    !error &&
+                    totalRecords > 0 && (
+                        <>
+                            <div className="tbl-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "supplierId"
+                                                    )
+                                                }
+                                                style={{
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                ID
+                                                {sortKey ===
+                                                    "supplierId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </th>
 
-      <FormModal
-        isOpen={
-          editLoading ||
-          !!editError ||
-          !!editingSupplier
-        }
-        onClose={handleCloseEditModal}
-        title="Edit Supplier"
-        subtitle="Update supplier information"
-        onSubmit={handleUpdateSupplier}
-        submitLabel="Save Changes"
-        cancelLabel="Cancel"
-        saving={editSaving}
-        error={editError}
-        success={editSuccess}
-        size="lg"
-      >
-        {editLoading && (
-          <div className="empty-state">
-            <p>Loading supplier details...</p>
-          </div>
-        )}
+                                            <th
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "supplierName"
+                                                    )
+                                                }
+                                                style={{
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                Supplier
+                                                {sortKey ===
+                                                    "supplierName" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </th>
 
-        {!editLoading &&
-          !editError &&
-          editingSupplier && (
-            <>
-              <div className="customer-modal-section">
-                <div className="customer-modal-section-title">
-                  Supplier Information
-                </div>
+                                            <th
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "phone"
+                                                    )
+                                                }
+                                                style={{
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                Phone
+                                                {sortKey ===
+                                                    "phone" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </th>
+
+                                            <th
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "remarks"
+                                                    )
+                                                }
+                                                style={{
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                Remarks
+                                                {sortKey ===
+                                                    "remarks" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </th>
+
+                                            <th
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "status"
+                                                    )
+                                                }
+                                                style={{
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                Status
+                                                {sortKey ===
+                                                    "status" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </th>
+
+                                            <th>
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {paginatedRecords.map(
+                                            (
+                                                supplier
+                                            ) => (
+                                                <tr
+                                                    key={
+                                                        supplier.supplierId
+                                                    }
+                                                >
+                                                    <td>
+                                                        {
+                                                            supplier.supplierId
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            supplier.supplierName
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            supplier.phone
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            supplier.remarks ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        <span
+                                                            className={
+                                                                supplier.status ===
+                                                                "ACTIVE"
+                                                                    ? "badge bg"
+                                                                    : "badge br"
+                                                            }
+                                                        >
+                                                            {
+                                                                supplier.status
+                                                            }
+                                                        </span>
+                                                    </td>
+
+                                                    <td>
+                                                        <div className="action-buttons">
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleViewSupplier(
+                                                                        supplier.supplierId
+                                                                    )
+                                                                }
+                                                            >
+                                                                View
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleEditSupplier(
+                                                                        supplier.supplierId
+                                                                    )
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleDeleteSupplier(
+                                                                        supplier
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={pageSize}
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
+                        </>
+                    )}
+            </div>
+
+            {/* ================================================== */}
+            {/* VIEW MODAL */}
+            {/* ================================================== */}
+
+            <ViewModal
+                isOpen={
+                    viewLoading ||
+                    !!viewError ||
+                    !!selectedSupplier
+                }
+                onClose={closeViewModal}
+                title="Supplier Details"
+                subtitle="View supplier information"
+                size="lg"
+            >
+                {viewLoading && (
+                    <div className="empty-state">
+                        Loading supplier details...
+                    </div>
+                )}
+
+                {!viewLoading && viewError && (
+                    <div className="alert e show">
+                        {viewError}
+                    </div>
+                )}
+
+                {!viewLoading &&
+                    !viewError &&
+                    selectedSupplier && (
+                        <DetailGrid>
+                            <DetailItem
+                                label="Supplier ID"
+                                value={
+                                    selectedSupplier.supplierId
+                                }
+                            />
+
+                            <DetailItem
+                                label="Supplier Name"
+                                value={
+                                    selectedSupplier.supplierName
+                                }
+                            />
+
+                            <DetailItem
+                                label="Contact Person"
+                                value={
+                                    selectedSupplier.contactPerson
+                                }
+                            />
+
+                            <DetailItem
+                                label="Phone"
+                                value={
+                                    selectedSupplier.phone
+                                }
+                            />
+
+                            <DetailItem
+                                label="WhatsApp"
+                                value={
+                                    selectedSupplier.whatsapp
+                                }
+                            />
+
+                            <DetailItem
+                                label="GST Number"
+                                value={
+                                    selectedSupplier.gstNumber
+                                }
+                            />
+
+                            <DetailItem
+                                label="Remarks"
+                                value={
+                                    selectedSupplier.remarks ||
+                                    "-"
+                                }
+                                fullWidth
+                            />
+
+                            <DetailItem
+                                label="Status"
+                                value={
+                                    selectedSupplier.status
+                                }
+                                type="badge"
+                            />
+
+                            <DetailItem
+                                label="Created At"
+                                value={formatCreatedAt(
+                                    selectedSupplier.createdAt
+                                )}
+                            />
+
+                            <DetailItem
+                                label="Address"
+                                value={
+                                    selectedSupplier.address
+                                }
+                                fullWidth
+                            />
+                        </DetailGrid>
+                    )}
+            </ViewModal>
+
+            {/* ================================================== */}
+            {/* EDIT MODAL */}
+            {/* ================================================== */}
+
+            <FormModal
+                isOpen={
+                    editLoading ||
+                    !!editingSupplier
+                }
+                onClose={closeEditModal}
+                title="Edit Supplier"
+                subtitle="Update supplier information"
+                size="lg"
+                onSubmit={
+                    handleEditSubmit
+                }
+                submitLabel={
+                    editSaving
+                        ? "Saving..."
+                        : "Save Changes"
+                }
+                saving={
+                    editSaving ||
+                    editLoading
+                }
+            >
+                {editLoading && (
+                    <div className="empty-state">
+                        Loading supplier...
+                    </div>
+                )}
+
+                {!editLoading && (
+                    <>
+                        {editError && (
+                            <div className="alert e show">
+                                {editError}
+                            </div>
+                        )}
+
+                        {editSuccess && (
+                            <div className="alert s show">
+                                {editSuccess}
+                            </div>
+                        )}
+
+                        <div className="form-grid">
+                            <div className="fld">
+                                <label>
+                                    Supplier Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="supplierName"
+                                    value={
+                                        editForm.supplierName
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    Contact Person
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="contactPerson"
+                                    value={
+                                        editForm.contactPerson
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    Phone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={
+                                        editForm.phone
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    WhatsApp
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="whatsapp"
+                                    value={
+                                        editForm.whatsapp
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    GST Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="gstNumber"
+                                    value={
+                                        editForm.gstNumber
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    Address
+                                </label>
+
+                                <textarea
+                                    name="address"
+                                    value={
+                                        editForm.address
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    rows="3"
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label>
+                                    Remarks
+                                </label>
+
+                                <textarea
+                                    name="remarks"
+                                    value={
+                                        editForm.remarks
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    rows="3"
+                                    placeholder="Example: Sand, Cement"
+                                />
+                            </div>
+                        </div>
+                    </>
+                )}
+            </FormModal>
+
+            {/* ================================================== */}
+            {/* ADD MODAL */}
+            {/* ================================================== */}
+
+            <FormModal
+                isOpen={
+                    showAddSupplierModal
+                }
+                onClose={closeAddModal}
+                title="Add Supplier"
+                subtitle="Enter supplier information"
+                size="lg"
+                onSubmit={
+                    handleAddSubmit
+                }
+                submitText={
+                    addSaving
+                        ? "Saving..."
+                        : "Add Supplier"
+                }
+                submitDisabled={addSaving}
+            >
+                {addError && (
+                    <div className="alert e show">
+                        {addError}
+                    </div>
+                )}
+
+                {addSuccess && (
+                    <div className="alert s show">
+                        {addSuccess}
+                    </div>
+                )}
 
                 <div className="form-grid">
+                    <div className="fld">
+                        <label>
+                            Supplier Name
+                        </label>
 
-                  <div className="fld">
-                    <label htmlFor="edit-supplier-name">
-                      Supplier Name
-                    </label>
+                        <input
+                            type="text"
+                            name="supplierName"
+                            value={
+                                addForm.supplierName
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                        />
+                    </div>
 
-                    <input
-                      id="edit-supplier-name"
-                      name="supplierName"
-                      type="text"
-                      value={editForm.supplierName}
-                      onChange={handleEditChange}
-                      minLength={2}
-                      maxLength={100}
-                      required
-                    />
-                  </div>
+                    <div className="fld">
+                        <label>
+                            Contact Person
+                        </label>
 
-                  <div className="fld">
-                    <label htmlFor="edit-contact-person">
-                      Contact Person
-                    </label>
+                        <input
+                            type="text"
+                            name="contactPerson"
+                            value={
+                                addForm.contactPerson
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                        />
+                    </div>
 
-                    <input
-                      id="edit-contact-person"
-                      name="contactPerson"
-                      type="text"
-                      value={editForm.contactPerson}
-                      onChange={handleEditChange}
-                      maxLength={100}
-                    />
-                  </div>
+                    <div className="fld">
+                        <label>
+                            Phone
+                        </label>
 
-                  <div className="fld">
-                    <label htmlFor="edit-supplier-phone">
-                      Phone
-                    </label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={addForm.phone}
+                            onChange={
+                                handleAddChange
+                            }
+                        />
+                    </div>
 
-                    <input
-                      id="edit-supplier-phone"
-                      name="phone"
-                      type="text"
-                      value={editForm.phone}
-                      onChange={handleEditChange}
-                      pattern="[6-9][0-9]{9}"
-                      maxLength={10}
-                      required
-                    />
-                  </div>
+                    <div className="fld">
+                        <label>
+                            WhatsApp
+                        </label>
 
-                  <div className="fld">
-                    <label htmlFor="edit-whatsapp">
-                      WhatsApp
-                    </label>
+                        <input
+                            type="text"
+                            name="whatsapp"
+                            value={
+                                addForm.whatsapp
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                        />
+                    </div>
 
-                    <input
-                      id="edit-whatsapp"
-                      name="whatsapp"
-                      type="text"
-                      value={editForm.whatsapp}
-                      onChange={handleEditChange}
-                      pattern="[6-9][0-9]{9}"
-                      maxLength={10}
-                    />
-                  </div>
+                    <div className="fld">
+                        <label>
+                            GST Number
+                        </label>
 
-                  <div className="fld">
-                    <label htmlFor="edit-gst-number">
-                      GST Number
-                    </label>
+                        <input
+                            type="text"
+                            name="gstNumber"
+                            value={
+                                addForm.gstNumber
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                        />
+                    </div>
 
-                    <input
-                      id="edit-gst-number"
-                      name="gstNumber"
-                      type="text"
-                      value={editForm.gstNumber}
-                      onChange={handleEditChange}
-                      maxLength={15}
-                    />
-                  </div>
+                    <div className="fld">
+                        <label>
+                            Address
+                        </label>
 
+                        <textarea
+                            name="address"
+                            value={
+                                addForm.address
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            rows="3"
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label>
+                            Remarks
+                        </label>
+
+                        <textarea
+                            name="remarks"
+                            value={
+                                addForm.remarks
+                            }
+                            onChange={
+                                handleAddChange
+                            }
+                            rows="3"
+                            placeholder="Example: Sand, Cement"
+                        />
+                    </div>
                 </div>
-              </div>
+            </FormModal>
 
-              <div className="customer-modal-section">
+            {/* ================================================== */}
+            {/* DELETE CONFIRMATION */}
+            {/* ================================================== */}
 
-                <div className="customer-modal-section-title">
-                  Address Information
-                </div>
-
-                <div className="form-grid">
-
-                  <div className="fld f-full">
-
-                    <label htmlFor="edit-supplier-address">
-                      Address
-                    </label>
-
-                    <textarea
-                      id="edit-supplier-address"
-                      name="address"
-                      value={editForm.address}
-                      onChange={handleEditChange}
-                      maxLength={500}
-                    />
-
-                  </div>
-
-                </div>
-              </div>
-            </>
-          )}
-      </FormModal>
-
-      {/* =====================================================
-          ADD SUPPLIER
-          ===================================================== */}
-
-      <FormModal
-        isOpen={showAddSupplierModal}
-        onClose={handleCloseAddSupplierModal}
-        title="Add Supplier"
-        subtitle="Enter supplier information"
-        onSubmit={handleCreateSupplier}
-        submitLabel="Add Supplier"
-        cancelLabel="Cancel"
-        saving={addSaving}
-        error={addError}
-        success={addSuccess}
-        size="lg"
-      >
-        <div className="customer-modal-section">
-
-          <div className="customer-modal-section-title">
-            Supplier Information
-          </div>
-
-          <div className="form-grid">
-
-            <div className="fld">
-              <label htmlFor="add-supplier-name">
-                Supplier Name
-              </label>
-
-              <input
-                id="add-supplier-name"
-                name="supplierName"
-                type="text"
-                value={addForm.supplierName}
-                onChange={handleAddChange}
-                minLength={2}
-                maxLength={100}
-                required
-              />
-            </div>
-
-            <div className="fld">
-              <label htmlFor="add-contact-person">
-                Contact Person
-              </label>
-
-              <input
-                id="add-contact-person"
-                name="contactPerson"
-                type="text"
-                value={addForm.contactPerson}
-                onChange={handleAddChange}
-                maxLength={100}
-              />
-            </div>
-
-            <div className="fld">
-              <label htmlFor="add-supplier-phone">
-                Phone
-              </label>
-
-              <input
-                id="add-supplier-phone"
-                name="phone"
-                type="text"
-                value={addForm.phone}
-                onChange={handleAddChange}
-                pattern="[6-9][0-9]{9}"
-                maxLength={10}
-                required
-              />
-            </div>
-
-            <div className="fld">
-              <label htmlFor="add-whatsapp">
-                WhatsApp
-              </label>
-
-              <input
-                id="add-whatsapp"
-                name="whatsapp"
-                type="text"
-                value={addForm.whatsapp}
-                onChange={handleAddChange}
-                pattern="[6-9][0-9]{9}"
-                maxLength={10}
-              />
-            </div>
-
-            <div className="fld">
-              <label htmlFor="add-gst-number">
-                GST Number
-              </label>
-
-              <input
-                id="add-gst-number"
-                name="gstNumber"
-                type="text"
-                value={addForm.gstNumber}
-                onChange={handleAddChange}
-                maxLength={15}
-              />
-            </div>
-
-          </div>
-        </div>
-
-        <div className="customer-modal-section">
-
-          <div className="customer-modal-section-title">
-            Address Information
-          </div>
-
-          <div className="form-grid">
-
-            <div className="fld f-full">
-
-              <label htmlFor="add-supplier-address">
-                Address
-              </label>
-
-              <textarea
-                id="add-supplier-address"
-                name="address"
-                value={addForm.address}
-                onChange={handleAddChange}
-                maxLength={500}
-              />
-
-            </div>
-
-          </div>
-        </div>
-      </FormModal>
-
-      {/* =====================================================
-          DELETE SUPPLIER
-          ===================================================== */}
-
-      <DeleteConfirmModal
-        isOpen={!!deletingSupplier}
-        onClose={handleCloseDeleteSupplier}
-        onConfirm={handleConfirmDeleteSupplier}
-        title="Delete Supplier"
-        subtitle="Deactivate supplier record"
-        message="Are you sure you want to delete this supplier?"
-        itemName={deletingSupplier?.supplierName}
-        confirming={deleteSaving}
-        error={deleteError}
-      />
-
-    </section>
-  );
+            <DeleteConfirmModal
+                isOpen={
+                    !!deletingSupplier
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    confirmDelete
+                }
+                itemName={
+                    deletingSupplier?.supplierName ||
+                    "this supplier"
+                }
+                loading={deleteSaving}
+                error={deleteError}
+            />
+        </section>
+    );
 }
 
 export default Supplier;

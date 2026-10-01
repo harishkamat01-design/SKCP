@@ -36,6 +36,8 @@ public class SupplierResponse
 
     private String gstNumber;
 
+    private String remarks;
+
     /*
      * status and createdAt are backend-controlled fields.
      *
@@ -126,6 +128,16 @@ public class SupplierResponse
     public void setGstNumber(String gstNumber)
     {
         this.gstNumber = gstNumber;
+    }
+
+    public String getRemarks()
+    {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks)
+    {
+        this.remarks = remarks;
     }
 
     public String getStatus()

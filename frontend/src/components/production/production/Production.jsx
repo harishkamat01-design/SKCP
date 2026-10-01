@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     apiGet,
@@ -15,12 +15,23 @@ import {
     DetailItem,
 } from "../../ui/common/DetailGrid";
 
+import Pagination from "../../../components/ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+
 function Production() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [productionDateFrom, setProductionDateFrom] =
+        useState("");
+    const [productionDateTo, setProductionDateTo] =
+        useState("");
+    const [dateFilterError, setDateFilterError] =
+        useState("");
+
     const [productions, setProductions] = useState([]);
 
     const [loading, setLoading] = useState(true);
@@ -106,7 +117,11 @@ function Production() {
                 result
             );
 
-            setProductions(result.data || []);
+            setProductions(
+                Array.isArray(result?.data)
+                    ? result.data
+                    : []
+            );
         } catch (err) {
             console.error(
                 "Error fetching productions:",
@@ -114,7 +129,8 @@ function Production() {
             );
 
             setError(
-                "Unable to load production records. Please try again."
+                err.message ||
+                    "Unable to load production records. Please try again."
             );
         } finally {
             setLoading(false);
@@ -122,52 +138,184 @@ function Production() {
     };
 
     // ============================================================
-    // SEARCH
+    // FILTER + SEARCH
     // ============================================================
 
-    const filteredProductions = productions.filter(
-        (production) => {
-            const keyword =
-                searchKeyword.toLowerCase().trim();
+    const filteredProductions = useMemo(() => {
+        const keyword =
+            searchKeyword.toLowerCase().trim();
 
-            if (!keyword) {
-                return true;
+        return productions.filter(
+            (production) => {
+                const productionId =
+                    String(
+                        production.productionId || ""
+                    ).toLowerCase();
+
+                const productionDate =
+                    String(
+                        production.productionDate || ""
+                    );
+
+                const productName =
+                    String(
+                        production.productName || ""
+                    ).toLowerCase();
+
+                const productSize =
+                    String(
+                        production.productSize || ""
+                    ).toLowerCase();
+
+                const assetName =
+                    String(
+                        production.assetName || ""
+                    ).toLowerCase();
+
+                const status =
+                    String(
+                        production.status || ""
+                    ).toLowerCase();
+
+                const matchesSearch =
+                    !keyword ||
+                    productionId.includes(
+                        keyword
+                    ) ||
+                    productionDate
+                        .toLowerCase()
+                        .includes(keyword) ||
+                    productName.includes(
+                        keyword
+                    ) ||
+                    productSize.includes(
+                        keyword
+                    ) ||
+                    assetName.includes(
+                        keyword
+                    ) ||
+                    status.includes(
+                        keyword
+                    );
+
+                const matchesFromDate =
+                    !productionDateFrom ||
+                    productionDate >=
+                        productionDateFrom;
+
+                const matchesToDate =
+                    !productionDateTo ||
+                    productionDate <=
+                        productionDateTo;
+
+                return (
+                    matchesSearch &&
+                    matchesFromDate &&
+                    matchesToDate
+                );
             }
+        );
+    }, [
+        productions,
+        searchKeyword,
+        productionDateFrom,
+        productionDateTo,
+    ]);
 
-            return (
-                String(
-                    production.productionId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    production.productionDate || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    production.productName || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    production.productSize || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    production.assetName || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    production.status || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword)
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredProductions,
+        "productionId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // DATE FILTER HANDLERS
+    // ============================================================
+
+    const handleProductionDateFromChange = (
+        event
+    ) => {
+        const value = event.target.value;
+
+        setProductionDateFrom(value);
+        setDateFilterError("");
+
+        if (
+            value &&
+            productionDateTo &&
+            value > productionDateTo
+        ) {
+            setDateFilterError(
+                "Production Date From cannot be later than Production Date To."
             );
         }
-    );
+    };
+
+    const handleProductionDateToChange = (
+        event
+    ) => {
+        const value = event.target.value;
+
+        setProductionDateTo(value);
+        setDateFilterError("");
+
+        if (
+            productionDateFrom &&
+            value &&
+            productionDateFrom > value
+        ) {
+            setDateFilterError(
+                "Production Date To cannot be earlier than Production Date From."
+            );
+        }
+    };
+
+    const handleClearFilters = () => {
+        setSearchKeyword("");
+        setProductionDateFrom("");
+        setProductionDateTo("");
+        setDateFilterError("");
+    };
+
+    // ============================================================
+    // SORT INDICATOR
+    // ============================================================
+
+    const getSortIndicator = (key) => {
+        if (sortKey !== key) {
+            return "";
+        }
+
+        return sortDirection === "asc"
+            ? " ▲"
+            : " ▼";
+    };
 
     // ============================================================
     // FORMAT DATE
@@ -181,6 +329,14 @@ function Production() {
         const date = new Date(
             `${dateValue}T00:00:00`
         );
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+            return dateValue;
+        }
 
         return date.toLocaleDateString(
             "en-GB",
@@ -205,7 +361,9 @@ function Production() {
             return "₹ 0.00";
         }
 
-        return `₹ ${Number(amount).toLocaleString(
+        return `₹ ${Number(
+            amount
+        ).toLocaleString(
             "en-IN",
             {
                 minimumFractionDigits: 2,
@@ -218,8 +376,32 @@ function Production() {
     // VIEW PRODUCTION
     // ============================================================
 
-    const handleView = (production) => {
-        setSelectedProduction(production);
+    const handleView = async (
+        production
+    ) => {
+        try {
+            const result = await apiGet(
+                `/api/productions/${production.productionId}`
+            );
+
+            console.log(
+                "Production details response:",
+                result
+            );
+
+            setSelectedProduction(
+                result.data
+            );
+        } catch (err) {
+            console.error(
+                "Failed to fetch production details:",
+                err
+            );
+
+            setError(
+                "Failed to load production details."
+            );
+        }
     };
 
     const closeViewModal = () => {
@@ -256,15 +438,22 @@ function Production() {
     };
 
     const handleAddChange = (event) => {
-        const { name, value } = event.target;
+        const {
+            name,
+            value,
+        } = event.target;
 
-        setAddForm((previous) => ({
-            ...previous,
-            [name]: value,
-        }));
+        setAddForm(
+            (previous) => ({
+                ...previous,
+                [name]: value,
+            })
+        );
     };
 
-    const handleCreateProduction = async (event) => {
+    const handleCreateProduction = async (
+        event
+    ) => {
         event.preventDefault();
 
         if (!addForm.productionDate) {
@@ -297,11 +486,16 @@ function Production() {
                     addForm.productionDate,
 
                 productId:
-                    Number(addForm.productId),
+                    Number(
+                        addForm.productId
+                    ),
 
-                assetId: addForm.assetId
-                    ? Number(addForm.assetId)
-                    : null,
+                assetId:
+                    addForm.assetId
+                        ? Number(
+                              addForm.assetId
+                          )
+                        : null,
 
                 quantityProduced:
                     Number(
@@ -376,10 +570,14 @@ function Production() {
     // EDIT PRODUCTION
     // ============================================================
 
-    const handleEdit = (production) => {
+    const handleEdit = (
+        production
+    ) => {
         setEditError("");
 
-        setEditingProduction(production);
+        setEditingProduction(
+            production
+        );
 
         setEditForm({
             productionDate:
@@ -399,7 +597,8 @@ function Production() {
                 "",
 
             remarks:
-                production.remarks || "",
+                production.remarks ||
+                "",
         });
     };
 
@@ -408,140 +607,158 @@ function Production() {
             return;
         }
 
-        setEditingProduction(null);
+        setEditingProduction(
+            null
+        );
+
         setEditError("");
     };
 
-    const handleEditChange = (event) => {
-        const { name, value } = event.target;
+    const handleEditChange = (
+        event
+    ) => {
+        const {
+            name,
+            value,
+        } = event.target;
 
-        setEditForm((previous) => ({
-            ...previous,
-            [name]: value,
-        }));
+        setEditForm(
+            (previous) => ({
+                ...previous,
+                [name]: value,
+            })
+        );
     };
 
     // ============================================================
     // UPDATE PRODUCTION
     // ============================================================
 
-    const handleUpdateProduction = async (
-        event
-    ) => {
-        event.preventDefault();
+    const handleUpdateProduction =
+        async (event) => {
+            event.preventDefault();
 
-        if (!editingProduction) {
-            return;
-        }
+            if (!editingProduction) {
+                return;
+            }
 
-        if (!editForm.productionDate) {
-            setEditError(
-                "Please select a production date."
-            );
-            return;
-        }
+            if (
+                !editForm.productionDate
+            ) {
+                setEditError(
+                    "Please select a production date."
+                );
+                return;
+            }
 
-        if (
-            editForm.quantityProduced ===
-                "" ||
-            Number.isNaN(
-                Number(
-                    editForm.quantityProduced
-                )
-            )
-        ) {
-            setEditError(
-                "Please enter a valid quantity produced."
-            );
-            return;
-        }
-
-        try {
-            setEditLoading(true);
-            setEditError("");
-
-            // Product is NOT editable in the UI.
-            // The existing Product ID is sent silently
-            // because the backend requires it for update.
-        const payload = {
-            productionDate:
-                editForm.productionDate,
-
-            productId:
-                Number(
-                    editingProduction.productId
-                ),
-
-            assetId:
-                editingProduction.assetId
-                    ? Number(
-                        editingProduction.assetId
+            if (
+                editForm.quantityProduced ===
+                    "" ||
+                Number.isNaN(
+                    Number(
+                        editForm.quantityProduced
                     )
-                    : null,
+                )
+            ) {
+                setEditError(
+                    "Please enter a valid quantity produced."
+                );
+                return;
+            }
 
-            quantityProduced:
-                Number(
-                    editForm.quantityProduced
-                ),
+            try {
+                setEditLoading(true);
+                setEditError("");
 
-            morningCementBags:
-                editForm.morningCementBags === ""
-                    ? 0
-                    : Number(
-                        editForm.morningCementBags
-                    ),
+                const payload = {
+                    productionDate:
+                        editForm.productionDate,
 
-            afternoonCementBags:
-                editForm.afternoonCementBags === ""
-                    ? 0
-                    : Number(
-                        editForm.afternoonCementBags
-                    ),
+                    productId:
+                        Number(
+                            editingProduction.productId
+                        ),
 
-            remarks:
-                editForm.remarks.trim() || null,
+                    assetId:
+                        editingProduction.assetId
+                            ? Number(
+                                  editingProduction.assetId
+                              )
+                            : null,
+
+                    quantityProduced:
+                        Number(
+                            editForm.quantityProduced
+                        ),
+
+                    morningCementBags:
+                        editForm.morningCementBags ===
+                        ""
+                            ? 0
+                            : Number(
+                                  editForm.morningCementBags
+                              ),
+
+                    afternoonCementBags:
+                        editForm.afternoonCementBags ===
+                        ""
+                            ? 0
+                            : Number(
+                                  editForm.afternoonCementBags
+                              ),
+
+                    remarks:
+                        editForm.remarks.trim() ||
+                        null,
+                };
+
+                console.log(
+                    "Updating production with payload:",
+                    payload
+                );
+
+                const result =
+                    await apiPut(
+                        `/api/productions/${editingProduction.productionId}`,
+                        payload
+                    );
+
+                console.log(
+                    "Production updated:",
+                    result
+                );
+
+                setEditingProduction(
+                    null
+                );
+
+                await fetchProductions();
+            } catch (err) {
+                console.error(
+                    "Error updating production:",
+                    err
+                );
+
+                setEditError(
+                    err.message ||
+                        "Unable to update production record."
+                );
+            } finally {
+                setEditLoading(false);
+            }
         };
-
-            console.log(
-                "Updating production with payload:",
-                payload
-            );
-
-            const result = await apiPut(
-                `/api/productions/${editingProduction.productionId}`,
-                payload
-            );
-
-            console.log(
-                "Production updated:",
-                result
-            );
-
-            setEditingProduction(null);
-
-            await fetchProductions();
-        } catch (err) {
-            console.error(
-                "Error updating production:",
-                err
-            );
-
-            setEditError(
-                err.message ||
-                    "Unable to update production record."
-            );
-        } finally {
-            setEditLoading(false);
-        }
-    };
 
     // ============================================================
     // DELETE PRODUCTION
     // ============================================================
 
-    const handleDelete = (production) => {
+    const handleDelete = (
+        production
+    ) => {
         setDeleteError("");
-        setDeletingProduction(production);
+        setDeletingProduction(
+            production
+        );
     };
 
     const closeDeleteModal = () => {
@@ -549,50 +766,57 @@ function Production() {
             return;
         }
 
-        setDeletingProduction(null);
+        setDeletingProduction(
+            null
+        );
+
         setDeleteError("");
     };
 
-    const handleConfirmDelete = async () => {
-        if (!deletingProduction) {
-            return;
-        }
+    const handleConfirmDelete =
+        async () => {
+            if (!deletingProduction) {
+                return;
+            }
 
-        try {
-            setDeleteLoading(true);
-            setDeleteError("");
+            try {
+                setDeleteLoading(true);
+                setDeleteError("");
 
-            console.log(
-                "Deleting production ID:",
-                deletingProduction.productionId
-            );
+                console.log(
+                    "Deleting production ID:",
+                    deletingProduction.productionId
+                );
 
-            const result = await apiDelete(
-                `/api/productions/${deletingProduction.productionId}`
-            );
+                const result =
+                    await apiDelete(
+                        `/api/productions/${deletingProduction.productionId}`
+                    );
 
-            console.log(
-                "Production deleted:",
-                result
-            );
+                console.log(
+                    "Production deleted:",
+                    result
+                );
 
-            setDeletingProduction(null);
+                setDeletingProduction(
+                    null
+                );
 
-            await fetchProductions();
-        } catch (err) {
-            console.error(
-                "Error deleting production:",
-                err
-            );
+                await fetchProductions();
+            } catch (err) {
+                console.error(
+                    "Error deleting production:",
+                    err
+                );
 
-            setDeleteError(
-                err.message ||
-                    "Unable to delete production record."
-            );
-        } finally {
-            setDeleteLoading(false);
-        }
-    };
+                setDeleteError(
+                    err.message ||
+                        "Unable to delete production record."
+                );
+            } finally {
+                setDeleteLoading(false);
+            }
+        };
 
     // ============================================================
     // LOADING
@@ -602,7 +826,10 @@ function Production() {
         return (
             <div className="page">
                 <section className="card">
-                    <h2>Production</h2>
+                    <h2>
+                        Production
+                    </h2>
+
                     <p>
                         Loading production records...
                     </p>
@@ -623,28 +850,22 @@ function Production() {
 
             <section className="card">
                 <div
-                    style={{
-                        display: "flex",
-                        justifyContent:
-                            "space-between",
-                        alignItems: "center",
-                        gap: "16px",
-                        flexWrap: "wrap",
-                    }}
+                    className="card-head customer-page-header"
                 >
                     <div>
-                        <h2>Production</h2>
+                        <div className="card-title">
+                            Production
+                        </div>
 
-                        <p>
+                        <div className="kpi-sub">
                             Manage production
-                            information and
-                            records.
-                        </p>
+                            information and records
+                        </div>
                     </div>
 
                     <button
                         type="button"
-                        className="action-btn view-btn"
+                        className="btn primary"
                         onClick={
                             openAddModal
                         }
@@ -653,28 +874,97 @@ function Production() {
                     </button>
                 </div>
 
-                <div className="fld production-search">
+                <div className="fld customer-search">
                     <label htmlFor="production-search">
                         Search Production
                     </label>
 
-                    <input
-                        id="production-search"
-                        type="text"
-                        placeholder="Search by product, size, date, asset or status..."
-                        value={
-                            searchKeyword
-                        }
-                        onChange={(
-                            event
-                        ) =>
-                            setSearchKeyword(
-                                event.target
-                                    .value
-                            )
-                        }
-                    />
+                    <div className="search-action-row">
+                        <input
+                            id="production-search"
+                            type="text"
+                            placeholder="Search by product, size, date, asset or status..."
+                            value={
+                                searchKeyword
+                            }
+                            onChange={(
+                                event
+                            ) =>
+                                setSearchKeyword(
+                                    event
+                                        .target
+                                        .value
+                                )
+                            }
+                        />
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={
+                                handleClearFilters
+                            }
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </div>
+
+                <div className="form-grid">
+                    <div className="fld">
+                        <label htmlFor="production-date-from">
+                            Production Date From
+                        </label>
+
+                        <input
+                            id="production-date-from"
+                            type="date"
+                            value={
+                                productionDateFrom
+                            }
+                            onChange={
+                                handleProductionDateFromChange
+                            }
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="production-date-to">
+                            Production Date To
+                        </label>
+
+                        <input
+                            id="production-date-to"
+                            type="date"
+                            value={
+                                productionDateTo
+                            }
+                            onChange={
+                                handleProductionDateToChange
+                            }
+                        />
+                    </div>
+                </div>
+
+                {dateFilterError && (
+                    <div className="alert e show">
+                        {dateFilterError}
+                    </div>
+                )}
+
+                {(searchKeyword ||
+                    productionDateFrom ||
+                    productionDateTo) && (
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearFilters
+                        }
+                    >
+                        Clear All Filters
+                    </button>
+                )}
             </section>
 
             {/* ====================================================
@@ -682,170 +972,320 @@ function Production() {
             ==================================================== */}
 
             <section className="card">
-                <h2>Production List</h2>
+                <div className="card-head">
+                    <div>
+                        <div className="card-title">
+                            Production List
+                        </div>
 
-                <p>
-                    {
-                        filteredProductions.length
-                    }{" "}
-                    production record(s)
-                </p>
+                        <div className="kpi-sub">
+                            {totalRecords}{" "}
+                            production record(s)
+                        </div>
+                    </div>
+                </div>
 
                 {error && (
-                    <p className="form-error">
+                    <div className="alert e show">
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 {!error &&
-                    filteredProductions.length ===
-                        0 && (
-                        <p>
-                            No production
-                            records found.
-                        </p>
+                    totalRecords === 0 && (
+                        <div className="empty-state">
+                            <p>
+                                No production
+                                records found.
+                            </p>
+                        </div>
                     )}
 
                 {!error &&
-                    filteredProductions.length >
-                        0 && (
-                        <div className="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>
-                                            DATE
-                                        </th>
-                                        <th>
-                                            PRODUCT
-                                        </th>
-                                        <th>
-                                            SIZE
-                                        </th>
-                                        <th>
-                                            QUANTITY
-                                        </th>
-                                        <th>
-                                            TOTAL CEMENT BAGS
-                                        </th>
-                                        <th>
-                                            ASSET
-                                        </th>
-                                        <th>
-                                            STATUS
-                                        </th>
-                                        <th>
-                                            ACTIONS
-                                        </th>
-                                    </tr>
-                                </thead>
+                    totalRecords > 0 && (
+                        <>
+                            <div className="tbl-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "productionId"
+                                                        )
+                                                    }
+                                                >
+                                                    ID
+                                                    {getSortIndicator(
+                                                        "productionId"
+                                                    )}
+                                                </button>
+                                            </th>
 
-                                <tbody>
-                                    {filteredProductions.map(
-                                        (
-                                            production
-                                        ) => (
-                                            <tr
-                                                key={
-                                                    production.productionId
-                                                }
-                                            >
-                                                <td>
-                                                    {
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "productionDate"
+                                                        )
+                                                    }
+                                                >
+                                                    DATE
+                                                    {getSortIndicator(
+                                                        "productionDate"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "productName"
+                                                        )
+                                                    }
+                                                >
+                                                    PRODUCT
+                                                    {getSortIndicator(
+                                                        "productName"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "productSize"
+                                                        )
+                                                    }
+                                                >
+                                                    SIZE
+                                                    {getSortIndicator(
+                                                        "productSize"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "quantityProduced"
+                                                        )
+                                                    }
+                                                >
+                                                    QUANTITY
+                                                    {getSortIndicator(
+                                                        "quantityProduced"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "totalCementBags"
+                                                        )
+                                                    }
+                                                >
+                                                    TOTAL CEMENT BAGS
+                                                    {getSortIndicator(
+                                                        "totalCementBags"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "assetName"
+                                                        )
+                                                    }
+                                                >
+                                                    ASSET
+                                                    {getSortIndicator(
+                                                        "assetName"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                <button
+                                                    type="button"
+                                                    className="table-sort-btn"
+                                                    onClick={() =>
+                                                        handleSort(
+                                                            "status"
+                                                        )
+                                                    }
+                                                >
+                                                    STATUS
+                                                    {getSortIndicator(
+                                                        "status"
+                                                    )}
+                                                </button>
+                                            </th>
+
+                                            <th>
+                                                ACTIONS
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {paginatedRecords.map(
+                                            (
+                                                production
+                                            ) => (
+                                                <tr
+                                                    key={
                                                         production.productionId
                                                     }
-                                                </td>
-
-                                                <td>
-                                                    {formatDate(
-                                                        production.productionDate
-                                                    )}
-                                                </td>
-
-                                                <td>
-                                                    <strong>
+                                                >
+                                                    <td>
                                                         {
-                                                            production.productName
+                                                            production.productionId
                                                         }
-                                                    </strong>
-                                                </td>
+                                                    </td>
 
-                                                <td>
-                                                    {
-                                                        production.productSize
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        {formatDate(
+                                                            production.productionDate
+                                                        )}
+                                                    </td>
 
-                                                <td>
-                                                    {
-                                                        production.quantityProduced
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        <strong>
+                                                            {
+                                                                production.productName
+                                                            }
+                                                        </strong>
+                                                    </td>
 
-                                                <td>
-                                                    {
-                                                        production.totalCementBags
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        {
+                                                            production.productSize
+                                                        }
+                                                    </td>
 
-                                                <td>
-                                                    {
-                                                        production.assetName
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        {
+                                                            production.quantityProduced
+                                                        }
+                                                    </td>
 
-                                                <td>
-                                                    {
-                                                        production.status
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        {
+                                                            production.totalCementBags
+                                                        }
+                                                    </td>
 
-                                                <td>
-                                                    <div className="table-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn view-btn"
-                                                            onClick={() =>
-                                                                handleView(
-                                                                    production
-                                                                )
+                                                    <td>
+                                                        {
+                                                            production.assetName
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        <span
+                                                            className={
+                                                                production.status ===
+                                                                "COMPLETED"
+                                                                    ? "badge bg"
+                                                                    : "badge br"
                                                             }
                                                         >
-                                                            View
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn edit-btn"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    production
-                                                                )
+                                                            {
+                                                                production.status
                                                             }
-                                                        >
-                                                            Edit
-                                                        </button>
+                                                        </span>
+                                                    </td>
 
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn delete-btn"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    production
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                                    <td>
+                                                        <div className="action-buttons">
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleView(
+                                                                        production
+                                                                    )
+                                                                }
+                                                            >
+                                                                View
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleEdit(
+                                                                        production
+                                                                    )
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="btn sm"
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        production
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={
+                                    pageSize
+                                }
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
+                        </>
                     )}
             </section>
 

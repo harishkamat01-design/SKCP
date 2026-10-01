@@ -1,4 +1,3 @@
-
 package com.skcp.dto.response.order;
 
 import java.time.LocalDate;
@@ -17,6 +16,13 @@ public class OrderSummaryResponse {
     // ============================================================
 
     private Integer customerId;
+
+
+    // ============================================================
+    // CUSTOMER NAME
+    // ============================================================
+
+    private String customerName;
 
 
     // ============================================================
@@ -68,6 +74,14 @@ public class OrderSummaryResponse {
         this.customerId = customerId;
     }
 
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
     public LocalDate getOrderDate() {
         return orderDate;
     }
@@ -93,7 +107,20 @@ public class OrderSummaryResponse {
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
-} 
+}
+
+
+/*
+
+                    Order Entity
+                         │
+                    OrderMapper
+                    /         \
+                   ↓           ↓
+      OrderResponse      OrderSummaryResponse
+       (full detail)        (list/detail-light)
+
+*/
 
 
 

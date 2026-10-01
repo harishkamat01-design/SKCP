@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import Pagination from "../../../components/ui/Pagination";
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
 
 import {
     apiGet,
@@ -554,49 +558,60 @@ function Attendance() {
     // SEARCH
     // ============================================================
 
-    const filteredAttendance =
-        attendance.filter((record) => {
-            const keyword =
-                searchKeyword
-                    .toLowerCase()
-                    .trim();
+    const filteredAttendance = useMemo(() => {
+        const keyword = searchKeyword.toLowerCase().trim();
 
-            if (!keyword) {
-                return true;
-            }
+        if (!keyword) {
+            return attendance;
+        }
 
-            return (
-                String(
-                    record.labourName || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+        return attendance.filter((record) =>
+            String(record.labourName || "")
+                .toLowerCase()
+                .includes(keyword) ||
+            String(record.labourId || "")
+                .toLowerCase()
+                .includes(keyword) ||
+            String(record.attendanceDate || "")
+                .toLowerCase()
+                .includes(keyword) ||
+            String(record.attendanceStatus || "")
+                .toLowerCase()
+                .includes(keyword) ||
+            String(record.status || "")
+                .toLowerCase()
+                .includes(keyword)
+        );
+    }, [attendance, searchKeyword]);
 
-                String(
-                    record.labourId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+    // ============================================================
+    // SORTING
+    // ============================================================
 
-                String(
-                    record.attendanceDate || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredAttendance,
+        "attendanceId",
+        "desc"
+    );
 
-                String(
-                    record.attendanceStatus || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
+    // ============================================================
+    // PAGINATION
+    // ============================================================
 
-                String(
-                    record.status || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword)
-            );
-        });
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(sortedRecords, 10);
 
     // ============================================================
     // FORMAT CURRENCY
@@ -681,22 +696,34 @@ function Attendance() {
                     </button>
                 </div>
 
-                <div className="fld attendance-search">
-                    <label htmlFor="attendance-search">
-                        Search Attendance
-                    </label>
+                <div className="search-action-row">
+                    <div className="fld attendance-search">
+                        <label htmlFor="attendance-search">
+                            Search Attendance
+                        </label>
 
-                    <input
-                        id="attendance-search"
-                        type="text"
-                        placeholder="Search by labour name, ID, date or status..."
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
+                        <input
+                            id="attendance-search"
+                            type="text"
+                            placeholder="Search by labour name, ID, date or status..."
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={() =>
+                            setSearchKeyword("")
                         }
-                    />
+                    >
+                        Clear
+                    </button>
                 </div>
             </section>
 
@@ -835,36 +862,151 @@ function Attendance() {
                     !error &&
                     filteredAttendance.length >
                         0 && (
-                        <div className="table-wrap">
-                            <table>
+                        <>
+                            <div className="table-wrap">
+                                <table>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>DATE</th>
-                                        <th>LABOUR</th>
                                         <th>
-                                            ATTENDANCE
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "attendanceId"
+                                                    )
+                                                }
+                                            >
+                                                ID
+                                                {sortKey ===
+                                                    "attendanceId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
                                         <th>
-                                            DAILY RATE
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "attendanceDate"
+                                                    )
+                                                }
+                                            >
+                                                DATE
+                                                {sortKey ===
+                                                    "attendanceDate" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
                                         <th>
-                                            DAILY AMOUNT
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "labourName"
+                                                    )
+                                                }
+                                            >
+                                                LABOUR
+                                                {sortKey ===
+                                                    "labourName" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
                                         <th>
-                                            REMARKS
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "attendanceStatus"
+                                                    )
+                                                }
+                                            >
+                                                ATTENDANCE
+                                                {sortKey ===
+                                                    "attendanceStatus" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
                                         <th>
-                                            STATUS
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "dailyRate"
+                                                    )
+                                                }
+                                            >
+                                                DAILY RATE
+                                                {sortKey ===
+                                                    "dailyRate" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
                                         <th>
-                                            ACTIONS
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "dailyAmount"
+                                                    )
+                                                }
+                                            >
+                                                DAILY AMOUNT
+                                                {sortKey ===
+                                                    "dailyAmount" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
                                         </th>
+                                        <th>REMARKS</th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "status"
+                                                    )
+                                                }
+                                            >
+                                                STATUS
+                                                {sortKey ===
+                                                    "status" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
+                                        <th>ACTIONS</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    {filteredAttendance.map(
+                                    {paginatedRecords.map(
                                         (record) => (
                                             <tr
                                                 key={
@@ -968,6 +1110,18 @@ function Attendance() {
                                 </tbody>
                             </table>
                         </div>
+
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalRecords={totalRecords}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
+                        </>
                     )}
             </section>
 

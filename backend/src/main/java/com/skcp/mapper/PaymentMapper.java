@@ -79,11 +79,18 @@ public class PaymentMapper {
 
         PaymentResponse response = new PaymentResponse();
 
-        response.setPaymentId(payment.getPaymentId());
+        response.setPaymentId(
+                payment.getPaymentId()
+        );
 
         if (payment.getCustomer() != null) {
+
             response.setCustomerId(
                     payment.getCustomer().getCustomerId()
+            );
+
+            response.setCustomerName(
+                    payment.getCustomer().getCustomerName()
             );
         }
 
@@ -119,6 +126,8 @@ public class PaymentMapper {
                 payment.getRecordStatus()
         );
 
+
+
         return response;
     }
 
@@ -138,8 +147,13 @@ public class PaymentMapper {
         );
 
         if (payment.getCustomer() != null) {
+
             response.setCustomerId(
                     payment.getCustomer().getCustomerId()
+            );
+
+            response.setCustomerName(
+                    payment.getCustomer().getCustomerName()
             );
         }
 
@@ -162,6 +176,8 @@ public class PaymentMapper {
         response.setRecordStatus(
                 payment.getRecordStatus()
         );
+
+        
 
         return response;
     }

@@ -1,12 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
 import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
 import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
+
 import {
     DetailGrid,
     DetailItem,
 } from "../../ui/common/DetailGrid";
-
+import Pagination from "../../ui/Pagination";
 import {
     apiGet,
     apiPost,
@@ -14,7 +21,8 @@ import {
     apiDelete,
 } from "../../../services/api";
 
-
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
 
 const PAYMENT_MODES = [
     "CASH",
@@ -25,6 +33,7 @@ const PAYMENT_MODES = [
 
 const initialFormData = {
     customerId: "",
+    orderId: "",
     paymentDate: "",
     totalAmountReceived: "",
     paymentMode: "CASH",
@@ -35,7 +44,9 @@ const initialFormData = {
 
 const formatDate = (dateValue) =>
     dateValue
-        ? new Date(`${dateValue}T00:00:00`).toLocaleDateString("en-GB", {
+        ? new Date(
+              `${dateValue}T00:00:00`
+          ).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
@@ -43,68 +54,142 @@ const formatDate = (dateValue) =>
         : "-";
 
 const formatDateTime = (dateValue) =>
-    dateValue ? new Date(dateValue).toLocaleString() : "-";
+    dateValue
+        ? new Date(dateValue).toLocaleString()
+        : "-";
 
 const formatCurrency = (amount) =>
-    `₹ ${Number(amount || 0).toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })}`;
+    `₹ ${Number(amount || 0).toLocaleString(
+        "en-IN",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }
+    )}`;
 
-
-
-function Payment() {
+function Payment({ paymentContext }) {
     const [payments, setPayments] = useState([]);
     const [allocations, setAllocations] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [searchTerm, setSearchTerm] = useState("");
+    // ============================================================
+    // SEARCH + DATE FILTER STATE
+    // ============================================================
 
-    const [selectedPayment, setSelectedPayment] = useState(null);
-    const [selectedAllocations, setSelectedAllocations] = useState([]);
-    const [viewLoading, setViewLoading] = useState(false);
-    const [viewError, setViewError] = useState("");
+    const [searchTerm, setSearchTerm] =
+        useState("");
 
-    const [showFormModal, setShowFormModal] = useState(false);
-    const [editingPayment, setEditingPayment] = useState(null);
-    const [formData, setFormData] = useState(initialFormData);
-    const [formError, setFormError] = useState("");
-    const [formSuccess, setFormSuccess] = useState("");
-    const [saving, setSaving] = useState(false);
+    const [dateFrom, setDateFrom] =
+        useState("");
 
-    const [deletingId, setDeletingId] = useState(null);
-    const [deleting, setDeleting] = useState(false);
+    const [dateTo, setDateTo] =
+        useState("");
+
+    const [dateFilterError, setDateFilterError] =
+        useState("");
+
+    // ============================================================
+    // VIEW STATE
+    // ============================================================
+
+    const [selectedPayment, setSelectedPayment] =
+        useState(null);
+
+    const [selectedAllocations, setSelectedAllocations] =
+        useState([]);
+
+    const [viewLoading, setViewLoading] =
+        useState(false);
+
+    const [viewError, setViewError] =
+        useState("");
+
+    // ============================================================
+    // FORM STATE
+    // ============================================================
+
+    const [showFormModal, setShowFormModal] =
+        useState(false);
+
+    const [editingPayment, setEditingPayment] =
+        useState(null);
+
+    const [formData, setFormData] =
+        useState(initialFormData);
+
+    const [formError, setFormError] =
+        useState("");
+
+    const [orderSummary, setOrderSummary] =
+        useState(null);
+
+    const [orderSummaryLoading, setOrderSummaryLoading] =
+        useState(false);
+
+    const [orderSummaryError, setOrderSummaryError] =
+        useState("");
+
+    const [formSuccess, setFormSuccess] =
+        useState("");
+
+    const [saving, setSaving] =
+        useState(false);
+
+    // ============================================================
+    // DELETE STATE
+    // ============================================================
+
+    const [deletingId, setDeletingId] =
+        useState(null);
+
+    const [deleting, setDeleting] =
+        useState(false);
+
+    // ============================================================
+    // FETCH PAYMENTS + ALLOCATIONS
+    // ============================================================
 
     const fetchPaymentsAndAllocations = async () => {
         setLoading(true);
         setError("");
 
         try {
-            const [paymentsData, allocationsData] =
-                await Promise.all([
-                    apiGet("/api/payments"),
-                    apiGet("/api/payment-allocations"),
-                ]);
+            const [
+                paymentsData,
+                allocationsData,
+            ] = await Promise.all([
+                apiGet("/api/payments"),
+                apiGet("/api/payment-allocations"),
+            ]);
 
-            const paymentList = Array.isArray(paymentsData)
-                ? paymentsData
-                : Array.isArray(paymentsData?.data)
-                ? paymentsData.data
-                : [];
+            const paymentList =
+                Array.isArray(paymentsData)
+                    ? paymentsData
+                    : Array.isArray(
+                          paymentsData?.data
+                      )
+                    ? paymentsData.data
+                    : [];
 
-            const allocationList = Array.isArray(allocationsData)
-                ? allocationsData
-                : Array.isArray(allocationsData?.data)
-                ? allocationsData.data
-                : [];
+            const allocationList =
+                Array.isArray(
+                    allocationsData
+                )
+                    ? allocationsData
+                    : Array.isArray(
+                          allocationsData?.data
+                      )
+                    ? allocationsData.data
+                    : [];
 
             setPayments(paymentList);
             setAllocations(allocationList);
         } catch (err) {
             setError(
-                err.message || "Failed to load payment records."
+                err.message ||
+                    "Failed to load payment records."
             );
         } finally {
             setLoading(false);
@@ -115,74 +200,274 @@ function Payment() {
         fetchPaymentsAndAllocations();
     }, []);
 
-    const getActiveAllocationsForPayment = (paymentId) =>
+    // ============================================================
+    // PAYMENT CONTEXT FROM ORDER
+    // ============================================================
+
+    useEffect(() => {
+        if (
+            !paymentContext?.customerId ||
+            !paymentContext?.orderId
+        ) {
+            return;
+        }
+
+        const loadOrderSummary = async () => {
+            setEditingPayment(null);
+            setFormError("");
+            setFormSuccess("");
+            setOrderSummary(null);
+            setOrderSummaryError("");
+            setOrderSummaryLoading(true);
+
+            setFormData({
+                ...initialFormData,
+                customerId: String(
+                    paymentContext.customerId
+                ),
+                orderId: String(
+                    paymentContext.orderId
+                ),
+                paymentDate: new Date()
+                    .toISOString()
+                    .split("T")[0],
+            });
+
+            setShowFormModal(true);
+
+            try {
+                const response =
+                    await apiGet(
+                        `/api/orders/${paymentContext.orderId}`
+                    );
+
+                const orderData =
+                    response?.data ||
+                    response;
+
+                setOrderSummary(orderData);
+
+                setFormData(
+                    (previous) => ({
+                        ...previous,
+                        totalAmountReceived:
+                            Number(
+                                orderData.balance ||
+                                    0
+                            ),
+                    })
+                );
+            } catch (err) {
+                setOrderSummaryError(
+                    err.message ||
+                        "Failed to load order details."
+                );
+            } finally {
+                setOrderSummaryLoading(
+                    false
+                );
+            }
+        };
+
+        loadOrderSummary();
+    }, [paymentContext]);
+
+    // ============================================================
+    // PAYMENT ALLOCATION HELPERS
+    // ============================================================
+
+    const getActiveAllocationsForPayment = (
+        paymentId
+    ) =>
         allocations.filter(
             (allocation) =>
-                Number(allocation.paymentId) === Number(paymentId) &&
-                allocation.recordStatus === "ACTIVE"
+                Number(
+                    allocation.paymentId
+                ) === Number(paymentId) &&
+                allocation.recordStatus ===
+                    "ACTIVE"
         );
 
-    const getTotalAllocated = (paymentId) =>
-        getActiveAllocationsForPayment(paymentId).reduce(
-            (total, allocation) =>
-                total + Number(allocation.allocatedAmount || 0),
+    const getTotalAllocated = (
+        paymentId
+    ) =>
+        getActiveAllocationsForPayment(
+            paymentId
+        ).reduce(
+            (
+                total,
+                allocation
+            ) =>
+                total +
+                Number(
+                    allocation.allocatedAmount ||
+                        0
+                ),
             0
         );
 
-    const getUnallocatedAmount = (payment) =>
-        Number(payment.totalAmountReceived || 0) -
-        getTotalAllocated(payment.paymentId);
+    const getUnallocatedAmount = (
+        payment
+    ) =>
+        Number(
+            payment.totalAmountReceived ||
+                0
+        ) -
+        getTotalAllocated(
+            payment.paymentId
+        );
+
+    // ============================================================
+    // FILTER PAYMENTS
+    // ============================================================
 
     const filteredPayments = useMemo(() => {
-        const term = searchTerm.trim().toLowerCase();
-
-        if (!term) {
-            return payments;
+        if (
+            dateFrom &&
+            dateTo &&
+            dateFrom > dateTo
+        ) {
+            return [];
         }
 
-        return payments.filter((payment) => {
-            const searchableText = [
-                payment.paymentId,
-                payment.customerId,
-                payment.paymentDate,
-                payment.totalAmountReceived,
-                payment.paymentMode,
-                payment.receivedBy,
-                payment.recordStatus,
-            ]
-                .filter(
-                    (value) => value !== null && value !== undefined
-                )
-                .join(" ")
+        const term =
+            searchTerm
+                .trim()
                 .toLowerCase();
 
-            return searchableText.includes(term);
-        });
-    }, [payments, searchTerm]);
+        return payments.filter(
+            (payment) => {
+                const searchableText = [
+                    payment.paymentId,
+                    payment.customerId,
+                    payment.customerName,
+                    payment.paymentDate,
+                    payment.totalAmountReceived,
+                    payment.paymentMode,
+                    payment.receivedBy,
+                    payment.paymentStatus,
+                ]
+                    .filter(
+                        (value) =>
+                            value !== null &&
+                            value !== undefined
+                    )
+                    .join(" ")
+                    .toLowerCase();
 
-    const handleView = async (payment) => {
+                const matchesSearch =
+                    !term ||
+                    searchableText.includes(
+                        term
+                    );
+
+                const matchesDateFrom =
+                    !dateFrom ||
+                    payment.paymentDate >=
+                        dateFrom;
+
+                const matchesDateTo =
+                    !dateTo ||
+                    payment.paymentDate <=
+                        dateTo;
+
+                return (
+                    matchesSearch &&
+                    matchesDateFrom &&
+                    matchesDateTo
+                );
+            }
+        );
+    }, [
+        payments,
+        searchTerm,
+        dateFrom,
+        dateTo,
+    ]);
+
+    // ============================================================
+    // SORT PAYMENTS
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredPayments,
+        "paymentId",
+        "desc"
+    );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords:
+            paginatedPayments,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // CLEAR SEARCH + DATE FILTERS
+    // ============================================================
+
+    const handleClearFilters = () => {
+        setSearchTerm("");
+        setDateFrom("");
+        setDateTo("");
+        setDateFilterError("");
+    };
+
+    // ============================================================
+    // VIEW PAYMENT
+    // ============================================================
+
+    const handleView = async (
+        payment
+    ) => {
         setViewLoading(true);
         setViewError("");
         setSelectedPayment(null);
         setSelectedAllocations([]);
 
         try {
-    const paymentResponse = await apiGet(
-        `/api/payments/${payment.paymentId}`
-    );
+            const paymentResponse =
+                await apiGet(
+                    `/api/payments/${payment.paymentId}`
+                );
 
-    const paymentData = Array.isArray(paymentResponse)
-        ? paymentResponse[0]
-        : paymentResponse?.data || paymentResponse;
+            const paymentData =
+                Array.isArray(
+                    paymentResponse
+                )
+                    ? paymentResponse[0]
+                    : paymentResponse?.data ||
+                      paymentResponse;
 
-    setSelectedPayment(paymentData);
+            setSelectedPayment(
+                paymentData
+            );
 
-    setSelectedAllocations(
-        getActiveAllocationsForPayment(payment.paymentId)
-    );
+            setSelectedAllocations(
+                getActiveAllocationsForPayment(
+                    payment.paymentId
+                )
+            );
         } catch (err) {
             setViewError(
-                err.message || "Failed to load payment details."
+                err.message ||
+                    "Failed to load payment details."
             );
         } finally {
             setViewLoading(false);
@@ -195,46 +480,83 @@ function Payment() {
         setViewError("");
     };
 
+    // ============================================================
+    // ADD PAYMENT
+    // ============================================================
+
     const handleAdd = () => {
         setEditingPayment(null);
         setFormData(initialFormData);
         setFormError("");
         setFormSuccess("");
+        setOrderSummary(null);
+        setOrderSummaryError("");
         setShowFormModal(true);
     };
 
-    const handleEdit = async (payment) => {
+    // ============================================================
+    // EDIT PAYMENT
+    // ============================================================
+
+    const handleEdit = async (
+        payment
+    ) => {
         setFormError("");
         setFormSuccess("");
         setEditingPayment(payment);
         setShowFormModal(true);
 
         try {
-            const paymentResponse = await apiGet(
-                `/api/payments/${payment.paymentId}`
-            );
+            const paymentResponse =
+                await apiGet(
+                    `/api/payments/${payment.paymentId}`
+                );
 
-            const paymentData = Array.isArray(paymentResponse)
-                ? paymentResponse[0]
-                : paymentResponse?.data || paymentResponse;
+            const paymentData =
+                Array.isArray(
+                    paymentResponse
+                )
+                    ? paymentResponse[0]
+                    : paymentResponse?.data ||
+                      paymentResponse;
 
             setFormData({
-                customerId: paymentData.customerId ?? "",
-                paymentDate: paymentData.paymentDate ?? "",
+                customerId:
+                    paymentData.customerId ??
+                    "",
+                orderId:
+                    paymentData.orderId ??
+                    "",
+                paymentDate:
+                    paymentData.paymentDate ??
+                    "",
                 totalAmountReceived:
-                    paymentData.totalAmountReceived ?? "",
-                paymentMode: paymentData.paymentMode ?? "CASH",
+                    paymentData.totalAmountReceived ??
+                    "",
+                paymentMode:
+                    paymentData.paymentMode ??
+                    "CASH",
                 referenceNumber:
-                    paymentData.referenceNumber ?? "",
-                receivedBy: paymentData.receivedBy ?? "",
-                remarks: paymentData.remarks ?? "",
+                    paymentData.referenceNumber ??
+                    "",
+                receivedBy:
+                    paymentData.receivedBy ??
+                    "",
+                remarks:
+                    paymentData.remarks ??
+                    "",
             });
         } catch (err) {
             setFormError(
-                err.message || "Failed to load payment details."
+                err.message ||
+                    "Failed to load payment details."
             );
         }
     };
+
+    // ============================================================
+    // CLOSE FORM
+    // ============================================================
 
     const closeFormModal = () => {
         if (saving) {
@@ -246,24 +568,49 @@ function Payment() {
         setFormData(initialFormData);
         setFormError("");
         setFormSuccess("");
+        setOrderSummary(null);
+        setOrderSummaryError("");
     };
 
-    const handleFormChange = (event) => {
-        const { name, value } = event.target;
+    // ============================================================
+    // FORM CHANGE
+    // ============================================================
 
-        setFormData((previous) => ({
-            ...previous,
-            [name]: value,
-        }));
+    const handleFormChange = (
+        event
+    ) => {
+        const {
+            name,
+            value,
+        } = event.target;
+
+        setFormData(
+            (previous) => ({
+                ...previous,
+                [name]: value,
+            })
+        );
     };
+
+    // ============================================================
+    // FORM VALIDATION
+    // ============================================================
 
     const validateForm = () => {
-        const customerId = Number(formData.customerId);
-        const totalAmountReceived = Number(
-            formData.totalAmountReceived
-        );
+        const customerId =
+            Number(
+                formData.customerId
+            );
 
-        if (!formData.customerId || customerId <= 0) {
+        const totalAmountReceived =
+            Number(
+                formData.totalAmountReceived
+            );
+
+        if (
+            !formData.customerId ||
+            customerId <= 0
+        ) {
             return "Customer ID is required and must be greater than 0.";
         }
 
@@ -278,52 +625,81 @@ function Payment() {
             return "Total amount received is required and must be greater than 0.";
         }
 
-        if (!PAYMENT_MODES.includes(formData.paymentMode)) {
+        if (
+            !PAYMENT_MODES.includes(
+                formData.paymentMode
+            )
+        ) {
             return "Please select a valid payment mode.";
         }
 
-        if (!formData.receivedBy.trim()) {
+        if (
+            !formData.receivedBy.trim()
+        ) {
             return "Received by is required.";
         }
 
-        if (formData.receivedBy.trim().length > 100) {
+        if (
+            formData.receivedBy.trim()
+                .length > 100
+        ) {
             return "Received by cannot exceed 100 characters.";
         }
 
-        if (formData.referenceNumber.trim().length > 100) {
+        if (
+            formData.referenceNumber.trim()
+                .length > 100
+        ) {
             return "Reference number cannot exceed 100 characters.";
         }
 
         return "";
     };
 
-    const handleSubmit = async (event) => {
+    // ============================================================
+    // SUBMIT PAYMENT
+    // ============================================================
+
+    const handleSubmit = async (
+        event
+    ) => {
         event.preventDefault();
 
         setFormError("");
         setFormSuccess("");
 
-        const validationError = validateForm();
+        const validationError =
+            validateForm();
 
         if (validationError) {
-            setFormError(validationError);
+            setFormError(
+                validationError
+            );
             return;
         }
 
         const payload = {
-            customerId: Number(formData.customerId),
-            paymentDate: formData.paymentDate,
-            totalAmountReceived: Number(
-                formData.totalAmountReceived
+            customerId: Number(
+                formData.customerId
             ),
-            paymentMode: formData.paymentMode,
+            paymentDate:
+                formData.paymentDate,
+            totalAmountReceived:
+                Number(
+                    formData.totalAmountReceived
+                ),
+            paymentMode:
+                formData.paymentMode,
             referenceNumber:
-                formData.referenceNumber.trim() === ""
+                formData.referenceNumber.trim() ===
+                ""
                     ? null
                     : formData.referenceNumber.trim(),
-            receivedBy: formData.receivedBy.trim(),
+            receivedBy:
+                formData.receivedBy.trim(),
             remarks:
-                formData.remarks.trim() === ""
+                formData.remarks.trim() ===
+                ""
                     ? null
                     : formData.remarks.trim(),
         };
@@ -331,7 +707,8 @@ function Payment() {
         setSaving(true);
 
         try {
-            const isEditing = !!editingPayment;
+            const isEditing =
+                !!editingPayment;
 
             if (isEditing) {
                 await apiPut(
@@ -339,11 +716,81 @@ function Payment() {
                     payload
                 );
             } else {
-                await apiPost("/api/payments", payload);
+                const paymentResponse =
+                    await apiPost(
+                        "/api/payments",
+                        payload
+                    );
+
+                const createdPayment =
+                    paymentResponse?.data ||
+                    paymentResponse;
+
+                const paymentId =
+                    createdPayment?.paymentId;
+
+                if (!paymentId) {
+                    throw new Error(
+                        "Payment was created but Payment ID was not returned."
+                    );
+                }
+
+                // Automatically allocate the payment
+                // to the current Order
+                if (formData.orderId) {
+                    const paymentAmount =
+                        Number(
+                            formData.totalAmountReceived
+                        );
+
+                    const unpaidAmount =
+                        Number(
+                            orderSummary?.balance ||
+                                0
+                        );
+
+                    if (
+                        paymentAmount >
+                        unpaidAmount
+                    ) {
+                        throw new Error(
+                            `Payment amount ₹${paymentAmount.toFixed(
+                                2
+                            )} cannot exceed the Unpaid Amount ₹${unpaidAmount.toFixed(
+                                2
+                            )}.`
+                        );
+                    }
+
+                    const allocationPayload =
+                        {
+                            paymentId:
+                                Number(
+                                    paymentId
+                                ),
+                            orderId:
+                                Number(
+                                    formData.orderId
+                                ),
+                            allocatedAmount:
+                                paymentAmount,
+                            allocationDate:
+                                formData.paymentDate,
+                            remarks: null,
+                        };
+
+                    await apiPost(
+                        "/api/payment-allocations",
+                        allocationPayload
+                    );
+                }
             }
+
             setFormSuccess(
                 isEditing
                     ? "Payment updated successfully."
+                    : formData.orderId
+                    ? "Payment created and allocated to the Order successfully."
                     : "Payment created successfully."
             );
 
@@ -352,9 +799,13 @@ function Payment() {
             setTimeout(() => {
                 setShowFormModal(false);
                 setEditingPayment(null);
-                setFormData(initialFormData);
+                setFormData(
+                    initialFormData
+                );
                 setFormError("");
                 setFormSuccess("");
+                setOrderSummary(null);
+                setOrderSummaryError("");
             }, 700);
         } catch (err) {
             setFormError(
@@ -368,8 +819,16 @@ function Payment() {
         }
     };
 
-    const openDeleteModal = (payment) => {
-        setDeletingId(payment.paymentId);
+    // ============================================================
+    // DELETE
+    // ============================================================
+
+    const openDeleteModal = (
+        payment
+    ) => {
+        setDeletingId(
+            payment.paymentId
+        );
     };
 
     const closeDeleteModal = () => {
@@ -389,38 +848,56 @@ function Payment() {
         setError("");
 
         try {
-            await apiDelete(`/api/payments/${deletingId}`);
+            await apiDelete(
+                `/api/payments/${deletingId}`
+            );
 
             setDeletingId(null);
 
             await fetchPaymentsAndAllocations();
         } catch (err) {
             setError(
-                err.message || "Failed to delete payment."
+                err.message ||
+                    "Failed to delete payment."
             );
         } finally {
             setDeleting(false);
         }
     };
 
+    // ============================================================
+    // LOADING
+    // ============================================================
+
     if (loading) {
         return (
             <div className="page">
                 <section className="card">
                     <h2>Payments</h2>
-                    <p>Loading payment records...</p>
+                    <p>
+                        Loading payment records...
+                    </p>
                 </section>
             </div>
         );
     }
 
+    // ============================================================
+    // PAGE
+    // ============================================================
+
     return (
         <div className="page">
+            {/* ==================================================
+                PAYMENT HEADER + SEARCH
+            ================================================== */}
+
             <section className="card">
                 <div
                     style={{
                         display: "flex",
-                        justifyContent: "space-between",
+                        justifyContent:
+                            "space-between",
                         alignItems: "center",
                         gap: "16px",
                         flexWrap: "wrap",
@@ -428,7 +905,10 @@ function Payment() {
                 >
                     <div>
                         <h2>Payments</h2>
-                        <p>Manage customer payment records.</p>
+                        <p>
+                            Manage customer
+                            payment records.
+                        </p>
                     </div>
 
                     <button
@@ -440,26 +920,153 @@ function Payment() {
                     </button>
                 </div>
 
-                <div className="fld production-search">
-                    <label>Search Payments</label>
+                {/* ==================================================
+                    SEARCH + DATE FILTER
+                ================================================== */}
 
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(event) =>
-                            setSearchTerm(event.target.value)
-                        }
-                        placeholder="Search by payment ID, customer ID, mode..."
-                    />
+                <div
+                    className="fld production-search"
+                    style={{
+                        marginTop: "16px",
+                    }}
+                >
+                    <label>
+                        Search Payments
+                    </label>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "12px",
+                            alignItems:
+                                "center",
+                            flexWrap:
+                                "wrap",
+                        }}
+                    >
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(
+                                event
+                            ) =>
+                                setSearchTerm(
+                                    event
+                                        .target
+                                        .value
+                                )
+                            }
+                            placeholder="Search by customer, payment ID, customer ID, mode..."
+                        />
+
+                        <input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(
+                                event
+                            ) => {
+                                const value =
+                                    event
+                                        .target
+                                        .value;
+
+                                setDateFrom(
+                                    value
+                                );
+
+                                if (
+                                    dateTo &&
+                                    value >
+                                        dateTo
+                                ) {
+                                    setDateFilterError(
+                                        "Date From cannot be later than Date To."
+                                    );
+                                } else {
+                                    setDateFilterError(
+                                        ""
+                                    );
+                                }
+                            }}
+                            aria-label="Payment date from"
+                        />
+
+                        <input
+                            type="date"
+                            value={dateTo}
+                            onChange={(
+                                event
+                            ) => {
+                                const value =
+                                    event
+                                        .target
+                                        .value;
+
+                                setDateTo(
+                                    value
+                                );
+
+                                if (
+                                    dateFrom &&
+                                    dateFrom >
+                                        value
+                                ) {
+                                    setDateFilterError(
+                                        "Date From cannot be later than Date To."
+                                    );
+                                } else {
+                                    setDateFilterError(
+                                        ""
+                                    );
+                                }
+                            }}
+                            aria-label="Payment date to"
+                        />
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={
+                                handleClearFilters
+                            }
+                        >
+                            Clear
+                        </button>
+                    </div>
+
+                    {dateFilterError && (
+                        <div
+                            style={{
+                                marginTop:
+                                    "8px",
+                                color:
+                                    "#b91c1c",
+                                fontSize:
+                                    "14px",
+                            }}
+                        >
+                            {
+                                dateFilterError
+                            }
+                        </div>
+                    )}
                 </div>
             </section>
+
+            {/* ==================================================
+                PAYMENT LIST
+            ================================================== */}
 
             <section className="card">
                 <h2>Payment List</h2>
 
                 <p>
-                    {filteredPayments.length} payment
-                    {filteredPayments.length === 1 ? "" : "s"}
+                    {filteredPayments.length}{" "}
+                    payment
+                    {filteredPayments.length ===
+                    1
+                        ? ""
+                        : "s"}
                 </p>
 
                 {error && (
@@ -468,354 +1075,586 @@ function Payment() {
                     </div>
                 )}
 
-                {filteredPayments.length === 0 ? (
-                    <p>No payment records found.</p>
+                {filteredPayments.length ===
+                0 ? (
+                    <p>
+                        No payment records
+                        found.
+                    </p>
                 ) : (
                     <div className="table-wrap">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>CUSTOMER ID</th>
-                                    <th>PAYMENT DATE</th>
-                                    <th>AMOUNT</th>
-                                    <th>PAYMENT MODE</th>
-                                    <th>RECEIVED BY</th>
-                                    <th>ALLOCATED</th>
-                                    <th>UNALLOCATED</th>
-                                    <th>STATUS</th>
-                                    <th>ACTIONS</th>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "paymentId"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        ID
+                                        {sortKey ===
+                                            "paymentId" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "customerName"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        CUSTOMER
+                                        {sortKey ===
+                                            "customerName" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "paymentDate"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        PAYMENT DATE
+                                        {sortKey ===
+                                            "paymentDate" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "totalAmountReceived"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        AMOUNT
+                                        {sortKey ===
+                                            "totalAmountReceived" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "paymentMode"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        PAYMENT MODE
+                                        {sortKey ===
+                                            "paymentMode" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "receivedBy"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        RECEIVED BY
+                                        {sortKey ===
+                                            "receivedBy" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th>
+                                        ALLOCATED
+                                    </th>
+
+                                    <th>
+                                        UNALLOCATED
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "paymentStatus"
+                                            )
+                                        }
+                                        style={{
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        PAYMENT STATUS
+                                        {sortKey ===
+                                            "paymentStatus" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ↑"
+                                                : " ↓")}
+                                    </th>
+
+                                    <th>
+                                        ACTIONS
+                                    </th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {filteredPayments.map((payment) => {
-                                    const totalAllocated =
-                                        getTotalAllocated(
-                                            payment.paymentId
-                                        );
-
-                                    const unallocatedAmount =
-                                        getUnallocatedAmount(payment);
-
-                                    return (
-                                        <tr
-                                            key={
+                                {paginatedPayments.map(
+                                    (
+                                        payment
+                                    ) => {
+                                        const totalAllocated =
+                                            getTotalAllocated(
                                                 payment.paymentId
-                                            }
-                                        >
-                                            <td>
-                                                {
+                                            );
+
+                                        const unallocatedAmount =
+                                            getUnallocatedAmount(
+                                                payment
+                                            );
+
+                                        return (
+                                            <tr
+                                                key={
                                                     payment.paymentId
                                                 }
-                                            </td>
+                                            >
+                                                <td>
+                                                    {
+                                                        payment.paymentId
+                                                    }
+                                                </td>
 
-                                            <td>
-                                                {
-                                                    payment.customerId
-                                                }
-                                            </td>
+                                                <td>
+                                                    {
+                                                        payment.customerName
+                                                    }
+                                                </td>
 
-                                            <td>
-                                                {formatDate(
-                                                    payment.paymentDate
-                                                )}
-                                            </td>
+                                                <td>
+                                                    {formatDate(
+                                                        payment.paymentDate
+                                                    )}
+                                                </td>
 
-                                            <td>
-                                                {formatCurrency(
-                                                    payment.totalAmountReceived
-                                                )}
-                                            </td>
+                                                <td>
+                                                    {formatCurrency(
+                                                        payment.totalAmountReceived
+                                                    )}
+                                                </td>
 
-                                            <td>
-                                                {
-                                                    payment.paymentMode
-                                                }
-                                            </td>
+                                                <td>
+                                                    {
+                                                        payment.paymentMode
+                                                    }
+                                                </td>
 
-                                            <td>
-                                                {
-                                                    payment.receivedBy
-                                                }
-                                            </td>
+                                                <td>
+                                                    {
+                                                        payment.receivedBy
+                                                    }
+                                                </td>
 
-                                            <td>
-                                                {formatCurrency(
-                                                    totalAllocated
-                                                )}
-                                            </td>
+                                                <td>
+                                                    {formatCurrency(
+                                                        totalAllocated
+                                                    )}
+                                                </td>
 
-                                            <td>
-                                                {formatCurrency(
-                                                    unallocatedAmount
-                                                )}
-                                            </td>
+                                                <td>
+                                                    {formatCurrency(
+                                                        unallocatedAmount
+                                                    )}
+                                                </td>
 
-                                            <td>
-                                                {
-                                                    payment.recordStatus
-                                                }
-                                            </td>
+                                                <td>
+                                                    {
+                                                        payment.paymentStatus ||
+                                                        "-"
+                                                    }
+                                                </td>
 
-                                            <td>
-                                                <div className="table-actions">
-                                                    <button
-                                                        type="button"
-                                                        className="action-btn view-btn"
-                                                        onClick={() =>
-                                                            handleView(
-                                                                payment
-                                                            )
-                                                        }
-                                                    >
-                                                        View
-                                                    </button>
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    payment
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="action-btn edit-btn"
-                                                        onClick={() =>
-                                                            handleEdit(
-                                                                payment
-                                                            )
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </button>
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    payment
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="action-btn delete-btn"
-                                                        onClick={() =>
-                                                            openDeleteModal(
-                                                                payment
-                                                            )
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                openDeleteModal(
+                                                                    payment
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    }
+                                )}
                             </tbody>
                         </table>
+
+                        <Pagination
+                            currentPage={
+                                currentPage
+                            }
+                            totalPages={
+                                totalPages
+                            }
+                            totalRecords={
+                                totalRecords
+                            }
+                            pageSize={
+                                pageSize
+                            }
+                            onPageChange={
+                                handlePageChange
+                            }
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
                     </div>
                 )}
             </section>
 
+            {/* ==================================================
+                VIEW PAYMENT MODAL
+            ================================================== */}
+
             <ViewModal
-                isOpen={!!selectedPayment || viewLoading || !!viewError}
-                onClose={closeViewModal}
+                isOpen={
+                    !!selectedPayment ||
+                    viewLoading ||
+                    !!viewError
+                }
+                onClose={
+                    closeViewModal
+                }
                 title="Payment Details"
                 subtitle={
                     selectedPayment
                         ? `Payment ID: ${selectedPayment.paymentId}`
                         : "Payment information"
                 }
-                loading={viewLoading}
-                error={viewError}
+                loading={
+                    viewLoading
+                }
+                error={
+                    viewError
+                }
                 size="lg"
                 footer={
                     <button
                         type="button"
                         className="btn"
-                        onClick={closeViewModal}
+                        onClick={
+                            closeViewModal
+                        }
                     >
                         Close
                     </button>
                 }
             >
-                {selectedPayment && !viewLoading && (
-                    <>
-                        <DetailGrid>
-                            <DetailItem
-                                label="Payment ID"
-                                value={
-                                    selectedPayment.paymentId
-                                }
-                            />
-
-                            <DetailItem
-                                label="Customer ID"
-                                value={
-                                    selectedPayment.customerId
-                                }
-                            />
-
-                            <DetailItem
-                                label="Payment Date"
-                                value={formatDate(
-                                    selectedPayment.paymentDate
-                                )}
-                            />
-
-                            <DetailItem
-                                label="Total Amount Received"
-                                value={formatCurrency(
-                                    selectedPayment.totalAmountReceived
-                                )}
-                            />
-
-                            <DetailItem
-                                label="Total Allocated"
-                                value={formatCurrency(
-                                    getTotalAllocated(
+                {selectedPayment &&
+                    !viewLoading && (
+                        <>
+                            <DetailGrid>
+                                <DetailItem
+                                    label="Payment ID"
+                                    value={
                                         selectedPayment.paymentId
-                                    )
-                                )}
-                            />
+                                    }
+                                />
 
-                            <DetailItem
-                                label="Unallocated Amount"
-                                value={formatCurrency(
-                                    Number(
-                                        selectedPayment.totalAmountReceived ||
-                                            0
-                                    ) -
+                                <DetailItem
+                                    label="Customer ID"
+                                    value={
+                                        selectedPayment.customerId
+                                    }
+                                />
+
+                                <DetailItem
+                                    label="Customer Name"
+                                    value={
+                                        selectedPayment.customerName ||
+                                        "-"
+                                    }
+                                />
+
+                                <DetailItem
+                                    label="Payment Date"
+                                    value={formatDate(
+                                        selectedPayment.paymentDate
+                                    )}
+                                />
+
+                                <DetailItem
+                                    label="Total Amount Received"
+                                    value={formatCurrency(
+                                        selectedPayment.totalAmountReceived
+                                    )}
+                                />
+
+                                <DetailItem
+                                    label="Total Allocated"
+                                    value={formatCurrency(
                                         getTotalAllocated(
                                             selectedPayment.paymentId
                                         )
-                                )}
-                            />
+                                    )}
+                                />
 
-                            <DetailItem
-                                label="Payment Mode"
-                                value={
-                                    selectedPayment.paymentMode
-                                }
-                            />
+                                <DetailItem
+                                    label="Unallocated Amount"
+                                    value={formatCurrency(
+                                        Number(
+                                            selectedPayment.totalAmountReceived ||
+                                                0
+                                        ) -
+                                            getTotalAllocated(
+                                                selectedPayment.paymentId
+                                            )
+                                    )}
+                                />
 
-                            <DetailItem
-                                label="Reference Number"
-                                value={
-                                    selectedPayment.referenceNumber ||
-                                    "-"
-                                }
-                            />
+                                <DetailItem
+                                    label="Payment Mode"
+                                    value={
+                                        selectedPayment.paymentMode
+                                    }
+                                />
 
-                            <DetailItem
-                                label="Received By"
-                                value={
-                                    selectedPayment.receivedBy ||
-                                    "-"
-                                }
-                            />
+                                <DetailItem
+                                    label="Reference Number"
+                                    value={
+                                        selectedPayment.referenceNumber ||
+                                        "-"
+                                    }
+                                />
 
-                            <DetailItem
-                                label="Record Status"
-                                value={
-                                    selectedPayment.recordStatus
-                                }
-                            />
+                                <DetailItem
+                                    label="Received By"
+                                    value={
+                                        selectedPayment.receivedBy ||
+                                        "-"
+                                    }
+                                />
 
-                            <DetailItem
-                                label="Created At"
-                                value={formatDateTime(
-                                    selectedPayment.createdAt
-                                )}
-                            />
+                                <DetailItem
+                                    label="Payment Status"
+                                    value={
+                                        selectedPayment.paymentStatus ||
+                                        "-"
+                                    }
+                                />
 
-                            <DetailItem
-                                label="Remarks"
-                                value={
-                                    selectedPayment.remarks ||
-                                    "-"
-                                }
-                            />
-                        </DetailGrid>
+                                <DetailItem
+                                    label="Created At"
+                                    value={formatDateTime(
+                                        selectedPayment.createdAt
+                                    )}
+                                />
 
-                        <div style={{ marginTop: "24px" }}>
-                            <h3>Payment Allocations</h3>
+                                <DetailItem
+                                    label="Remarks"
+                                    value={
+                                        selectedPayment.remarks ||
+                                        "-"
+                                    }
+                                />
+                            </DetailGrid>
 
-                            <p>
-                                {selectedAllocations.length} active
-                                allocation
-                                {selectedAllocations.length === 1
-                                    ? ""
-                                    : "s"}
-                            </p>
+                            <div
+                                style={{
+                                    marginTop:
+                                        "24px",
+                                }}
+                            >
+                                <h3>
+                                    Payment
+                                    Allocations
+                                </h3>
 
-                            {selectedAllocations.length === 0 ? (
                                 <p>
-                                    No active payment allocations
-                                    found.
+                                    {
+                                        selectedAllocations.length
+                                    }{" "}
+                                    active
+                                    allocation
+                                    {selectedAllocations.length ===
+                                    1
+                                        ? ""
+                                        : "s"}
                                 </p>
-                            ) : (
-                                <div className="table-wrap">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    ALLOCATION ID
-                                                </th>
-                                                <th>ORDER ID</th>
-                                                <th>
-                                                    ALLOCATION DATE
-                                                </th>
-                                                <th>
-                                                    ALLOCATED AMOUNT
-                                                </th>
-                                                <th>STATUS</th>
-                                            </tr>
-                                        </thead>
 
-                                        <tbody>
-                                            {selectedAllocations.map(
-                                                (
-                                                    allocation
-                                                ) => (
-                                                    <tr
-                                                        key={
-                                                            allocation.paymentAllocationId
-                                                        }
-                                                    >
-                                                        <td>
-                                                            {
+                                {selectedAllocations.length ===
+                                0 ? (
+                                    <p>
+                                        No active
+                                        payment
+                                        allocations
+                                        found.
+                                    </p>
+                                ) : (
+                                    <div className="table-wrap">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        ALLOCATION
+                                                        ID
+                                                    </th>
+                                                    <th>
+                                                        ORDER
+                                                        ID
+                                                    </th>
+                                                    <th>
+                                                        ALLOCATION
+                                                        DATE
+                                                    </th>
+                                                    <th>
+                                                        ALLOCATED
+                                                        AMOUNT
+                                                    </th>
+                                                    <th>
+                                                        ALLOCATION
+                                                        STATUS
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {selectedAllocations.map(
+                                                    (
+                                                        allocation
+                                                    ) => (
+                                                        <tr
+                                                            key={
                                                                 allocation.paymentAllocationId
                                                             }
-                                                        </td>
+                                                        >
+                                                            <td>
+                                                                {
+                                                                    allocation.paymentAllocationId
+                                                                }
+                                                            </td>
 
-                                                        <td>
-                                                            {
-                                                                allocation.orderId
-                                                            }
-                                                        </td>
+                                                            <td>
+                                                                {
+                                                                    allocation.orderId
+                                                                }
+                                                            </td>
 
-                                                        <td>
-                                                            {formatDate(
-                                                                allocation.allocationDate
-                                                            )}
-                                                        </td>
+                                                            <td>
+                                                                {formatDate(
+                                                                    allocation.allocationDate
+                                                                )}
+                                                            </td>
 
-                                                        <td>
-                                                            {formatCurrency(
-                                                                allocation.allocatedAmount
-                                                            )}
-                                                        </td>
+                                                            <td>
+                                                                {formatCurrency(
+                                                                    allocation.allocatedAmount
+                                                                )}
+                                                            </td>
 
-                                                        <td>
-                                                            {
-                                                                allocation.recordStatus
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
+                                                            <td>
+                                                                {
+                                                                    allocation.allocationStatus ||
+                                                                    "-"
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
             </ViewModal>
 
+            {/* ==================================================
+                PAYMENT FORM MODAL
+            ================================================== */}
+
             <FormModal
-                isOpen={showFormModal}
-                onClose={closeFormModal}
+                isOpen={
+                    showFormModal
+                }
+                onClose={
+                    closeFormModal
+                }
                 title={
                     editingPayment
                         ? "Edit Payment"
@@ -826,18 +1665,109 @@ function Payment() {
                         ? `Update Payment ID: ${editingPayment.paymentId}`
                         : "Enter customer payment details."
                 }
-                onSubmit={handleSubmit}
+                onSubmit={
+                    handleSubmit
+                }
                 submitLabel={
                     editingPayment
                         ? "Update Payment"
                         : "Add Payment"
                 }
                 cancelLabel="Cancel"
-                saving={saving}
-                error={formError}
-                success={formSuccess}
+                saving={
+                    saving
+                }
+                error={
+                    formError
+                }
+                success={
+                    formSuccess
+                }
                 size="lg"
             >
+                {orderSummaryLoading && (
+                    <div className="form-success">
+                        Loading order
+                        details...
+                    </div>
+                )}
+
+                {orderSummaryError && (
+                    <div className="form-error">
+                        {
+                            orderSummaryError
+                        }
+                    </div>
+                )}
+
+                {orderSummary &&
+                    !orderSummaryLoading && (
+                        <div
+                            style={{
+                                marginBottom:
+                                    "20px",
+                                padding:
+                                    "16px",
+                                border:
+                                    "1px solid #ddd",
+                                borderRadius:
+                                    "8px",
+                            }}
+                        >
+                            <h3
+                                style={{
+                                    marginTop: 0,
+                                }}
+                            >
+                                Order Summary
+                            </h3>
+
+                            <div className="edit-form-grid">
+                                <div className="fld">
+                                    <label>
+                                        Order Total
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        value={formatCurrency(
+                                            orderSummary.totalAmount
+                                        )}
+                                        readOnly
+                                    />
+                                </div>
+
+                                <div className="fld">
+                                    <label>
+                                        Already Paid
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        value={formatCurrency(
+                                            orderSummary.paidAmount
+                                        )}
+                                        readOnly
+                                    />
+                                </div>
+
+                                <div className="fld">
+                                    <label>
+                                        Unpaid Amount
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        value={formatCurrency(
+                                            orderSummary.balance
+                                        )}
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 <div className="edit-form-grid">
                     <div className="fld">
                         <label htmlFor="customerId">
@@ -849,8 +1779,32 @@ function Payment() {
                             name="customerId"
                             type="number"
                             min="1"
-                            value={formData.customerId}
-                            onChange={handleFormChange}
+                            value={
+                                formData.customerId
+                            }
+                            onChange={
+                                handleFormChange
+                            }
+                            required
+                        />
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="orderId">
+                            Order ID
+                        </label>
+
+                        <input
+                            id="orderId"
+                            name="orderId"
+                            type="number"
+                            min="1"
+                            value={
+                                formData.orderId
+                            }
+                            onChange={
+                                handleFormChange
+                            }
                             required
                         />
                     </div>
@@ -864,15 +1818,20 @@ function Payment() {
                             id="paymentDate"
                             name="paymentDate"
                             type="date"
-                            value={formData.paymentDate}
-                            onChange={handleFormChange}
+                            value={
+                                formData.paymentDate
+                            }
+                            onChange={
+                                handleFormChange
+                            }
                             required
                         />
                     </div>
 
                     <div className="fld">
                         <label htmlFor="totalAmountReceived">
-                            Total Amount Received
+                            Total Amount
+                            Received
                         </label>
 
                         <input
@@ -884,7 +1843,9 @@ function Payment() {
                             value={
                                 formData.totalAmountReceived
                             }
-                            onChange={handleFormChange}
+                            onChange={
+                                handleFormChange
+                            }
                             required
                         />
                     </div>
@@ -897,18 +1858,28 @@ function Payment() {
                         <select
                             id="paymentMode"
                             name="paymentMode"
-                            value={formData.paymentMode}
-                            onChange={handleFormChange}
+                            value={
+                                formData.paymentMode
+                            }
+                            onChange={
+                                handleFormChange
+                            }
                             required
                         >
-                            {PAYMENT_MODES.map((mode) => (
-                                <option
-                                    key={mode}
-                                    value={mode}
-                                >
-                                    {mode}
-                                </option>
-                            ))}
+                            {PAYMENT_MODES.map(
+                                (mode) => (
+                                    <option
+                                        key={
+                                            mode
+                                        }
+                                        value={
+                                            mode
+                                        }
+                                    >
+                                        {mode}
+                                    </option>
+                                )
+                            )}
                         </select>
                     </div>
 
@@ -925,7 +1896,9 @@ function Payment() {
                             value={
                                 formData.referenceNumber
                             }
-                            onChange={handleFormChange}
+                            onChange={
+                                handleFormChange
+                            }
                             placeholder="Optional"
                         />
                     </div>
@@ -940,28 +1913,14 @@ function Payment() {
                             name="receivedBy"
                             type="text"
                             maxLength="100"
-                            value={formData.receivedBy}
-                            onChange={handleFormChange}
+                            value={
+                                formData.receivedBy
+                            }
+                            onChange={
+                                handleFormChange
+                            }
                             required
                         />
-                    </div>
-
-                    <div className="fld">
-                        <label htmlFor="recordStatus">
-                            Record Status
-                        </label>
-
-                        <input
-                            id="recordStatus"
-                            type="text"
-                            value="ACTIVE"
-                            disabled
-                        />
-
-                        <small>
-                            Payment records are managed using
-                            soft-delete status.
-                        </small>
                     </div>
 
                     <div className="fld edit-full">
@@ -973,18 +1932,32 @@ function Payment() {
                             id="remarks"
                             name="remarks"
                             rows="4"
-                            value={formData.remarks}
-                            onChange={handleFormChange}
+                            value={
+                                formData.remarks
+                            }
+                            onChange={
+                                handleFormChange
+                            }
                             placeholder="Optional remarks"
                         />
                     </div>
                 </div>
             </FormModal>
 
+            {/* ==================================================
+                DELETE CONFIRMATION
+            ================================================== */}
+
             <DeleteConfirmModal
-                isOpen={!!deletingId}
-                onClose={closeDeleteModal}
-                onConfirm={confirmDelete}
+                isOpen={
+                    !!deletingId
+                }
+                onClose={
+                    closeDeleteModal
+                }
+                onConfirm={
+                    confirmDelete
+                }
                 title="Delete Payment"
                 subtitle="Please confirm this action"
                 message="Are you sure you want to delete this payment?"
@@ -993,7 +1966,9 @@ function Payment() {
                         ? `Payment ID: ${deletingId}`
                         : ""
                 }
-                confirming={deleting}
+                confirming={
+                    deleting
+                }
                 error=""
             />
         </div>

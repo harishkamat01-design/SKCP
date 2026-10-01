@@ -10,6 +10,10 @@ public class DeliveryResponse {
 
     private Integer orderId;
 
+    private Integer customerId;
+
+    private String customerName;
+
     private LocalDate deliveryDate;
 
     private Integer tripNumber;
@@ -61,6 +65,22 @@ public class DeliveryResponse {
 
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
+    }
+
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public LocalDate getDeliveryDate() {

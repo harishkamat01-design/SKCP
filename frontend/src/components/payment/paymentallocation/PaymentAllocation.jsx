@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
 import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
@@ -8,14 +12,17 @@ import {
     DetailItem,
 } from "../../ui/common/DetailGrid";
 
+import Pagination from "../../ui/Pagination";
+
+import usePagination from "../../../hooks/usePagination";
+import useTableSort from "../../../hooks/useTableSort";
+
 import {
     apiGet,
     apiPost,
     apiPut,
     apiDelete,
 } from "../../../services/api";
-
-
 
 function PaymentAllocation() {
     // ============================================================
@@ -24,6 +31,10 @@ function PaymentAllocation() {
 
     const [searchKeyword, setSearchKeyword] = useState("");
     const [allocations, setAllocations] = useState([]);
+
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [filterError, setFilterError] = useState("");
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -92,7 +103,7 @@ function PaymentAllocation() {
     // FETCH PAYMENT ALLOCATIONS
     // ============================================================
 
-        const fetchAllocations = async () => {
+    const fetchAllocations = async () => {
         try {
             setLoading(true);
             setError("");
@@ -106,7 +117,13 @@ function PaymentAllocation() {
                 result
             );
 
-            setAllocations(result.data || []);
+            const allocationList = Array.isArray(result)
+                ? result
+                : Array.isArray(result?.data)
+                ? result.data
+                : [];
+
+            setAllocations(allocationList);
         } catch (err) {
             console.error(
                 "Error fetching payment allocations:",
@@ -123,52 +140,161 @@ function PaymentAllocation() {
     };
 
     // ============================================================
-    // SEARCH
+    // FILTER HANDLERS
     // ============================================================
 
-    const filteredAllocations = allocations.filter(
-        (allocation) => {
-            const keyword =
-                searchKeyword.toLowerCase().trim();
+    const handleDateFromChange = (event) => {
+        const value = event.target.value;
 
-            if (!keyword) {
-                return true;
-            }
+        setDateFrom(value);
 
-            return (
-                String(
-                    allocation.paymentAllocationId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    allocation.paymentId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    allocation.orderId || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    allocation.allocatedAmount || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    allocation.allocationDate || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword) ||
-                String(
-                    allocation.recordStatus || ""
-                )
-                    .toLowerCase()
-                    .includes(keyword)
+        if (dateTo && value > dateTo) {
+            setFilterError(
+                "From date cannot be later than To date."
             );
+        } else {
+            setFilterError("");
         }
+    };
+
+    const handleDateToChange = (event) => {
+        const value = event.target.value;
+
+        setDateTo(value);
+
+        if (dateFrom && dateFrom > value) {
+            setFilterError(
+                "From date cannot be later than To date."
+            );
+        } else {
+            setFilterError("");
+        }
+    };
+
+    const handleClearFilters = () => {
+        setSearchKeyword("");
+        setDateFrom("");
+        setDateTo("");
+        setFilterError("");
+    };
+
+    // ============================================================
+    // FILTER
+    // ============================================================
+
+    const filteredAllocations = useMemo(() => {
+        const keyword = searchKeyword
+            .toLowerCase()
+            .trim();
+
+        if (
+            dateFrom &&
+            dateTo &&
+            dateFrom > dateTo
+        ) {
+            return [];
+        }
+
+        return allocations.filter(
+            (allocation) => {
+                const searchableText = [
+                    allocation.paymentAllocationId,
+                    allocation.paymentId,
+                    allocation.orderId,
+                    allocation.customerId,
+                    allocation.customerName,
+                    allocation.allocatedAmount,
+                    allocation.allocationDate,
+                    allocation.allocationStatus,
+                ]
+                    .filter(
+                        (value) =>
+                            value !== null &&
+                            value !== undefined
+                    )
+                    .join(" ")
+                    .toLowerCase();
+
+                const matchesSearch =
+                    !keyword ||
+                    searchableText.includes(
+                        keyword
+                    );
+
+                const allocationDate =
+                    allocation.allocationDate
+                        ? String(
+                              allocation.allocationDate
+                          ).slice(0, 10)
+                        : "";
+
+                const matchesFrom =
+                    !dateFrom ||
+                    allocationDate >= dateFrom;
+
+                const matchesTo =
+                    !dateTo ||
+                    allocationDate <= dateTo;
+
+                return (
+                    matchesSearch &&
+                    matchesFrom &&
+                    matchesTo
+                );
+            }
+        );
+    }, [
+        allocations,
+        searchKeyword,
+        dateFrom,
+        dateTo,
+    ]);
+
+    // ============================================================
+    // SORTING
+    // ============================================================
+
+    const {
+        sortKey,
+        sortDirection,
+        sortedRecords,
+        handleSort,
+    } = useTableSort(
+        filteredAllocations,
+        "paymentAllocationId",
+        "desc"
     );
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalRecords,
+        paginatedRecords,
+        handlePageChange,
+        handlePageSizeChange,
+    } = usePagination(
+        sortedRecords,
+        10
+    );
+
+    // ============================================================
+    // SORT INDICATOR
+    // ============================================================
+
+    const getSortIndicator = (key) => {
+        if (sortKey !== key) {
+            return "";
+        }
+
+        return sortDirection === "asc"
+            ? " ↑"
+            : " ↓";
+    };
 
     // ============================================================
     // FORMAT DATE
@@ -263,7 +389,9 @@ function PaymentAllocation() {
         }));
     };
 
-    const handleCreateAllocation = async (event) => {
+    const handleCreateAllocation = async (
+        event
+    ) => {
         event.preventDefault();
 
         if (
@@ -346,6 +474,7 @@ function PaymentAllocation() {
                 "/api/payment-allocations",
                 payload
             );
+
             console.log(
                 "Payment allocation created:",
                 result
@@ -571,9 +700,9 @@ function PaymentAllocation() {
                 deletingAllocation.paymentAllocationId
             );
 
-        const result = await apiDelete(
-            `/api/payment-allocations/${deletingAllocation.paymentAllocationId}`
-        );
+            const result = await apiDelete(
+                `/api/payment-allocations/${deletingAllocation.paymentAllocationId}`
+            );
 
             console.log(
                 "Payment allocation deleted:",
@@ -606,9 +735,13 @@ function PaymentAllocation() {
         return (
             <div className="page">
                 <section className="card">
-                    <h2>Payment Allocations</h2>
+                    <h2>
+                        Payment Allocations
+                    </h2>
+
                     <p>
-                        Loading payment allocation records...
+                        Loading payment allocation
+                        records...
                     </p>
                 </section>
             </div>
@@ -658,28 +791,118 @@ function PaymentAllocation() {
                     </button>
                 </div>
 
-                <div className="fld production-search">
-                    <label htmlFor="payment-allocation-search">
-                        Search Payment Allocations
-                    </label>
+                {/* ====================================================
+                    FILTERS
+                ==================================================== */}
 
-                    <input
-                        id="payment-allocation-search"
-                        type="text"
-                        placeholder="Search by payment ID, order ID, amount, date or status..."
-                        value={
-                            searchKeyword
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "20px",
+                    }}
+                >
+                    <div
+                        className="fld production-search"
+                        style={{
+                            flex:
+                                "2 1 320px",
+                        }}
+                    >
+                        <label htmlFor="payment-allocation-search">
+                            Search Payment
+                            Allocations
+                        </label>
+
+                        <input
+                            id="payment-allocation-search"
+                            type="text"
+                            placeholder="Search by customer, payment ID, order ID, amount, date or status..."
+                            value={
+                                searchKeyword
+                            }
+                            onChange={(
+                                event
+                            ) =>
+                                setSearchKeyword(
+                                    event
+                                        .target
+                                        .value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex:
+                                "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="payment-allocation-date-from">
+                            Date From
+                        </label>
+
+                        <input
+                            id="payment-allocation-date-from"
+                            type="date"
+                            value={dateFrom}
+                            onChange={
+                                handleDateFromChange
+                            }
+                        />
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex:
+                                "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="payment-allocation-date-to">
+                            Date To
+                        </label>
+
+                        <input
+                            id="payment-allocation-date-to"
+                            type="date"
+                            value={dateTo}
+                            onChange={
+                                handleDateToChange
+                            }
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearFilters
                         }
-                        onChange={(
-                            event
-                        ) =>
-                            setSearchKeyword(
-                                event.target
-                                    .value
-                            )
-                        }
-                    />
+                    >
+                        Clear
+                    </button>
                 </div>
+
+                {filterError && (
+                    <p
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+
+                            color:
+                                    "#b91c1c",
+                                fontSize:
+                                    "14px",
+                        }}
+                    >
+                        {filterError}
+                    </p>
+                )}
             </section>
 
             {/* ====================================================
@@ -692,10 +915,11 @@ function PaymentAllocation() {
                 </h2>
 
                 <p>
-                    {
-                        filteredAllocations.length
-                    }{" "}
-                    payment allocation record(s)
+                    {totalRecords} payment allocation
+                    {totalRecords === 1
+                        ? ""
+                        : "s"}{" "}
+                    found
                 </p>
 
                 {error && (
@@ -705,8 +929,8 @@ function PaymentAllocation() {
                 )}
 
                 {!error &&
-                    filteredAllocations.length ===
-                        0 && (
+                    !filterError &&
+                    totalRecords === 0 && (
                         <p>
                             No payment allocation
                             records found.
@@ -714,28 +938,131 @@ function PaymentAllocation() {
                     )}
 
                 {!error &&
-                    filteredAllocations.length >
-                        0 && (
+                    !filterError &&
+                    totalRecords > 0 && (
                         <div className="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentAllocationId"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
+                                            ID
+                                            {getSortIndicator(
+                                                "paymentAllocationId"
+                                            )}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentId"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
                                             PAYMENT ID
+                                            {getSortIndicator(
+                                                "paymentId"
+                                            )}
                                         </th>
-                                        <th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "orderId"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
                                             ORDER ID
+                                            {getSortIndicator(
+                                                "orderId"
+                                            )}
                                         </th>
-                                        <th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "customerName"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
+                                            CUSTOMER
+                                            {getSortIndicator(
+                                                "customerName"
+                                            )}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "allocationDate"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
                                             ALLOCATION DATE
+                                            {getSortIndicator(
+                                                "allocationDate"
+                                            )}
                                         </th>
-                                        <th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "allocatedAmount"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
                                             ALLOCATED AMOUNT
+                                            {getSortIndicator(
+                                                "allocatedAmount"
+                                            )}
                                         </th>
-                                        <th>
-                                            STATUS
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "allocationStatus"
+                                                )
+                                            }
+                                            style={{
+                                                cursor:
+                                                    "pointer",
+                                            }}
+                                        >
+                                            ALLOCATION STATUS
+                                            {getSortIndicator(
+                                                "allocationStatus"
+                                            )}
                                         </th>
+
                                         <th>
                                             ACTIONS
                                         </th>
@@ -743,7 +1070,7 @@ function PaymentAllocation() {
                                 </thead>
 
                                 <tbody>
-                                    {filteredAllocations.map(
+                                    {paginatedRecords.map(
                                         (
                                             allocation
                                         ) => (
@@ -771,6 +1098,13 @@ function PaymentAllocation() {
                                                 </td>
 
                                                 <td>
+                                                    {
+                                                        allocation.customerName ||
+                                                        "-"
+                                                    }
+                                                </td>
+
+                                                <td>
                                                     {formatDate(
                                                         allocation.allocationDate
                                                     )}
@@ -784,7 +1118,8 @@ function PaymentAllocation() {
 
                                                 <td>
                                                     {
-                                                        allocation.recordStatus
+                                                        allocation.allocationStatus ||
+                                                        "-"
                                                     }
                                                 </td>
 
@@ -832,6 +1167,27 @@ function PaymentAllocation() {
                                     )}
                                 </tbody>
                             </table>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={
+                                    pageSize
+                                }
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
                         </div>
                     )}
             </section>
@@ -886,6 +1242,21 @@ function PaymentAllocation() {
                         />
 
                         <DetailItem
+                            label="Customer ID"
+                            value={
+                                selectedAllocation.customerId
+                            }
+                        />
+
+                        <DetailItem
+                            label="Customer Name"
+                            value={
+                                selectedAllocation.customerName ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
                             label="Allocation Date"
                             value={formatDate(
                                 selectedAllocation.allocationDate
@@ -900,9 +1271,10 @@ function PaymentAllocation() {
                         />
 
                         <DetailItem
-                            label="Record Status"
+                            label="Allocation Status"
                             value={
-                                selectedAllocation.recordStatus
+                                selectedAllocation.allocationStatus ||
+                                "-"
                             }
                         />
 
@@ -1054,19 +1426,6 @@ function PaymentAllocation() {
                         />
                     </div>
 
-                    <div className="fld">
-                        <label htmlFor="add-record-status">
-                            Record Status
-                        </label>
-
-                        <input
-                            id="add-record-status"
-                            type="text"
-                            value="ACTIVE"
-                            disabled
-                        />
-                    </div>
-
                     <div className="fld edit-full">
                         <label htmlFor="add-payment-allocation-remarks">
                             Remarks
@@ -1209,22 +1568,6 @@ function PaymentAllocation() {
                                     handleEditChange
                                 }
                                 required
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-record-status">
-                                Record Status
-                            </label>
-
-                            <input
-                                id="edit-record-status"
-                                type="text"
-                                value={
-                                    editingAllocation.recordStatus ||
-                                    ""
-                                }
-                                disabled
                             />
                         </div>
 

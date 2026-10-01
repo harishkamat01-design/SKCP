@@ -1,127 +1,201 @@
+package com.skcp.dto.response.order;
 
-    package com.skcp.dto.response.order;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
-    import java.time.LocalDate;
-    import java.time.LocalDateTime;
+public class OrderResponse {
 
-    public class OrderResponse {
+    private String paymentStatus;
+    private BigDecimal paidAmount;
+    private BigDecimal balance;
 
-        // ============================================================
-        // ORDER ID
-        // ============================================================
+    // ============================================================
+    // ORDER ID
+    // ============================================================
 
-        private Integer orderId;
-
-
-        // ============================================================
-        // CUSTOMER ID
-        // ============================================================
-
-        private Integer customerId;
+    private Integer orderId;
 
 
-        // ============================================================
-        // ORDER DATE
-        // ============================================================
+    // ============================================================
+    // CUSTOMER ID
+    // ============================================================
 
-        private LocalDate orderDate;
-
-
-        // ============================================================
-        // EXPECTED DELIVERY DATE
-        // ============================================================
-
-        private LocalDate expectedDeliveryDate;
+    private Integer customerId;
 
 
-        // ============================================================
-        // ORDER STATUS
-        // ============================================================
+    // ============================================================
+    // CUSTOMER NAME
+    // ============================================================
 
-        private String orderStatus;
-
-
-        // ============================================================
-        // REMARKS
-        // ============================================================
-
-        private String remarks;
+    private String customerName;
 
 
-        // ============================================================
-        // CREATED AT
-        // ============================================================
+    // ============================================================
+    // ORDER DATE
+    // ============================================================
 
-        private LocalDateTime createdAt;
-
-
-        // ============================================================
-        // DEFAULT CONSTRUCTOR
-        // ============================================================
-
-        public OrderResponse() {
-        }
+    private LocalDate orderDate;
 
 
-        // ============================================================
-        // GETTERS AND SETTERS
-        // ============================================================
+    // ============================================================
+    // EXPECTED DELIVERY DATE
+    // ============================================================
 
-        public Integer getOrderId() {
-            return orderId;
-        }
+    private LocalDate expectedDeliveryDate;
 
-        public void setOrderId(Integer orderId) {
-            this.orderId = orderId;
-        }
 
-        public Integer getCustomerId() {
-            return customerId;
-        }
+    // ============================================================
+    // ORDER STATUS
+    // ============================================================
 
-        public void setCustomerId(Integer customerId) {
-            this.customerId = customerId;
-        }
+    private String orderStatus;
 
-        public LocalDate getOrderDate() {
-            return orderDate;
-        }
 
-        public void setOrderDate(LocalDate orderDate) {
-            this.orderDate = orderDate;
-        }
+    // ============================================================
+    // REMARKS
+    // ============================================================
 
-        public LocalDate getExpectedDeliveryDate() {
-            return expectedDeliveryDate;
-        }
+    private String remarks;
 
-        public void setExpectedDeliveryDate(
-                LocalDate expectedDeliveryDate) {
 
-            this.expectedDeliveryDate = expectedDeliveryDate;
-        }
+    // ============================================================
+    // ORDER BILL ITEMS
+    // ============================================================
 
-        public String getOrderStatus() {
-            return orderStatus;
-        }
+    private List<OrderBillItemResponse> items;
 
-        public void setOrderStatus(String orderStatus) {
-            this.orderStatus = orderStatus;
-        }
 
-        public String getRemarks() {
-            return remarks;
-        }
+    // ============================================================
+    // TOTAL AMOUNT
+    // ============================================================
 
-        public void setRemarks(String remarks) {
-            this.remarks = remarks;
-        }
+    private BigDecimal totalAmount;
 
-        public LocalDateTime getCreatedAt() {
-            return createdAt;
-        }
 
-        public void setCreatedAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-        }
-    }  
+    // ============================================================
+    // CREATED AT
+    // ============================================================
+
+    private LocalDateTime createdAt;
+
+
+    // ============================================================
+    // DEFAULT CONSTRUCTOR
+    // ============================================================
+
+    public OrderResponse() {
+    }
+
+
+    // ============================================================
+    // GETTERS AND SETTERS
+    // ============================================================
+
+    public String getPaymentStatus() {
+    return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public LocalDate getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public LocalDate getExpectedDeliveryDate() {
+        return expectedDeliveryDate;
+    }
+
+    public void setExpectedDeliveryDate(
+            LocalDate expectedDeliveryDate) {
+
+        this.expectedDeliveryDate = expectedDeliveryDate;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public List<OrderBillItemResponse> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderBillItemResponse> items) {
+        this.items = items;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+}

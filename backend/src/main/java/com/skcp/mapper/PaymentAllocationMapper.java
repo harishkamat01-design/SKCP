@@ -56,11 +56,30 @@ public class PaymentAllocationMapper {
                 allocation.getPaymentAllocationId());
 
         if (allocation.getPayment() != null) {
+
             response.setPaymentId(
                     allocation.getPayment().getPaymentId());
+
+            /*
+             * Customer is derived through the existing
+             * Payment → Customer relationship.
+             */
+            if (allocation.getPayment().getCustomer() != null) {
+
+                response.setCustomerId(
+                        allocation.getPayment()
+                                .getCustomer()
+                                .getCustomerId());
+
+                response.setCustomerName(
+                        allocation.getPayment()
+                                .getCustomer()
+                                .getCustomerName());
+            }
         }
 
         if (allocation.getOrder() != null) {
+
             response.setOrderId(
                     allocation.getOrder().getOrderId());
         }
@@ -73,6 +92,9 @@ public class PaymentAllocationMapper {
 
         response.setRemarks(
                 allocation.getRemarks());
+
+        response.setAllocationStatus("ALLOCATED");
+
 
         response.setRecordStatus(
                 allocation.getRecordStatus());
@@ -98,11 +120,30 @@ public class PaymentAllocationMapper {
                 allocation.getPaymentAllocationId());
 
         if (allocation.getPayment() != null) {
+
             response.setPaymentId(
                     allocation.getPayment().getPaymentId());
+
+            /*
+             * Customer is derived through the existing
+             * Payment → Customer relationship.
+             */
+            if (allocation.getPayment().getCustomer() != null) {
+
+                response.setCustomerId(
+                        allocation.getPayment()
+                                .getCustomer()
+                                .getCustomerId());
+
+                response.setCustomerName(
+                        allocation.getPayment()
+                                .getCustomer()
+                                .getCustomerName());
+            }
         }
 
         if (allocation.getOrder() != null) {
+
             response.setOrderId(
                     allocation.getOrder().getOrderId());
         }
@@ -113,6 +154,8 @@ public class PaymentAllocationMapper {
         response.setAllocationDate(
                 allocation.getAllocationDate());
 
+        response.setAllocationStatus("ALLOCATED");
+                
         response.setRecordStatus(
                 allocation.getRecordStatus());
 

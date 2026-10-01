@@ -13,6 +13,7 @@ function FormModal({
   error = "",
   success = "",
   size = "md",
+  formId = "skcp-common-form",
 }) {
   const footer = (
     <>
@@ -21,6 +22,79 @@ function FormModal({
         className="btn"
         onClick={onClose}
         disabled={saving}
+      >
+        {cancelLabel}
+      </button>
+
+      <button
+        type="submit"
+        className="btn primary"
+        form={formId}
+        disabled={saving}
+      >
+        {saving ? "Saving..." : submitLabel}
+      </button>
+    </>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      subtitle={subtitle}
+      footer={footer}
+      size={size}
+      closeDisabled={saving}
+    >
+      {error && (
+        <div className="alert e show">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="alert s show">
+          {success}
+        </div>
+      )}
+
+      <form
+        id={formId}
+        onSubmit={onSubmit}
+      >
+        {children}
+      </form>
+    </Modal>
+  );
+}
+
+export default FormModal;
+
+
+/*import Modal from "./Modal";
+
+function FormModal({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  children,
+  onSubmit,
+  submitLabel = "Save",
+  cancelLabel = "Cancel",
+  saving = false,
+  error = "",
+  success = "",
+  size = "md",
+}) {
+  const footer = (
+    <>
+      <button
+        type="button"
+        className="btn"
+        onClick={onClose}
+        disabled={saving} 
       >
         {cancelLabel}
       </button>
@@ -68,4 +142,4 @@ function FormModal({
   );
 }
 
-export default FormModal;
+export default FormModal; */
