@@ -218,7 +218,7 @@ function Asset() {
             return dateValue;
         }
 
-        return date.toLocaleDateString();
+        return date.toLocaleDateString("en-IN");
     };
 
     // ============================================================
@@ -238,7 +238,7 @@ function Asset() {
             return dateTimeValue;
         }
 
-        return date.toLocaleString();
+        return date.toLocaleString("en-IN");
     };
 
     // ============================================================
@@ -618,52 +618,95 @@ function Asset() {
     };
 
     // ============================================================
+    // LOADING STATE
+    // ============================================================
+
+    if (loading) {
+
+        return (
+            <div className="page">
+
+                <section className="card">
+
+                    <h2>Assets</h2>
+
+                    <p>
+                        Loading asset records...
+                    </p>
+
+                </section>
+
+            </div>
+        );
+    }
+
+    // ============================================================
     // RENDER
     // ============================================================
 
     return (
 
-        <section className="section active">
+        <div className="page">
 
             {/* ====================================================
-                PAGE HEADER
+                PAGE HEADER + SEARCH
             ==================================================== */}
 
-            <div className="card">
+            <section className="card">
 
-                <div className="card-head customer-page-header">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap"
+                    }}
+                >
 
                     <div>
 
-                        <div className="card-title">
+                        <h2>
                             Assets
-                        </div>
+                        </h2>
 
-                        <div className="kpi-sub">
-                            Manage asset information and maintenance records
-                        </div>
+                        <p>
+                            Manage asset information and maintenance records.
+                        </p>
 
                     </div>
 
                     <button
                         type="button"
-                        className="btn primary"
+                        className="action-btn view-btn"
                         onClick={handleOpenAdd}
                     >
-                        + Add Asset
+                        Add Asset
                     </button>
 
                 </div>
 
-                {/* Search */}
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px"
+                    }}
+                >
 
-                <div className="fld customer-search">
+                    <div
+                        className="fld"
+                        style={{
+                            width: "420px",
+                            maxWidth: "100%"
+                        }}
+                    >
 
-                    <label htmlFor="asset-search">
-                        Search Asset
-                    </label>
-
-                    <div className="search-action-row">
+                        <label htmlFor="asset-search">
+                            Search Assets
+                        </label>
 
                         <input
                             id="asset-search"
@@ -677,358 +720,271 @@ function Asset() {
                             }
                         />
 
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={handleClearSearch}
-                            disabled={!searchKeyword}
-                        >
-                            Clear
-                        </button>
-
                     </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={handleClearSearch}
+                        disabled={!searchKeyword}
+                    >
+                        Clear
+                    </button>
 
                 </div>
 
-            </div>
+            </section>
 
             {/* ====================================================
                 ASSET LIST
             ==================================================== */}
 
-            <div className="card">
+            <section className="card">
 
-                <div className="card-head">
+                <h2>
+                    Asset List
+                </h2>
 
-                    <div>
-
-                        <div className="card-title">
-                            Asset List
-                        </div>
-
-                        <div className="kpi-sub">
-
-                            {loading
-                                ? "Loading assets..."
-                                : `${filteredAssets.length} asset(s)`
-                            }
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {/* Success */}
+                <p>
+                    {totalRecords} asset{totalRecords === 1 ? "" : "s"}
+                </p>
 
                 {successMessage && (
-
-                    <div className="alert s show">
+                    <div
+                        className="alert s show"
+                        style={{
+                            marginBottom: "12px"
+                        }}
+                    >
                         {successMessage}
                     </div>
-
                 )}
 
-                {/* Loading */}
-
-                {loading && (
-
-                    <div className="empty-state">
-
-                        <p>
-                            Loading assets...
-                        </p>
-
+                {error && (
+                    <div className="form-error">
+                        {error}
                     </div>
-
                 )}
 
-                {/* Error */}
-
-                {!loading && error && (
-
-                    <div className="empty-state">
-
-                        <p>
-                            {error}
-                        </p>
-
-                    </div>
-
+                {!error && totalRecords === 0 && (
+                    <p>
+                        No asset records found.
+                    </p>
                 )}
 
-                {/* Table */}
+                {!error && totalRecords > 0 && (
 
-                {!loading &&
-                    !error &&
-                    filteredAssets.length > 0 && (
+                    <div className="table-wrap">
 
-                        <>
+                        <table>
 
-                            <div className="tbl-wrap">
+                            <thead>
 
-                                <table>
+                                <tr>
 
-                                    <thead>
+                                    <th
+                                        onClick={() =>
+                                            handleSort("assetId")
+                                        }
+                                        style={{
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        ID
+                                        {getSortIndicator("assetId")}
+                                    </th>
 
-                                        <tr>
+                                    <th
+                                        onClick={() =>
+                                            handleSort("assetName")
+                                        }
+                                        style={{
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Asset
+                                        {getSortIndicator("assetName")}
+                                    </th>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "assetId"
-                                                    )
+                                    <th
+                                        onClick={() =>
+                                            handleSort("assetCategory")
+                                        }
+                                        style={{
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Category
+                                        {getSortIndicator("assetCategory")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort("location")
+                                        }
+                                        style={{
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Location
+                                        {getSortIndicator("location")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort("status")
+                                        }
+                                        style={{
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Status
+                                        {getSortIndicator("status")}
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {paginatedRecords.map(
+                                    (asset) => (
+
+                                        <tr
+                                            key={
+                                                asset.assetId
+                                            }
+                                        >
+
+                                            <td>
+                                                {
+                                                    asset.assetId
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer"
-                                                }}
-                                            >
-                                                ID
-                                                {getSortIndicator(
-                                                    "assetId"
-                                                )}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "assetName"
-                                                    )
+                                            <td>
+                                                <strong>
+                                                    {
+                                                        asset.assetName ||
+                                                        "-"
+                                                    }
+                                                </strong>
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    asset.assetCategory ||
+                                                    "-"
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer"
-                                                }}
-                                            >
-                                                Asset
-                                                {getSortIndicator(
-                                                    "assetName"
-                                                )}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "assetCategory"
-                                                    )
+                                            <td>
+                                                {
+                                                    asset.location ||
+                                                    "-"
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer"
-                                                }}
-                                            >
-                                                Category
-                                                {getSortIndicator(
-                                                    "assetCategory"
-                                                )}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "location"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor:
-                                                        "pointer"
-                                                }}
-                                            >
-                                                Location
-                                                {getSortIndicator(
-                                                    "location"
-                                                )}
-                                            </th>
+                                            <td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "status"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor:
-                                                        "pointer"
-                                                }}
-                                            >
-                                                Status
-                                                {getSortIndicator(
-                                                    "status"
-                                                )}
-                                            </th>
+                                                <span
+                                                    className={
+                                                        asset.status ===
+                                                        "ACTIVE"
+                                                            ? "badge bg"
+                                                            : "badge br"
+                                                    }
+                                                >
+                                                    {
+                                                        asset.status ||
+                                                        "-"
+                                                    }
+                                                </span>
 
-                                            <th>
-                                                Actions
-                                            </th>
+                                            </td>
+
+                                            <td>
+
+                                                <div className="action-buttons">
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleViewAsset(
+                                                                asset.assetId
+                                                            )
+                                                        }
+                                                    >
+                                                        View
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEditAsset(
+                                                                asset.assetId
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            asset.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleDeleteAsset(
+                                                                asset
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            asset.status !==
+                                                            "ACTIVE"
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+
+                                                </div>
+
+                                            </td>
 
                                         </tr>
 
-                                    </thead>
+                                    )
+                                )}
 
-                                    <tbody>
+                            </tbody>
 
-                                        {paginatedRecords.map(
-                                            (asset) => (
+                        </table>
 
-                                                <tr
-                                                    key={
-                                                        asset.assetId
-                                                    }
-                                                >
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalRecords={totalRecords}
+                            pageSize={pageSize}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
 
-                                                    <td>
-                                                        {
-                                                            asset.assetId
-                                                        }
-                                                    </td>
+                    </div>
 
-                                                    <td>
+                )}
 
-                                                        <strong>
-                                                            {
-                                                                asset.assetName ||
-                                                                "-"
-                                                            }
-                                                        </strong>
-
-                                                    </td>
-
-                                                    <td>
-                                                        {
-                                                            asset.assetCategory ||
-                                                            "-"
-                                                        }
-                                                    </td>
-
-                                                    <td className="mu">
-                                                        {
-                                                            asset.location ||
-                                                            "-"
-                                                        }
-                                                    </td>
-
-                                                    <td>
-
-                                                        <span
-                                                            className={
-                                                                asset.status ===
-                                                                "ACTIVE"
-                                                                    ? "badge bg"
-                                                                    : "badge br"
-                                                            }
-                                                        >
-                                                            {
-                                                                asset.status ||
-                                                                "-"
-                                                            }
-                                                        </span>
-
-                                                    </td>
-
-                                                    <td>
-
-                                                        <div className="action-buttons">
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleViewAsset(
-                                                                        asset.assetId
-                                                                    )
-                                                                }
-                                                            >
-                                                                View
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleEditAsset(
-                                                                        asset.assetId
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    asset.status !==
-                                                                    "ACTIVE"
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleDeleteAsset(
-                                                                        asset
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    asset.status !==
-                                                                    "ACTIVE"
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </button>
-
-                                                        </div>
-
-                                                    </td>
-
-                                                </tr>
-
-                                            )
-                                        )}
-
-                                    </tbody>
-
-                                </table>
-
-                            </div>
-
-                            {/* Pagination */}
-
-                            {totalRecords > 0 && (
-
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    totalRecords={totalRecords}
-                                    pageSize={pageSize}
-                                    onPageChange={
-                                        handlePageChange
-                                    }
-                                    onPageSizeChange={
-                                        handlePageSizeChange
-                                    }
-                                />
-
-                            )}
-
-                        </>
-
-                    )}
-
-                {/* Empty State */}
-
-                {!loading &&
-                    !error &&
-                    filteredAssets.length === 0 && (
-
-                        <div className="empty-state">
-
-                            <p>
-                                No assets found.
-                            </p>
-
-                        </div>
-
-                    )}
-
-            </div>
+            </section>
 
             {/* ====================================================
                 VIEW MODAL
@@ -1559,7 +1515,7 @@ function Asset() {
                 error={deleteError}
             />
 
-        </section>
+        </div>
     );
 }
 

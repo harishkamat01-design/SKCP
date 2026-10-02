@@ -34,21 +34,17 @@ function RawMaterialStock() {
     // VIEW MODAL
     // ============================================================
 
-    const [selectedStock, setSelectedStock] =
-        useState(null);
+    const [selectedStock, setSelectedStock] = useState(null);
 
-    const [viewLoading, setViewLoading] =
-        useState(false);
+    const [viewLoading, setViewLoading] = useState(false);
 
-    const [viewError, setViewError] =
-        useState("");
+    const [viewError, setViewError] = useState("");
 
     // ============================================================
     // ADD STOCK MODAL
     // ============================================================
 
-    const [showAddModal, setShowAddModal] =
-        useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const [addForm, setAddForm] = useState({
         rawMaterialId: "",
@@ -57,18 +53,15 @@ function RawMaterialStock() {
         notes: "",
     });
 
-    const [addLoading, setAddLoading] =
-        useState(false);
+    const [addLoading, setAddLoading] = useState(false);
 
-    const [addError, setAddError] =
-        useState("");
+    const [addError, setAddError] = useState("");
 
     // ============================================================
     // EDIT STOCK MODAL
     // ============================================================
 
-    const [editingStock, setEditingStock] =
-        useState(null);
+    const [editingStock, setEditingStock] = useState(null);
 
     const [editForm, setEditForm] = useState({
         currentStockLevel: "",
@@ -76,24 +69,19 @@ function RawMaterialStock() {
         notes: "",
     });
 
-    const [editLoading, setEditLoading] =
-        useState(false);
+    const [editLoading, setEditLoading] = useState(false);
 
-    const [editError, setEditError] =
-        useState("");
+    const [editError, setEditError] = useState("");
 
     // ============================================================
     // DELETE MODAL
     // ============================================================
 
-    const [deletingStock, setDeletingStock] =
-        useState(null);
+    const [deletingStock, setDeletingStock] = useState(null);
 
-    const [deleteLoading, setDeleteLoading] =
-        useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
-    const [deleteError, setDeleteError] =
-        useState("");
+    const [deleteError, setDeleteError] = useState("");
 
     // ============================================================
     // INITIAL LOAD
@@ -201,6 +189,10 @@ function RawMaterialStock() {
         });
     }, [stockList, searchKeyword]);
 
+    // ============================================================
+    // SORTING
+    // ============================================================
+
     const {
         sortKey,
         sortDirection,
@@ -212,7 +204,10 @@ function RawMaterialStock() {
         "desc"
     );
 
-           
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
     const {
         currentPage,
         pageSize,
@@ -225,8 +220,6 @@ function RawMaterialStock() {
         sortedRecords,
         10
     );
-
-
 
     // ============================================================
     // VIEW STOCK
@@ -270,6 +263,32 @@ function RawMaterialStock() {
 
         setSelectedStock(null);
         setViewError("");
+    };
+
+    // ============================================================
+    // DATE / TIME FORMAT
+    // ============================================================
+
+    const formatDateTime = (dateTimeValue) => {
+        if (!dateTimeValue) {
+            return "-";
+        }
+
+        const date = new Date(dateTimeValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateTimeValue;
+        }
+
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+        });
     };
 
     // ============================================================
@@ -710,13 +729,10 @@ function RawMaterialStock() {
         return (
             <div className="page">
                 <section className="card">
-                    <h2>
-                        Raw Material Stock
-                    </h2>
-
+                    <h2>Raw Material Stock</h2>
                     <p>
-                        Loading raw material
-                        stock records...
+                        Loading raw material stock
+                        records...
                     </p>
                 </section>
             </div>
@@ -728,81 +744,67 @@ function RawMaterialStock() {
     // ============================================================
 
     return (
-        <>
+        <div className="page">
             {/* ====================================================
-                RAW MATERIAL STOCK HEADER
+                RAW MATERIAL STOCK HEADER / FILTERS
             ==================================================== */}
 
             <section className="card">
                 <div
                     style={{
                         display: "flex",
-                        justifyContent:
-                            "space-between",
+                        justifyContent: "space-between",
                         alignItems: "center",
                         gap: "16px",
                         flexWrap: "wrap",
                     }}
                 >
                     <div>
-                        <h2>
-                            Raw Material Stock
-                        </h2>
-
+                        <h2>Raw Material Stock</h2>
                         <p>
-                            Manage raw material
-                            stock information
-                            and records.
+                            Manage raw material stock
+                            information and records.
                         </p>
                     </div>
 
                     <button
                         type="button"
                         className="action-btn view-btn"
-                        onClick={
-                            openAddModal
-                        }
+                        onClick={openAddModal}
                     >
-                        + Add Stock
+                        Add Stock
                     </button>
                 </div>
 
-                {/*<div className="fld production-search">
-                    <label htmlFor="raw-material-stock-search">
-                        Search Raw Material Stock
-                    </label>
-
-                    <input
-                        id="raw-material-stock-search"
-                        type="text"
-                        placeholder="Search by raw material, unit, stock level or status..."
-                        value={
-                            searchKeyword
-                        }
-                        onChange={(
-                            event
-                        ) =>
-                            setSearchKeyword(
-                                event.target
-                                    .value
-                            )
-                        }
-                    />
-                </div> */}
-
-                <div className="search-action-row">
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
                     <div
-                        className="search-container"
+                        className="fld"
                         style={{
-                            width: "15%",
+                            width: "420px",
+                            maxWidth: "100%",
                         }}
                     >
+                        <label htmlFor="raw-material-stock-search">
+                            Search Raw Material Stock
+                        </label>
+
                         <input
+                            id="raw-material-stock-search"
                             type="text"
-                            placeholder="Search raw material stock..."
+                            placeholder="Search by raw material, unit, stock level or status..."
                             value={searchKeyword}
                             onChange={(event) =>
-                                setSearchKeyword(event.target.value)
+                                setSearchKeyword(
+                                    event.target.value
+                                )
                             }
                         />
                     </div>
@@ -810,14 +812,14 @@ function RawMaterialStock() {
                     <button
                         type="button"
                         className="btn secondary"
-                        onClick={() => setSearchKeyword("")}
+                        onClick={() =>
+                            setSearchKeyword("")
+                        }
+                        disabled={!searchKeyword}
                     >
                         Clear
                     </button>
                 </div>
-
-
-
             </section>
 
             {/* ====================================================
@@ -825,133 +827,180 @@ function RawMaterialStock() {
             ==================================================== */}
 
             <section className="card">
-                <h2>
-                    Raw Material Stock List
-                </h2>
+                <h2>Raw Material Stock List</h2>
 
                 <p>
-                    {
-                        filteredStock.length
-                    }{" "}
-                    stock record(s)
+                    {totalRecords} stock record
+                    {totalRecords === 1 ? "" : "s"}
                 </p>
 
                 {error && (
-                    <p className="form-error">
+                    <div className="form-error">
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 {!error &&
-                    filteredStock.length ===
-                        0 && (
+                    totalRecords === 0 && (
                         <p>
-                            No raw material
-                            stock records
-                            found.
+                            No raw material stock
+                            records found.
                         </p>
                     )}
 
                 {!error &&
-                    filteredStock.length >
-                        0 && (
+                    totalRecords > 0 && (
                         <div className="table-wrap">
                             <table>
                                 <thead>
-                                <tr>
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("rawMaterialStockId")}
-                                        >
-                                            ID
-                                            {sortKey === "rawMaterialStockId" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                    <tr>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "rawMaterialStockId"
+                                                    )
+                                                }
+                                            >
+                                                ID
+                                                {sortKey ===
+                                                    "rawMaterialStockId" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("rawMaterialName")}
-                                        >
-                                            RAW MATERIAL
-                                            {sortKey === "rawMaterialName" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "rawMaterialName"
+                                                    )
+                                                }
+                                            >
+                                                RAW MATERIAL
+                                                {sortKey ===
+                                                    "rawMaterialName" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("rawMaterialUnit")}
-                                        >
-                                            UNIT
-                                            {sortKey === "rawMaterialUnit" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "rawMaterialUnit"
+                                                    )
+                                                }
+                                            >
+                                                UNIT
+                                                {sortKey ===
+                                                    "rawMaterialUnit" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("currentStockLevel")}
-                                        >
-                                            CURRENT STOCK
-                                            {sortKey === "currentStockLevel" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "currentStockLevel"
+                                                    )
+                                                }
+                                            >
+                                                CURRENT STOCK
+                                                {sortKey ===
+                                                    "currentStockLevel" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("minimumStockLevel")}
-                                        >
-                                            MINIMUM STOCK
-                                            {sortKey === "minimumStockLevel" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "minimumStockLevel"
+                                                    )
+                                                }
+                                            >
+                                                MINIMUM STOCK
+                                                {sortKey ===
+                                                    "minimumStockLevel" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("stockStatus")}
-                                        >
-                                            STOCK STATUS
-                                            {sortKey === "stockStatus" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "stockStatus"
+                                                    )
+                                                }
+                                            >
+                                                STOCK STATUS
+                                                {sortKey ===
+                                                    "stockStatus" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>
-                                        <button
-                                            type="button"
-                                            className="table-sort-btn"
-                                            onClick={() => handleSort("recordStatus")}
-                                        >
-                                            STATUS
-                                            {sortKey === "recordStatus" &&
-                                                (sortDirection === "asc" ? " ▲" : " ▼")}
-                                        </button>
-                                    </th>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "recordStatus"
+                                                    )
+                                                }
+                                            >
+                                                STATUS
+                                                {sortKey ===
+                                                    "recordStatus" &&
+                                                    (sortDirection ===
+                                                    "asc"
+                                                        ? " ▲"
+                                                        : " ▼")}
+                                            </button>
+                                        </th>
 
-                                    <th>ACTIONS</th>
-                                </tr>
-                            </thead>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
 
                                 <tbody>
                                     {paginatedRecords.map(
-                                        (
-                                            stock
-                                        ) => (
+                                        (stock) => (
                                             <tr
                                                 key={
                                                     stock.rawMaterialStockId
@@ -1006,7 +1055,7 @@ function RawMaterialStock() {
                                                 </td>
 
                                                 <td>
-                                                    <div className="table-actions">
+                                                    <div className="action-buttons">
                                                         <button
                                                             type="button"
                                                             className="action-btn view-btn"
@@ -1050,18 +1099,16 @@ function RawMaterialStock() {
                                 </tbody>
                             </table>
 
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    totalRecords={totalRecords}
-                                    pageSize={pageSize}
-                                    onPageChange={handlePageChange}
-                                    onPageSizeChange={handlePageSizeChange}
-                                />
-
-
-
-
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalRecords={totalRecords}
+                                pageSize={pageSize}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
                         </div>
                     )}
             </section>
@@ -1076,28 +1123,18 @@ function RawMaterialStock() {
                     viewLoading ||
                     !!viewError
                 }
-                onClose={
-                    closeViewModal
-                }
+                onClose={closeViewModal}
                 title="Raw Material Stock Details"
                 subtitle="View raw material stock information"
-                loading={
-                    viewLoading
-                }
-                error={
-                    viewError
-                }
+                loading={viewLoading}
+                error={viewError}
                 size="lg"
                 footer={
                     <button
                         type="button"
                         className="btn"
-                        onClick={
-                            closeViewModal
-                        }
-                        disabled={
-                            viewLoading
-                        }
+                        onClick={closeViewModal}
+                        disabled={viewLoading}
                     >
                         Close
                     </button>
@@ -1175,15 +1212,9 @@ function RawMaterialStock() {
 
                         <DetailItem
                             label="Created At"
-                            value={
+                            value={formatDateTime(
                                 selectedStock.createdAt
-                                    ? new Date(
-                                          selectedStock.createdAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
@@ -1203,28 +1234,18 @@ function RawMaterialStock() {
             ==================================================== */}
 
             <FormModal
-                isOpen={
-                    showAddModal
-                }
-                onClose={
-                    closeAddModal
-                }
+                isOpen={showAddModal}
+                onClose={closeAddModal}
                 title="Add Raw Material Stock"
                 subtitle="Record new raw material stock information"
-                onSubmit={
-                    handleCreateStock
-                }
+                onSubmit={handleCreateStock}
                 submitLabel="Add Stock"
                 cancelLabel="Cancel"
-                saving={
-                    addLoading
-                }
-                error={
-                    addError
-                }
+                saving={addLoading}
+                error={addError}
                 size="lg"
             >
-                <div className="edit-form-grid">
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="add-raw-material-id">
                             Raw Material ID
@@ -1289,7 +1310,7 @@ function RawMaterialStock() {
                         />
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="add-raw-material-stock-notes">
                             Notes
                         </label>
@@ -1299,9 +1320,7 @@ function RawMaterialStock() {
                             name="notes"
                             rows="3"
                             maxLength="1000"
-                            value={
-                                addForm.notes
-                            }
+                            value={addForm.notes}
                             onChange={
                                 handleAddChange
                             }
@@ -1316,29 +1335,19 @@ function RawMaterialStock() {
             ==================================================== */}
 
             <FormModal
-                isOpen={
-                    !!editingStock
-                }
-                onClose={
-                    closeEditModal
-                }
+                isOpen={!!editingStock}
+                onClose={closeEditModal}
                 title="Edit Raw Material Stock"
                 subtitle="Update raw material stock information"
-                onSubmit={
-                    handleUpdateStock
-                }
+                onSubmit={handleUpdateStock}
                 submitLabel="Update Stock"
                 cancelLabel="Cancel"
-                saving={
-                    editLoading
-                }
-                error={
-                    editError
-                }
+                saving={editLoading}
+                error={editError}
                 size="lg"
             >
                 {editingStock && (
-                    <div className="edit-form-grid">
+                    <div className="form-grid">
                         <div className="fld">
                             <label htmlFor="edit-raw-material-stock-id">
                                 Stock ID
@@ -1474,7 +1483,7 @@ function RawMaterialStock() {
                             />
                         </div>
 
-                        <div className="fld edit-full">
+                        <div className="fld f-full">
                             <label htmlFor="edit-raw-material-stock-notes">
                                 Notes
                             </label>
@@ -1502,15 +1511,9 @@ function RawMaterialStock() {
             ==================================================== */}
 
             <DeleteConfirmModal
-                isOpen={
-                    !!deletingStock
-                }
-                onClose={
-                    closeDeleteModal
-                }
-                onConfirm={
-                    handleConfirmDelete
-                }
+                isOpen={!!deletingStock}
+                onClose={closeDeleteModal}
+                onConfirm={handleConfirmDelete}
                 title="Delete Raw Material Stock"
                 subtitle="Please confirm this action"
                 message="Are you sure you want to delete this raw material stock record?"
@@ -1522,14 +1525,10 @@ function RawMaterialStock() {
                           }`
                         : ""
                 }
-                confirming={
-                    deleteLoading
-                }
-                error={
-                    deleteError
-                }
+                confirming={deleteLoading}
+                error={deleteError}
             />
-        </>
+        </div>
     );
 }
 

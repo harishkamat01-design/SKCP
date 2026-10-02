@@ -497,7 +497,26 @@ function RawMaterial() {
     }
 
     try {
-      return new Date(value).toLocaleString("en-IN");
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+
+      const datePart = date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+
+      const timePart = date.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+
+      return `${datePart} ${timePart}`;
     } catch {
       return value;
     }
@@ -507,300 +526,298 @@ function RawMaterial() {
   // UI
   // =========================================================
 
+  if (loading) {
+    return (
+      <div className="page">
+        <section className="card">
+          <h2>Raw Materials</h2>
+          <p>Loading raw material records...</p>
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <section className="section active">
+    <div className="page">
 
       {/* =====================================================
-          PAGE HEADER
+          PAGE HEADER + SEARCH
           ===================================================== */}
 
-      <div className="card">
+      <section className="card">
 
-        <div className="card-head">
-
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+            flexWrap: "wrap",
+          }}
+        >
           <div>
-            <div className="card-title">
-              Raw Materials
-            </div>
-
-            <div className="kpi-sub">
-              Manage raw material information and records
-            </div>
+            <h2>Raw Materials</h2>
+            <p>Manage raw material information and records.</p>
           </div>
 
           <button
             type="button"
-            className="btn primary"
+            className="action-btn view-btn"
             onClick={handleOpenAddRawMaterialModal}
           >
-            + Add Raw Material
+            Add Raw Material
           </button>
-
         </div>
 
-        <div className="fld customer-search">
-
-          <label htmlFor="raw-material-search">
-            Search Raw Material
-          </label>
-
-          <div className="search-action-row">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: "16px",
+            flexWrap: "wrap",
+            marginTop: "16px",
+          }}
+        >
+          <div
+            className="fld"
+            style={{
+              width: "420px",
+              maxWidth: "100%",
+            }}
+          >
+            <label htmlFor="raw-material-search">
+              Search Raw Materials
+            </label>
 
             <input
               id="raw-material-search"
               type="text"
-              placeholder="Search by ID, material, category, unit or status..."
+              placeholder="Search by ID, material, category, unit, status..."
               value={searchKeyword}
               onChange={(event) =>
                 setSearchKeyword(event.target.value)
               }
             />
-
-            <button
-              type="button"
-              className="btn secondary"
-              onClick={handleClearSearch}
-              disabled={!searchKeyword}
-            >
-              Clear
-            </button>
-
           </div>
 
+          <button
+            type="button"
+            className="btn secondary"
+            onClick={handleClearSearch}
+            disabled={!searchKeyword}
+          >
+            Clear
+          </button>
         </div>
 
-      </div>
+        {error && (
+          <div
+            className="form-error"
+            style={{ marginTop: "12px" }}
+          >
+            {error}
+          </div>
+        )}
+
+      </section>
 
       {/* =====================================================
           RAW MATERIAL LIST
           ===================================================== */}
 
-      <div className="card">
+      <section className="card">
 
-        <div className="card-head">
+        <h2>Raw Material List</h2>
 
-          <div>
-            <div className="card-title">
-              Raw Material List
-            </div>
+        <p>
+          {totalRecords} raw material
+          {totalRecords === 1 ? "" : "s"}
+        </p>
 
-            <div className="kpi-sub">
-              {loading
-                ? "Loading raw materials..."
-                : `${totalRecords} raw material(s)`}
-            </div>
-          </div>
-
-        </div>
-
-        {loading && (
-          <div className="empty-state">
-            <p>Loading raw materials...</p>
-          </div>
-        )}
-
-        {!loading && error && (
-          <div className="empty-state">
-            <p>{error}</p>
-          </div>
-        )}
-
-        {!loading && !error && deleteError && (
-          <div className="alert e show">
+        {!error && deleteError && (
+          <div className="form-error">
             {deleteError}
           </div>
         )}
 
-        {!loading &&
-          !error &&
-          totalRecords > 0 && (
-            <div className="tbl-wrap">
+        {!error && totalRecords === 0 && (
+          <p>
+            {searchKeyword
+              ? "No raw materials match your search."
+              : "No raw materials found."}
+          </p>
+        )}
 
-              <table>
+        {!error && totalRecords > 0 && (
+          <div className="table-wrap">
 
-                <thead>
-                  <tr>
+            <table>
 
-                    <th
-                      onClick={() =>
-                        handleSort("rawMaterialId")
-                      }
-                    >
-                      ID{" "}
-                      <span className="sort-indicator">
-                        {getSortIndicator("rawMaterialId")}
+              <thead>
+                <tr>
+
+                  <th
+                    onClick={() =>
+                      handleSort("rawMaterialId")
+                    }
+                  >
+                    ID{" "}
+                    <span className="sort-indicator">
+                      {getSortIndicator("rawMaterialId")}
+                    </span>
+                  </th>
+
+                  <th
+                    onClick={() =>
+                      handleSort("materialName")
+                    }
+                  >
+                    Material{" "}
+                    <span className="sort-indicator">
+                      {getSortIndicator("materialName")}
+                    </span>
+                  </th>
+
+                  <th
+                    onClick={() =>
+                      handleSort("materialCategory")
+                    }
+                  >
+                    Category{" "}
+                    <span className="sort-indicator">
+                      {getSortIndicator("materialCategory")}
+                    </span>
+                  </th>
+
+                  <th
+                    onClick={() =>
+                      handleSort("unit")
+                    }
+                  >
+                    Unit{" "}
+                    <span className="sort-indicator">
+                      {getSortIndicator("unit")}
+                    </span>
+                  </th>
+
+                  <th
+                    onClick={() =>
+                      handleSort("status")
+                    }
+                  >
+                    Status{" "}
+                    <span className="sort-indicator">
+                      {getSortIndicator("status")}
+                    </span>
+                  </th>
+
+                  <th>Actions</th>
+
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {paginatedRecords.map((material) => (
+
+                  <tr key={material.rawMaterialId}>
+
+                    <td>
+                      {material.rawMaterialId}
+                    </td>
+
+                    <td>
+                      <strong>
+                        {material.materialName || "-"}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {material.materialCategory || "-"}
+                    </td>
+
+                    <td>
+                      {material.unit || "-"}
+                    </td>
+
+                    <td>
+                      <span
+                        className={
+                          material.status === "ACTIVE"
+                            ? "badge bg"
+                            : "badge br"
+                        }
+                      >
+                        {material.status || "-"}
                       </span>
-                    </th>
+                    </td>
 
-                    <th
-                      onClick={() =>
-                        handleSort("materialName")
-                      }
-                    >
-                      Material{" "}
-                      <span className="sort-indicator">
-                        {getSortIndicator("materialName")}
-                      </span>
-                    </th>
+                    <td>
 
-                    <th
-                      onClick={() =>
-                        handleSort("materialCategory")
-                      }
-                    >
-                      Category{" "}
-                      <span className="sort-indicator">
-                        {getSortIndicator("materialCategory")}
-                      </span>
-                    </th>
+                      <div className="action-buttons">
 
-                    <th
-                      onClick={() =>
-                        handleSort("unit")
-                      }
-                    >
-                      Unit{" "}
-                      <span className="sort-indicator">
-                        {getSortIndicator("unit")}
-                      </span>
-                    </th>
-
-                    <th
-                      onClick={() =>
-                        handleSort("status")
-                      }
-                    >
-                      Status{" "}
-                      <span className="sort-indicator">
-                        {getSortIndicator("status")}
-                      </span>
-                    </th>
-
-                    <th>Actions</th>
-
-                  </tr>
-                </thead>
-
-                <tbody>
-
-                  {paginatedRecords.map((material) => (
-
-                    <tr key={material.rawMaterialId}>
-
-                      <td>
-                        {material.rawMaterialId}
-                      </td>
-
-                      <td>
-                        <strong>
-                          {material.materialName || "-"}
-                        </strong>
-                      </td>
-
-                      <td>
-                        {material.materialCategory || "-"}
-                      </td>
-
-                      <td>
-                        {material.unit || "-"}
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            material.status === "ACTIVE"
-                              ? "badge bg"
-                              : "badge br"
+                        <button
+                          type="button"
+                          className="action-btn view-btn"
+                          onClick={() =>
+                            handleViewRawMaterial(
+                              material.rawMaterialId,
+                            )
                           }
                         >
-                          {material.status || "-"}
-                        </span>
-                      </td>
+                          View
+                        </button>
 
-                      <td>
-
-                        <div className="action-buttons">
-
-                          <button
-                            type="button"
-                            className="btn sm"
-                            onClick={() =>
-                              handleViewRawMaterial(
-                                material.rawMaterialId,
-                              )
-                            }
-                          >
-                            View
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn sm"
-                            onClick={() =>
-                              handleEditRawMaterial(
-                                material.rawMaterialId,
-                              )
-                            }
-                            disabled={
-                              deleteSaving &&
-                              deletingRawMaterial?.rawMaterialId ===
-                                material.rawMaterialId
-                            }
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn sm"
-                            onClick={() =>
-                              handleOpenDeleteRawMaterial(
-                                material,
-                              )
-                            }
-                            disabled={
-                              deleteSaving &&
-                              deletingRawMaterial?.rawMaterialId ===
-                                material.rawMaterialId
-                            }
-                          >
-                            {deleteSaving &&
+                        <button
+                          type="button"
+                          className="action-btn edit-btn"
+                          onClick={() =>
+                            handleEditRawMaterial(
+                              material.rawMaterialId,
+                            )
+                          }
+                          disabled={
+                            deleteSaving &&
                             deletingRawMaterial?.rawMaterialId ===
                               material.rawMaterialId
-                              ? "Deleting..."
-                              : "Delete"}
-                          </button>
+                          }
+                        >
+                          Edit
+                        </button>
 
-                        </div>
+                        <button
+                          type="button"
+                          className="action-btn delete-btn"
+                          onClick={() =>
+                            handleOpenDeleteRawMaterial(
+                              material,
+                            )
+                          }
+                          disabled={
+                            deleteSaving &&
+                            deletingRawMaterial?.rawMaterialId ===
+                              material.rawMaterialId
+                          }
+                        >
+                          {deleteSaving &&
+                          deletingRawMaterial?.rawMaterialId ===
+                            material.rawMaterialId
+                            ? "Deleting..."
+                            : "Delete"}
+                        </button>
 
-                      </td>
+                      </div>
 
-                    </tr>
+                    </td>
 
-                  ))}
+                  </tr>
 
-                </tbody>
+                ))}
 
-              </table>
+              </tbody>
 
-            </div>
-          )}
+            </table>
 
-        {!loading &&
-          !error &&
-          totalRecords === 0 && (
-            <div className="empty-state">
-              <p>
-                {searchKeyword
-                  ? "No raw materials match your search."
-                  : "No raw materials found."}
-              </p>
-            </div>
-          )}
-
-        {!loading &&
-          !error &&
-          totalRecords > 0 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -809,9 +826,11 @@ function RawMaterial() {
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
             />
-          )}
 
-      </div>
+          </div>
+        )}
+
+      </section>
 
       {/* =====================================================
           VIEW RAW MATERIAL
@@ -929,6 +948,7 @@ function RawMaterial() {
           !editError &&
           editingRawMaterial && (
             <>
+
               <div className="customer-modal-section">
 
                 <div className="customer-modal-section-title">
@@ -1066,6 +1086,7 @@ function RawMaterial() {
                 </div>
 
               </div>
+
             </>
           )}
 
@@ -1220,7 +1241,7 @@ function RawMaterial() {
         error={deleteError}
       />
 
-    </section>
+    </div>
   );
 }
 

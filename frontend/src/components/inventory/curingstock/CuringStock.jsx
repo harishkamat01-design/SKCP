@@ -270,6 +270,52 @@ function CuringStock() {
     } = usePagination(sortedRecords, 10);
 
     // ============================================================
+    // DATE / TIME FORMAT
+    // ============================================================
+
+    const formatDate = (dateValue) => {
+        if (!dateValue) {
+            return "-";
+        }
+
+        const date = new Date(
+            `${dateValue}T00:00:00`
+        );
+
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
+
+        return date.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+    };
+
+    const formatDateTime = (dateTimeValue) => {
+        if (!dateTimeValue) {
+            return "-";
+        }
+
+        const date = new Date(dateTimeValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateTimeValue;
+        }
+
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+        });
+    };
+
+    // ============================================================
     // VIEW CURING STOCK
     // ============================================================
 
@@ -296,10 +342,12 @@ function CuringStock() {
 
             setSelectedStock({
                 ...result.data,
+
                 productName:
                     result.data?.productName ||
                     product?.productName ||
                     "-",
+
                 size:
                     product?.size ||
                     "-",
@@ -516,10 +564,12 @@ function CuringStock() {
 
             setEditingStock({
                 ...stockData,
+
                 productName:
                     stockData?.productName ||
                     product?.productName ||
                     "-",
+
                 size:
                     product?.size ||
                     "-",
@@ -775,26 +825,23 @@ function CuringStock() {
     // ============================================================
 
     return (
-        <>
+        <div className="page">
             {/* ====================================================
-                CURING STOCK HEADER
+                CURING STOCK HEADER / FILTERS
             ==================================================== */}
 
             <section className="card">
                 <div
                     style={{
                         display: "flex",
-                        justifyContent:
-                            "space-between",
+                        justifyContent: "space-between",
                         alignItems: "center",
                         gap: "16px",
                         flexWrap: "wrap",
                     }}
                 >
                     <div>
-                        <h2>
-                            Curing Stock
-                        </h2>
+                        <h2>Curing Stock</h2>
 
                         <p>
                             Manage blocks currently
@@ -805,27 +852,32 @@ function CuringStock() {
                     <button
                         type="button"
                         className="action-btn view-btn"
-                        onClick={
-                            openAddModal
-                        }
+                        onClick={openAddModal}
                     >
-                        + Add Curing Stock
+                        Add Curing Stock
                     </button>
                 </div>
 
-                <div className="fld production-search">
-                    <label htmlFor="curing-stock-search">
-                        Search Curing Stock
-                    </label>
-
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
                     <div
+                        className="fld"
                         style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            marginTop: "10px",
+                            width: "420px",
+                            maxWidth: "100%",
                         }}
                     >
+                        <label htmlFor="curing-stock-search">
+                            Search Curing Stock
+                        </label>
+
                         <input
                             id="curing-stock-search"
                             type="text"
@@ -836,21 +888,19 @@ function CuringStock() {
                                     event.target.value
                                 )
                             }
-                            style={{
-                                width: "20%",
-                            }}
                         />
-
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={() =>
-                                setSearchKeyword("")
-                            }
-                        >
-                            Clear
-                        </button>
                     </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={() =>
+                            setSearchKeyword("")
+                        }
+                        disabled={!searchKeyword}
+                    >
+                        Clear
+                    </button>
                 </div>
             </section>
 
@@ -859,27 +909,22 @@ function CuringStock() {
             ==================================================== */}
 
             <section className="card">
-                <h2>
-                    Curing Stock List
-                </h2>
+                <h2>Curing Stock List</h2>
 
                 <p>
-                    {
-                        filteredStock.length
-                    }{" "}
-                    curing stock
-                    record(s)
+                    {totalRecords} curing stock
+                    record
+                    {totalRecords === 1 ? "" : "s"}
                 </p>
 
                 {error && (
-                    <p className="form-error">
+                    <div className="form-error">
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 {!error &&
-                    filteredStock.length ===
-                        0 && (
+                    totalRecords === 0 && (
                         <p>
                             No curing stock
                             records found.
@@ -887,8 +932,7 @@ function CuringStock() {
                     )}
 
                 {!error &&
-                    filteredStock.length >
-                        0 && (
+                    totalRecords > 0 && (
                         <div className="table-wrap">
                             <table>
                                 <thead>
@@ -903,13 +947,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                ID{" "}
+                                                ID
                                                 {sortKey ===
                                                     "curingStockId" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -923,13 +967,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                PRODUCTION ID{" "}
+                                                PRODUCTION ID
                                                 {sortKey ===
                                                     "productionId" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -943,13 +987,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                PRODUCT{" "}
+                                                PRODUCT
                                                 {sortKey ===
                                                     "productName" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -963,13 +1007,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                SIZE{" "}
+                                                SIZE
                                                 {sortKey ===
                                                     "size" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -983,13 +1027,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                QUANTITY{" "}
+                                                QUANTITY
                                                 {sortKey ===
                                                     "quantity" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -1003,13 +1047,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                PRODUCTION DATE{" "}
+                                                PRODUCTION DATE
                                                 {sortKey ===
                                                     "productionDate" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -1023,13 +1067,13 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                EXPECTED READY{" "}
+                                                EXPECTED READY
                                                 {sortKey ===
                                                     "expectedReadyDate" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
@@ -1043,27 +1087,23 @@ function CuringStock() {
                                                     )
                                                 }
                                             >
-                                                STATUS{" "}
+                                                STATUS
                                                 {sortKey ===
                                                     "status" &&
                                                     (sortDirection ===
                                                     "asc"
-                                                        ? "▲"
-                                                        : "▼")}
+                                                        ? " ▲"
+                                                        : " ▼")}
                                             </button>
                                         </th>
 
-                                        <th>
-                                            ACTIONS
-                                        </th>
+                                        <th>ACTIONS</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
                                     {paginatedRecords.map(
-                                        (
-                                            stock
-                                        ) => (
+                                        (stock) => (
                                             <tr
                                                 key={
                                                     stock.curingStockId
@@ -1104,16 +1144,15 @@ function CuringStock() {
                                                 </td>
 
                                                 <td>
-                                                    {
+                                                    {formatDate(
                                                         stock.productionDate
-                                                    }
+                                                    )}
                                                 </td>
 
                                                 <td>
-                                                    {
-                                                        stock.expectedReadyDate ||
-                                                        "-"
-                                                    }
+                                                    {formatDate(
+                                                        stock.expectedReadyDate
+                                                    )}
                                                 </td>
 
                                                 <td>
@@ -1124,7 +1163,7 @@ function CuringStock() {
                                                 </td>
 
                                                 <td>
-                                                    <div className="table-actions">
+                                                    <div className="action-buttons">
                                                         <button
                                                             type="button"
                                                             className="action-btn view-btn"
@@ -1169,18 +1208,10 @@ function CuringStock() {
                             </table>
 
                             <Pagination
-                                currentPage={
-                                    currentPage
-                                }
-                                totalPages={
-                                    totalPages
-                                }
-                                totalRecords={
-                                    totalRecords
-                                }
-                                pageSize={
-                                    pageSize
-                                }
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalRecords={totalRecords}
+                                pageSize={pageSize}
                                 onPageChange={
                                     handlePageChange
                                 }
@@ -1202,28 +1233,18 @@ function CuringStock() {
                     viewLoading ||
                     !!viewError
                 }
-                onClose={
-                    closeViewModal
-                }
+                onClose={closeViewModal}
                 title="Curing Stock Details"
                 subtitle="View curing stock information"
-                loading={
-                    viewLoading
-                }
-                error={
-                    viewError
-                }
+                loading={viewLoading}
+                error={viewError}
                 size="lg"
                 footer={
                     <button
                         type="button"
                         className="btn"
-                        onClick={
-                            closeViewModal
-                        }
-                        disabled={
-                            viewLoading
-                        }
+                        onClick={closeViewModal}
+                        disabled={viewLoading}
                     >
                         Close
                     </button>
@@ -1277,18 +1298,16 @@ function CuringStock() {
 
                         <DetailItem
                             label="Production Date"
-                            value={
-                                selectedStock.productionDate ||
-                                "-"
-                            }
+                            value={formatDate(
+                                selectedStock.productionDate
+                            )}
                         />
 
                         <DetailItem
                             label="Expected Ready Date"
-                            value={
-                                selectedStock.expectedReadyDate ||
-                                "-"
-                            }
+                            value={formatDate(
+                                selectedStock.expectedReadyDate
+                            )}
                         />
 
                         <DetailItem
@@ -1301,28 +1320,16 @@ function CuringStock() {
 
                         <DetailItem
                             label="Created At"
-                            value={
+                            value={formatDateTime(
                                 selectedStock.createdAt
-                                    ? new Date(
-                                          selectedStock.createdAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
                             label="Updated At"
-                            value={
+                            value={formatDateTime(
                                 selectedStock.updatedAt
-                                    ? new Date(
-                                          selectedStock.updatedAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
@@ -1342,28 +1349,18 @@ function CuringStock() {
             ==================================================== */}
 
             <FormModal
-                isOpen={
-                    showAddModal
-                }
-                onClose={
-                    closeAddModal
-                }
+                isOpen={showAddModal}
+                onClose={closeAddModal}
                 title="Add Curing Stock"
                 subtitle="Record new curing stock information"
-                onSubmit={
-                    handleCreateStock
-                }
+                onSubmit={handleCreateStock}
                 submitLabel="Add Curing Stock"
                 cancelLabel="Cancel"
-                saving={
-                    addLoading
-                }
-                error={
-                    addError
-                }
+                saving={addLoading}
+                error={addError}
                 size="lg"
             >
-                <div className="edit-form-grid">
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="add-curing-production-id">
                             Production ID
@@ -1468,11 +1465,14 @@ function CuringStock() {
                                                   3
                                           );
 
-                                          return date
-                                              .toISOString()
-                                              .split(
-                                                  "T"
-                                              )[0];
+                                          return date.toLocaleDateString(
+                                              "en-IN",
+                                              {
+                                                  day: "2-digit",
+                                                  month: "2-digit",
+                                                  year: "numeric",
+                                              }
+                                          );
                                       })()
                                     : "-"
                             }
@@ -1486,7 +1486,7 @@ function CuringStock() {
                         </small>
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="add-curing-remarks">
                             Remarks
                         </label>
@@ -1513,29 +1513,19 @@ function CuringStock() {
             ==================================================== */}
 
             <FormModal
-                isOpen={
-                    !!editingStock
-                }
-                onClose={
-                    closeEditModal
-                }
+                isOpen={!!editingStock}
+                onClose={closeEditModal}
                 title="Edit Curing Stock"
                 subtitle="Update curing stock information"
-                onSubmit={
-                    handleUpdateStock
-                }
+                onSubmit={handleUpdateStock}
                 submitLabel="Update Curing Stock"
                 cancelLabel="Cancel"
-                saving={
-                    editLoading
-                }
-                error={
-                    editError
-                }
+                saving={editLoading}
+                error={editError}
                 size="lg"
             >
                 {editingStock && (
-                    <div className="edit-form-grid">
+                    <div className="form-grid">
                         <div className="fld">
                             <label htmlFor="edit-curing-stock-id">
                                 Curing Stock ID
@@ -1652,11 +1642,14 @@ function CuringStock() {
                                                       3
                                               );
 
-                                              return date
-                                                  .toISOString()
-                                                  .split(
-                                                      "T"
-                                                  )[0];
+                                              return date.toLocaleDateString(
+                                                  "en-IN",
+                                                  {
+                                                      day: "2-digit",
+                                                      month: "2-digit",
+                                                      year: "numeric",
+                                                  }
+                                              );
                                           })()
                                         : "-"
                                 }
@@ -1686,7 +1679,7 @@ function CuringStock() {
                             />
                         </div>
 
-                        <div className="fld edit-full">
+                        <div className="fld f-full">
                             <label htmlFor="edit-curing-remarks">
                                 Remarks
                             </label>
@@ -1714,15 +1707,9 @@ function CuringStock() {
             ==================================================== */}
 
             <DeleteConfirmModal
-                isOpen={
-                    !!deletingStock
-                }
-                onClose={
-                    closeDeleteModal
-                }
-                onConfirm={
-                    handleConfirmDelete
-                }
+                isOpen={!!deletingStock}
+                onClose={closeDeleteModal}
+                onConfirm={handleConfirmDelete}
                 title="Delete Curing Stock"
                 subtitle="Please confirm this action"
                 message="Are you sure you want to delete this curing stock record?"
@@ -1734,14 +1721,10 @@ function CuringStock() {
                           }`
                         : ""
                 }
-                confirming={
-                    deleteLoading
-                }
-                error={
-                    deleteError
-                }
+                confirming={deleteLoading}
+                error={deleteError}
             />
-        </>
+        </div>
     );
 }
 

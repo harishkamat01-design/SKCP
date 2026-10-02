@@ -104,3 +104,6 @@ Desktop.ini
 frontend/src/**/*backup*
 frontend/src/**/*before-*
 frontend/src/**/*corrupted*
+
+# Codex-generated reference images
+frontend/src/Codex Image*.png

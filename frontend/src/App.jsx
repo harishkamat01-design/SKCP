@@ -30,6 +30,7 @@ import Settings from "./components/application/settings/Settings";
 import AboutUs from "./components/application/aboutus/AboutUs";
 
 import Sidebar from "./components/layout/Sidebar";
+import NavIcon from "./components/ui/NavIcon";
 
 function App()
 {
@@ -44,181 +45,275 @@ function App()
     );
 
     const handleLogout = () => {
-    sessionStorage.removeItem("skcp_token");
-    sessionStorage.removeItem("skcp_user");
-    sessionStorage.removeItem("skcp_role");
-    sessionStorage.removeItem("skcp_user_id");
+      sessionStorage.removeItem("skcp_token");
+      sessionStorage.removeItem("skcp_user");
+      sessionStorage.removeItem("skcp_role");
+      sessionStorage.removeItem("skcp_user_id");
 
-  setIsAuthenticated(false);
-};
+      setIsAuthenticated(false);
+    };
 
-  useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDark ? "dark" : "light"
-    );
-    localStorage.setItem("skcp_theme", isDark ? "dark" : "light");
-  }, [isDark]);
+    useEffect(() => {
+      document.documentElement.setAttribute(
+        "data-theme",
+        isDark ? "dark" : "light"
+      );
+      localStorage.setItem("skcp_theme", isDark ? "dark" : "light");
+    }, [isDark]);
 
-
-  const handleOpenPayment = (context) => {
+    const handleOpenPayment = (context) => {
       console.log("OPEN PAYMENT CONTEXT:", context);
 
       setPaymentContext(context);
       setActiveSection("payment");
-  };
+    };
 
-  const handleSectionChange = (section) => {
+    const handleSectionChange = (section) => {
       if (section === "payment") {
-          setPaymentContext(null);
+        setPaymentContext(null);
       }
 
       setActiveSection(section);
-  };
-
-  const renderActiveSection = () => {
-    switch (activeSection) {
-      case "customer":
-        return <Customer />;
-
-      case "supplier":
-        return <Supplier />;
-
-      case "product":
-        return <Product />;
-
-      case "raw-material":
-        return <RawMaterial />;
-
-      case "labour":
-        return <Labour />;
-
-      case "asset":
-        return <Asset />;
-
-      case "attendance":
-        return <Attendance />;
-
-      case "purchase":
-        return <Purchase />;
-
-      case "production":
-        return <Production />;
-
-      case "raw-material-stock":
-        return <RawMaterialStock />;
-
-      case "curing-stock":
-        return <CuringStock />;
-
-      case "finished-goods-stock":
-        return <FinishedGoodsStock />;
-
-      case "order":
-        return (
-        <Order
-            onOpenPayment={handleOpenPayment}
-        />
-        );
-
-      case "delivery":
-        return <Delivery />;
-
-      case "payment":
-        return (
-        <Payment
-            paymentContext={paymentContext}
-        />
-        );
-
-      case "payment-allocation":
-        return <PaymentAllocation />;
-
-      case "dashboard":
-        return <Dashboard />;
-
-      case "reports":
-        return <Reports />;
-
-      case "statements":
-        return <Statements />;
-
-      case "settings":
-        return <Settings />;
-
-      case "about":
-        return <AboutUs />;
-
-      default:
-        return <Dashboard />;
-    }
-  };
-
-  const getPageTitle = () => {
-    const titles = {
-      dashboard: "Dashboard",
-      customer: "Customers",
-      supplier: "Suppliers",
-      product: "Products",
-      "raw-material": "Raw Materials",
-      labour: "Labour",
-      asset: "Assets",
-      attendance: "Attendance",
-      purchase: "Purchases",
-      production: "Production",
-      "raw-material-stock": "Raw Material Stock",
-      "curing-stock": "Curing Stock",
-      "finished-goods-stock": "Finished Goods Stock",
-      order: "Orders",
-      delivery: "Deliveries",
-      payment: "Payments",
-      "payment-allocation": "Payment Allocation",
-      reports: "Reports",
-      settings: "Settings",
-      about: "About Us",
     };
 
-    return titles[activeSection] || "Dashboard";
-  };
+    const renderActiveSection = () => {
+      switch (activeSection) {
+        case "customer":
+          return <Customer />;
 
-  if (!isAuthenticated) {
-    return (
-      <Login
-      isDark={isDark}
-      setIsDark={setIsDark}
-        onLogin={() => {
-          setIsAuthenticated(true);
-        }}
-      />
-    );
-  }
+        case "supplier":
+          return <Supplier />;
 
-  return (
-    <div className={isDark ? "app dark" : "app"}>
-      <Sidebar
-      isDark={isDark}
-      setIsDark={setIsDark}
-      currentLang={currentLang}
-      setCurrentLang={setCurrentLang}
-      setActiveSection={handleSectionChange}
-      activeSection={activeSection}
-      onLogout={handleLogout}   
+        case "product":
+          return <Product />;
 
-      />
+        case "raw-material":
+          return <RawMaterial />;
 
-      <main className="main">
-        <header className="topbar">
-          <div className="topbar-title">
-            {getPageTitle()}
+        case "labour":
+          return <Labour />;
+
+        case "asset":
+          return <Asset />;
+
+        case "attendance":
+          return <Attendance />;
+
+        case "purchase":
+          return <Purchase />;
+
+        case "production":
+          return <Production />;
+
+        case "raw-material-stock":
+          return <RawMaterialStock />;
+
+        case "curing-stock":
+          return <CuringStock />;
+
+        case "finished-goods-stock":
+          return <FinishedGoodsStock />;
+
+        case "order":
+          return (
+            <Order
+              onOpenPayment={handleOpenPayment}
+            />
+          );
+
+        case "delivery":
+          return <Delivery />;
+
+        case "payment":
+          return (
+            <Payment
+              paymentContext={paymentContext}
+            />
+          );
+
+        case "payment-allocation":
+          return <PaymentAllocation />;
+
+        case "dashboard":
+          return <Dashboard />;
+
+        case "reports":
+          return <Reports />;
+
+        case "statements":
+          return <Statements />;
+
+        case "settings":
+          return <Settings />;
+
+        case "about":
+          return <AboutUs />;
+
+        default:
+          return <Dashboard />;
+      }
+    };
+
+    const getPageTitle = () => {
+      const titles = {
+        dashboard: "Dashboard",
+        customer: "Customers",
+        supplier: "Suppliers",
+        product: "Products",
+        "raw-material": "Raw Materials",
+        labour: "Labour",
+        asset: "Assets",
+        attendance: "Attendance",
+        purchase: "Purchases",
+        production: "Production",
+        "raw-material-stock": "Raw Material Stock",
+        "curing-stock": "Curing Stock",
+        "finished-goods-stock": "Finished Goods Stock",
+        order: "Orders",
+        delivery: "Deliveries",
+        payment: "Payments",
+        "payment-allocation": "Payment Allocation",
+        reports: "SKCP Reports",
+        statements: "Statements",
+        settings: "Settings",
+        about: "About Us",
+      };
+
+      return titles[activeSection] || "Dashboard";
+    };
+
+    const getPageIcon = () => {
+      const icons = {
+        dashboard: "dashboard",
+        customer: "customer",
+        supplier: "supplier",
+        product: "product",
+        "raw-material": "raw-material",
+        labour: "labour",
+        asset: "asset",
+        attendance: "attendance",
+        purchase: "purchase",
+        production: "production",
+        "raw-material-stock": "raw-material-stock",
+        "curing-stock": "curing-stock",
+        "finished-goods-stock": "finished-goods-stock",
+        order: "order",
+        delivery: "delivery",
+        payment: "payment",
+        "payment-allocation": "payment-allocation",
+        reports: "reports",
+        statements: "statements",
+        settings: "settings",
+        about: "about",
+      };
+
+      return icons[activeSection] || "dashboard";
+    };
+
+    if (!isAuthenticated) {
+      return (
+        <Login
+          isDark={isDark}
+          setIsDark={setIsDark}
+          onLogin={() => {
+            setIsAuthenticated(true);
+          }}
+        />
+      );
+    }
+
+        return (
+          <div className={isDark ? "app dark" : "app"}>
+
+            <main className="main">
+
+              <header className="topbar">
+
+                {/* ==================================================
+                    SKCP BRAND TILE
+                ================================================== */}
+                <div className="topbar-brand">
+                  <div className="brand-logo">
+                    <img src="/assets/skcp-logo.png" alt="SKCP" />
+                  </div>
+
+                  <div className="brand-info">
+                    <div className="brand-name">
+                      Shree Kundodari Cement Products
+                    </div>
+
+                    <div className="brand-sub brand-sub-italic">
+                      B2B MANAGEMENT PORTAL
+                    </div>
+                  </div>
+                </div>
+
+                {/* ==================================================
+                    LANGUAGE + CURRENT PAGE TILE
+                ================================================== */}
+                <div className="topbar-navigation">
+
+                  <div className="topbar-language">
+                    <button
+                      type="button"
+                      className={`lang-btn ${
+                        currentLang === "en" ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentLang("en")}
+                      aria-pressed={currentLang === "en"}
+                    >
+                      English
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`lang-btn ${
+                        currentLang === "kn" ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentLang("kn")}
+                      aria-pressed={currentLang === "kn"}
+                    >
+                      ಕನ್ನಡ
+                    </button>
+                  </div>
+
+                  <div className="topbar-title">
+                    <NavIcon type={getPageIcon()} />
+                    <span>{getPageTitle()}</span>
+                  </div>
+
+                </div>
+
+                {/* ==================================================
+                    USER TILE
+                ================================================== */}
+                <div className="topbar-user">
+                  {sessionStorage.getItem("skcp_user")} ·{" "}
+                  {sessionStorage.getItem("skcp_role")}
+                </div>
+
+              </header>
+
+              <section className="content">
+                <Sidebar
+                  isDark={isDark}
+                  setIsDark={setIsDark}
+                  currentLang={currentLang}
+                  setCurrentLang={setCurrentLang}
+                  setActiveSection={handleSectionChange}
+                  activeSection={activeSection}
+                  onLogout={handleLogout}
+                />
+
+                <div className="application-content">
+                  {renderActiveSection()}
+                </div>
+              </section>
+
+            </main>
+
           </div>
-        </header>
-
-        <section className="content">
-          {renderActiveSection()}
-        </section>
-      </main>
-    </div>
-  );
+        );
 }
 
 export default App;

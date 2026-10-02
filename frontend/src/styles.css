@@ -18,7 +18,7 @@
   --color-purple: #6e5dc6;
 
   /* SKCP Design System — Layout */
-  --sidebar-width: 232px;
+  --sidebar-width: 210px;
   --content-padding: 18px;
 
   /* SKCP Design System — Radius */
@@ -148,8 +148,7 @@ a {
   border-right: 0.5px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   transition: background var(--transition);
 }
 
@@ -160,21 +159,24 @@ a {
   flex-direction: column;
   overflow: hidden;
 }
+
 .topbar {
-    position: relative;
-    display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 10px;
-  padding: 16px var(--content-padding);
+  gap: 24px;
+  padding: 8px 16px;
   border-bottom: 0.5px solid var(--border);
   background: var(--bg2);
   flex-shrink: 0;
+  min-height: 52px;
 }
 
 .content {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--content-padding);
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
 }
 
 .brand {
@@ -249,12 +251,13 @@ a {
 }
 
 .nav-item {
-  display: flex;
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
-  padding: 7px 14px;
+  padding: 5px 14px;
   margin: 0;
   border-radius: 0;
   font-size: 12px;
@@ -275,7 +278,7 @@ a {
 
 .nav-item.active {
   color: var(--accent);
-  font-weight:   600;
+  font-weight: 600;
   background: transparent;
   border-left: 3px solid var(--accent);
 }
@@ -315,15 +318,22 @@ a {
 }
 
 .topbar-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-head);
   font-size: 18px;
   font-weight: 700;
-  flex-shrink: 0;
   color: var(--text);
-  
+  white-space: nowrap;
+}
+
+
+.topbar-user {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
 .tb-search {
@@ -896,7 +906,7 @@ td.mu {
   gap: 7px;
   padding: 8px 14px;
   margin: 0;
-  width: 100%;
+  width: auto;
   border-radius: 0;
   background: transparent;
   cursor: pointer;
@@ -2021,16 +2031,13 @@ td.mu {
 /* LANGUAGE BAR */
 
 #lang-bar {
-  background: var(--bg2);
-  border-bottom: 0.5px solid var(--border);
-  padding: 2px 10px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  z-index: 20;
-  white-space: nowrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
 }
 
 .lang-lbl {
@@ -3985,10 +3992,10 @@ td.mu {
 
 .nav-section-title {
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text3);
-  padding: 8px 14px 3px;
+  padding: 6px 14px 2px;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -5037,4 +5044,85 @@ td.mu {
     color: inherit;
     cursor: pointer;
     text-align: left;
+}
+
+.brand-sub-italic {
+  font-style: italic;
+}
+
+.sidebar-footer {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  
+  border-top: 0.5px solid var(--border);
+}
+
+.sidebar-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.application-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-name {
+  font-family: var(--font-head);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.topbar-navigation {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.topbar-language {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.topbar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
 }

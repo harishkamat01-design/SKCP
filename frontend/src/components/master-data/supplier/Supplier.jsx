@@ -253,17 +253,17 @@ function Supplier() {
     };
 
     const handleEditSubmit = async (event) => {
-    event.preventDefault();
+        event.preventDefault();
 
-    try {
-        setEditSaving(true);
-        setEditError("");
-        setEditSuccess("");
+        try {
+            setEditSaving(true);
+            setEditError("");
+            setEditSuccess("");
 
-        await apiPut(
-            `/api/suppliers/${editingSupplier.supplierId}`,
-            editForm
-        );
+            await apiPut(
+                `/api/suppliers/${editingSupplier.supplierId}`,
+                editForm
+            );
 
             setEditSuccess(
                 "Supplier updated successfully."
@@ -417,351 +417,346 @@ function Supplier() {
             return "-";
         }
 
-        return new Date(value).toLocaleString(
-            "en-IN"
-        );
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "-";
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+        const period = hours >= 12 ? "PM" : "AM";
+
+        hours = hours % 12 || 12;
+
+        return `${day}-${month}-${year} ${String(hours).padStart(
+            2,
+            "0"
+        )}:${minutes}:${seconds} ${period}`;
     };
 
     // ============================================================
     // RENDER
     // ============================================================
 
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Suppliers</h2>
+                    <p>Loading supplier records...</p>
+                </section>
+            </div>
+        );
+    }
+
     return (
-        <section className="section active">
+        <div className="page">
             {/* ================================================== */}
-            {/* HEADER */}
+            {/* HEADER + SEARCH */}
             {/* ================================================== */}
 
-            <div className="card">
-                <div className="card-head">
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-                        <h2 className="card-title">
-                            Suppliers
-                        </h2>
-
-                        <div className="kpi-sub">
-                            Manage supplier information
-                        </div>
+                        <h2>Suppliers</h2>
+                        <p>
+                            Manage supplier information and records.
+                        </p>
                     </div>
 
                     <button
                         type="button"
-                        className="btn primary"
-                        onClick={
-                            handleOpenAddSupplier
-                        }
+                        className="action-btn view-btn"
+                        onClick={handleOpenAddSupplier}
                     >
-                        + Add Supplier
+                        Add Supplier
                     </button>
                 </div>
-            </div>
 
-            {/* ================================================== */}
-            {/* SEARCH */}
-            {/* ================================================== */}
-
-            <div className="card">
                 <div
-                    className="customer-search"
                     style={{
                         display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
                     }}
                 >
-                    <input
-                        type="text"
-                        placeholder="Search suppliers..."
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
-                        }
-                    />
+                    <div
+                        className="fld"
+                        style={{
+                            width: "420px",
+                            maxWidth: "100%",
+                        }}
+                    >
+                        <label>Search Suppliers</label>
+
+                        <input
+                            type="text"
+                            placeholder="Search by supplier, phone, contact person, GST, remarks, status..."
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(event.target.value)
+                            }
+                        />
+                    </div>
 
                     <button
                         type="button"
                         className="btn secondary"
-                        onClick={
-                            handleClearSearch
-                        }
+                        onClick={handleClearSearch}
                         disabled={!searchKeyword}
                     >
                         Clear
                     </button>
                 </div>
-            </div>
+            </section>
 
             {/* ================================================== */}
             {/* SUPPLIER LIST */}
             {/* ================================================== */}
 
-            <div className="card">
-                <div className="card-head">
-                    <div>
-                        <h3 className="card-title">
-                            Supplier List
-                        </h3>
+            <section className="card">
+                <h2>Supplier List</h2>
+                <p>
+                    {totalRecords} supplier
+                    {totalRecords === 1 ? "" : "s"}
+                </p>
 
-                        <div className="kpi-sub">
-                            Showing {totalRecords}{" "}
-                            records
-                        </div>
-                    </div>
-                </div>
-
-                {loading && (
-                    <div className="empty-state">
-                        Loading suppliers...
-                    </div>
-                )}
-
-                {!loading && error && (
-                    <div className="alert e show">
+                {error && (
+                    <div className="form-error">
                         {error}
                     </div>
                 )}
 
-                {!loading &&
-                    !error &&
-                    totalRecords === 0 && (
-                        <div className="empty-state">
-                            No suppliers found.
-                        </div>
-                    )}
+                {!error && totalRecords === 0 && (
+                    <p>No supplier records found.</p>
+                )}
 
-                {!loading &&
-                    !error &&
-                    totalRecords > 0 && (
-                        <>
-                            <div className="tbl-wrap">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "supplierId"
-                                                    )
+                {!error && totalRecords > 0 && (
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "supplierId"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        ID
+                                        {sortKey ===
+                                            "supplierId" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "supplierName"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Supplier
+                                        {sortKey ===
+                                            "supplierName" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "phone"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Phone
+                                        {sortKey ===
+                                            "phone" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "remarks"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Remarks
+                                        {sortKey ===
+                                            "remarks" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "status"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Status
+                                        {sortKey ===
+                                            "status" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {paginatedRecords.map(
+                                    (supplier) => (
+                                        <tr
+                                            key={
+                                                supplier.supplierId
+                                            }
+                                        >
+                                            <td>
+                                                {
+                                                    supplier.supplierId
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                ID
-                                                {sortKey ===
-                                                    "supplierId" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "supplierName"
-                                                    )
+                                            <td>
+                                                {
+                                                    supplier.supplierName
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Supplier
-                                                {sortKey ===
-                                                    "supplierName" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "phone"
-                                                    )
+                                            <td>
+                                                {
+                                                    supplier.phone
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Phone
-                                                {sortKey ===
-                                                    "phone" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "remarks"
-                                                    )
+                                            <td>
+                                                {
+                                                    supplier.remarks ||
+                                                    "-"
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Remarks
-                                                {sortKey ===
-                                                    "remarks" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "status"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Status
-                                                {sortKey ===
-                                                    "status" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
-
-                                            <th>
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {paginatedRecords.map(
-                                            (
-                                                supplier
-                                            ) => (
-                                                <tr
-                                                    key={
-                                                        supplier.supplierId
+                                            <td>
+                                                <span
+                                                    className={
+                                                        supplier.status ===
+                                                        "ACTIVE"
+                                                            ? "badge bg"
+                                                            : "badge br"
                                                     }
                                                 >
-                                                    <td>
-                                                        {
-                                                            supplier.supplierId
+                                                    {
+                                                        supplier.status
+                                                    }
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleViewSupplier(
+                                                                supplier.supplierId
+                                                            )
                                                         }
-                                                    </td>
+                                                    >
+                                                        View
+                                                    </button>
 
-                                                    <td>
-                                                        {
-                                                            supplier.supplierName
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEditSupplier(
+                                                                supplier.supplierId
+                                                            )
                                                         }
-                                                    </td>
+                                                    >
+                                                        Edit
+                                                    </button>
 
-                                                    <td>
-                                                        {
-                                                            supplier.phone
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleDeleteSupplier(
+                                                                supplier
+                                                            )
                                                         }
-                                                    </td>
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
 
-                                                    <td>
-                                                        {
-                                                            supplier.remarks ||
-                                                            "-"
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        <span
-                                                            className={
-                                                                supplier.status ===
-                                                                "ACTIVE"
-                                                                    ? "badge bg"
-                                                                    : "badge br"
-                                                            }
-                                                        >
-                                                            {
-                                                                supplier.status
-                                                            }
-                                                        </span>
-                                                    </td>
-
-                                                    <td>
-                                                        <div className="action-buttons">
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleViewSupplier(
-                                                                        supplier.supplierId
-                                                                    )
-                                                                }
-                                                            >
-                                                                View
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleEditSupplier(
-                                                                        supplier.supplierId
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleDeleteSupplier(
-                                                                        supplier
-                                                                    )
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <Pagination
-                                currentPage={
-                                    currentPage
-                                }
-                                totalPages={
-                                    totalPages
-                                }
-                                totalRecords={
-                                    totalRecords
-                                }
-                                pageSize={pageSize}
-                                onPageChange={
-                                    handlePageChange
-                                }
-                                onPageSizeChange={
-                                    handlePageSizeChange
-                                }
-                            />
-                        </>
-                    )}
-            </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalRecords={totalRecords}
+                            pageSize={pageSize}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
+                    </div>
+                )}
+            </section>
 
             {/* ================================================== */}
             {/* VIEW MODAL */}
@@ -884,9 +879,7 @@ function Supplier() {
                 title="Edit Supplier"
                 subtitle="Update supplier information"
                 size="lg"
-                onSubmit={
-                    handleEditSubmit
-                }
+                onSubmit={handleEditSubmit}
                 submitLabel={
                     editSaving
                         ? "Saving..."
@@ -1047,16 +1040,12 @@ function Supplier() {
             {/* ================================================== */}
 
             <FormModal
-                isOpen={
-                    showAddSupplierModal
-                }
+                isOpen={showAddSupplierModal}
                 onClose={closeAddModal}
                 title="Add Supplier"
                 subtitle="Enter supplier information"
                 size="lg"
-                onSubmit={
-                    handleAddSubmit
-                }
+                onSubmit={handleAddSubmit}
                 submitText={
                     addSaving
                         ? "Saving..."
@@ -1202,15 +1191,9 @@ function Supplier() {
             {/* ================================================== */}
 
             <DeleteConfirmModal
-                isOpen={
-                    !!deletingSupplier
-                }
-                onClose={
-                    closeDeleteModal
-                }
-                onConfirm={
-                    confirmDelete
-                }
+                isOpen={!!deletingSupplier}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
                 itemName={
                     deletingSupplier?.supplierName ||
                     "this supplier"
@@ -1218,7 +1201,7 @@ function Supplier() {
                 loading={deleteSaving}
                 error={deleteError}
             />
-        </section>
+        </div>
     );
 }
 

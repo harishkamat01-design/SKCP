@@ -305,16 +305,56 @@ function PaymentAllocation() {
             return "-";
         }
 
-        const date = new Date(
-            `${dateValue}T00:00:00`
-        );
+        const dateText = String(dateValue);
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+            const [year, month, day] =
+                dateText.split("-");
+
+            return `${day}-${month}-${year}`;
+        }
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
 
         return date.toLocaleDateString(
-            "en-GB",
+            "en-IN",
             {
                 day: "2-digit",
-                month: "short",
+                month: "2-digit",
                 year: "numeric",
+            }
+        );
+    };
+
+    // ============================================================
+    // FORMAT DATE TIME
+    // ============================================================
+
+    const formatDateTime = (dateTimeValue) => {
+        if (!dateTimeValue) {
+            return "-";
+        }
+
+        const date = new Date(dateTimeValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateTimeValue;
+        }
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true,
             }
         );
     };
@@ -753,7 +793,7 @@ function PaymentAllocation() {
     // ============================================================
 
     return (
-        <>
+        <div className="page">
             {/* ====================================================
                 PAYMENT ALLOCATION HEADER
             ==================================================== */}
@@ -787,7 +827,7 @@ function PaymentAllocation() {
                             openAddModal
                         }
                     >
-                        + Add Payment Allocation
+                        Add Payment Allocation
                     </button>
                 </div>
 
@@ -801,7 +841,7 @@ function PaymentAllocation() {
                         alignItems: "flex-end",
                         gap: "16px",
                         flexWrap: "wrap",
-                        marginTop: "20px",
+                        marginTop: "16px",
                     }}
                 >
                     <div
@@ -889,19 +929,14 @@ function PaymentAllocation() {
                 </div>
 
                 {filterError && (
-                    <p
+                    <div
                         className="form-error"
                         style={{
                             marginTop: "12px",
-
-                            color:
-                                    "#b91c1c",
-                                fontSize:
-                                    "14px",
                         }}
                     >
                         {filterError}
-                    </p>
+                    </div>
                 )}
             </section>
 
@@ -918,24 +953,24 @@ function PaymentAllocation() {
                     {totalRecords} payment allocation
                     {totalRecords === 1
                         ? ""
-                        : "s"}{" "}
-                    found
+                        : "s"}
                 </p>
 
                 {error && (
-                    <p className="form-error">
+                    <div className="form-error">
                         {error}
-                    </p>
+                    </div>
                 )}
 
-                {!error &&
-                    !filterError &&
-                    totalRecords === 0 && (
-                        <p>
-                            No payment allocation
-                            records found.
-                        </p>
-                    )}
+                {filterError
+                    ? null
+                    : !error &&
+                      totalRecords === 0 && (
+                          <p>
+                              No payment allocation
+                              records found.
+                          </p>
+                      )}
 
                 {!error &&
                     !filterError &&
@@ -944,123 +979,123 @@ function PaymentAllocation() {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "paymentAllocationId"
+                                                    )
+                                                }
+                                            >
+                                                ID
+                                                {getSortIndicator(
                                                     "paymentAllocationId"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            ID
-                                            {getSortIndicator(
-                                                "paymentAllocationId"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "paymentId"
+                                                    )
+                                                }
+                                            >
+                                                PAYMENT ID
+                                                {getSortIndicator(
                                                     "paymentId"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            PAYMENT ID
-                                            {getSortIndicator(
-                                                "paymentId"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "orderId"
+                                                    )
+                                                }
+                                            >
+                                                ORDER ID
+                                                {getSortIndicator(
                                                     "orderId"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            ORDER ID
-                                            {getSortIndicator(
-                                                "orderId"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "customerName"
+                                                    )
+                                                }
+                                            >
+                                                CUSTOMER
+                                                {getSortIndicator(
                                                     "customerName"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            CUSTOMER
-                                            {getSortIndicator(
-                                                "customerName"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "allocationDate"
+                                                    )
+                                                }
+                                            >
+                                                ALLOCATION DATE
+                                                {getSortIndicator(
                                                     "allocationDate"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            ALLOCATION DATE
-                                            {getSortIndicator(
-                                                "allocationDate"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "allocatedAmount"
+                                                    )
+                                                }
+                                            >
+                                                ALLOCATED AMOUNT
+                                                {getSortIndicator(
                                                     "allocatedAmount"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            ALLOCATED AMOUNT
-                                            {getSortIndicator(
-                                                "allocatedAmount"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
-                                        <th
-                                            onClick={() =>
-                                                handleSort(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
+                                                        "allocationStatus"
+                                                    )
+                                                }
+                                            >
+                                                ALLOCATION STATUS
+                                                {getSortIndicator(
                                                     "allocationStatus"
-                                                )
-                                            }
-                                            style={{
-                                                cursor:
-                                                    "pointer",
-                                            }}
-                                        >
-                                            ALLOCATION STATUS
-                                            {getSortIndicator(
-                                                "allocationStatus"
-                                            )}
+                                                )}
+                                            </button>
                                         </th>
 
                                         <th>
@@ -1280,28 +1315,16 @@ function PaymentAllocation() {
 
                         <DetailItem
                             label="Created At"
-                            value={
+                            value={formatDateTime(
                                 selectedAllocation.createdAt
-                                    ? new Date(
-                                          selectedAllocation.createdAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
                             label="Updated At"
-                            value={
+                            value={formatDateTime(
                                 selectedAllocation.updatedAt
-                                    ? new Date(
-                                          selectedAllocation.updatedAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
@@ -1342,7 +1365,7 @@ function PaymentAllocation() {
                 }
                 size="lg"
             >
-                <div className="edit-form-grid">
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="add-payment-id">
                             Payment ID
@@ -1426,7 +1449,7 @@ function PaymentAllocation() {
                         />
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="add-payment-allocation-remarks">
                             Remarks
                         </label>
@@ -1475,7 +1498,7 @@ function PaymentAllocation() {
                 size="lg"
             >
                 {editingAllocation && (
-                    <div className="edit-form-grid">
+                    <div className="form-grid">
                         <div className="fld">
                             <label htmlFor="edit-payment-allocation-id">
                                 Payment Allocation ID
@@ -1571,7 +1594,7 @@ function PaymentAllocation() {
                             />
                         </div>
 
-                        <div className="fld edit-full">
+                        <div className="fld f-full">
                             <label htmlFor="edit-payment-allocation-remarks">
                                 Remarks
                             </label>
@@ -1623,7 +1646,7 @@ function PaymentAllocation() {
                     deleteError
                 }
             />
-        </>
+        </div>
     );
 }
 

@@ -95,7 +95,6 @@ function Dashboard() {
 
       // ============================================================
       // TODAY'S PRODUCTION
-      // Only COMPLETED production records for today are included.
       // ============================================================
 
       const todaysProduction = productions
@@ -115,9 +114,6 @@ function Dashboard() {
 
       // ============================================================
       // ACTIVE / NON-CANCELLED ORDERS
-      //
-      // GET /api/orders already returns ACTIVE orders only.
-      // We still exclude CANCELLED orders from business calculations.
       // ============================================================
 
       const activeBusinessOrders = orders.filter(
@@ -133,12 +129,6 @@ function Dashboard() {
 
       // ============================================================
       // TODAY'S SALES
-      //
-      // Sales value =
-      // orderedQuantity Ã— unitSellingPrice
-      //
-      // The backend already returns ACTIVE order items only.
-      // CANCELLED orders are excluded through todaysOrderIds.
       // ============================================================
 
       const todaysOrderIds = new Set(
@@ -174,13 +164,6 @@ function Dashboard() {
 
       // ============================================================
       // FINISHED GOODS STOCK
-      //
-      // The backend already returns ACTIVE stock records only.
-      // Record Status is an internal backend field and is not
-      // exposed or evaluated by the frontend.
-      //
-      // currentStockLevel represents the actual available
-      // finished goods quantity.
       // ============================================================
 
       const finishedGoodsStock =
@@ -196,12 +179,8 @@ function Dashboard() {
       // ============================================================
       // RAW MATERIAL STOCK
       //
-      // Raw materials use different units such as BAG, TON,
-      // CUBIC_METER, etc.
-      //
-      // Therefore, quantities must NOT be summed.
-      // The backend already returns ACTIVE stock records only.
-      // Dashboard shows the number of returned stock records.
+      // Raw materials use different units.
+      // Therefore quantities must not be summed.
       // ============================================================
 
       const rawMaterialStock =
@@ -209,9 +188,6 @@ function Dashboard() {
 
       // ============================================================
       // LOW RAW MATERIAL STOCK
-      //
-      // The backend already filters out inactive records.
-      // Dashboard only evaluates the business stock status.
       // ============================================================
 
       const lowRawMaterialCount =
@@ -223,10 +199,6 @@ function Dashboard() {
 
       // ============================================================
       // ACTIVE BUSINESS ORDER ITEMS
-      //
-      // The backend already returns ACTIVE order items only.
-      // Only items belonging to active, non-cancelled orders
-      // are included in the payment calculation.
       // ============================================================
 
       const activeBusinessOrderItems =
@@ -252,13 +224,6 @@ function Dashboard() {
 
       // ============================================================
       // PAYMENT ALLOCATIONS
-      //
-      // The backend already returns ACTIVE payment allocations only.
-      // Record Status is an internal backend field and is not
-      // evaluated by the frontend.
-      //
-      // Only allocations belonging to active, non-cancelled orders
-      // are included in the pending payment calculation.
       // ============================================================
 
       const activePaymentAllocations =
@@ -288,9 +253,6 @@ function Dashboard() {
 
       // ============================================================
       // PENDING DELIVERIES
-      //
-      // PENDING and PARTIAL orders both require delivery action.
-      // COMPLETED and CANCELLED orders are excluded.
       // ============================================================
 
       const pendingDeliveries =
@@ -351,83 +313,95 @@ function Dashboard() {
     0
   );
 
-  return (
-    <div className="module-container">
+  // ============================================================
+  // LOADING
+  // ============================================================
 
-      {/* ============================================================
-          DASHBOARD HEADER
-      ============================================================ */}
-
-      <div className="module-header">
-
-        <h1>
-          SKCP Dashboard
-        </h1>
-
-        <p>
-          Overview of today's production, sales,
-          inventory, payments, deliveries, and
-          business alerts.
-        </p>
-
+  if (dashboardData.loading) {
+    return (
+      <div className="page">
+        <section className="card">
+          <h2>SKCP Dashboard</h2>
+          <p>Loading dashboard data...</p>
+        </section>
       </div>
+    );
+  }
 
-      {/* ============================================================
-          LOADING / ERROR
-      ============================================================ */}
+  // ============================================================
+  // MAIN UI
+  // ============================================================
 
-      {dashboardData.loading && (
-        <div className="dashboard-loading">
-          Loading dashboard data...
+  return (
+    <div className="page">
+      {/* ========================================================
+          DASHBOARD HEADER
+      ======================================================== */}
+
+      <section className="card">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h2>SKCP Dashboard</h2>
+
+            <p>
+              Overview of today's production, sales,
+              inventory, payments, deliveries, and
+              business alerts.
+            </p>
+          </div>
         </div>
-      )}
+      </section>
+
+      {/* ========================================================
+          ERROR
+      ======================================================== */}
 
       {dashboardData.error && (
-        <div className="module-card">
-          {dashboardData.error}
-        </div>
+        <section className="card">
+          <div className="form-error">
+            {dashboardData.error}
+          </div>
+        </section>
       )}
 
-      {!dashboardData.loading && (
-        <div className="dashboard-sections">
-
+      {!dashboardData.error && (
+        <div>
           {/* ====================================================
               BUSINESS OVERVIEW
           ==================================================== */}
 
-          <div className="module-card dashboard-overview-card">
-
+          <section className="card">
             <div className="section-header">
-
               <div>
-
-                <h2>
-                  Business Overview
-                </h2>
+                <h2>Business Overview</h2>
 
                 <p>
                   Today's key operational information
                 </p>
-
               </div>
-
             </div>
 
             <div className="dashboard-kpi-grid">
-
               {/* Today's Production */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Production"
                 >
-                  &#x1F3ED;</div>
+                  &#x1F3ED;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Today's Production
                   </div>
@@ -442,24 +416,21 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Cement Blocks Produced
                   </div>
-
                 </div>
-
               </div>
 
               {/* Today's Sales */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Sales"
                 >
-                  &#x1F4B0;</div>
+                  &#x1F4B0;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Today's Sales
                   </div>
@@ -474,24 +445,21 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Sales Value
                   </div>
-
                 </div>
-
               </div>
 
               {/* Finished Goods Stock */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Finished goods stock"
                 >
-                  &#x1F4E6;</div>
+                  &#x1F4E6;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Finished Goods Stock
                   </div>
@@ -506,24 +474,21 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Available Blocks
                   </div>
-
                 </div>
-
               </div>
 
               {/* Raw Material Stock */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Raw material stock"
                 >
-                  &#x1F9F1;</div>
+                  &#x1F9F1;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Raw Material Stock
                   </div>
@@ -538,24 +503,21 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Active Materials
                   </div>
-
                 </div>
-
               </div>
 
               {/* Pending Payments */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Pending payments"
                 >
-                  &#x1F4B3;</div>
+                  &#x1F4B3;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Pending Payments
                   </div>
@@ -570,24 +532,21 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Outstanding Amount
                   </div>
-
                 </div>
-
               </div>
 
               {/* Pending Deliveries */}
 
               <div className="dashboard-kpi-card">
-
                 <div
                   className="dashboard-kpi-icon"
                   role="img"
                   aria-label="Pending deliveries"
                 >
-                  &#x1F69A;</div>
+                  &#x1F69A;
+                </div>
 
                 <div className="dashboard-kpi-content">
-
                   <div className="dashboard-kpi-label">
                     Pending Deliveries
                   </div>
@@ -602,52 +561,39 @@ function Dashboard() {
                   <div className="dashboard-kpi-description">
                     Orders Pending Delivery
                   </div>
-
                 </div>
-
               </div>
-
             </div>
-
-          </div>
+          </section>
 
           {/* ====================================================
               BUSINESS ALERTS
           ==================================================== */}
 
-          <div className="module-card dashboard-alerts-card">
-
+          <section className="card">
             <div className="section-header">
-
               <div>
-
-                <h2>
-                  Business Alerts
-                </h2>
+                <h2>Business Alerts</h2>
 
                 <p>
                   Items requiring attention
                 </p>
-
               </div>
-
             </div>
 
             <div className="dashboard-alert-grid">
-
               {/* Pending Payment */}
 
               <div className="dashboard-alert-item">
-
                 <div
                   className="dashboard-alert-icon"
                   role="img"
                   aria-label="Pending payment"
                 >
-                  &#x1F4B3;</div>
+                  &#x1F4B3;
+                </div>
 
                 <div className="dashboard-alert-content">
-
                   <div className="dashboard-alert-title">
                     Pending Payment
                   </div>
@@ -662,24 +608,21 @@ function Dashboard() {
                   <div className="dashboard-alert-description">
                     Outstanding customer payments
                   </div>
-
                 </div>
-
               </div>
 
               {/* Raw Material Status */}
 
               <div className="dashboard-alert-item">
-
                 <div
                   className="dashboard-alert-icon"
                   role="img"
                   aria-label="Raw material status"
                 >
-                  &#x1F9F1;</div>
+                  &#x1F9F1;
+                </div>
 
                 <div className="dashboard-alert-content">
-
                   <div className="dashboard-alert-title">
                     Raw Material Status
                   </div>
@@ -695,24 +638,21 @@ function Dashboard() {
                   <div className="dashboard-alert-description">
                     Raw materials requiring attention
                   </div>
-
                 </div>
-
               </div>
 
               {/* Pending Delivery */}
 
               <div className="dashboard-alert-item">
-
                 <div
                   className="dashboard-alert-icon"
                   role="img"
                   aria-label="Pending delivery"
                 >
-                  &#x1F69A;</div>
+                  &#x1F69A;
+                </div>
 
                 <div className="dashboard-alert-content">
-
                   <div className="dashboard-alert-title">
                     Pending Delivery
                   </div>
@@ -727,52 +667,39 @@ function Dashboard() {
                   <div className="dashboard-alert-description">
                     Orders awaiting delivery
                   </div>
-
                 </div>
-
               </div>
-
             </div>
-
-          </div>
+          </section>
 
           {/* ====================================================
               STOCK SNAPSHOT
           ==================================================== */}
 
-          <div className="module-card dashboard-stock-card">
-
+          <section className="card">
             <div className="section-header">
-
               <div>
-
-                <h2>
-                  Stock Snapshot
-                </h2>
+                <h2>Stock Snapshot</h2>
 
                 <p>
                   Current inventory position
                 </p>
-
               </div>
-
             </div>
 
             <div className="dashboard-stock-grid">
-
               {/* Finished Goods */}
 
               <div className="dashboard-stock-item">
-
                 <div
                   className="dashboard-stock-icon"
                   role="img"
                   aria-label="Finished goods"
                 >
-                  &#x1F4E6;</div>
+                  &#x1F4E6;
+                </div>
 
                 <div className="dashboard-stock-content">
-
                   <div className="dashboard-stock-label">
                     Finished Goods
                   </div>
@@ -787,24 +714,21 @@ function Dashboard() {
                   <div className="dashboard-stock-unit">
                     Total units in stock
                   </div>
-
                 </div>
-
               </div>
 
               {/* Raw Materials */}
 
               <div className="dashboard-stock-item">
-
                 <div
                   className="dashboard-stock-icon"
                   role="img"
                   aria-label="Raw materials"
                 >
-                  &#x1F9F1;</div>
+                  &#x1F9F1;
+                </div>
 
                 <div className="dashboard-stock-content">
-
                   <div className="dashboard-stock-label">
                     Raw Materials
                   </div>
@@ -819,24 +743,21 @@ function Dashboard() {
                   <div className="dashboard-stock-unit">
                     Active stock records
                   </div>
-
                 </div>
-
               </div>
 
               {/* Low Stock */}
 
               <div className="dashboard-stock-item">
-
                 <div
                   className="dashboard-stock-icon"
                   role="img"
                   aria-label="Low stock"
                 >
-                  &#x26A0;&#xFE0F;</div>
+                  &#x26A0;&#xFE0F;
+                </div>
 
                 <div className="dashboard-stock-content">
-
                   <div className="dashboard-stock-label">
                     Low Stock
                   </div>
@@ -851,51 +772,38 @@ function Dashboard() {
                   <div className="dashboard-stock-unit">
                     Materials requiring attention
                   </div>
-
                 </div>
-
               </div>
-
             </div>
-
-          </div>
+          </section>
 
           {/* ====================================================
               PRODUCTION / STOCK TRENDS
           ==================================================== */}
 
-          <div className="module-card dashboard-trends-card">
-
+          <section className="card">
             <div className="section-header">
-
               <div>
-
                 <h2>
                   Production / Stock Trends
                 </h2>
 
                 <p>
-                  Completed production for the last 7 days
+                  Completed production for the last
+                  7 days
                 </p>
-
               </div>
-
             </div>
 
             <div className="dashboard-trend-container">
-
               {productionTrend.length === 0 ? (
-
                 <div className="dashboard-trend-message">
-                  No production data available for the last 7 days.
+                  No production data available for
+                  the last 7 days.
                 </div>
-
               ) : (
-
                 <div className="dashboard-production-trend">
-
                   {productionTrend.map((item) => {
-
                     const barHeight =
                       maxProductionTrend > 0
                         ? (item.quantity /
@@ -910,23 +818,20 @@ function Dashboard() {
                         "en-IN",
                         {
                           day: "2-digit",
-                          month: "short",
+                          month: "2-digit",
                         }
                       );
 
                     return (
-
                       <div
                         className="dashboard-production-day"
                         key={item.date}
                       >
-
                         <div className="dashboard-production-value">
                           {item.quantity}
                         </div>
 
                         <div className="dashboard-production-bar-area">
-
                           <div
                             className="dashboard-production-bar"
                             style={{
@@ -939,30 +844,20 @@ function Dashboard() {
                               )}%`,
                             }}
                           />
-
                         </div>
 
                         <div className="dashboard-production-date">
                           {displayDate}
                         </div>
-
                       </div>
-
                     );
-
                   })}
-
                 </div>
-
               )}
-
             </div>
-
-          </div>
-
+          </section>
         </div>
       )}
-
     </div>
   );
 }

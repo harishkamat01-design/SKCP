@@ -127,7 +127,27 @@ function Product() {
         }
 
         try {
-            return new Date(value).toLocaleString("en-IN");
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+
+            let hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            const seconds = String(date.getSeconds()).padStart(2, "0");
+            const period = hours >= 12 ? "PM" : "AM";
+
+            hours = hours % 12 || 12;
+
+            return `${day}-${month}-${year} ${String(hours).padStart(
+                2,
+                "0"
+            )}:${minutes}:${seconds} ${period}`;
         } catch {
             return value;
         }
@@ -268,7 +288,8 @@ function Product() {
                     addForm.productCode.trim(),
                 productName:
                     addForm.productName.trim(),
-                size: addForm.size.trim(),
+                size:
+                    addForm.size.trim(),
                 length: Number(addForm.length),
                 width: Number(addForm.width),
                 height: Number(addForm.height),
@@ -519,9 +540,7 @@ function Product() {
     // OPEN DELETE CONFIRMATION
     // ============================================================
 
-    const handleOpenDeleteProduct = (
-        product
-    ) => {
+    const handleOpenDeleteProduct = (product) => {
         setDeleteError("");
         setDeletingProduct(product);
     };
@@ -579,383 +598,325 @@ function Product() {
     // RENDER
     // ============================================================
 
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Products</h2>
+                    <p>Loading product records...</p>
+                </section>
+            </div>
+        );
+    }
+
     return (
-        <section className="section active">
-
+        <div className="page">
             {/* ================================================== */}
-            {/* PAGE HEADER */}
+            {/* HEADER + SEARCH */}
             {/* ================================================== */}
 
-            <div className="card">
-
-                <div className="card-head">
-
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <div>
-                        <div className="card-title">
-                            Products
-                        </div>
-
-                        <div className="kpi-sub">
-                            Manage product information and records
-                        </div>
+                        <h2>Products</h2>
+                        <p>
+                            Manage product information and records.
+                        </p>
                     </div>
 
                     <button
                         type="button"
-                        className="btn primary"
-                        onClick={
-                            handleOpenAddProduct
-                        }
+                        className="action-btn view-btn"
+                        onClick={handleOpenAddProduct}
                     >
-                        + Add Product
+                        Add Product
                     </button>
-
                 </div>
-
-            </div>
-
-            {/* ================================================== */}
-            {/* PRODUCT LIST */}
-            {/* ================================================== */}
-
-            <div className="card">
-
-                <div className="card-head">
-
-                    <div>
-                        <div className="card-title">
-                            Product List
-                        </div>
-
-                        <div className="kpi-sub">
-                            {totalRecords}{" "}
-                            {totalRecords === 1
-                                ? "record"
-                                : "records"}
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* SEARCH */}
 
                 <div
-                    className="search-wrap"
                     style={{
-                        marginBottom: "16px",
                         display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
                     }}
                 >
-                    <input
-                        type="text"
-                        className="search-input"
-                        placeholder="Search products..."
-                        value={searchTerm}
-                        onChange={(event) =>
-                            setSearchTerm(
-                                event.target.value
-                            )
-                        }
-                    />
+                    <div
+                        className="fld"
+                        style={{
+                            width: "420px",
+                            maxWidth: "100%",
+                        }}
+                    >
+                        <label>Search Products</label>
+
+                        <input
+                            type="text"
+                            placeholder="Search by product code, name, size, unit, status..."
+                            value={searchTerm}
+                            onChange={(event) =>
+                                setSearchTerm(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
 
                     <button
                         type="button"
                         className="btn secondary"
-                        onClick={
-                            handleClearSearch
-                        }
+                        onClick={handleClearSearch}
                         disabled={!searchTerm}
                     >
                         Clear
                     </button>
                 </div>
+            </section>
 
-                {/* LOADING */}
+            {/* ================================================== */}
+            {/* PRODUCT LIST */}
+            {/* ================================================== */}
 
-                {loading && (
-                    <div className="empty-state">
-                        <p>
-                            Loading products...
-                        </p>
+            <section className="card">
+                <h2>Product List</h2>
+                <p>
+                    {totalRecords} product
+                    {totalRecords === 1 ? "" : "s"}
+                </p>
+
+                {error && (
+                    <div className="form-error">
+                        {error}
                     </div>
                 )}
 
-                {/* ERROR */}
-
-                {!loading && error && (
-                    <div className="empty-state">
-                        <p>{error}</p>
-                    </div>
+                {!error && totalRecords === 0 && (
+                    <p>No product records found.</p>
                 )}
 
-                {/* TABLE */}
+                {!error && totalRecords > 0 && (
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "productId"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        ID
+                                        {sortKey ===
+                                            "productId" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
 
-                {!loading &&
-                    !error &&
-                    totalRecords > 0 && (
-                        <>
-                            <div className="tbl-wrap">
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "productCode"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Product Code
+                                        {sortKey ===
+                                            "productCode" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
 
-                                <table>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "productName"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Product Name
+                                        {sortKey ===
+                                            "productName" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
 
-                                    <thead>
-                                        <tr>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "size"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Size
+                                        {sortKey ===
+                                            "size" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "productId"
-                                                    )
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "status"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Status
+                                        {sortKey ===
+                                            "status" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {paginatedRecords.map(
+                                    (product) => (
+                                        <tr
+                                            key={
+                                                product.productId
+                                            }
+                                        >
+                                            <td>
+                                                {
+                                                    product.productId
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                ID
-                                                {sortKey ===
-                                                    "productId" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "productCode"
-                                                    )
+                                            <td>
+                                                <strong>
+                                                    {
+                                                        product.productCode
+                                                    }
+                                                </strong>
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    product.productName
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Product Code
-                                                {sortKey ===
-                                                    "productCode" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "productName"
-                                                    )
+                                            <td>
+                                                {
+                                                    product.size
                                                 }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Product Name
-                                                {sortKey ===
-                                                    "productName" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
+                                            </td>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "size"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Size
-                                                {sortKey ===
-                                                    "size" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
-
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "status"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor:
-                                                        "pointer",
-                                                }}
-                                            >
-                                                Status
-                                                {sortKey ===
-                                                    "status" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </th>
-
-                                            <th>
-                                                Actions
-                                            </th>
-
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-
-                                        {paginatedRecords.map(
-                                            (product) => (
-                                                <tr
-                                                    key={
-                                                        product.productId
+                                            <td>
+                                                <span
+                                                    className={
+                                                        product.status ===
+                                                        "ACTIVE"
+                                                            ? "badge bg"
+                                                            : "badge br"
                                                     }
                                                 >
+                                                    {
+                                                        product.status
+                                                    }
+                                                </span>
+                                            </td>
 
-                                                    <td>
-                                                        {
-                                                            product.productId
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleViewProduct(
+                                                                product.productId
+                                                            )
                                                         }
-                                                    </td>
+                                                    >
+                                                        View
+                                                    </button>
 
-                                                    <td>
-                                                        <strong>
-                                                            {
-                                                                product.productCode
-                                                            }
-                                                        </strong>
-                                                    </td>
-
-                                                    <td>
-                                                        {
-                                                            product.productName
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEditProduct(
+                                                                product.productId
+                                                            )
                                                         }
-                                                    </td>
+                                                    >
+                                                        Edit
+                                                    </button>
 
-                                                    <td>
-                                                        {
-                                                            product.size
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleOpenDeleteProduct(
+                                                                product
+                                                            )
                                                         }
-                                                    </td>
+                                                        disabled={
+                                                            deleteSaving
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
 
-                                                    <td>
-                                                        <span
-                                                            className={
-                                                                product.status ===
-                                                                "ACTIVE"
-                                                                    ? "badge bg"
-                                                                    : "badge br"
-                                                            }
-                                                        >
-                                                            {
-                                                                product.status
-                                                            }
-                                                        </span>
-                                                    </td>
-
-                                                    <td>
-
-                                                        <div className="action-buttons">
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleViewProduct(
-                                                                        product.productId
-                                                                    )
-                                                                }
-                                                            >
-                                                                View
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleEditProduct(
-                                                                        product.productId
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleOpenDeleteProduct(
-                                                                        product
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    deleteSaving
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </button>
-
-                                                        </div>
-
-                                                    </td>
-
-                                                </tr>
-                                            )
-                                        )}
-
-                                    </tbody>
-
-                                </table>
-
-                            </div>
-
-                            <Pagination
-                                currentPage={
-                                    currentPage
-                                }
-                                totalPages={
-                                    totalPages
-                                }
-                                totalRecords={
-                                    totalRecords
-                                }
-                                pageSize={
-                                    pageSize
-                                }
-                                onPageChange={
-                                    handlePageChange
-                                }
-                                onPageSizeChange={
-                                    handlePageSizeChange
-                                }
-                            />
-                        </>
-                    )}
-
-                {/* EMPTY STATE */}
-
-                {!loading &&
-                    !error &&
-                    totalRecords === 0 && (
-                        <div className="empty-state">
-                            <p>
-                                {searchTerm.trim()
-                                    ? "No products match your search."
-                                    : "No products found."}
-                            </p>
-                        </div>
-                    )}
-
-            </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalRecords={totalRecords}
+                            pageSize={pageSize}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
+                    </div>
+                )}
+            </section>
 
             {/* ================================================== */}
             {/* VIEW PRODUCT MODAL */}
@@ -967,9 +928,7 @@ function Product() {
                     !!viewError ||
                     !!selectedProduct
                 }
-                onClose={
-                    handleCloseProductModal
-                }
+                onClose={handleCloseProductModal}
                 title="Product Details"
                 subtitle="View product information"
                 size="lg"
@@ -985,7 +944,6 @@ function Product() {
                     </button>
                 }
             >
-
                 {viewLoading && (
                     <div className="empty-state">
                         <p>
@@ -994,20 +952,16 @@ function Product() {
                     </div>
                 )}
 
-                {!viewLoading &&
-                    viewError && (
-                        <div className="empty-state">
-                            <p>
-                                {viewError}
-                            </p>
-                        </div>
-                    )}
+                {!viewLoading && viewError && (
+                    <div className="empty-state">
+                        <p>{viewError}</p>
+                    </div>
+                )}
 
                 {!viewLoading &&
                     !viewError &&
                     selectedProduct && (
                         <DetailGrid>
-
                             <DetailItem
                                 label="Product ID"
                                 value={
@@ -1073,11 +1027,9 @@ function Product() {
 
                             <DetailItem
                                 label="Created At"
-                                value={
-                                    formatCreatedAt(
-                                        selectedProduct.createdAt
-                                    )
-                                }
+                                value={formatCreatedAt(
+                                    selectedProduct.createdAt
+                                )}
                             />
 
                             <DetailItem
@@ -1088,10 +1040,8 @@ function Product() {
                                 }
                                 fullWidth
                             />
-
                         </DetailGrid>
                     )}
-
             </ViewModal>
 
             {/* ================================================== */}
@@ -1099,17 +1049,11 @@ function Product() {
             {/* ================================================== */}
 
             <FormModal
-                isOpen={
-                    showAddProduct
-                }
-                onClose={
-                    handleCloseAddProduct
-                }
+                isOpen={showAddProduct}
+                onClose={handleCloseAddProduct}
                 title="Add Product"
                 subtitle="Create a new product"
-                onSubmit={
-                    handleCreateProduct
-                }
+                onSubmit={handleCreateProduct}
                 submitLabel="Add Product"
                 cancelLabel="Cancel"
                 saving={addSaving}
@@ -1117,15 +1061,12 @@ function Product() {
                 success={addSuccess}
                 size="lg"
             >
-
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
                         Product Information
                     </div>
 
                     <div className="form-grid">
-
                         <div className="fld">
                             <label>
                                 Product Code
@@ -1173,9 +1114,7 @@ function Product() {
                             <input
                                 name="size"
                                 type="text"
-                                value={
-                                    addForm.size
-                                }
+                                value={addForm.size}
                                 onChange={
                                     handleAddChange
                                 }
@@ -1192,9 +1131,7 @@ function Product() {
                             <input
                                 name="unit"
                                 type="text"
-                                value={
-                                    addForm.unit
-                                }
+                                value={addForm.unit}
                                 onChange={
                                     handleAddChange
                                 }
@@ -1202,19 +1139,15 @@ function Product() {
                                 required
                             />
                         </div>
-
                     </div>
-
                 </div>
 
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
                         Dimensions
                     </div>
 
                     <div className="form-grid">
-
                         <div className="fld">
                             <label>
                                 Length
@@ -1274,21 +1207,16 @@ function Product() {
                                 required
                             />
                         </div>
-
                     </div>
-
                 </div>
 
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
                         Additional Information
                     </div>
 
                     <div className="form-grid">
-
                         <div className="fld f-full">
-
                             <label>
                                 Description
                             </label>
@@ -1303,13 +1231,9 @@ function Product() {
                                 }
                                 maxLength={500}
                             />
-
                         </div>
-
                     </div>
-
                 </div>
-
             </FormModal>
 
             {/* ================================================== */}
@@ -1322,14 +1246,10 @@ function Product() {
                     !!editError ||
                     !!editingProduct
                 }
-                onClose={
-                    handleCloseEditModal
-                }
+                onClose={handleCloseEditModal}
                 title="Edit Product"
                 subtitle="Update product information"
-                onSubmit={
-                    handleUpdateProduct
-                }
+                onSubmit={handleUpdateProduct}
                 submitLabel="Save Changes"
                 cancelLabel="Cancel"
                 saving={editSaving}
@@ -1337,7 +1257,6 @@ function Product() {
                 success={editSuccess}
                 size="lg"
             >
-
                 {editLoading && (
                     <div className="empty-state">
                         <p>
@@ -1349,15 +1268,12 @@ function Product() {
                 {!editLoading &&
                     editingProduct && (
                         <>
-
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Product Information
                                 </div>
 
                                 <div className="form-grid">
-
                                     <div className="fld">
                                         <label>
                                             Product Code
@@ -1429,19 +1345,15 @@ function Product() {
                                             required
                                         />
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Dimensions
                                 </div>
 
                                 <div className="form-grid">
-
                                     <div className="fld">
                                         <label>
                                             Length
@@ -1501,21 +1413,16 @@ function Product() {
                                             required
                                         />
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Additional Information
                                 </div>
 
                                 <div className="form-grid">
-
                                     <div className="fld f-full">
-
                                         <label>
                                             Description
                                         </label>
@@ -1529,11 +1436,9 @@ function Product() {
                                                 handleEditChange
                                             }
                                         />
-
                                     </div>
 
                                     <div className="fld">
-
                                         <label>
                                             Status
                                         </label>
@@ -1556,16 +1461,11 @@ function Product() {
                                                 INACTIVE
                                             </option>
                                         </select>
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </>
                     )}
-
             </FormModal>
 
             {/* ================================================== */}
@@ -1573,30 +1473,19 @@ function Product() {
             {/* ================================================== */}
 
             <DeleteConfirmModal
-                isOpen={
-                    !!deletingProduct
-                }
-                onClose={
-                    handleCloseDeleteProduct
-                }
-                onConfirm={
-                    handleConfirmDelete
-                }
+                isOpen={!!deletingProduct}
+                onClose={handleCloseDeleteProduct}
+                onConfirm={handleConfirmDelete}
                 title="Delete Product"
                 subtitle="Deactivate product record"
                 message="Are you sure you want to delete this product?"
                 itemName={
                     deletingProduct?.productName
                 }
-                confirming={
-                    deleteSaving
-                }
-                error={
-                    deleteError
-                }
+                confirming={deleteSaving}
+                error={deleteError}
             />
-
-        </section>
+        </div>
     );
 }
 

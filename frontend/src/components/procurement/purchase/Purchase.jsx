@@ -615,7 +615,18 @@ function Purchase() {
             return dateTimeValue;
         }
 
-        return date.toLocaleString();
+        const datePart =
+            date.toLocaleDateString("en-GB");
+
+        const timePart =
+            date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true,
+            });
+
+        return `${datePart} ${timePart}`;
     };
 
     const formatCurrency = (amount) => {
@@ -650,37 +661,67 @@ function Purchase() {
         purchase?.supplier?.supplierName ||
         "-";
 
-    return (
-        <section className="section active">
-            <div className="card">
-                <div className="card-head customer-page-header">
-                    <div>
-                        <div className="card-title">
-                            Purchases
-                        </div>
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Purchases</h2>
+                    <p>Loading purchase records...</p>
+                </section>
+            </div>
+        );
+    }
 
-                        <div className="kpi-sub">
-                            Manage purchase information and records
-                        </div>
+    return (
+        <div className="page">
+            <section className="card">
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <div>
+                        <h2>Purchases</h2>
+                        <p>
+                            Manage purchase information and records.
+                        </p>
                     </div>
 
                     <button
                         type="button"
-                        className="btn primary"
+                        className="action-btn view-btn"
                         onClick={
                             handleOpenAddPurchaseModal
                         }
                     >
-                        + Add Purchase
+                        Add Purchase
                     </button>
                 </div>
 
-                <div className="fld customer-search">
-                    <label htmlFor="purchase-search">
-                        Search Purchase
-                    </label>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
+                    <div
+                        className="fld"
+                        style={{
+                            width: "420px",
+                            maxWidth: "100%",
+                        }}
+                    >
+                        <label htmlFor="purchase-search">
+                            Search Purchases
+                        </label>
 
-                    <div className="search-action-row">
                         <input
                             id="purchase-search"
                             type="text"
@@ -694,346 +735,331 @@ function Purchase() {
                                 )
                             }
                         />
-
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={
-                                handleClearSearch
-                            }
-                        >
-                            Clear
-                        </button>
                     </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearSearch
+                        }
+                        disabled={!searchKeyword}
+                    >
+                        Clear
+                    </button>
                 </div>
-            </div>
+            </section>
 
-            <div className="card">
-                <div className="card-head">
-                    <div>
-                        <div className="card-title">
-                            Purchase List
-                        </div>
+            <section className="card">
+                <h2>Purchase List</h2>
 
-                        <div className="kpi-sub">
-                            {loading
-                                ? "Loading purchases..."
-                                : `${totalRecords} purchase(s)`}
-                        </div>
+                <p>
+                    {totalRecords} purchase
+                    {totalRecords === 1
+                        ? ""
+                        : "s"}
+                </p>
+
+                {error && (
+                    <div className="form-error">
+                        {error}
                     </div>
-                </div>
+                )}
 
                 {deleteError && (
-                    <div className="alert e show">
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
                         {deleteError}
                     </div>
                 )}
 
-                {loading && (
-                    <div className="empty-state">
-                        <p>
-                            Loading purchases...
-                        </p>
-                    </div>
-                )}
-
-                {!loading && error && (
-                    <div className="empty-state">
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {!loading && !error && (
-                    <>
-                        {totalRecords === 0 ? (
-                            <div className="empty-state">
-                                <p>
-                                    No purchases found.
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="tbl-wrap">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "purchaseId"
-                                                            )
-                                                        }
-                                                    >
-                                                        ID
-                                                        {getSortIndicator(
-                                                            "purchaseId"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "purchaseDate"
-                                                            )
-                                                        }
-                                                    >
-                                                        DATE
-                                                        {getSortIndicator(
-                                                            "purchaseDate"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "invoiceNumber"
-                                                            )
-                                                        }
-                                                    >
-                                                        INVOICE
-                                                        {getSortIndicator(
-                                                            "invoiceNumber"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "supplierName"
-                                                            )
-                                                        }
-                                                    >
-                                                        SUPPLIER
-                                                        {getSortIndicator(
-                                                            "supplierName"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "totalAmount"
-                                                            )
-                                                        }
-                                                    >
-                                                        TOTAL AMOUNT
-                                                        {getSortIndicator(
-                                                            "totalAmount"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "paymentStatus"
-                                                            )
-                                                        }
-                                                    >
-                                                        PAYMENT STATUS
-                                                        {getSortIndicator(
-                                                            "paymentStatus"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    <button
-                                                        type="button"
-                                                        className="table-sort-btn"
-                                                        onClick={() =>
-                                                            handleSort(
-                                                                "status"
-                                                            )
-                                                        }
-                                                    >
-                                                        STATUS
-                                                        {getSortIndicator(
-                                                            "status"
-                                                        )}
-                                                    </button>
-                                                </th>
-
-                                                <th>
-                                                    ACTIONS
-                                                </th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {paginatedRecords.map(
-                                                (
-                                                    purchase
-                                                ) => (
-                                                    <tr
-                                                        key={
-                                                            purchase.purchaseId
-                                                        }
-                                                    >
-                                                        <td>
-                                                            {
-                                                                purchase.purchaseId
-                                                            }
-                                                        </td>
-
-                                                        <td>
-                                                            {formatDate(
-                                                                purchase.purchaseDate
-                                                            )}
-                                                        </td>
-
-                                                        <td>
-                                                            <strong>
-                                                                {purchase.invoiceNumber ||
-                                                                    "-"}
-                                                            </strong>
-                                                        </td>
-
-                                                        <td>
-                                                            {supplierName(
-                                                                purchase
-                                                            )}
-                                                        </td>
-
-                                                        <td>
-                                                            {formatCurrency(
-                                                                purchase.totalAmount
-                                                            )}
-                                                        </td>
-
-                                                        <td>
-                                                            <span
-                                                                className={
-                                                                    purchase.paymentStatus ===
-                                                                    "PAID"
-                                                                        ? "badge bg"
-                                                                        : "badge br"
-                                                                }
-                                                            >
-                                                                {purchase.paymentStatus ||
-                                                                    "-"}
-                                                            </span>
-                                                        </td>
-
-                                                        <td>
-                                                            <span
-                                                                className={
-                                                                    purchase.status ===
-                                                                    "ACTIVE"
-                                                                        ? "badge bg"
-                                                                        : "badge br"
-                                                                }
-                                                            >
-                                                                {purchase.status ||
-                                                                    "-"}
-                                                            </span>
-                                                        </td>
-
-                                                        <td>
-                                                            <div className="action-buttons">
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn sm"
-                                                                    onClick={() =>
-                                                                        handleViewPurchase(
-                                                                            purchase.purchaseId
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    View
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn sm"
-                                                                    onClick={() =>
-                                                                        handleEditPurchase(
-                                                                            purchase.purchaseId
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        deletingPurchaseId ===
-                                                                            purchase.purchaseId ||
-                                                                        purchase.status !==
-                                                                            "ACTIVE"
-                                                                    }
-                                                                >
-                                                                    Edit
-                                                                </button>
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn sm"
-                                                                    onClick={() =>
-                                                                        handleOpenDeleteConfirm(
-                                                                            purchase
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        deletingPurchaseId ===
-                                                                            purchase.purchaseId ||
-                                                                        purchase.status !==
-                                                                            "ACTIVE"
-                                                                    }
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                {totalRecords === 0 ? (
+                    <p>
+                        No purchase records found.
+                    </p>
+                ) : (
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "purchaseId"
                                                 )
+                                            }
+                                        >
+                                            ID
+                                            {getSortIndicator(
+                                                "purchaseId"
                                             )}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        </button>
+                                    </th>
 
-                                <Pagination
-                                    currentPage={
-                                        currentPage
-                                    }
-                                    totalPages={
-                                        totalPages
-                                    }
-                                    totalRecords={
-                                        totalRecords
-                                    }
-                                    pageSize={
-                                        pageSize
-                                    }
-                                    onPageChange={
-                                        handlePageChange
-                                    }
-                                    onPageSizeChange={
-                                        handlePageSizeChange
-                                    }
-                                />
-                            </>
-                        )}
-                    </>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "purchaseDate"
+                                                )
+                                            }
+                                        >
+                                            DATE
+                                            {getSortIndicator(
+                                                "purchaseDate"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "invoiceNumber"
+                                                )
+                                            }
+                                        >
+                                            INVOICE
+                                            {getSortIndicator(
+                                                "invoiceNumber"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "supplierName"
+                                                )
+                                            }
+                                        >
+                                            SUPPLIER
+                                            {getSortIndicator(
+                                                "supplierName"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "totalAmount"
+                                                )
+                                            }
+                                        >
+                                            TOTAL AMOUNT
+                                            {getSortIndicator(
+                                                "totalAmount"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentStatus"
+                                                )
+                                            }
+                                        >
+                                            PAYMENT STATUS
+                                            {getSortIndicator(
+                                                "paymentStatus"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "status"
+                                                )
+                                            }
+                                        >
+                                            STATUS
+                                            {getSortIndicator(
+                                                "status"
+                                            )}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        ACTIONS
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {paginatedRecords.map(
+                                    (
+                                        purchase
+                                    ) => (
+                                        <tr
+                                            key={
+                                                purchase.purchaseId
+                                            }
+                                        >
+                                            <td>
+                                                {
+                                                    purchase.purchaseId
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {formatDate(
+                                                    purchase.purchaseDate
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                <strong>
+                                                    {purchase.invoiceNumber ||
+                                                        "-"}
+                                                </strong>
+                                            </td>
+
+                                            <td>
+                                                {supplierName(
+                                                    purchase
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {formatCurrency(
+                                                    purchase.totalAmount
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className={
+                                                        purchase.paymentStatus ===
+                                                        "PAID"
+                                                            ? "badge bg"
+                                                            : "badge br"
+                                                    }
+                                                >
+                                                    {purchase.paymentStatus ||
+                                                        "-"}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <span
+                                                    className={
+                                                        purchase.status ===
+                                                        "ACTIVE"
+                                                            ? "badge bg"
+                                                            : "badge br"
+                                                    }
+                                                >
+                                                    {purchase.status ||
+                                                        "-"}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleViewPurchase(
+                                                                purchase.purchaseId
+                                                            )
+                                                        }
+                                                    >
+                                                        View
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEditPurchase(
+                                                                purchase.purchaseId
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            deletingPurchaseId ===
+                                                                purchase.purchaseId ||
+                                                            purchase.status !==
+                                                                "ACTIVE"
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleOpenDeleteConfirm(
+                                                                purchase
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            deletingPurchaseId ===
+                                                                purchase.purchaseId ||
+                                                            purchase.status !==
+                                                                "ACTIVE"
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+
+                        <Pagination
+                            currentPage={
+                                currentPage
+                            }
+                            totalPages={
+                                totalPages
+                            }
+                            totalRecords={
+                                totalRecords
+                            }
+                            pageSize={
+                                pageSize
+                            }
+                            onPageChange={
+                                handlePageChange
+                            }
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
+                    </div>
                 )}
-            </div>
+            </section>
 
             <ViewModal
                 isOpen={
@@ -1148,7 +1174,7 @@ function Purchase() {
                         {selectedPurchase
                             .purchaseItems
                             ?.length > 0 ? (
-                            <div className="tbl-wrap">
+                            <div className="table-wrap">
                                 <table>
                                     <thead>
                                         <tr>
@@ -1756,7 +1782,7 @@ function Purchase() {
                     }
                     disabled={addSaving}
                 >
-                    + Add Item
+                    Add Item
                 </button>
 
                 <div className="modal-section-title">
@@ -1810,7 +1836,7 @@ function Purchase() {
                 }
                 error={deleteError}
             />
-        </section>
+        </div>
     );
 }
 

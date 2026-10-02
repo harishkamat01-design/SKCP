@@ -957,10 +957,10 @@ function Delivery() {
                 <h2>Delivery List</h2>
 
                 <p>
-                    {totalRecords} delivery
+                    {totalRecords}{" "}
                     {totalRecords === 1
-                        ? ""
-                        : "ies"}
+                        ? "delivery"
+                        : "deliveries"}
                 </p>
 
                 {error && (

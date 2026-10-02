@@ -1,4 +1,5 @@
 ﻿import React from "react";
+import NavIcon from "../ui/NavIcon";
 
 export default function Sidebar({
   isDark,
@@ -15,50 +16,6 @@ export default function Sidebar({
 
   return (
     <aside className="sidebar">
-      <div className="brand">
-        <div className="brand-row">
-          <div className="brand-logo">
-            <img src="/assets/skcp-logo.png" alt="SKCP" />
-          </div>
-
-          <div>
-            <div className="brand-name">
-              Shree Kundodari
-              <br />
-              Cement Products
-            </div>
-
-            <div className="brand-sub">B2B MANAGEMENT PORTAL</div>
-          </div>
-        </div>
-
-        {/* LANGUAGE SELECTOR */}
-        <div id="lang-bar">
-          <span className="lang-lbl">🌐 Language:</span>
-
-          <button
-            type="button"
-            className={`lang-btn ${
-              currentLang === "en" ? "active" : ""
-            }`}
-            onClick={() => setCurrentLang("en")}
-            aria-pressed={currentLang === "en"}
-          >
-            English
-          </button>
-
-          <button
-            type="button"
-            className={`lang-btn ${
-              currentLang === "kn" ? "active" : ""
-            }`}
-            onClick={() => setCurrentLang("kn")}
-            aria-pressed={currentLang === "kn"}
-          >
-            ಕನ್ನಡ
-          </button>
-        </div>
-      </div>
 
       <nav className="sidebar-nav">
         {/* MASTER DATA */}
@@ -73,6 +30,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("customer")}
           >
+            <NavIcon type="customer" />
             {isKannada ? "ಗ್ರಾಹಕರು" : "Customers"}
           </button>
 
@@ -82,6 +40,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("supplier")}
           >
+             <NavIcon type="supplier" />
             {isKannada ? "ಪೂರೈಕೆದಾರರು" : "Suppliers"}
           </button>
 
@@ -91,6 +50,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("product")}
           >
+            <NavIcon type="product" />
             {isKannada ? "ಉತ್ಪನ್ನಗಳು" : "Products"}
           </button>
 
@@ -100,6 +60,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("raw-material")}
           >
+            <NavIcon type="raw-material" />
             {isKannada ? "ಕಚ್ಚಾ ವಸ್ತುಗಳು" : "Raw Materials"}
           </button>
 
@@ -109,6 +70,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("labour")}
           >
+            <NavIcon type="labour" />
             {isKannada ? "ಕಾರ್ಮಿಕರು" : "Labour"}
           </button>
 
@@ -118,6 +80,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("asset")}
           >
+            <NavIcon type="asset" />
             {isKannada ? "ಆಸ್ತಿಗಳು" : "Assets"}
           </button>
         </div>
@@ -134,6 +97,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("attendance")}
           >
+            <NavIcon type="attendance" />
             {isKannada ? "ಹಾಜರಾತಿ" : "Attendance"}
           </button>
 
@@ -143,6 +107,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("purchase")}
           >
+            <NavIcon type="purchase" />
             {isKannada ? "ಖರೀದಿಗಳು" : "Purchases"}
           </button>
 
@@ -152,6 +117,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("production")}
           >
+            <NavIcon type="production" />
             {isKannada ? "ಉತ್ಪಾದನೆ" : "Production"}
           </button>
         </div>
@@ -168,6 +134,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("raw-material-stock")}
           >
+            <NavIcon type="raw-material" />
             {isKannada
               ? "ಕಚ್ಚಾ ವಸ್ತುಗಳ ದಾಸ್ತಾನು"
               : "Raw Material Stock"}
@@ -179,6 +146,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("curing-stock")}
           >
+            <NavIcon type="curing-stock" />
             {isKannada ? "ಕ್ಯೂರಿಂಗ್ ದಾಸ್ತಾನು" : "Curing Stock"}
           </button>
 
@@ -188,6 +156,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("finished-goods-stock")}
           >
+            <NavIcon type="finished-goods-stock" />
             {isKannada
               ? "ಸಿದ್ಧ ಸರಕುಗಳ ದಾಸ್ತಾನು"
               : "Finished Goods Stock"}
@@ -206,6 +175,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("order")}
           >
+            <NavIcon type="order" />
             {isKannada ? "ಆರ್ಡರ್‌ಗಳು" : "Orders"}
           </button>
 
@@ -215,6 +185,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("delivery")}
           >
+            <NavIcon type="delivery" />
             {isKannada ? "ವಿತರಣೆಗಳು" : "Deliveries"}
           </button>
         </div>
@@ -231,6 +202,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("payment")}
           >
+            <NavIcon type="payment" />
             {isKannada ? "ಪಾವತಿಗಳು" : "Payments"}
           </button>
 
@@ -242,6 +214,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("payment-allocation")}
           >
+            <NavIcon type="payment-allocation" />
             {isKannada
               ? "ಪಾವತಿ ಹಂಚಿಕೆ"
               : "Payment Allocation"}
@@ -260,17 +233,19 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("dashboard")}
           >
+            <NavIcon type="dashboard" />
             {isKannada ? "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್" : "Dashboard"}
           </button>
 
-            <button
-          className={`nav-item ${
-            isActive("reports") ? "active" : ""
-          }`}
-          onClick={() => setActiveSection("reports")}
-        >
-          {isKannada ? "SKCP ವರದಿಗಳು" : "SKCP Reports"}
-        </button>
+          <button
+            className={`nav-item ${
+              isActive("reports") ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("reports")}
+          >
+            <NavIcon type="reports" />
+            {isKannada ? "SKCP ವರದಿಗಳು" : "SKCP Reports"}
+          </button>
 
           <button
             className={`nav-item ${
@@ -278,6 +253,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("statements")}
           >
+            <NavIcon type="statements" />
             {isKannada ? "ಹೇಳಿಕೆಗಳು" : "Statements"}
           </button>
 
@@ -287,6 +263,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("settings")}
           >
+            <NavIcon type="settings" />
             {isKannada ? "ಸೆಟ್ಟಿಂಗ್ಸ್" : "Settings"}
           </button>
 
@@ -296,6 +273,7 @@ export default function Sidebar({
             }`}
             onClick={() => setActiveSection("about")}
           >
+            <NavIcon type="about" />
             {isKannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"}
           </button>
         </div>

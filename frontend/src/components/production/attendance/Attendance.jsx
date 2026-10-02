@@ -648,22 +648,47 @@ function Attendance() {
             `${dateValue}T00:00:00`
         );
 
-        return date.toLocaleDateString(
-            "en-GB",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            }
-        );
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
+
+        const day = String(
+            date.getDate()
+        ).padStart(2, "0");
+
+        const month = String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
     };
+
+    // ============================================================
+    // LOADING
+    // ============================================================
+
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
+                    <h2>Attendance</h2>
+
+                    <p>
+                        Loading attendance records...
+                    </p>
+                </section>
+            </div>
+        );
+    }
 
     // ============================================================
     // RENDER
     // ============================================================
 
     return (
-        <>
+        <div className="page">
             {/* ====================================================
                 ATTENDANCE HEADER
             ==================================================== */}
@@ -692,12 +717,26 @@ function Attendance() {
                         className="action-btn view-btn"
                         onClick={openAddModal}
                     >
-                        + Add Attendance
+                        Add Attendance
                     </button>
                 </div>
 
-                <div className="search-action-row">
-                    <div className="fld attendance-search">
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
+                    <div
+                        className="fld"
+                        style={{
+                            width: "420px",
+                            maxWidth: "100%",
+                        }}
+                    >
                         <label htmlFor="attendance-search">
                             Search Attendance
                         </label>
@@ -721,6 +760,7 @@ function Attendance() {
                         onClick={() =>
                             setSearchKeyword("")
                         }
+                        disabled={!searchKeyword}
                     >
                         Clear
                     </button>
@@ -734,7 +774,7 @@ function Attendance() {
             <section className="card">
                 <h2>Weekly Attendance Summary</h2>
 
-                <p>
+                <p style={{ marginBottom: "16px" }}> 
                     View weekly attendance and labour
                     payment summary.
                 </p>
@@ -831,298 +871,290 @@ function Attendance() {
                 <h2>Attendance List</h2>
 
                 <p>
-                    {loading
-                        ? "Loading..."
-                        : `${filteredAttendance.length} attendance record(s)`}
+                    {totalRecords} attendance record
+                    {totalRecords === 1 ? "" : "s"}
                 </p>
 
-                {loading && (
-                    <p>
-                        Loading attendance records...
-                    </p>
-                )}
-
-                {!loading && error && (
-                    <p className="form-error">
+                {error && (
+                    <div className="form-error">
                         {error}
+                    </div>
+                )}
+
+                {!error && totalRecords === 0 && (
+                    <p>
+                        No attendance records found.
                     </p>
                 )}
 
-                {!loading &&
-                    !error &&
-                    filteredAttendance.length ===
-                        0 && (
-                        <p>
-                            No attendance records
-                            found.
-                        </p>
-                    )}
+                {!error && totalRecords > 0 && (
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "attendanceId"
+                                                )
+                                            }
+                                        >
+                                            ID
+                                            {sortKey ===
+                                                "attendanceId" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
 
-                {!loading &&
-                    !error &&
-                    filteredAttendance.length >
-                        0 && (
-                        <>
-                            <div className="table-wrap">
-                                <table>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "attendanceId"
-                                                    )
-                                                }
-                                            >
-                                                ID
-                                                {sortKey ===
-                                                    "attendanceId" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "attendanceDate"
-                                                    )
-                                                }
-                                            >
-                                                DATE
-                                                {sortKey ===
-                                                    "attendanceDate" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "labourName"
-                                                    )
-                                                }
-                                            >
-                                                LABOUR
-                                                {sortKey ===
-                                                    "labourName" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "attendanceStatus"
-                                                    )
-                                                }
-                                            >
-                                                ATTENDANCE
-                                                {sortKey ===
-                                                    "attendanceStatus" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "dailyRate"
-                                                    )
-                                                }
-                                            >
-                                                DAILY RATE
-                                                {sortKey ===
-                                                    "dailyRate" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "dailyAmount"
-                                                    )
-                                                }
-                                            >
-                                                DAILY AMOUNT
-                                                {sortKey ===
-                                                    "dailyAmount" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>REMARKS</th>
-                                        <th>
-                                            <button
-                                                type="button"
-                                                className="table-sort-btn"
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "status"
-                                                    )
-                                                }
-                                            >
-                                                STATUS
-                                                {sortKey ===
-                                                    "status" &&
-                                                    (sortDirection ===
-                                                    "asc"
-                                                        ? " ▲"
-                                                        : " ▼")}
-                                            </button>
-                                        </th>
-                                        <th>ACTIONS</th>
-                                    </tr>
-                                </thead>
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "attendanceDate"
+                                                )
+                                            }
+                                        >
+                                            DATE
+                                            {sortKey ===
+                                                "attendanceDate" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
 
-                                <tbody>
-                                    {paginatedRecords.map(
-                                        (record) => (
-                                            <tr
-                                                key={
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "labourName"
+                                                )
+                                            }
+                                        >
+                                            LABOUR
+                                            {sortKey ===
+                                                "labourName" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "attendanceStatus"
+                                                )
+                                            }
+                                        >
+                                            ATTENDANCE
+                                            {sortKey ===
+                                                "attendanceStatus" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "dailyRate"
+                                                )
+                                            }
+                                        >
+                                            DAILY RATE
+                                            {sortKey ===
+                                                "dailyRate" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "dailyAmount"
+                                                )
+                                            }
+                                        >
+                                            DAILY AMOUNT
+                                            {sortKey ===
+                                                "dailyAmount" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>REMARKS</th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "status"
+                                                )
+                                            }
+                                        >
+                                            STATUS
+                                            {sortKey ===
+                                                "status" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {paginatedRecords.map(
+                                    (record) => (
+                                        <tr
+                                            key={
+                                                record.attendanceId
+                                            }
+                                        >
+                                            <td>
+                                                {
                                                     record.attendanceId
                                                 }
-                                            >
-                                                <td>
+                                            </td>
+
+                                            <td>
+                                                {formatDate(
+                                                    record.attendanceDate
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                <strong>
                                                     {
-                                                        record.attendanceId
+                                                        record.labourName
                                                     }
-                                                </td>
+                                                </strong>
+                                            </td>
 
-                                                <td>
-                                                    {formatDate(
-                                                        record.attendanceDate
-                                                    )}
-                                                </td>
+                                            <td>
+                                                {
+                                                    record.attendanceStatus
+                                                }
+                                            </td>
 
-                                                <td>
-                                                    <strong>
-                                                        {
-                                                            record.labourName
+                                            <td>
+                                                {formatCurrency(
+                                                    record.dailyRate
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {formatCurrency(
+                                                    record.dailyAmount
+                                                )}
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    record.remarks ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    record.status ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleView(
+                                                                record
+                                                            )
                                                         }
-                                                    </strong>
-                                                </td>
+                                                    >
+                                                        View
+                                                    </button>
 
-                                                <td>
-                                                    {
-                                                        record.attendanceStatus
-                                                    }
-                                                </td>
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEdit(
+                                                                record
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
 
-                                                <td>
-                                                    {formatCurrency(
-                                                        record.dailyRate
-                                                    )}
-                                                </td>
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                record
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
 
-                                                <td>
-                                                    {formatCurrency(
-                                                        record.dailyAmount
-                                                    )}
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        record.remarks ||
-                                                        "-"
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        record.status ||
-                                                        "-"
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    <div className="table-actions">
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn view-btn"
-                                                            onClick={() =>
-                                                                handleView(
-                                                                    record
-                                                                )
-                                                            }
-                                                        >
-                                                            View
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn edit-btn"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    record
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn delete-btn"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    record
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                totalRecords={totalRecords}
-                                pageSize={pageSize}
-                                onPageChange={handlePageChange}
-                                onPageSizeChange={
-                                    handlePageSizeChange
-                                }
-                            />
-                        </>
-                    )}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalRecords={totalRecords}
+                            pageSize={pageSize}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
+                    </div>
+                )}
             </section>
 
             {/* ====================================================
@@ -1172,8 +1204,6 @@ function Attendance() {
                             }
                         >
                             <div className="edit-form-grid">
-                                {/* LABOUR */}
-
                                 <div className="fld">
                                     <label htmlFor="add-labour">
                                         Labour
@@ -1221,8 +1251,6 @@ function Attendance() {
                                     </select>
                                 </div>
 
-                                {/* ATTENDANCE DATE */}
-
                                 <div className="fld">
                                     <label htmlFor="add-attendance-date">
                                         Attendance Date
@@ -1241,8 +1269,6 @@ function Attendance() {
                                         required
                                     />
                                 </div>
-
-                                {/* ATTENDANCE STATUS */}
 
                                 <div className="fld">
                                     <label htmlFor="add-attendance-status">
@@ -1274,8 +1300,6 @@ function Attendance() {
                                     </select>
                                 </div>
 
-                                {/* DAILY RATE */}
-
                                 <div className="fld">
                                     <label htmlFor="add-daily-rate">
                                         Daily Rate
@@ -1298,8 +1322,6 @@ function Attendance() {
                                     />
                                 </div>
 
-                                {/* LEAVE REASON */}
-
                                 {addForm.attendanceStatus ===
                                     "ABSENT" && (
                                     <div className="fld edit-full">
@@ -1321,8 +1343,6 @@ function Attendance() {
                                         />
                                     </div>
                                 )}
-
-                                {/* REMARKS */}
 
                                 <div className="fld edit-full">
                                     <label htmlFor="add-remarks">
@@ -1714,10 +1734,55 @@ function Attendance() {
                                 </span>
 
                                 <strong>
-                                    {
-                                        selectedAttendance.createdAt ||
-                                        "-"
-                                    }
+                                    {selectedAttendance.createdAt
+                                        ? (() => {
+                                              const date =
+                                                  new Date(
+                                                      selectedAttendance.createdAt
+                                                  );
+
+                                              if (
+                                                  Number.isNaN(
+                                                      date.getTime()
+                                                  )
+                                              ) {
+                                                  return selectedAttendance.createdAt;
+                                              }
+
+                                              const day =
+                                                  String(
+                                                      date.getDate()
+                                                  ).padStart(
+                                                      2,
+                                                      "0"
+                                                  );
+
+                                              const month =
+                                                  String(
+                                                      date.getMonth() +
+                                                          1
+                                                  ).padStart(
+                                                      2,
+                                                      "0"
+                                                  );
+
+                                              const year =
+                                                  date.getFullYear();
+
+                                              const time =
+                                                  date.toLocaleTimeString(
+                                                      "en-IN",
+                                                      {
+                                                          hour: "2-digit",
+                                                          minute: "2-digit",
+                                                          second: "2-digit",
+                                                          hour12: true,
+                                                      }
+                                                  );
+
+                                              return `${day}-${month}-${year} ${time}`;
+                                          })()
+                                        : "-"}
                                 </strong>
                             </div>
 
@@ -1796,8 +1861,6 @@ function Attendance() {
                             }
                         >
                             <div className="edit-form-grid">
-                                {/* LABOUR */}
-
                                 <div className="fld">
                                     <label htmlFor="edit-labour">
                                         Labour
@@ -1813,8 +1876,6 @@ function Attendance() {
                                         disabled
                                     />
                                 </div>
-
-                                {/* ATTENDANCE DATE */}
 
                                 <div className="fld">
                                     <label htmlFor="edit-attendance-date">
@@ -1834,8 +1895,6 @@ function Attendance() {
                                         required
                                     />
                                 </div>
-
-                                {/* ATTENDANCE STATUS */}
 
                                 <div className="fld">
                                     <label htmlFor="edit-attendance-status">
@@ -1867,8 +1926,6 @@ function Attendance() {
                                     </select>
                                 </div>
 
-                                {/* DAILY RATE */}
-
                                 <div className="fld">
                                     <label htmlFor="edit-daily-rate">
                                         Daily Rate
@@ -1889,8 +1946,6 @@ function Attendance() {
                                         required
                                     />
                                 </div>
-
-                                {/* LEAVE REASON */}
 
                                 {editForm.attendanceStatus ===
                                     "ABSENT" && (
@@ -1913,8 +1968,6 @@ function Attendance() {
                                         />
                                     </div>
                                 )}
-
-                                {/* REMARKS */}
 
                                 <div className="fld edit-full">
                                     <label htmlFor="edit-remarks">
@@ -2118,7 +2171,7 @@ function Attendance() {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }
 

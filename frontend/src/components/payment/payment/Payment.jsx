@@ -1,4 +1,3 @@
-
 import React, {
     useEffect,
     useMemo,
@@ -42,21 +41,54 @@ const initialFormData = {
     remarks: "",
 };
 
-const formatDate = (dateValue) =>
-    dateValue
-        ? new Date(
-              `${dateValue}T00:00:00`
-          ).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-          })
-        : "-";
+const formatDate = (dateValue) => {
+    if (!dateValue) {
+        return "-";
+    }
 
-const formatDateTime = (dateValue) =>
-    dateValue
-        ? new Date(dateValue).toLocaleString()
-        : "-";
+    const dateText = String(dateValue);
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+        const [year, month, day] =
+            dateText.split("-");
+
+        return `${day}-${month}-${year}`;
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return dateValue;
+    }
+
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+};
+
+const formatDateTime = (dateValue) => {
+    if (!dateValue) {
+        return "-";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return dateValue;
+    }
+
+    return date.toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+    });
+};
 
 const formatCurrency = (amount) =>
     `₹ ${Number(amount || 0).toLocaleString(
@@ -920,31 +952,27 @@ function Payment({ paymentContext }) {
                     </button>
                 </div>
 
-                {/* ==================================================
-                    SEARCH + DATE FILTER
-                ================================================== */}
-
                 <div
-                    className="fld production-search"
                     style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
                         marginTop: "16px",
                     }}
                 >
-                    <label>
-                        Search Payments
-                    </label>
-
                     <div
+                        className="fld production-search"
                         style={{
-                            display: "flex",
-                            gap: "12px",
-                            alignItems:
-                                "center",
-                            flexWrap:
-                                "wrap",
+                            flex: "2 1 320px",
                         }}
                     >
+                        <label htmlFor="payment-search">
+                            Search Payments
+                        </label>
+
                         <input
+                            id="payment-search"
                             type="text"
                             value={searchTerm}
                             onChange={(
@@ -958,8 +986,20 @@ function Payment({ paymentContext }) {
                             }
                             placeholder="Search by customer, payment ID, customer ID, mode..."
                         />
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="payment-date-from">
+                            Date From
+                        </label>
 
                         <input
+                            id="payment-date-from"
                             type="date"
                             value={dateFrom}
                             onChange={(
@@ -988,10 +1028,21 @@ function Payment({ paymentContext }) {
                                     );
                                 }
                             }}
-                            aria-label="Payment date from"
                         />
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="payment-date-to">
+                            Date To
+                        </label>
 
                         <input
+                            id="payment-date-to"
                             type="date"
                             value={dateTo}
                             onChange={(
@@ -1020,37 +1071,37 @@ function Payment({ paymentContext }) {
                                     );
                                 }
                             }}
-                            aria-label="Payment date to"
                         />
-
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={
-                                handleClearFilters
-                            }
-                        >
-                            Clear
-                        </button>
                     </div>
 
-                    {dateFilterError && (
-                        <div
-                            style={{
-                                marginTop:
-                                    "8px",
-                                color:
-                                    "#b91c1c",
-                                fontSize:
-                                    "14px",
-                            }}
-                        >
-                            {
-                                dateFilterError
-                            }
-                        </div>
-                    )}
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={
+                            handleClearFilters
+                        }
+                        disabled={
+                            !searchTerm &&
+                            !dateFrom &&
+                            !dateTo
+                        }
+                    >
+                        Clear
+                    </button>
                 </div>
+
+                {dateFilterError && (
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
+                        {
+                            dateFilterError
+                        }
+                    </div>
+                )}
             </section>
 
             {/* ==================================================
@@ -1061,10 +1112,8 @@ function Payment({ paymentContext }) {
                 <h2>Payment List</h2>
 
                 <p>
-                    {filteredPayments.length}{" "}
-                    payment
-                    {filteredPayments.length ===
-                    1
+                    {totalRecords} payment
+                    {totalRecords === 1
                         ? ""
                         : "s"}
                 </p>
@@ -1075,8 +1124,8 @@ function Payment({ paymentContext }) {
                     </div>
                 )}
 
-                {filteredPayments.length ===
-                0 ? (
+                {dateFilterError ? null : totalRecords ===
+                  0 ? (
                     <p>
                         No payment records
                         found.
@@ -1086,124 +1135,124 @@ function Payment({ paymentContext }) {
                         <table>
                             <thead>
                                 <tr>
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "paymentId"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        ID
-                                        {sortKey ===
-                                            "paymentId" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentId"
+                                                )
+                                            }
+                                        >
+                                            ID{" "}
+                                            {sortKey ===
+                                                "paymentId" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "customerName"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        CUSTOMER
-                                        {sortKey ===
-                                            "customerName" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "customerName"
+                                                )
+                                            }
+                                        >
+                                            CUSTOMER{" "}
+                                            {sortKey ===
+                                                "customerName" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "paymentDate"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        PAYMENT DATE
-                                        {sortKey ===
-                                            "paymentDate" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentDate"
+                                                )
+                                            }
+                                        >
+                                            PAYMENT DATE{" "}
+                                            {sortKey ===
+                                                "paymentDate" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "totalAmountReceived"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        AMOUNT
-                                        {sortKey ===
-                                            "totalAmountReceived" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "totalAmountReceived"
+                                                )
+                                            }
+                                        >
+                                            AMOUNT{" "}
+                                            {sortKey ===
+                                                "totalAmountReceived" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "paymentMode"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        PAYMENT MODE
-                                        {sortKey ===
-                                            "paymentMode" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentMode"
+                                                )
+                                            }
+                                        >
+                                            PAYMENT MODE{" "}
+                                            {sortKey ===
+                                                "paymentMode" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "receivedBy"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        RECEIVED BY
-                                        {sortKey ===
-                                            "receivedBy" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "receivedBy"
+                                                )
+                                            }
+                                        >
+                                            RECEIVED BY{" "}
+                                            {sortKey ===
+                                                "receivedBy" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
                                     <th>
@@ -1214,24 +1263,24 @@ function Payment({ paymentContext }) {
                                         UNALLOCATED
                                     </th>
 
-                                    <th
-                                        onClick={() =>
-                                            handleSort(
-                                                "paymentStatus"
-                                            )
-                                        }
-                                        style={{
-                                            cursor:
-                                                "pointer",
-                                        }}
-                                    >
-                                        PAYMENT STATUS
-                                        {sortKey ===
-                                            "paymentStatus" &&
-                                            (sortDirection ===
-                                            "asc"
-                                                ? " ↑"
-                                                : " ↓")}
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "paymentStatus"
+                                                )
+                                            }
+                                        >
+                                            PAYMENT STATUS{" "}
+                                            {sortKey ===
+                                                "paymentStatus" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </button>
                                     </th>
 
                                     <th>
@@ -1722,7 +1771,7 @@ function Payment({ paymentContext }) {
                                 Order Summary
                             </h3>
 
-                            <div className="edit-form-grid">
+                            <div className="form-grid">
                                 <div className="fld">
                                     <label>
                                         Order Total
@@ -1768,7 +1817,7 @@ function Payment({ paymentContext }) {
                         </div>
                     )}
 
-                <div className="edit-form-grid">
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="customerId">
                             Customer ID
@@ -1923,7 +1972,7 @@ function Payment({ paymentContext }) {
                         />
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="remarks">
                             Remarks
                         </label>

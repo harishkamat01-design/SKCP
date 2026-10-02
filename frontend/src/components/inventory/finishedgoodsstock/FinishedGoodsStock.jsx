@@ -36,21 +36,15 @@ function FinishedGoodsStock() {
     // VIEW MODAL
     // ============================================================
 
-    const [selectedStock, setSelectedStock] =
-        useState(null);
-
-    const [viewLoading, setViewLoading] =
-        useState(false);
-
-    const [viewError, setViewError] =
-        useState("");
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [viewLoading, setViewLoading] = useState(false);
+    const [viewError, setViewError] = useState("");
 
     // ============================================================
     // ADD FINISHED GOODS STOCK MODAL
     // ============================================================
 
-    const [showAddModal, setShowAddModal] =
-        useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const [addForm, setAddForm] = useState({
         productId: "",
@@ -59,18 +53,14 @@ function FinishedGoodsStock() {
         notes: "",
     });
 
-    const [addLoading, setAddLoading] =
-        useState(false);
-
-    const [addError, setAddError] =
-        useState("");
+    const [addLoading, setAddLoading] = useState(false);
+    const [addError, setAddError] = useState("");
 
     // ============================================================
     // EDIT FINISHED GOODS STOCK MODAL
     // ============================================================
 
-    const [editingStock, setEditingStock] =
-        useState(null);
+    const [editingStock, setEditingStock] = useState(null);
 
     const [editForm, setEditForm] = useState({
         currentStockLevel: "",
@@ -78,24 +68,68 @@ function FinishedGoodsStock() {
         notes: "",
     });
 
-    const [editLoading, setEditLoading] =
-        useState(false);
-
-    const [editError, setEditError] =
-        useState("");
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState("");
 
     // ============================================================
     // DELETE MODAL
     // ============================================================
 
-    const [deletingStock, setDeletingStock] =
-        useState(null);
+    const [deletingStock, setDeletingStock] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
 
-    const [deleteLoading, setDeleteLoading] =
-        useState(false);
+    // ============================================================
+    // DATE FORMATTERS
+    // ============================================================
 
-    const [deleteError, setDeleteError] =
-        useState("");
+    const formatDate = (dateValue) => {
+        if (!dateValue) {
+            return "-";
+        }
+
+        const dateText = String(dateValue);
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+            const [year, month, day] = dateText.split("-");
+
+            return `${day}-${month}-${year}`;
+        }
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
+
+        return date.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+    };
+
+    const formatDateTime = (dateTimeValue) => {
+        if (!dateTimeValue) {
+            return "-";
+        }
+
+        const date = new Date(dateTimeValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateTimeValue;
+        }
+
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+        });
+    };
 
     // ============================================================
     // INITIAL LOAD
@@ -122,10 +156,6 @@ function FinishedGoodsStock() {
                 "/api/products"
             );
 
-            setProductList(
-                productResult.data || []
-            );
-
             console.log(
                 "Finished Goods Stock API response:",
                 result
@@ -134,6 +164,10 @@ function FinishedGoodsStock() {
             console.log(
                 "Products API response:",
                 productResult
+            );
+
+            setProductList(
+                productResult.data || []
             );
 
             setStockList(
@@ -161,8 +195,7 @@ function FinishedGoodsStock() {
         return stockList.map((stock) => {
             const product = productList.find(
                 (item) =>
-                    item.productId ===
-                    stock.productId
+                    item.productId === stock.productId
             );
 
             return {
@@ -813,7 +846,7 @@ function FinishedGoodsStock() {
     // ============================================================
 
     return (
-        <>
+        <div className="page">
             {/* ====================================================
                 FINISHED GOODS STOCK HEADER
             ==================================================== */}
@@ -848,23 +881,30 @@ function FinishedGoodsStock() {
                             openAddModal
                         }
                     >
-                        + Add Finished Goods Stock
+                        Add Finished Goods Stock
                     </button>
                 </div>
 
-                <div className="fld production-search">
-                    <label htmlFor="finished-goods-stock-search">
-                        Search Finished Goods Stock
-                    </label>
-
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
                     <div
+                        className="fld"
                         style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            marginTop: "10px",
+                            width: "420px",
+                            maxWidth: "100%",
                         }}
                     >
+                        <label htmlFor="finished-goods-stock-search">
+                            Search Finished Goods Stock
+                        </label>
+
                         <input
                             id="finished-goods-stock-search"
                             type="text"
@@ -879,23 +919,23 @@ function FinishedGoodsStock() {
                                     event.target.value
                                 )
                             }
-                            style={{
-                                width: "20%",
-                            }}
                         />
-
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={() =>
-                                setSearchKeyword(
-                                    ""
-                                )
-                            }
-                        >
-                            Clear
-                        </button>
                     </div>
+
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={() =>
+                            setSearchKeyword(
+                                ""
+                            )
+                        }
+                        disabled={
+                            !searchKeyword
+                        }
+                    >
+                        Clear
+                    </button>
                 </div>
             </section>
 
@@ -909,22 +949,21 @@ function FinishedGoodsStock() {
                 </h2>
 
                 <p>
-                    {
-                        filteredStock.length
-                    }{" "}
-                    finished goods stock
-                    record(s)
+                    {totalRecords} finished goods
+                    stock record
+                    {totalRecords === 1
+                        ? ""
+                        : "s"}
                 </p>
 
                 {error && (
-                    <p className="form-error">
+                    <div className="form-error">
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 {!error &&
-                    filteredStock.length ===
-                        0 && (
+                    totalRecords === 0 && (
                         <p>
                             No finished goods
                             stock records
@@ -933,8 +972,7 @@ function FinishedGoodsStock() {
                     )}
 
                 {!error &&
-                    filteredStock.length >
-                        0 && (
+                    totalRecords > 0 && (
                         <div className="table-wrap">
                             <table>
                                 <thead>
@@ -1121,10 +1159,9 @@ function FinishedGoodsStock() {
                                                 </td>
 
                                                 <td>
-                                                    {
-                                                        stock.lastUpdatedDate ||
-                                                        "-"
-                                                    }
+                                                    {formatDate(
+                                                        stock.lastUpdatedDate
+                                                    )}
                                                 </td>
 
                                                 <td>
@@ -1281,36 +1318,23 @@ function FinishedGoodsStock() {
 
                         <DetailItem
                             label="Last Updated Date"
-                            value={
-                                selectedStock.lastUpdatedDate ||
-                                "-"
-                            }
+                            value={formatDate(
+                                selectedStock.lastUpdatedDate
+                            )}
                         />
 
                         <DetailItem
                             label="Created At"
-                            value={
+                            value={formatDateTime(
                                 selectedStock.createdAt
-                                    ? new Date(
-                                          selectedStock.createdAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
                             label="Updated At"
-                            value={
+                            value={formatDateTime(
                                 selectedStock.updatedAt
-                                    ? new Date(
-                                          selectedStock.updatedAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
@@ -1351,7 +1375,7 @@ function FinishedGoodsStock() {
                 }
                 size="lg"
             >
-                <div className="edit-form-grid">
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="add-finished-goods-product-id">
                             Product ID
@@ -1417,7 +1441,7 @@ function FinishedGoodsStock() {
                         />
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="add-finished-goods-notes">
                             Notes
                         </label>
@@ -1466,7 +1490,7 @@ function FinishedGoodsStock() {
                 size="lg"
             >
                 {editingStock && (
-                    <div className="edit-form-grid">
+                    <div className="form-grid">
                         <div className="fld">
                             <label htmlFor="edit-finished-goods-stock-id">
                                 Finished Goods Stock ID
@@ -1568,15 +1592,14 @@ function FinishedGoodsStock() {
                             <input
                                 id="edit-finished-goods-last-updated"
                                 type="text"
-                                value={
-                                    editingStock.lastUpdatedDate ||
-                                    "-"
-                                }
+                                value={formatDate(
+                                    editingStock.lastUpdatedDate
+                                )}
                                 disabled
                             />
                         </div>
 
-                        <div className="fld edit-full">
+                        <div className="fld f-full">
                             <label htmlFor="edit-finished-goods-notes">
                                 Notes
                             </label>
@@ -1631,7 +1654,7 @@ function FinishedGoodsStock() {
                     deleteError
                 }
             />
-        </>
+        </div>
     );
 }
 

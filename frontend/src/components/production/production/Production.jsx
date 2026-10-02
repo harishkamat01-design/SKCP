@@ -339,13 +339,45 @@ function Production() {
         }
 
         return date.toLocaleDateString(
-            "en-GB",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            }
+            "en-GB"
         );
+    };
+
+    // ============================================================
+    // FORMAT DATE TIME
+    // ============================================================
+
+    const formatDateTime = (
+        dateTimeValue
+    ) => {
+        if (!dateTimeValue) {
+            return "-";
+        }
+
+        const date = new Date(
+            dateTimeValue
+        );
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+            return dateTimeValue;
+        }
+
+        const datePart =
+            date.toLocaleDateString("en-GB");
+
+        const timePart =
+            date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true,
+            });
+
+        return `${datePart} ${timePart}`;
     };
 
     // ============================================================
@@ -826,10 +858,7 @@ function Production() {
         return (
             <div className="page">
                 <section className="card">
-                    <h2>
-                        Production
-                    </h2>
-
+                    <h2>Production</h2>
                     <p>
                         Loading production records...
                     </p>
@@ -843,43 +872,55 @@ function Production() {
     // ============================================================
 
     return (
-        <>
-            {/* ====================================================
-                PRODUCTION HEADER
-            ==================================================== */}
-
+        <div className="page">
             <section className="card">
                 <div
-                    className="card-head customer-page-header"
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                    }}
                 >
                     <div>
-                        <div className="card-title">
-                            Production
-                        </div>
+                        <h2>Production</h2>
 
-                        <div className="kpi-sub">
-                            Manage production
-                            information and records
-                        </div>
+                        <p>
+                            Manage production information and records.
+                        </p>
                     </div>
 
                     <button
                         type="button"
-                        className="btn primary"
+                        className="action-btn view-btn"
                         onClick={
                             openAddModal
                         }
                     >
-                        + Add Production
+                        Add Production
                     </button>
                 </div>
 
-                <div className="fld customer-search">
-                    <label htmlFor="production-search">
-                        Search Production
-                    </label>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
+                    <div
+                        className="fld production-search"
+                        style={{
+                            flex: "2 1 320px",
+                        }}
+                    >
+                        <label htmlFor="production-search">
+                            Search Production
+                        </label>
 
-                    <div className="search-action-row">
                         <input
                             id="production-search"
                             type="text"
@@ -897,23 +938,16 @@ function Production() {
                                 )
                             }
                         />
-
-                        <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={
-                                handleClearFilters
-                            }
-                        >
-                            Clear
-                        </button>
                     </div>
-                </div>
 
-                <div className="form-grid">
-                    <div className="fld">
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
                         <label htmlFor="production-date-from">
-                            Production Date From
+                            Date From
                         </label>
 
                         <input
@@ -928,9 +962,14 @@ function Production() {
                         />
                     </div>
 
-                    <div className="fld">
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
                         <label htmlFor="production-date-to">
-                            Production Date To
+                            Date To
                         </label>
 
                         <input
@@ -944,326 +983,319 @@ function Production() {
                             }
                         />
                     </div>
-                </div>
 
-                {dateFilterError && (
-                    <div className="alert e show">
-                        {dateFilterError}
-                    </div>
-                )}
-
-                {(searchKeyword ||
-                    productionDateFrom ||
-                    productionDateTo) && (
                     <button
                         type="button"
                         className="btn secondary"
                         onClick={
                             handleClearFilters
                         }
+                        disabled={
+                            !searchKeyword &&
+                            !productionDateFrom &&
+                            !productionDateTo
+                        }
                     >
-                        Clear All Filters
+                        Clear
                     </button>
+                </div>
+
+                {dateFilterError && (
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
+                        {dateFilterError}
+                    </div>
                 )}
             </section>
 
-            {/* ====================================================
-                PRODUCTION LIST
-            ==================================================== */}
-
             <section className="card">
-                <div className="card-head">
-                    <div>
-                        <div className="card-title">
-                            Production List
-                        </div>
+                <h2>Production List</h2>
 
-                        <div className="kpi-sub">
-                            {totalRecords}{" "}
-                            production record(s)
-                        </div>
-                    </div>
-                </div>
+                <p>
+                    {totalRecords} production
+                    {totalRecords === 1
+                        ? ""
+                        : " records"}
+                </p>
 
                 {error && (
-                    <div className="alert e show">
+                    <div className="form-error">
                         {error}
                     </div>
                 )}
 
                 {!error &&
                     totalRecords === 0 && (
-                        <div className="empty-state">
-                            <p>
-                                No production
-                                records found.
-                            </p>
-                        </div>
+                        <p>
+                            No production records found.
+                        </p>
                     )}
 
                 {!error &&
                     totalRecords > 0 && (
-                        <>
-                            <div className="tbl-wrap">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "productionId"
-                                                        )
-                                                    }
-                                                >
-                                                    ID
-                                                    {getSortIndicator(
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "productionId"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                ID
+                                                {getSortIndicator(
+                                                    "productionId"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "productionDate"
-                                                        )
-                                                    }
-                                                >
-                                                    DATE
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "productionDate"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                DATE
+                                                {getSortIndicator(
+                                                    "productionDate"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "productName"
-                                                        )
-                                                    }
-                                                >
-                                                    PRODUCT
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "productName"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                PRODUCT
+                                                {getSortIndicator(
+                                                    "productName"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "productSize"
-                                                        )
-                                                    }
-                                                >
-                                                    SIZE
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "productSize"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                SIZE
+                                                {getSortIndicator(
+                                                    "productSize"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "quantityProduced"
-                                                        )
-                                                    }
-                                                >
-                                                    QUANTITY
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "quantityProduced"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                QUANTITY
+                                                {getSortIndicator(
+                                                    "quantityProduced"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "totalCementBags"
-                                                        )
-                                                    }
-                                                >
-                                                    TOTAL CEMENT BAGS
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "totalCementBags"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                TOTAL CEMENT BAGS
+                                                {getSortIndicator(
+                                                    "totalCementBags"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "assetName"
-                                                        )
-                                                    }
-                                                >
-                                                    ASSET
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "assetName"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                ASSET
+                                                {getSortIndicator(
+                                                    "assetName"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                <button
-                                                    type="button"
-                                                    className="table-sort-btn"
-                                                    onClick={() =>
-                                                        handleSort(
-                                                            "status"
-                                                        )
-                                                    }
-                                                >
-                                                    STATUS
-                                                    {getSortIndicator(
+                                        <th>
+                                            <button
+                                                type="button"
+                                                className="table-sort-btn"
+                                                onClick={() =>
+                                                    handleSort(
                                                         "status"
-                                                    )}
-                                                </button>
-                                            </th>
+                                                    )
+                                                }
+                                            >
+                                                STATUS
+                                                {getSortIndicator(
+                                                    "status"
+                                                )}
+                                            </button>
+                                        </th>
 
-                                            <th>
-                                                ACTIONS
-                                            </th>
-                                        </tr>
-                                    </thead>
+                                        <th>
+                                            ACTIONS
+                                        </th>
+                                    </tr>
+                                </thead>
 
-                                    <tbody>
-                                        {paginatedRecords.map(
-                                            (
-                                                production
-                                            ) => (
-                                                <tr
-                                                    key={
+                                <tbody>
+                                    {paginatedRecords.map(
+                                        (
+                                            production
+                                        ) => (
+                                            <tr
+                                                key={
+                                                    production.productionId
+                                                }
+                                            >
+                                                <td>
+                                                    {
                                                         production.productionId
                                                     }
-                                                >
-                                                    <td>
+                                                </td>
+
+                                                <td>
+                                                    {formatDate(
+                                                        production.productionDate
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    <strong>
                                                         {
-                                                            production.productionId
+                                                            production.productName
                                                         }
-                                                    </td>
+                                                    </strong>
+                                                </td>
 
-                                                    <td>
-                                                        {formatDate(
-                                                            production.productionDate
-                                                        )}
-                                                    </td>
+                                                <td>
+                                                    {
+                                                        production.productSize
+                                                    }
+                                                </td>
 
-                                                    <td>
-                                                        <strong>
-                                                            {
-                                                                production.productName
-                                                            }
-                                                        </strong>
-                                                    </td>
+                                                <td>
+                                                    {
+                                                        production.quantityProduced
+                                                    }
+                                                </td>
 
-                                                    <td>
+                                                <td>
+                                                    {
+                                                        production.totalCementBags
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        production.assetName
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <span
+                                                        className={
+                                                            production.status ===
+                                                            "COMPLETED"
+                                                                ? "badge bg"
+                                                                : "badge br"
+                                                        }
+                                                    >
                                                         {
-                                                            production.productSize
+                                                            production.status
                                                         }
-                                                    </td>
+                                                    </span>
+                                                </td>
 
-                                                    <td>
-                                                        {
-                                                            production.quantityProduced
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        {
-                                                            production.totalCementBags
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        {
-                                                            production.assetName
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        <span
-                                                            className={
-                                                                production.status ===
-                                                                "COMPLETED"
-                                                                    ? "badge bg"
-                                                                    : "badge br"
+                                                <td>
+                                                    <div className="action-buttons">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    production
+                                                                )
                                                             }
                                                         >
-                                                            {
-                                                                production.status
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    production
+                                                                )
                                                             }
-                                                        </span>
-                                                    </td>
+                                                        >
+                                                            Edit
+                                                        </button>
 
-                                                    <td>
-                                                        <div className="action-buttons">
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleView(
-                                                                        production
-                                                                    )
-                                                                }
-                                                            >
-                                                                View
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleEdit(
-                                                                        production
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        production
-                                                                    )
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    production
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
 
                             <Pagination
                                 currentPage={
@@ -1285,7 +1317,7 @@ function Production() {
                                     handlePageSizeChange
                                 }
                             />
-                        </>
+                        </div>
                     )}
             </section>
 
@@ -1403,15 +1435,9 @@ function Production() {
 
                         <DetailItem
                             label="Created At"
-                            value={
+                            value={formatDateTime(
                                 selectedProduction.createdAt
-                                    ? new Date(
-                                          selectedProduction.createdAt
-                                      ).toLocaleString(
-                                          "en-IN"
-                                      )
-                                    : "-"
-                            }
+                            )}
                         />
 
                         <DetailItem
@@ -1452,7 +1478,11 @@ function Production() {
                 }
                 size="lg"
             >
-                <div className="edit-form-grid">
+                <div className="modal-section-title">
+                    Production Information
+                </div>
+
+                <div className="form-grid">
                     <div className="fld">
                         <label htmlFor="add-production-date">
                             Production Date
@@ -1577,7 +1607,7 @@ function Production() {
                         />
                     </div>
 
-                    <div className="fld edit-full">
+                    <div className="fld f-full">
                         <label htmlFor="add-production-remarks">
                             Remarks
                         </label>
@@ -1625,175 +1655,181 @@ function Production() {
                 size="lg"
             >
                 {editingProduction && (
-                    <div className="edit-form-grid">
-                        <div className="fld">
-                            <label htmlFor="edit-production-id">
-                                Production ID
-                            </label>
-
-                            <input
-                                id="edit-production-id"
-                                type="text"
-                                value={
-                                    editingProduction.productionId
-                                }
-                                disabled
-                            />
+                    <>
+                        <div className="modal-section-title">
+                            Production Information
                         </div>
 
-                        <div className="fld">
-                            <label htmlFor="edit-production-product">
-                                Product
-                            </label>
+                        <div className="form-grid">
+                            <div className="fld">
+                                <label htmlFor="edit-production-id">
+                                    Production ID
+                                </label>
 
-                            <input
-                                id="edit-production-product"
-                                type="text"
-                                value={
-                                    editingProduction.productName ||
-                                    ""
-                                }
-                                disabled
-                            />
+                                <input
+                                    id="edit-production-id"
+                                    type="text"
+                                    value={
+                                        editingProduction.productionId
+                                    }
+                                    disabled
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-production-product">
+                                    Product
+                                </label>
+
+                                <input
+                                    id="edit-production-product"
+                                    type="text"
+                                    value={
+                                        editingProduction.productName ||
+                                        ""
+                                    }
+                                    disabled
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-production-date">
+                                    Production Date
+                                </label>
+
+                                <input
+                                    id="edit-production-date"
+                                    type="date"
+                                    name="productionDate"
+                                    value={
+                                        editForm.productionDate
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-quantity-produced">
+                                    Quantity Produced
+                                </label>
+
+                                <input
+                                    id="edit-quantity-produced"
+                                    type="number"
+                                    name="quantityProduced"
+                                    min="0"
+                                    step="0.01"
+                                    value={
+                                        editForm.quantityProduced
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-morning-cement-bags">
+                                    Morning Cement Bags
+                                </label>
+
+                                <input
+                                    id="edit-morning-cement-bags"
+                                    type="number"
+                                    name="morningCementBags"
+                                    min="0"
+                                    step="0.01"
+                                    value={
+                                        editForm.morningCementBags
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-afternoon-cement-bags">
+                                    Afternoon Cement Bags
+                                </label>
+
+                                <input
+                                    id="edit-afternoon-cement-bags"
+                                    type="number"
+                                    name="afternoonCementBags"
+                                    min="0"
+                                    step="0.01"
+                                    value={
+                                        editForm.afternoonCementBags
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-total-cement-bags">
+                                    Total Cement Bags
+                                </label>
+
+                                <input
+                                    id="edit-total-cement-bags"
+                                    type="text"
+                                    value={
+                                        Number(
+                                            editForm.morningCementBags ||
+                                                0
+                                        ) +
+                                        Number(
+                                            editForm.afternoonCementBags ||
+                                                0
+                                        )
+                                    }
+                                    disabled
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-production-asset">
+                                    Asset
+                                </label>
+
+                                <input
+                                    id="edit-production-asset"
+                                    type="text"
+                                    value={
+                                        editingProduction.assetName ||
+                                        ""
+                                    }
+                                    disabled
+                                />
+                            </div>
+
+                            <div className="fld f-full">
+                                <label htmlFor="edit-production-remarks">
+                                    Remarks
+                                </label>
+
+                                <textarea
+                                    id="edit-production-remarks"
+                                    name="remarks"
+                                    rows="3"
+                                    value={
+                                        editForm.remarks
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    placeholder="Enter remarks"
+                                />
+                            </div>
                         </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-production-date">
-                                Production Date
-                            </label>
-
-                            <input
-                                id="edit-production-date"
-                                type="date"
-                                name="productionDate"
-                                value={
-                                    editForm.productionDate
-                                }
-                                onChange={
-                                    handleEditChange
-                                }
-                                required
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-quantity-produced">
-                                Quantity Produced
-                            </label>
-
-                            <input
-                                id="edit-quantity-produced"
-                                type="number"
-                                name="quantityProduced"
-                                min="0"
-                                step="0.01"
-                                value={
-                                    editForm.quantityProduced
-                                }
-                                onChange={
-                                    handleEditChange
-                                }
-                                required
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-morning-cement-bags">
-                                Morning Cement Bags
-                            </label>
-
-                            <input
-                                id="edit-morning-cement-bags"
-                                type="number"
-                                name="morningCementBags"
-                                min="0"
-                                step="0.01"
-                                value={
-                                    editForm.morningCementBags
-                                }
-                                onChange={
-                                    handleEditChange
-                                }
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-afternoon-cement-bags">
-                                Afternoon Cement Bags
-                            </label>
-
-                            <input
-                                id="edit-afternoon-cement-bags"
-                                type="number"
-                                name="afternoonCementBags"
-                                min="0"
-                                step="0.01"
-                                value={
-                                    editForm.afternoonCementBags
-                                }
-                                onChange={
-                                    handleEditChange
-                                }
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-total-cement-bags">
-                                Total Cement Bags
-                            </label>
-
-                            <input
-                                id="edit-total-cement-bags"
-                                type="text"
-                                value={
-                                    Number(
-                                        editForm.morningCementBags ||
-                                            0
-                                    ) +
-                                    Number(
-                                        editForm.afternoonCementBags ||
-                                            0
-                                    )
-                                }
-                                disabled
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label htmlFor="edit-production-asset">
-                                Asset
-                            </label>
-
-                            <input
-                                id="edit-production-asset"
-                                type="text"
-                                value={
-                                    editingProduction.assetName ||
-                                    ""
-                                }
-                                disabled
-                            />
-                        </div>
-
-                        <div className="fld edit-full">
-                            <label htmlFor="edit-production-remarks">
-                                Remarks
-                            </label>
-
-                            <textarea
-                                id="edit-production-remarks"
-                                name="remarks"
-                                rows="3"
-                                value={
-                                    editForm.remarks
-                                }
-                                onChange={
-                                    handleEditChange
-                                }
-                                placeholder="Enter remarks"
-                            />
-                        </div>
-                    </div>
+                    </>
                 )}
             </FormModal>
 
@@ -1826,7 +1862,7 @@ function Production() {
                     deleteError
                 }
             />
-        </>
+        </div>
     );
 }
 

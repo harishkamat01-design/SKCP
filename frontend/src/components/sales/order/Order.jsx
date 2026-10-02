@@ -57,8 +57,7 @@ function Order({ onOpenPayment }) {
 
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
-    const [dateFilterError, setDateFilterError] =
-    useState("");
+    const [dateFilterError, setDateFilterError] = useState("");
 
     // ============================================================
     // CUSTOMERS / PRODUCTS
@@ -73,7 +72,9 @@ function Order({ onOpenPayment }) {
     // ============================================================
     // ADD ORDER
     // ============================================================
-    const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
+
+    const [showAddCustomerModal, setShowAddCustomerModal] =
+        useState(false);
     const [showAddOrder, setShowAddOrder] = useState(false);
     const [addSaving, setAddSaving] = useState(false);
     const [addError, setAddError] = useState("");
@@ -256,8 +257,6 @@ function Order({ onOpenPayment }) {
         dateTo,
     ]);
 
-
-
     // ============================================================
     // SORT ORDERS
     // ============================================================
@@ -272,7 +271,6 @@ function Order({ onOpenPayment }) {
         "orderId",
         "desc"
     );
-
 
     // ============================================================
     // PAGINATION
@@ -358,9 +356,6 @@ function Order({ onOpenPayment }) {
             maximumFractionDigits: 2,
         })}`;
     };
-
-
-
 
     // ============================================================
     // GET PRODUCT
@@ -582,7 +577,6 @@ function Order({ onOpenPayment }) {
                 );
             }
 
-
             if (
                 addForm.expectedDeliveryDate &&
                 addForm.expectedDeliveryDate < addForm.orderDate
@@ -591,7 +585,6 @@ function Order({ onOpenPayment }) {
                     "Expected delivery date cannot be earlier than the order date."
                 );
             }
-
 
             if (!addForm.transportMode) {
                 throw new Error(
@@ -605,10 +598,6 @@ function Order({ onOpenPayment }) {
             if (itemValidation) {
                 throw new Error(itemValidation);
             }
-
-            // ----------------------------------------------------
-            // STEP 1: CREATE ORDER HEADER
-            // ----------------------------------------------------
 
             const orderPayload = {
                 customerId: Number(
@@ -652,10 +641,6 @@ function Order({ onOpenPayment }) {
             const orderId =
                 createdOrder.orderId;
 
-            // ----------------------------------------------------
-            // STEP 2: CREATE ORDER ITEMS
-            // ----------------------------------------------------
-
             for (const item of addItems) {
                 const itemPayload = {
                     orderId: Number(orderId),
@@ -684,24 +669,16 @@ function Order({ onOpenPayment }) {
                 );
             }
 
-                    // ----------------------------------------------------
-                    // STEP 3: OPEN PAYMENT WORKFLOW
-                    // ----------------------------------------------------
+            if (onOpenPayment) {
+                onOpenPayment({
+                    customerId: Number(addForm.customerId),
+                    orderId: Number(orderId),
+                });
+            }
 
-                    if (onOpenPayment) {
-                        onOpenPayment({
-                            customerId: Number(addForm.customerId),
-                            orderId: Number(orderId),
-                        });
-                    }
-
-        // ----------------------------------------------------
-        // STEP 4: REFRESH
-        // ----------------------------------------------------
-
-        setAddSuccess(
-            "Order and order items created successfully."
-        );
+            setAddSuccess(
+                "Order and order items created successfully."
+            );
 
             await fetchOrders();
 
@@ -761,7 +738,7 @@ function Order({ onOpenPayment }) {
         } finally {
             setViewLoading(false);
         }
-    };              
+    };
 
     // ============================================================
     // CLOSE VIEW
@@ -772,8 +749,6 @@ function Order({ onOpenPayment }) {
         setViewError("");
         setViewLoading(false);
     };
-
-
 
     // ============================================================
     // DOWNLOAD ORDER BILL PDF
@@ -786,31 +761,42 @@ function Order({ onOpenPayment }) {
 
         const doc = new jsPDF();
 
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        // --------------------------------------------------------
-        // HEADER
-        // --------------------------------------------------------
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
 
         doc.setFontSize(20);
         doc.setFont("helvetica", "bold");
-        doc.text("Shree Kundodari Cement Products", 18, 18);
+        doc.text(
+            "Shree Kundodari Cement Products",
+            18,
+            18
+        );
 
         doc.setFontSize(16);
-        doc.text("ORDER BILL", pageWidth - 18, 18, {
-            align: "right",
-        });
+        doc.text(
+            "ORDER BILL",
+            pageWidth - 18,
+            18,
+            {
+                align: "right",
+            }
+        );
 
         doc.setLineWidth(0.5);
-        doc.line(20, 26, pageWidth - 20, 26);
-
-        // --------------------------------------------------------
-        // ORDER INFORMATION
-        // --------------------------------------------------------
+        doc.line(
+            20,
+            26,
+            pageWidth - 20,
+            26
+        );
 
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text("Order Information", 20, 38);
+        doc.text(
+            "Order Information",
+            20,
+            38
+        );
 
         doc.setFont("helvetica", "normal");
 
@@ -840,14 +826,14 @@ function Order({ onOpenPayment }) {
             71
         );
 
-        // --------------------------------------------------------
-        // ORDER ITEMS
-        // --------------------------------------------------------
-
         let y = 84;
 
         doc.setFont("helvetica", "bold");
-        doc.text("Order Items", 20, y);
+        doc.text(
+            "Order Items",
+            20,
+            y
+        );
 
         y += 8;
 
@@ -862,7 +848,12 @@ function Order({ onOpenPayment }) {
         y += 5;
 
         doc.setLineWidth(0.3);
-        doc.line(20, y, pageWidth - 20, y);
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
 
         y += 7;
 
@@ -874,19 +865,25 @@ function Order({ onOpenPayment }) {
         ) {
             selectedOrder.items.forEach((item) => {
                 doc.text(
-                    String(item.productName || "-"),
+                    String(
+                        item.productName || "-"
+                    ),
                     20,
                     y
                 );
 
                 doc.text(
-                    String(item.productSize || "-"),
+                    String(
+                        item.productSize || "-"
+                    ),
                     75,
                     y
                 );
 
                 doc.text(
-                    String(item.orderedQuantity || 0),
+                    String(
+                        item.orderedQuantity || 0
+                    ),
                     115,
                     y
                 );
@@ -900,7 +897,9 @@ function Order({ onOpenPayment }) {
                 );
 
                 doc.text(
-                    formatPdfCurrency(item.amount),
+                    formatPdfCurrency(
+                        item.amount
+                    ),
                     170,
                     y
                 );
@@ -922,20 +921,25 @@ function Order({ onOpenPayment }) {
             y += 7;
         }
 
-        // --------------------------------------------------------
-        // TOTAL
-        // --------------------------------------------------------
-
         y += 3;
 
         doc.setLineWidth(0.3);
-        doc.line(20, y, pageWidth - 20, y);
+        doc.line(
+            20,
+            y,
+            pageWidth - 20,
+            y
+        );
 
         y += 9;
 
         doc.setFont("helvetica", "bold");
 
-        doc.text("Total", 140, y);
+        doc.text(
+            "Total",
+            140,
+            y
+        );
 
         doc.text(
             formatPdfCurrency(
@@ -945,14 +949,14 @@ function Order({ onOpenPayment }) {
             y
         );
 
-        // --------------------------------------------------------
-        // PAYMENT SUMMARY
-        // --------------------------------------------------------
-
         y += 16;
 
         doc.setFontSize(11);
-        doc.text("Payment Summary", 20, y);
+        doc.text(
+            "Payment Summary",
+            20,
+            y
+        );
 
         y += 8;
 
@@ -987,10 +991,6 @@ function Order({ onOpenPayment }) {
             20,
             y
         );
-
-        // --------------------------------------------------------
-        // ADDITIONAL INFORMATION
-        // --------------------------------------------------------
 
         y += 16;
 
@@ -1033,15 +1033,14 @@ function Order({ onOpenPayment }) {
             y
         );
 
-        // --------------------------------------------------------
-        // FOOTER
-        // --------------------------------------------------------
-
         const footerY =
             doc.internal.pageSize.getHeight() - 15;
 
         doc.setFontSize(8);
-        doc.setFont("helvetica", "normal");
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
 
         doc.text(
             "SKCP - Kumta - 581343, Karnataka",
@@ -1052,18 +1051,10 @@ function Order({ onOpenPayment }) {
             }
         );
 
-        // --------------------------------------------------------
-        // DOWNLOAD
-        // --------------------------------------------------------
-
         doc.save(
             `SKCP-Order-${selectedOrder.orderId}.pdf`
         );
     };
-
-
-
-
 
     // ============================================================
     // EDIT ORDER
@@ -1083,10 +1074,6 @@ function Order({ onOpenPayment }) {
                 await fetchMasterData();
             }
 
-            // ----------------------------------------------------
-            // GET ORDER
-            // ----------------------------------------------------
-
             const orderResult = await apiGet(
                 `/api/orders/${orderId}`
             );
@@ -1099,14 +1086,6 @@ function Order({ onOpenPayment }) {
                     "Order details not found."
                 );
             }
-
-            // ----------------------------------------------------
-            // GET ORDER ITEMS
-            //
-            // OrderResponse is designed for the bill and does
-            // not contain orderItemId. Therefore edit mode
-            // retrieves OrderItem records separately.
-            // ----------------------------------------------------
 
             const orderItemsResult =
                 await apiGet(
@@ -1236,7 +1215,6 @@ function Order({ onOpenPayment }) {
     ) => {
         const item = editItems[index];
 
-        // New unsaved item
         if (!item?.isExisting) {
             if (editItems.length === 1) {
                 setEditItems([
@@ -1255,7 +1233,6 @@ function Order({ onOpenPayment }) {
             return;
         }
 
-        // Existing item
         try {
             setEditSaving(true);
             setEditError("");
@@ -1330,10 +1307,6 @@ function Order({ onOpenPayment }) {
                 throw new Error(itemValidation);
             }
 
-            // ----------------------------------------------------
-            // STEP 1: UPDATE ORDER HEADER
-            // ----------------------------------------------------
-
             const orderPayload = {
                 customerId: Number(
                     editForm.customerId
@@ -1359,10 +1332,6 @@ function Order({ onOpenPayment }) {
                 `/api/orders/${editingOrder.orderId}`,
                 orderPayload
             );
-
-            // ----------------------------------------------------
-            // STEP 2: UPDATE / CREATE ORDER ITEMS
-            // ----------------------------------------------------
 
             for (const item of editItems) {
                 const itemPayload = {
@@ -1409,18 +1378,12 @@ function Order({ onOpenPayment }) {
                 }
             }
 
-            // ----------------------------------------------------
-            // STEP 3: REFRESH
-            // ----------------------------------------------------
-
             setEditSuccess(
                 "Order and order items updated successfully."
             );
 
             await fetchOrders();
 
-            // Reload the order so the edit modal reflects
-            // the latest backend state.
             const refreshedOrderResult =
                 await apiGet(
                     `/api/orders/${editingOrder.orderId}`
@@ -1561,10 +1524,12 @@ function Order({ onOpenPayment }) {
                                 );
 
                             return (
-                                <tr key={
-                                    item.orderItemId ||
-                                    `new-${index}`
-                                }>
+                                <tr
+                                    key={
+                                        item.orderItemId ||
+                                        `new-${index}`
+                                    }
+                                >
                                     <td>
                                         <select
                                             value={
@@ -1603,8 +1568,7 @@ function Order({ onOpenPayment }) {
                                                         >
                                                             {
                                                                 product.productName
-                                                            }
-                                                            {" "}
+                                                            }{" "}
                                                             -{" "}
                                                             {
                                                                 product.size
@@ -1641,8 +1605,7 @@ function Order({ onOpenPayment }) {
                                                 onItemChange(
                                                     index,
                                                     "orderedQuantity",
-                                                    event.target
-                                                        .value
+                                                    event.target.value
                                                 )
                                             }
                                             required
@@ -1663,8 +1626,7 @@ function Order({ onOpenPayment }) {
                                                 onItemChange(
                                                     index,
                                                     "unitSellingPrice",
-                                                    event.target
-                                                        .value
+                                                    event.target.value
                                                 )
                                             }
                                             required
@@ -1715,15 +1677,12 @@ function Order({ onOpenPayment }) {
 
     return (
         <section className="section active">
-
             {/* ==================================================
                 PAGE HEADER
             ================================================== */}
 
             <div className="card">
-
                 <div className="card-head">
-
                     <div>
                         <div className="card-title">
                             Orders
@@ -1741,67 +1700,58 @@ function Order({ onOpenPayment }) {
                             handleOpenAddOrder
                         }
                     >
-                        + Add Order
+                        Add Order
                     </button>
-
                 </div>
 
-            </div>
-
-            {/* ==================================================
-                ORDER LIST
-            ================================================== */}
-
-            <div className="card">
-
-                <div className="card-head">
-
-                    <div>
-                        <div className="card-title">
-                            Order List
-                        </div>
-
-                        <div className="kpi-sub">
-                            {filteredOrders.length}{" "}
-                            {filteredOrders.length === 1
-                                ? "record"
-                                : "records"}
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* SEARCH */}
-
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
                     <div
-                        className="search-wrap"
+                        className="fld"
                         style={{
-                            marginBottom: "16px",
-                            display: "flex",
-                            gap: "12px",
-                            alignItems: "center",
-                            flexWrap: "wrap",
+                            flex: "2 1 320px",
                         }}
                     >
+                        <label>
+                            Search Orders
+                        </label>
+
                         <input
                             type="text"
-                            className="search-input"
-                            placeholder="Search orders..."
                             value={searchTerm}
                             onChange={(event) =>
                                 setSearchTerm(
                                     event.target.value
                                 )
                             }
+                            placeholder="Search by customer, order ID, date, status..."
                         />
+                    </div>
 
-            
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="orderDateFrom">
+                            Date From
+                        </label>
 
                         <input
+                            id="orderDateFrom"
                             type="date"
                             value={dateFrom}
                             onChange={(event) => {
-                                const value = event.target.value;
+                                const value =
+                                    event.target.value;
 
                                 setDateFrom(value);
 
@@ -1810,20 +1760,32 @@ function Order({ onOpenPayment }) {
                                     value > dateTo
                                 ) {
                                     setDateFilterError(
-                                        "Date From cannot be later than Date To."
+                                        "From date cannot be later than To date."
                                     );
                                 } else {
                                     setDateFilterError("");
                                 }
                             }}
-                            aria-label="Order date from"
                         />
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="orderDateTo">
+                            Date To
+                        </label>
 
                         <input
+                            id="orderDateTo"
                             type="date"
                             value={dateTo}
                             onChange={(event) => {
-                                const value = event.target.value;
+                                const value =
+                                    event.target.value;
 
                                 setDateTo(value);
 
@@ -1832,44 +1794,60 @@ function Order({ onOpenPayment }) {
                                     dateFrom > value
                                 ) {
                                     setDateFilterError(
-                                        "Date From cannot be later than Date To."
+                                        "From date cannot be later than To date."
                                     );
                                 } else {
                                     setDateFilterError("");
                                 }
                             }}
-                            aria-label="Order date to"
                         />
-
-                            <button
-                            type="button"
-                            className="btn secondary"
-                            onClick={() => {
-                                setSearchTerm("");
-                                setDateFrom("");
-                                setDateTo("");
-                                setDateFilterError("");
-                            }}
-                        >
-                            Clear
-                        </button>
-
                     </div>
 
-                    {dateFilterError && (
-                        <div
-                            style={{
-                                marginTop: "-8px",
-                                marginBottom: "16px",
-                                color: "#b91c1c",
-                                fontSize: "14px",
-                            }}
-                        >
-                            {dateFilterError}
-                        </div>
-                    )}
+                    <button
+                        type="button"
+                        className="btn secondary"
+                        onClick={() => {
+                            setSearchTerm("");
+                            setDateFrom("");
+                            setDateTo("");
+                            setDateFilterError("");
+                        }}
+                    >
+                        Clear
+                    </button>
+                </div>
 
-                {/* LOADING */}
+                {dateFilterError && (
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
+                        {dateFilterError}
+                    </div>
+                )}
+            </div>
+
+            {/* ==================================================
+                ORDER LIST
+            ================================================== */}
+
+            <div className="card">
+                <div className="card-head">
+                    <div>
+                        <div className="card-title">
+                            Order List
+                        </div>
+
+                        <div className="kpi-sub">
+                            {totalRecords}{" "}
+                            {totalRecords === 1
+                                ? "record"
+                                : "records"}
+                        </div>
+                    </div>
+                </div>
 
                 {loading && (
                     <div className="empty-state">
@@ -1879,223 +1857,16 @@ function Order({ onOpenPayment }) {
                     </div>
                 )}
 
-                {/* ERROR */}
-
                 {!loading && error && (
                     <div className="empty-state">
                         <p>{error}</p>
                     </div>
                 )}
 
-                {/* TABLE */}
-
-                {!loading && !error && (
-                    <div className="tbl-wrap">
-
-                        <table>
-
-                            <thead>
-                                <tr>
-                                    <th
-                                        onClick={() =>
-                                            handleSort("orderId")
-                                        }
-                                        style={{
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        ID
-                                        {sortKey === "orderId" &&
-                                            (sortDirection === "asc"
-                                                ? " ↑"
-                                                : " ↓")}
-                                    </th>
-                                    <th
-                                            onClick={() =>
-                                                handleSort("customerName")
-                                            }
-                                            style={{
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Customer
-                                            {sortKey === "customerName" &&
-                                                (sortDirection === "asc"
-                                                    ? " ↑"
-                                                    : " ↓")}
-                                        </th>
-                                    <th
-                                        onClick={() =>
-                                            handleSort("orderDate")
-                                        }
-                                        style={{
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        Order Date
-                                        {sortKey === "orderDate" &&
-                                            (sortDirection === "asc"
-                                                ? " ↑"
-                                                : " ↓")}
-                                    </th>
-                                    <th
-                                        onClick={() =>
-                                            handleSort("expectedDeliveryDate")
-                                        }
-                                        style={{
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        Expected Delivery
-                                        {sortKey === "expectedDeliveryDate" &&
-                                            (sortDirection === "asc"
-                                                ? " ↑"
-                                                : " ↓")}
-                                    </th>
-                                    <th
-                                        onClick={() =>
-                                            handleSort("orderStatus")
-                                        }
-                                        style={{
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        Status
-                                        {sortKey === "orderStatus" &&
-                                            (sortDirection === "asc"
-                                                ? " ↑"
-                                                : " ↓")}
-                                    </th>
-                                    <th>
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                {paginatedRecords.map(
-                                    (order) => (
-                                        <tr
-                                            key={
-                                                order.orderId
-                                            }
-                                        >
-
-                                            <td>
-                                                {
-                                                    order.orderId
-                                                }
-                                            </td>
-
-                                            <td>
-                                                <strong>
-                                                    {order.customerName ||
-                                                        `Customer #${order.customerId}`}
-                                                </strong>
-                                            </td>
-
-                                            <td>
-                                                {formatDate(
-                                                    order.orderDate
-                                                )}
-                                            </td>
-
-                                            <td>
-                                                {formatDate(
-                                                    order.expectedDeliveryDate
-                                                )}
-                                            </td>
-
-                                            <td>
-                                                <span
-                                                    className={
-                                                        order.orderStatus ===
-                                                        "COMPLETED"
-                                                            ? "badge bg"
-                                                            : "badge br"
-                                                    }
-                                                >
-                                                    {
-                                                        order.orderStatus
-                                                    }
-                                                </span>
-                                            </td>
-
-                                            <td>
-
-                                                <div className="action-buttons">
-
-                                                    <button
-                                                        type="button"
-                                                        className="btn sm"
-                                                        onClick={() =>
-                                                            handleViewOrder(
-                                                                order.orderId
-                                                            )
-                                                        }
-                                                    >
-                                                        View
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        className="btn sm"
-                                                        onClick={() =>
-                                                            handleEditOrder(
-                                                                order.orderId
-                                                            )
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        className="btn sm"
-                                                        onClick={() =>
-                                                            handleOpenDeleteOrder(
-                                                                order
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            deleteSaving
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-
-                                                </div>
-
-                                            </td>
-
-                                        </tr>
-                                    )
-                                )}
-
-                            </tbody>
-
-                        </table>
-
-                         <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            totalRecords={totalRecords}
-                            pageSize={pageSize}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={handlePageSizeChange}
-                        />
-
-
-                    </div>
-                )}
-
-                {/* EMPTY STATE */}
-
                 {!loading &&
                     !error &&
-                    filteredOrders.length ===
-                        0 && (
+                    !dateFilterError &&
+                    totalRecords === 0 && (
                         <div className="empty-state">
                             <p>
                                 {searchTerm.trim()
@@ -2105,6 +1876,233 @@ function Order({ onOpenPayment }) {
                         </div>
                     )}
 
+                {!loading &&
+                    !error &&
+                    !dateFilterError &&
+                    totalRecords > 0 && (
+                        <div className="tbl-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "orderId"
+                                                )
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            ID
+                                            {sortKey ===
+                                                "orderId" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "customerName"
+                                                )
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            CUSTOMER
+                                            {sortKey ===
+                                                "customerName" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "orderDate"
+                                                )
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            ORDER DATE
+                                            {sortKey ===
+                                                "orderDate" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "expectedDeliveryDate"
+                                                )
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            EXPECTED DELIVERY
+                                            {sortKey ===
+                                                "expectedDeliveryDate" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+
+                                        <th
+                                            onClick={() =>
+                                                handleSort(
+                                                    "orderStatus"
+                                                )
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            STATUS
+                                            {sortKey ===
+                                                "orderStatus" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+
+                                        <th>
+                                            ACTIONS
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {paginatedRecords.map(
+                                        (order) => (
+                                            <tr
+                                                key={
+                                                    order.orderId
+                                                }
+                                            >
+                                                <td>
+                                                    {
+                                                        order.orderId
+                                                    }
+                                                </td>
+
+                                                <td>
+                                                    <strong>
+                                                        {order.customerName ||
+                                                            `Customer #${order.customerId}`}
+                                                    </strong>
+                                                </td>
+
+                                                <td>
+                                                    {formatDate(
+                                                        order.orderDate
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    {formatDate(
+                                                        order.expectedDeliveryDate
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    <span
+                                                        className={
+                                                            order.orderStatus ===
+                                                            "COMPLETED"
+                                                                ? "badge bg"
+                                                                : "badge br"
+                                                        }
+                                                    >
+                                                        {
+                                                            order.orderStatus
+                                                        }
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    <div className="table-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn view-btn"
+                                                            onClick={() =>
+                                                                handleViewOrder(
+                                                                    order.orderId
+                                                                )
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn edit-btn"
+                                                            onClick={() =>
+                                                                handleEditOrder(
+                                                                    order.orderId
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleOpenDeleteOrder(
+                                                                    order
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                deleteSaving
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+
+                            <Pagination
+                                currentPage={
+                                    currentPage
+                                }
+                                totalPages={
+                                    totalPages
+                                }
+                                totalRecords={
+                                    totalRecords
+                                }
+                                pageSize={
+                                    pageSize
+                                }
+                                onPageChange={
+                                    handlePageChange
+                                }
+                                onPageSizeChange={
+                                    handlePageSizeChange
+                                }
+                            />
+                        </div>
+                    )}
             </div>
 
             {/* ==================================================
@@ -2124,56 +2122,60 @@ function Order({ onOpenPayment }) {
                 subtitle="Customer order and payment details"
                 size="lg"
                 footer={
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: "8px",
-                    }}
-                >
-                    {selectedOrder &&
-                        Number(selectedOrder.balance || 0) > 0 && (
-                            <button
-                                type="button"
-                                className="btn primary"
-                                onClick={() => {
-                                    onOpenPayment({
-                                        customerId: Number(
-                                            selectedOrder.customerId
-                                        ),
-                                        orderId: Number(
-                                            selectedOrder.orderId
-                                        ),
-                                    });
-                                }}
-                            >
-                                Collect Payment
-                            </button>
-                        )}
-
-                    <button
-                        type="button"
-                        className="btn primary"
-                        onClick={
-                            handleDownloadOrderPdf
-                        }
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent:
+                                "flex-end",
+                            gap: "8px",
+                        }}
                     >
-                        Download PDF
-                    </button>
+                        {selectedOrder &&
+                            Number(
+                                selectedOrder.balance || 0
+                            ) > 0 && (
+                                <button
+                                    type="button"
+                                    className="btn primary"
+                                    onClick={() => {
+                                        onOpenPayment({
+                                            customerId:
+                                                Number(
+                                                    selectedOrder.customerId
+                                                ),
+                                            orderId:
+                                                Number(
+                                                    selectedOrder.orderId
+                                                ),
+                                        });
+                                    }}
+                                >
+                                    Collect Payment
+                                </button>
+                            )}
 
-                    <button
-                        type="button"
-                        className="btn"
-                        onClick={
-                            handleCloseViewOrder
-                        }
-                    >
-                        Close
-                    </button>
-                </div>
-            }
+                        <button
+                            type="button"
+                            className="btn primary"
+                            onClick={
+                                handleDownloadOrderPdf
+                            }
+                        >
+                            Download PDF
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn"
+                            onClick={
+                                handleCloseViewOrder
+                            }
+                        >
+                            Close
+                        </button>
+                    </div>
+                }
             >
-
                 {viewLoading && (
                     <div className="empty-state">
                         <p>
@@ -2192,15 +2194,12 @@ function Order({ onOpenPayment }) {
                     !viewError &&
                     selectedOrder && (
                         <>
-
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Order Information
                                 </div>
 
                                 <DetailGrid>
-
                                     <DetailItem
                                         label="Customer"
                                         value={
@@ -2229,13 +2228,10 @@ function Order({ onOpenPayment }) {
                                             selectedOrder.expectedDeliveryDate
                                         )}
                                     />
-
                                 </DetailGrid>
-
                             </div>
 
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Order Items
                                 </div>
@@ -2243,11 +2239,8 @@ function Order({ onOpenPayment }) {
                                 {selectedOrder.items &&
                                 selectedOrder.items.length >
                                     0 ? (
-
                                     <div className="tbl-wrap">
-
                                         <table>
-
                                             <thead>
                                                 <tr>
                                                     <th>
@@ -2269,7 +2262,6 @@ function Order({ onOpenPayment }) {
                                             </thead>
 
                                             <tbody>
-
                                                 {selectedOrder.items.map(
                                                     (
                                                         item,
@@ -2278,7 +2270,6 @@ function Order({ onOpenPayment }) {
                                                         <tr
                                                             key={`${item.productId}-${index}`}
                                                         >
-
                                                             <td>
                                                                 {
                                                                     item.productName
@@ -2310,17 +2301,13 @@ function Order({ onOpenPayment }) {
                                                                     )}
                                                                 </strong>
                                                             </td>
-
                                                         </tr>
                                                     )
                                                 )}
-
                                             </tbody>
 
                                             <tfoot>
-
                                                 <tr>
-
                                                     <td
                                                         colSpan="4"
                                                         style={{
@@ -2340,15 +2327,10 @@ function Order({ onOpenPayment }) {
                                                             )}
                                                         </strong>
                                                     </td>
-
                                                 </tr>
-
                                             </tfoot>
-
                                         </table>
-
                                     </div>
-
                                 ) : (
                                     <div className="empty-state">
                                         <p>
@@ -2356,17 +2338,14 @@ function Order({ onOpenPayment }) {
                                         </p>
                                     </div>
                                 )}
-
                             </div>
 
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Payment Summary
                                 </div>
 
                                 <DetailGrid>
-
                                     <DetailItem
                                         label="Payment Status"
                                         value={
@@ -2395,19 +2374,15 @@ function Order({ onOpenPayment }) {
                                             selectedOrder.balance
                                         )}
                                     />
-
                                 </DetailGrid>
-
                             </div>
 
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Additional Information
                                 </div>
 
                                 <DetailGrid>
-
                                     <DetailItem
                                         label="Order Status"
                                         value={
@@ -2424,14 +2399,10 @@ function Order({ onOpenPayment }) {
                                         }
                                         fullWidth
                                     />
-
                                 </DetailGrid>
-
                             </div>
-
                         </>
                     )}
-
             </ViewModal>
 
             {/* ==================================================
@@ -2459,62 +2430,13 @@ function Order({ onOpenPayment }) {
                 success={addSuccess}
                 size="lg"
             >
-
-                {/* CUSTOMER / ORDER INFORMATION */}
-
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
                         Order Information
                     </div>
 
                     <div className="form-grid">
-
                         <div className="fld">
-                            <label>Customer *</label>
-
-                            <select
-                                name="customerId"
-                                value={addForm.customerId}
-                                onChange={handleAddFormChange}
-                                required
-                                disabled={masterLoading}
-                            >
-                                <option value="">
-                                    {masterLoading
-                                        ? "Loading customers..."
-                                        : "Select Customer"}
-                                </option>
-
-                                {customers
-                                    .filter(
-                                        (customer) =>
-                                            customer.status === "ACTIVE"
-                                    )
-                                    .map((customer) => (
-                                        <option
-                                            key={customer.customerId}
-                                            value={customer.customerId}
-                                        >
-                                            {customer.customerName}
-                                        </option>
-                                    ))}
-                            </select>
-
-                            <button
-                                type="button"
-                                className="btn sm"
-                                style={{ marginTop: "8px" }}
-                                onClick={() =>
-                                    setShowAddCustomerModal(true)
-                                }
-                            >
-                                + Add Customer
-                            </button>
-                        </div>
-
-                      {/*  <div className="fld">
-
                             <label>
                                 Customer *
                             </label>
@@ -2532,7 +2454,6 @@ function Order({ onOpenPayment }) {
                                     masterLoading
                                 }
                             >
-
                                 <option value="">
                                     {masterLoading
                                         ? "Loading customers..."
@@ -2546,9 +2467,7 @@ function Order({ onOpenPayment }) {
                                             "ACTIVE"
                                     )
                                     .map(
-                                        (
-                                            customer
-                                        ) => (
+                                        (customer) => (
                                             <option
                                                 key={
                                                     customer.customerId
@@ -2563,13 +2482,26 @@ function Order({ onOpenPayment }) {
                                             </option>
                                         )
                                     )}
-
                             </select>
 
-                        </div> */ }
+                            <button
+                                type="button"
+                                className="btn sm"
+                                style={{
+                                    marginTop:
+                                        "8px",
+                                }}
+                                onClick={() =>
+                                    setShowAddCustomerModal(
+                                        true
+                                    )
+                                }
+                            >
+                                Add Customer
+                            </button>
+                        </div>
 
                         <div className="fld">
-
                             <label>
                                 Order Date *
                             </label>
@@ -2585,11 +2517,9 @@ function Order({ onOpenPayment }) {
                                 }
                                 required
                             />
-
                         </div>
 
                         <div className="fld">
-
                             <label>
                                 Expected Delivery Date
                             </label>
@@ -2604,11 +2534,9 @@ function Order({ onOpenPayment }) {
                                     handleAddFormChange
                                 }
                             />
-
                         </div>
 
                         <div className="fld">
-
                             <label>
                                 Transport *
                             </label>
@@ -2639,21 +2567,12 @@ function Order({ onOpenPayment }) {
                                     Third-Party Transport
                                 </option>
                             </select>
-
                         </div>
-
-
-
                     </div>
-
                 </div>
 
-                {/* ORDER ITEMS */}
-
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
-
                         <div
                             style={{
                                 display: "flex",
@@ -2663,7 +2582,6 @@ function Order({ onOpenPayment }) {
                                     "center",
                             }}
                         >
-
                             <span>
                                 Order Items
                             </span>
@@ -2675,11 +2593,9 @@ function Order({ onOpenPayment }) {
                                     handleAddItem
                                 }
                             >
-                                + Add Item
+                                Add Item
                             </button>
-
                         </div>
-
                     </div>
 
                     {renderOrderItemRows(
@@ -2704,21 +2620,15 @@ function Order({ onOpenPayment }) {
                             )}
                         </strong>
                     </div>
-
                 </div>
 
-                {/* REMARKS */}
-
                 <div className="customer-modal-section">
-
                     <div className="customer-modal-section-title">
                         Additional Information
                     </div>
 
                     <div className="form-grid">
-
                         <div className="fld f-full">
-
                             <label>
                                 Remarks
                             </label>
@@ -2733,20 +2643,19 @@ function Order({ onOpenPayment }) {
                                 }
                                 maxLength={500}
                             />
-
                         </div>
-
                     </div>
-
                 </div>
-
             </FormModal>
 
-
             <AddCustomerModal
-                isOpen={showAddCustomerModal}
+                isOpen={
+                    showAddCustomerModal
+                }
                 onClose={() =>
-                    setShowAddCustomerModal(false)
+                    setShowAddCustomerModal(
+                        false
+                    )
                 }
                 onCustomerCreated={(createdCustomer) => {
                     const normalizedCustomer = {
@@ -2757,13 +2666,16 @@ function Order({ onOpenPayment }) {
                     };
 
                     setCustomers((previous) => {
-                        const exists = previous.some(
-                            (customer) =>
-                                Number(customer.customerId) ===
-                                Number(
-                                    normalizedCustomer.customerId
-                                )
-                        );
+                        const exists =
+                            previous.some(
+                                (customer) =>
+                                    Number(
+                                        customer.customerId
+                                    ) ===
+                                    Number(
+                                        normalizedCustomer.customerId
+                                    )
+                            );
 
                         if (exists) {
                             return previous;
@@ -2777,9 +2689,10 @@ function Order({ onOpenPayment }) {
 
                     setAddForm((previous) => ({
                         ...previous,
-                        customerId: String(
-                            normalizedCustomer.customerId
-                        ),
+                        customerId:
+                            String(
+                                normalizedCustomer.customerId
+                            ),
                     }));
                 }}
             />
@@ -2809,7 +2722,6 @@ function Order({ onOpenPayment }) {
                 success={editSuccess}
                 size="lg"
             >
-
                 {editLoading && (
                     <div className="empty-state">
                         <p>
@@ -2821,19 +2733,13 @@ function Order({ onOpenPayment }) {
                 {!editLoading &&
                     editingOrder && (
                         <>
-
-                            {/* ORDER INFORMATION */}
-
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Order Information
                                 </div>
 
                                 <div className="form-grid">
-
                                     <div className="fld">
-
                                         <label>
                                             Customer *
                                         </label>
@@ -2848,7 +2754,6 @@ function Order({ onOpenPayment }) {
                                             }
                                             required
                                         >
-
                                             <option value="">
                                                 Select Customer
                                             </option>
@@ -2879,13 +2784,10 @@ function Order({ onOpenPayment }) {
                                                         </option>
                                                     )
                                                 )}
-
                                         </select>
-
                                     </div>
 
                                     <div className="fld">
-
                                         <label>
                                             Order Date *
                                         </label>
@@ -2901,11 +2803,9 @@ function Order({ onOpenPayment }) {
                                             }
                                             required
                                         />
-
                                     </div>
 
                                     <div className="fld">
-
                                         <label>
                                             Expected Delivery Date
                                         </label>
@@ -2920,11 +2820,9 @@ function Order({ onOpenPayment }) {
                                                 handleEditFormChange
                                             }
                                         />
-
                                     </div>
 
                                     <div className="fld">
-
                                         <label>
                                             Order Status
                                         </label>
@@ -2937,12 +2835,12 @@ function Order({ onOpenPayment }) {
                                                 event
                                             ) =>
                                                 setEditOrderStatus(
-                                                    event.target
+                                                    event
+                                                        .target
                                                         .value
                                                 )
                                             }
                                         >
-
                                             {ORDER_STATUSES.map(
                                                 (
                                                     status
@@ -2961,21 +2859,13 @@ function Order({ onOpenPayment }) {
                                                     </option>
                                                 )
                                             )}
-
                                         </select>
-
                                     </div>
-
                                 </div>
-
                             </div>
 
-                            {/* EXISTING ORDER ITEMS */}
-
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
-
                                     <div
                                         style={{
                                             display:
@@ -2986,7 +2876,6 @@ function Order({ onOpenPayment }) {
                                                 "center",
                                         }}
                                     >
-
                                         <span>
                                             Order Items
                                         </span>
@@ -2998,11 +2887,9 @@ function Order({ onOpenPayment }) {
                                                 handleAddEditItem
                                             }
                                         >
-                                            + Add Item
+                                            Add Item
                                         </button>
-
                                     </div>
-
                                 </div>
 
                                 {renderOrderItemRows(
@@ -3031,21 +2918,15 @@ function Order({ onOpenPayment }) {
                                         )}
                                     </strong>
                                 </div>
-
                             </div>
 
-                            {/* REMARKS */}
-
                             <div className="customer-modal-section">
-
                                 <div className="customer-modal-section-title">
                                     Additional Information
                                 </div>
 
                                 <div className="form-grid">
-
                                     <div className="fld f-full">
-
                                         <label>
                                             Remarks
                                         </label>
@@ -3062,16 +2943,11 @@ function Order({ onOpenPayment }) {
                                                 500
                                             }
                                         />
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </>
                     )}
-
             </FormModal>
 
             {/* ==================================================
@@ -3103,7 +2979,6 @@ function Order({ onOpenPayment }) {
                     deleteError
                 }
             />
-
         </section>
     );
 }

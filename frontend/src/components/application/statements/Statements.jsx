@@ -294,14 +294,18 @@ const Statements = () => {
             return date;
         }
 
-        return parsedDate.toLocaleDateString(
-            "en-IN",
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            }
-        );
+        const day = String(
+            parsedDate.getDate()
+        ).padStart(2, "0");
+
+        const month = String(
+            parsedDate.getMonth() + 1
+        ).padStart(2, "0");
+
+        const year =
+            parsedDate.getFullYear();
+
+        return `${day}-${month}-${year}`;
     };
 
     // ============================================================
@@ -440,33 +444,7 @@ const Statements = () => {
     };
 
     const formatPdfDate = (date) => {
-        if (!date) {
-            return "-";
-        }
-
-        const parsedDate =
-            new Date(date);
-
-        if (
-            Number.isNaN(
-                parsedDate.getTime()
-            )
-        ) {
-            return String(date);
-        }
-
-        const day = String(
-            parsedDate.getDate()
-        ).padStart(2, "0");
-
-        const month = String(
-            parsedDate.getMonth() + 1
-        ).padStart(2, "0");
-
-        const year =
-            parsedDate.getFullYear();
-
-        return `${day}-${month}-${year}`;
+        return formatDate(date);
     };
 
     // ============================================================
@@ -1401,63 +1379,66 @@ const Statements = () => {
     // ============================================================
 
     return (
-        <div>
+        <div className="page">
 
             {/* =====================================================
                 HEADER
             ====================================================== */}
 
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent:
-                        "space-between",
-                    marginBottom: "16px"
-                }}
-            >
-                <div>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "20px",
-                            fontWeight: 700
-                        }}
-                    >
-                        Statements
-                    </h2>
+            <section className="card">
 
-                    <p
-                        style={{
-                            margin: "4px 0 0",
-                            fontSize: "12px",
-                            color:
-                                "var(--text2)"
-                        }}
-                    >
-                        Customer account
-                        statements and
-                        transaction details
-                    </p>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: "16px",
+                        flexWrap: "wrap"
+                    }}
+                >
+
+                    <div>
+                        <h2>
+                            Statements
+                        </h2>
+
+                        <p>
+                            Customer account
+                            statements and
+                            transaction details.
+                        </p>
+                    </div>
+
                 </div>
-            </div>
+
+            </section>
 
             {/* =====================================================
                 CUSTOMER STATEMENT FILTER
             ====================================================== */}
 
-            <div className="card">
+            <section className="card">
 
-                <div className="card-head">
-                    <div className="card-title">
-                        Customer Statement
-                    </div>
-                </div>
+                <h2>
+                    Customer Statement
+                </h2>
 
-                <div className="reports-filter-grid">
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px"
+                    }}
+                >
 
-                    <div className="reports-filter-field">
-
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "2 1 320px"
+                        }}
+                    >
                         <label>
                             Customer
                         </label>
@@ -1493,11 +1474,14 @@ const Statements = () => {
                                 )
                             )}
                         </select>
-
                     </div>
 
-                    <div className="reports-filter-field">
-
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px"
+                        }}
+                    >
                         <label>
                             From Date
                         </label>
@@ -1513,11 +1497,14 @@ const Statements = () => {
                                 )
                             }
                         />
-
                     </div>
 
-                    <div className="reports-filter-field">
-
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px"
+                        }}
+                    >
                         <label>
                             To Date
                         </label>
@@ -1533,75 +1520,52 @@ const Statements = () => {
                                 )
                             }
                         />
-
                     </div>
 
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems:
-                                "flex-end"
-                        }}
+                    <button
+                        type="button"
+                        className="action-btn view-btn"
+                        onClick={
+                            handleGenerateStatement
+                        }
+                        disabled={loading}
                     >
-                        <button
-                            type="button"
-                            className="action-btn view-btn"
-                            style={{
-                                minHeight:
-                                    "40px",
-                                padding:
-                                    "0 16px"
-                            }}
-                            onClick={
-                                handleGenerateStatement
-                            }
-                            disabled={loading}
-                        >
-                            {loading
-                                ? "Loading..."
-                                : "Generate Statement"}
-                        </button>
-                    </div>
+                        {loading
+                            ? "Loading..."
+                            : "Generate Statement"}
+                    </button>
 
                 </div>
-            </div>
 
-            {/* =====================================================
-                ERROR
-            ====================================================== */}
-
-            {error && (
-                <div
-                    className="card"
-                    style={{
-                        padding:
-                            "12px 15px",
-                        color:
-                            "var(--text)"
-                    }}
-                >
+                {error && (
                     <div
+                        className="form-error"
                         style={{
-                            fontSize:
-                                "12px",
-                            fontWeight: 600,
-                            color:
-                                "var(--accent)"
+                            marginTop: "12px"
                         }}
                     >
                         {error}
                     </div>
-                </div>
-            )}
+                )}
+
+            </section>
 
             {/* =====================================================
                 LOADING
             ====================================================== */}
 
             {loading && (
-                <div className="dashboard-loading">
-                    Loading statement data...
-                </div>
+                <section className="card">
+
+                    <h2>
+                        Statements
+                    </h2>
+
+                    <p>
+                        Loading statement data...
+                    </p>
+
+                </section>
             )}
 
             {/* =====================================================
@@ -1616,12 +1580,27 @@ const Statements = () => {
                             STATEMENT HEADER
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    gap: "16px",
+                                    flexWrap: "wrap"
+                                }}
+                            >
 
-                                <div className="card-title">
-                                    Statement Results
+                                <div>
+                                    <h2>
+                                        Statement Results
+                                    </h2>
+
+                                    <p>
+                                        Customer account
+                                        statement.
+                                    </p>
                                 </div>
 
                                 <button
@@ -1638,13 +1617,11 @@ const Statements = () => {
 
                             <div
                                 style={{
-                                    display:
-                                        "flex",
-                                    flexWrap:
-                                        "wrap",
+                                    display: "flex",
+                                    flexWrap: "wrap",
                                     gap: "24px",
-                                    alignItems:
-                                        "center"
+                                    alignItems: "center",
+                                    marginTop: "16px"
                                 }}
                             >
 
@@ -1652,12 +1629,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "3px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "3px"
                                         }}
                                     >
                                         CUSTOMER
@@ -1665,12 +1639,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "15px",
-                                            fontWeight:
-                                                700,
-                                            color:
-                                                "var(--text)"
+                                            fontSize: "15px",
+                                            fontWeight: 700,
+                                            color: "var(--text)"
                                         }}
                                     >
                                         {
@@ -1686,12 +1657,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "3px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "3px"
                                         }}
                                     >
                                         PERIOD
@@ -1699,10 +1667,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "13px",
-                                            fontWeight:
-                                                600
+                                            fontSize: "13px",
+                                            fontWeight: 600
                                         }}
                                     >
                                         {fromDate ||
@@ -1719,34 +1685,32 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             ACCOUNT SUMMARY
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Account Summary
+                            </h2>
 
-                                <div className="card-title">
-                                    Account Summary
-                                </div>
-
-                            </div>
-
-                            <div className="kpi-grid">
+                            <div
+                                className="kpi-grid"
+                                style={{
+                                    marginTop: "16px"
+                                }}
+                            >
 
                                 <div className="card">
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         TOTAL ORDER
@@ -1755,10 +1719,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1772,12 +1734,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         TOTAL PAID
@@ -1786,10 +1745,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1803,12 +1760,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         TOTAL
@@ -1817,10 +1771,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1832,34 +1784,32 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             PAYMENT SUMMARY
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Payment Summary
+                            </h2>
 
-                                <div className="card-title">
-                                    Payment Summary
-                                </div>
-
-                            </div>
-
-                            <div className="kpi-grid">
+                            <div
+                                className="kpi-grid"
+                                style={{
+                                    marginTop: "16px"
+                                }}
+                            >
 
                                 <div className="card">
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         TOTAL PAYMENTS
@@ -1868,10 +1818,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1885,12 +1833,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         TOTAL
@@ -1899,10 +1844,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1916,12 +1859,9 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "11px",
-                                            color:
-                                                "var(--text2)",
-                                            marginBottom:
-                                                "6px"
+                                            fontSize: "11px",
+                                            color: "var(--text2)",
+                                            marginBottom: "6px"
                                         }}
                                     >
                                         UNALLOCATED
@@ -1930,10 +1870,8 @@ const Statements = () => {
 
                                     <div
                                         style={{
-                                            fontSize:
-                                                "17px",
-                                            fontWeight:
-                                                700
+                                            fontSize: "17px",
+                                            fontWeight: 700
                                         }}
                                     >
                                         {formatCurrency(
@@ -1945,28 +1883,26 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             ORDERS
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Orders
+                            </h2>
 
-                                <div className="card-title">
-                                    Orders
-                                </div>
+                            <p>
+                                {sortedOrders.length} order
+                                {sortedOrders.length === 1
+                                    ? ""
+                                    : "s"}
+                            </p>
 
-                            </div>
-
-                            <div
-                                style={{
-                                    overflowX:
-                                        "auto"
-                                }}
-                            >
+                            <div className="table-wrap">
 
                                 <table>
 
@@ -2199,10 +2135,8 @@ const Statements = () => {
                                             <td
                                                 colSpan="3"
                                                 style={{
-                                                    fontWeight:
-                                                        700,
-                                                    textAlign:
-                                                        "right"
+                                                    fontWeight: 700,
+                                                    textAlign: "right"
                                                 }}
                                             >
                                                 TOTAL
@@ -2210,8 +2144,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2221,8 +2154,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2232,8 +2164,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2252,28 +2183,26 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             PAYMENTS
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Payments
+                            </h2>
 
-                                <div className="card-title">
-                                    Payments
-                                </div>
+                            <p>
+                                {sortedPayments.length} payment
+                                {sortedPayments.length === 1
+                                    ? ""
+                                    : "s"}
+                            </p>
 
-                            </div>
-
-                            <div
-                                style={{
-                                    overflowX:
-                                        "auto"
-                                }}
-                            >
+                            <div className="table-wrap">
 
                                 <table>
 
@@ -2456,10 +2385,8 @@ const Statements = () => {
                                             <td
                                                 colSpan="4"
                                                 style={{
-                                                    fontWeight:
-                                                        700,
-                                                    textAlign:
-                                                        "right"
+                                                    fontWeight: 700,
+                                                    textAlign: "right"
                                                 }}
                                             >
                                                 TOTAL
@@ -2467,8 +2394,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2485,10 +2411,8 @@ const Statements = () => {
                                             <td
                                                 colSpan="4"
                                                 style={{
-                                                    fontWeight:
-                                                        700,
-                                                    textAlign:
-                                                        "right"
+                                                    fontWeight: 700,
+                                                    textAlign: "right"
                                                 }}
                                             >
                                                 UNALLOCATED
@@ -2497,8 +2421,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2516,28 +2439,26 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             PAYMENT ALLOCATIONS
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Payment Allocations
+                            </h2>
 
-                                <div className="card-title">
-                                    Payment Allocations
-                                </div>
+                            <p>
+                                {sortedAllocations.length} allocation
+                                {sortedAllocations.length === 1
+                                    ? ""
+                                    : "s"}
+                            </p>
 
-                            </div>
-
-                            <div
-                                style={{
-                                    overflowX:
-                                        "auto"
-                                }}
-                            >
+                            <div className="table-wrap">
 
                                 <table>
 
@@ -2720,10 +2641,8 @@ const Statements = () => {
                                             <td
                                                 colSpan="4"
                                                 style={{
-                                                    fontWeight:
-                                                        700,
-                                                    textAlign:
-                                                        "right"
+                                                    fontWeight: 700,
+                                                    textAlign: "right"
                                                 }}
                                             >
                                                 TOTAL
@@ -2731,8 +2650,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2750,28 +2668,26 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                         {/* =============================================
                             OUTSTANDING BALANCE
                         ============================================== */}
 
-                        <div className="card">
+                        <section className="card">
 
-                            <div className="card-head">
+                            <h2>
+                                Outstanding Balance
+                            </h2>
 
-                                <div className="card-title">
-                                    Outstanding Balance
-                                </div>
+                            <p>
+                                {sortedOutstanding.length} order
+                                {sortedOutstanding.length === 1
+                                    ? ""
+                                    : "s"}
+                            </p>
 
-                            </div>
-
-                            <div
-                                style={{
-                                    overflowX:
-                                        "auto"
-                                }}
-                            >
+                            <div className="table-wrap">
 
                                 <table>
 
@@ -2927,10 +2843,8 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700,
-                                                    textAlign:
-                                                        "right"
+                                                    fontWeight: 700,
+                                                    textAlign: "right"
                                                 }}
                                             >
                                                 TOTAL
@@ -2938,8 +2852,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2949,8 +2862,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2960,8 +2872,7 @@ const Statements = () => {
 
                                             <td
                                                 style={{
-                                                    fontWeight:
-                                                        700
+                                                    fontWeight: 700
                                                 }}
                                             >
                                                 {formatCurrency(
@@ -2979,7 +2890,7 @@ const Statements = () => {
 
                             </div>
 
-                        </div>
+                        </section>
 
                     </>
                 )}

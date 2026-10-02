@@ -1,16 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
-
 import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
 import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
-import { DetailGrid, DetailItem } from "../../ui/common/DetailGrid";
-import AddCustomerModal from "./AddCustomerModal";
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../ui/common/DetailGrid";
+
+import { apiGet, apiPut, apiDelete } from "../../../services/api";
 
 import useTableSort from "../../../hooks/useTableSort";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../ui/Pagination";
+
+import AddCustomerModal from "./AddCustomerModal";
 
 const initialForm = {
     customerName: "",
@@ -25,29 +29,39 @@ const initialForm = {
 };
 
 function Customer() {
-    const [searchKeyword, setSearchKeyword] = useState("");
-    const [dateFrom, setDateFrom] = useState("");
-    const [dateTo, setDateTo] = useState("");
-    const [filterError, setFilterError] = useState("");
+    // ============================================================
+    // STATE
+    // ============================================================
 
     const [customers, setCustomers] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // ---------------------------------------------------------------------------
-    // VIEW
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------
+    // FILTER STATE
+    // ------------------------------------------------------------
+
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [filterError, setFilterError] = useState("");
+
+    // ------------------------------------------------------------
+    // VIEW STATE
+    // ------------------------------------------------------------
 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [viewLoading, setViewLoading] = useState(false);
     const [viewError, setViewError] = useState("");
 
-    // ---------------------------------------------------------------------------
-    // EDIT
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------
+    // ADD / EDIT STATE
+    // ------------------------------------------------------------
 
-    const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
+    const [showAddCustomerModal, setShowAddCustomerModal] =
+        useState(false);
+
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [editForm, setEditForm] = useState(initialForm);
     const [editLoading, setEditLoading] = useState(false);
@@ -55,25 +69,68 @@ function Customer() {
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
 
-    // ---------------------------------------------------------------------------
-    // DELETE
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------
+    // DELETE STATE
+    // ------------------------------------------------------------
 
     const [deletingCustomer, setDeletingCustomer] = useState(null);
     const [deleteSaving, setDeleteSaving] = useState(false);
     const [deleteError, setDeleteError] = useState("");
 
-    // ---------------------------------------------------------------------------
-    // INITIAL LOAD
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // FORMATTERS
+    // ============================================================
 
-    useEffect(() => {
-        fetchCustomers();
-    }, []);
+    const formatDate = (dateValue) => {
+        if (!dateValue) {
+            return "-";
+        }
 
-    // ---------------------------------------------------------------------------
-    // GET ALL CUSTOMERS
-    // ---------------------------------------------------------------------------
+        const date = new Date(
+            `${String(dateValue).slice(0, 10)}T00:00:00`
+        );
+
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+    };
+
+    const formatDateTime = (dateValue) => {
+        if (!dateValue) {
+            return "-";
+        }
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return dateValue;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        const hour12 = hours % 12 || 12;
+        const period = hours >= 12 ? "PM" : "AM";
+
+        return `${day}-${month}-${year} ${String(hour12).padStart(
+            2,
+            "0"
+        )}:${minutes} ${period}`;
+    };
+
+    // ============================================================
+    // FETCH ALL CUSTOMERS
+    // ============================================================
 
     const fetchCustomers = async () => {
         try {
@@ -81,6 +138,8 @@ function Customer() {
             setError("");
 
             const result = await apiGet("/api/customers");
+
+            console.log("Customers API response:", result);
 
             setCustomers(
                 Array.isArray(result?.data)
@@ -91,71 +150,27 @@ function Customer() {
             );
         } catch (err) {
             console.error("Error fetching customers:", err);
-            setError(err.message || "Failed to load customers.");
+
+            setError(
+                err.message ||
+                    "Unable to load customers. Please try again."
+            );
         } finally {
             setLoading(false);
         }
     };
 
-    // ---------------------------------------------------------------------------
-    // SEARCH + DATE FILTER
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // INITIAL LOAD
+    // ============================================================
 
-    const filteredCustomers = useMemo(() => {
-        const keyword = searchKeyword.trim().toLowerCase();
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
 
-        return customers.filter((customer) => {
-            const createdDate = customer.createdAt
-                ? String(customer.createdAt).slice(0, 10)
-                : "";
-
-            if (dateFrom && dateTo && dateFrom > dateTo) {
-                return false;
-            }
-
-            const matchesSearch =
-                !keyword ||
-                [
-                    customer.customerId,
-                    customer.customerName,
-                    customer.mobileNumber,
-                    customer.alternateMobile,
-                    customer.address,
-                    customer.village,
-                    customer.city,
-                    customer.pincode,
-                    customer.gstNumber,
-                    customer.status,
-                ].some((value) =>
-                    String(value ?? "")
-                        .toLowerCase()
-                        .includes(keyword)
-                );
-
-            const matchesFrom =
-                !dateFrom ||
-                (createdDate && createdDate >= dateFrom);
-
-            const matchesTo =
-                !dateTo ||
-                (createdDate && createdDate <= dateTo);
-
-            return (
-                matchesSearch &&
-                matchesFrom &&
-                matchesTo
-            );
-        });
-    }, [
-        customers,
-        searchKeyword,
-        dateFrom,
-        dateTo,
-    ]);
-
-    // ---------------------------------------------------------------------------
+    // ============================================================
     // DATE FILTER HANDLERS
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const handleDateFromChange = (event) => {
         const value = event.target.value;
@@ -185,9 +200,9 @@ function Customer() {
         }
     };
 
-    // ---------------------------------------------------------------------------
-    // CLEAR FILTERS
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // CLEAR ALL FILTERS
+    // ============================================================
 
     const handleClearFilters = () => {
         setSearchKeyword("");
@@ -196,14 +211,77 @@ function Customer() {
         setFilterError("");
     };
 
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // FILTER
+    // ============================================================
+
+    const filteredCustomers = useMemo(() => {
+        const keyword = searchKeyword
+            .trim()
+            .toLowerCase();
+
+        if (dateFrom && dateTo && dateFrom > dateTo) {
+            return [];
+        }
+
+        return customers.filter((customer) => {
+            const searchableText = [
+                customer.customerId,
+                customer.customerName,
+                customer.mobileNumber,
+                customer.alternateMobile,
+                customer.address,
+                customer.village,
+                customer.city,
+                customer.pincode,
+                customer.gstNumber,
+                customer.status,
+            ]
+                .filter(
+                    (value) =>
+                        value !== null &&
+                        value !== undefined
+                )
+                .join(" ")
+                .toLowerCase();
+
+            const matchesSearch =
+                !keyword ||
+                searchableText.includes(keyword);
+
+            const createdDate = customer.createdAt
+                ? String(customer.createdAt).slice(0, 10)
+                : "";
+
+            const matchesFrom =
+                !dateFrom ||
+                (createdDate && createdDate >= dateFrom);
+
+            const matchesTo =
+                !dateTo ||
+                (createdDate && createdDate <= dateTo);
+
+            return (
+                matchesSearch &&
+                matchesFrom &&
+                matchesTo
+            );
+        });
+    }, [
+        customers,
+        searchKeyword,
+        dateFrom,
+        dateTo,
+    ]);
+
+    // ============================================================
     // SORTING
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const {
         sortKey,
         sortDirection,
-        sortedRecords: sortedCustomers,
+        sortedRecords,
         handleSort,
     } = useTableSort(
         filteredCustomers,
@@ -211,40 +289,108 @@ function Customer() {
         "desc"
     );
 
-    // ---------------------------------------------------------------------------
+    // ============================================================
     // PAGINATION
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const {
         currentPage,
         pageSize,
         totalPages,
         totalRecords,
-        paginatedRecords,
+        paginatedRecords: paginatedCustomers,
         handlePageChange,
         handlePageSizeChange,
     } = usePagination(
-        sortedCustomers,
+        sortedRecords,
         10
     );
 
-    // ---------------------------------------------------------------------------
+    // ============================================================
     // SORT INDICATOR
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
-    const getSortIndicator = (key) => {
-        if (sortKey !== key) {
-            return "";
-        }
+    const getSortIndicator = (key) =>
+        sortKey === key
+            ? sortDirection === "asc"
+                ? " ↑"
+                : " ↓"
+            : "";
 
-        return sortDirection === "asc"
-            ? " ▲"
-            : " ▼";
+    // ============================================================
+    // STATUS HELPERS
+    // ============================================================
+
+    const getStatusLabel = (customer) => {
+        const status = String(
+            customer?.status || ""
+        ).toUpperCase();
+
+        return status || "-";
     };
 
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // OPEN ADD CUSTOMER
+    // ============================================================
+
+    const handleAdd = () => {
+        setShowAddCustomerModal(true);
+    };
+
+    // ============================================================
+    // VIEW CUSTOMER
+    // ============================================================
+
+    const handleView = async (id) => {
+        try {
+            setViewError("");
+            setViewLoading(true);
+
+            const result = await apiGet(
+                `/api/customers/${id}`
+            );
+
+            console.log(
+                "Customer details:",
+                result
+            );
+
+            const customer =
+                result?.data || result;
+
+            setSelectedCustomer(customer);
+        } catch (err) {
+            console.error(
+                "Error fetching customer details:",
+                err
+            );
+
+            setViewError(
+                err.message ||
+                    "Unable to load customer details."
+            );
+        } finally {
+            setViewLoading(false);
+        }
+    };
+
+    // ============================================================
+    // CLOSE VIEW
+    // ============================================================
+
+    const closeViewModal = () => {
+        if (viewLoading) {
+            return;
+        }
+
+        setSelectedCustomer(null);
+        setViewError("");
+        setViewLoading(false);
+    };
+
+    // ============================================================
     // FORM HELPERS
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const handleEditFormChange = (event) => {
         const { name, value } = event.target;
@@ -261,9 +407,9 @@ function Customer() {
         setEditSuccess("");
     };
 
-    // ---------------------------------------------------------------------------
+    // ============================================================
     // VALIDATION
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const validateCustomerForm = (form) => {
         if (!form.customerName.trim()) {
@@ -279,139 +425,114 @@ function Customer() {
 
     const buildCustomerPayload = (form) => ({
         customerName: form.customerName.trim(),
-        mobileNumber: form.mobileNumber.trim(),
+
+        mobileNumber:
+            form.mobileNumber.trim(),
+
         alternateMobile:
             form.alternateMobile.trim() || null,
+
         address:
             form.address.trim() || null,
+
         village:
             form.village.trim() || null,
+
         city:
             form.city.trim() || null,
+
         pincode:
             form.pincode.trim() || null,
+
         gstNumber:
             form.gstNumber.trim() || null,
+
         remarks:
             form.remarks.trim() || null,
     });
 
-    // ---------------------------------------------------------------------------
-    // VIEW CUSTOMER
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // OPEN EDIT CUSTOMER
+    // ============================================================
 
-    const handleViewCustomer = async (customer) => {
-        setSelectedCustomer(null);
-        setViewError("");
-        setViewLoading(true);
-
+    const handleEdit = async (id) => {
         try {
+            setEditError("");
+            setEditSuccess("");
+            setEditLoading(true);
+
             const result = await apiGet(
-                `/api/customers/${customer.customerId}`
+                `/api/customers/${id}`
             );
 
-            setSelectedCustomer(
-                result?.data || null
-            );
-        } catch (err) {
-            console.error(
-                "Error fetching customer details:",
-                err
+            console.log(
+                "Customer details for edit:",
+                result
             );
 
-            setViewError(
-                err.message ||
-                    "Failed to load customer details."
-            );
-        } finally {
-            setViewLoading(false);
-        }
-    };
+            const customer =
+                result?.data || result;
 
-    const closeViewModal = () => {
-        if (viewLoading) {
-            return;
-        }
-
-        setSelectedCustomer(null);
-        setViewError("");
-    };
-
-    // ---------------------------------------------------------------------------
-    // OPEN EDIT
-    // ---------------------------------------------------------------------------
-
-    const handleEditCustomer = async (customer) => {
-        setEditingCustomer(customer);
-        setEditLoading(true);
-        setEditError("");
-        setEditSuccess("");
-
-        try {
-            const result = await apiGet(
-                `/api/customers/${customer.customerId}`
-            );
-
-            const data = result?.data;
-
-            if (!data) {
+            if (!customer) {
                 throw new Error(
                     "Customer details were not found."
                 );
             }
 
-            setEditingCustomer(data);
+            setEditingCustomer(customer);
 
             setEditForm({
                 customerName:
-                    data.customerName || "",
+                    customer.customerName || "",
+
                 mobileNumber:
-                    data.mobileNumber || "",
+                    customer.mobileNumber || "",
+
                 alternateMobile:
-                    data.alternateMobile || "",
+                    customer.alternateMobile || "",
+
                 address:
-                    data.address || "",
+                    customer.address || "",
+
                 village:
-                    data.village || "",
+                    customer.village || "",
+
                 city:
-                    data.city || "",
+                    customer.city || "",
+
                 pincode:
-                    data.pincode || "",
+                    customer.pincode || "",
+
                 gstNumber:
-                    data.gstNumber || "",
+                    customer.gstNumber || "",
+
                 remarks:
-                    data.remarks || "",
+                    customer.remarks || "",
             });
         } catch (err) {
             console.error(
-                "Error fetching customer for edit:",
+                "Error loading customer for edit:",
                 err
             );
 
             setEditError(
                 err.message ||
-                    "Failed to load customer details."
+                    "Unable to load the customer record for editing."
             );
         } finally {
             setEditLoading(false);
         }
     };
 
-    const closeEditCustomerModal = () => {
-        if (editSaving) {
-            return;
-        }
-
-        setEditingCustomer(null);
-        resetEditForm();
-    };
-
-    // ---------------------------------------------------------------------------
+    // ============================================================
     // UPDATE CUSTOMER
-    // ---------------------------------------------------------------------------
+    // ============================================================
 
     const handleUpdateCustomer = async (event) => {
         event.preventDefault();
+
+        setEditError("");
+        setEditSuccess("");
 
         const validationError =
             validateCustomerForm(editForm);
@@ -428,8 +549,6 @@ function Customer() {
 
         try {
             setEditSaving(true);
-            setEditError("");
-            setEditSuccess("");
 
             const payload =
                 buildCustomerPayload(editForm);
@@ -437,6 +556,11 @@ function Customer() {
             const result = await apiPut(
                 `/api/customers/${editingCustomer.customerId}`,
                 payload
+            );
+
+            console.log(
+                "Update Customer response:",
+                result
             );
 
             setEditSuccess(
@@ -458,32 +582,40 @@ function Customer() {
 
             setEditError(
                 err.message ||
-                    "Failed to update customer."
+                    "Unable to update customer."
             );
         } finally {
             setEditSaving(false);
         }
     };
 
-    // ---------------------------------------------------------------------------
-    // DELETE CUSTOMER
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // CLOSE EDIT MODAL
+    // ============================================================
 
-    const handleDeleteCustomer = (customer) => {
-        setDeletingCustomer(customer);
-        setDeleteError("");
-    };
-
-    const closeDeleteCustomerModal = () => {
-        if (deleteSaving) {
+    const closeEditModal = () => {
+        if (editSaving) {
             return;
         }
 
-        setDeletingCustomer(null);
-        setDeleteError("");
+        setEditingCustomer(null);
+        resetEditForm();
     };
 
-    const confirmDeleteCustomer = async () => {
+    // ============================================================
+    // OPEN DELETE MODAL
+    // ============================================================
+
+    const handleDelete = (customer) => {
+        setDeleteError("");
+        setDeletingCustomer(customer);
+    };
+
+    // ============================================================
+    // CONFIRM DELETE / SOFT DELETE
+    // ============================================================
+
+    const confirmDelete = async () => {
         if (!deletingCustomer?.customerId) {
             setDeleteError("Customer ID is missing.");
             return;
@@ -492,14 +624,20 @@ function Customer() {
         try {
             setDeleteSaving(true);
             setDeleteError("");
+            setError("");
 
-            await apiDelete(
+            const result = await apiDelete(
                 `/api/customers/${deletingCustomer.customerId}`
             );
 
-            await fetchCustomers();
+            console.log(
+                "Delete Customer response:",
+                result
+            );
 
             setDeletingCustomer(null);
+
+            await fetchCustomers();
         } catch (err) {
             console.error(
                 "Error deleting customer:",
@@ -508,127 +646,136 @@ function Customer() {
 
             setDeleteError(
                 err.message ||
-                    "Failed to delete customer."
+                    "Unable to delete customer."
             );
         } finally {
             setDeleteSaving(false);
         }
     };
 
-    // ---------------------------------------------------------------------------
-    // DISPLAY HELPERS
-    // ---------------------------------------------------------------------------
+    // ============================================================
+    // CLOSE DELETE MODAL
+    // ============================================================
 
-    const formatCreatedAt = (value) => {
-        if (!value) {
-            return "—";
+    const closeDeleteModal = () => {
+        if (deleteSaving) {
+            return;
         }
 
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return value;
-        }
-
-        return date.toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-        });
+        setDeletingCustomer(null);
+        setDeleteError("");
     };
 
-    const getStatusLabel = (customer) => {
-        const status = String(
-            customer?.status || ""
-        ).toUpperCase();
+    // ============================================================
+    // LOADING
+    // ============================================================
 
-        return status || "—";
-    };
-
-    const getStatusClass = (customer) => {
-        const status = String(
-            customer?.status || ""
-        ).toUpperCase();
-
-        return status === "ACTIVE"
-            ? "bg"
-            : "br";
-    };
-
-    // ---------------------------------------------------------------------------
-    // RENDER
-    // ---------------------------------------------------------------------------
-
-    return (
-        <section className="section active">
-
-            {/* ==================================================================
-                PAGE HEADER
-            ================================================================== */}
-
-            <div className="card-head customer-page-header">
-                <div>
+    if (loading) {
+        return (
+            <div className="page">
+                <section className="card">
                     <h2>Customers</h2>
 
                     <p>
-                        Manage customer information
-                        and records.
+                        Loading customer records...
                     </p>
-                </div>
-
-                <button
-                    type="button"
-                    className="btn primary"
-                    onClick={() =>
-                        setShowAddCustomerModal(true)
-                    }
-                >
-                    + Add Customer
-                </button>
+                </section>
             </div>
+        );
+    }
 
-            {/* ==================================================================
-                SEARCH + DATE FILTERS
-            ================================================================== */}
+    // ============================================================
+    // RENDER
+    // ============================================================
 
-            <div className="card">
+    return (
+        <div className="page">
 
-                <div className="fld customer-search">
-                    <label htmlFor="customer-search">
-                        Search Customers
-                    </label>
+            {/* ==================================================
+                HEADER + SEARCH + FILTERS
+            ================================================== */}
 
-                    <input
-                        id="customer-search"
-                        type="text"
-                        value={searchKeyword}
-                        onChange={(event) =>
-                            setSearchKeyword(
-                                event.target.value
-                            )
-                        }
-                        placeholder="Search by customer name, mobile, village, city..."
-                    />
-                </div>
+            <section className="card">
 
                 <div
                     style={{
                         display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                         gap: "16px",
-                        alignItems: "flex-end",
                         flexWrap: "wrap",
                     }}
                 >
-                    <div className="fld">
-                        <label htmlFor="customer-date-from">
+                    <div>
+                        <h2>Customers</h2>
+
+                        <p>
+                            Manage customer information
+                            and records.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="action-btn view-btn"
+                        onClick={handleAdd}
+                    >
+                        Add Customer
+                    </button>
+                </div>
+
+                {/* ------------------------------------------------
+                    FILTER ROW
+                ------------------------------------------------ */}
+
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        marginTop: "16px",
+                    }}
+                >
+
+                    {/* SEARCH */}
+
+                    <div
+                        className="fld production-search"
+                        style={{
+                            flex: "2 1 320px",
+                        }}
+                    >
+                        <label>
+                            Search Customers
+                        </label>
+
+                        <input
+                            type="text"
+                            value={searchKeyword}
+                            onChange={(event) =>
+                                setSearchKeyword(
+                                    event.target.value
+                                )
+                            }
+                            placeholder="Search by name, mobile, village, city, GST, status..."
+                        />
+                    </div>
+
+                    {/* DATE FROM */}
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="customerDateFrom">
                             Date From
                         </label>
 
                         <input
-                            id="customer-date-from"
+                            id="customerDateFrom"
                             type="date"
                             value={dateFrom}
                             onChange={
@@ -637,13 +784,20 @@ function Customer() {
                         />
                     </div>
 
-                    <div className="fld">
-                        <label htmlFor="customer-date-to">
+                    {/* DATE TO */}
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex: "1 1 180px",
+                        }}
+                    >
+                        <label htmlFor="customerDateTo">
                             Date To
                         </label>
 
                         <input
-                            id="customer-date-to"
+                            id="customerDateTo"
                             type="date"
                             value={dateTo}
                             onChange={
@@ -651,6 +805,8 @@ function Customer() {
                             }
                         />
                     </div>
+
+                    {/* CLEAR */}
 
                     <button
                         type="button"
@@ -663,289 +819,282 @@ function Customer() {
                     </button>
                 </div>
 
+                {/* FILTER ERROR */}
+
                 {filterError && (
-                    <div className="form-error">
+                    <div
+                        className="form-error"
+                        style={{
+                            marginTop: "12px",
+                        }}
+                    >
                         {filterError}
                     </div>
                 )}
-            </div>
+            </section>
 
-            {/* ==================================================================
+            {/* ==================================================
                 CUSTOMER LIST
-            ================================================================== */}
+            ================================================== */}
 
-            <div className="card">
+            <section className="card">
 
-                <div className="card-head">
-                    <div>
-                        <h3>Customer List</h3>
+                <h2>Customer List</h2>
 
-                        <p>
-                            {totalRecords} customer
-                            {totalRecords === 1
-                                ? ""
-                                : "s"}
-                        </p>
-                    </div>
-                </div>
+                <p>
+                    {totalRecords} customer
+                    {totalRecords === 1
+                        ? ""
+                        : "s"}
+                </p>
 
-                {loading && (
-                    <div className="empty-state">
-                        <p>
-                            Loading customers...
-                        </p>
-                    </div>
-                )}
-
-                {!loading && error && (
-                    <div className="alert e show">
+                {error && (
+                    <div className="form-error">
                         {error}
                     </div>
                 )}
 
-                {!loading &&
-                    !error &&
-                    !filterError &&
-                    totalRecords === 0 && (
-                        <div className="empty-state">
-                            <p>
-                                {searchKeyword ||
-                                dateFrom ||
-                                dateTo
-                                    ? "No customers match your filters."
-                                    : "No customers found."}
-                            </p>
-                        </div>
-                    )}
+                {filterError ? null : totalRecords ===
+                  0 ? (
+                    <p>
+                        {searchKeyword ||
+                        dateFrom ||
+                        dateTo
+                            ? "No customer records match the selected filters."
+                            : "No customer records found."}
+                    </p>
+                ) : (
+                    <div className="table-wrap">
 
-                {!loading &&
-                    !error &&
-                    !filterError &&
-                    totalRecords > 0 && (
-                        <>
-                            <div className="table-wrap">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "customerId"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                ID
-                                                {getSortIndicator(
-                                                    "customerId"
-                                                )}
-                                            </th>
+                        <table>
+                            <thead>
+                                <tr>
 
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "customerName"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Customer
-                                                {getSortIndicator(
-                                                    "customerName"
-                                                )}
-                                            </th>
-
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "mobileNumber"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Mobile
-                                                {getSortIndicator(
-                                                    "mobileNumber"
-                                                )}
-                                            </th>
-
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "village"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Village
-                                                {getSortIndicator(
-                                                    "village"
-                                                )}
-                                            </th>
-
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "city"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                City
-                                                {getSortIndicator(
-                                                    "city"
-                                                )}
-                                            </th>
-
-                                            <th
-                                                onClick={() =>
-                                                    handleSort(
-                                                        "status"
-                                                    )
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Status
-                                                {getSortIndicator(
-                                                    "status"
-                                                )}
-                                            </th>
-
-                                            <th>
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {paginatedRecords.map(
-                                            (customer) => (
-                                                <tr
-                                                    key={
-                                                        customer.customerId
-                                                    }
-                                                >
-                                                    <td>
-                                                        {
-                                                            customer.customerId
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        <strong>
-                                                            {
-                                                                customer.customerName
-                                                            }
-                                                        </strong>
-                                                    </td>
-
-                                                    <td>
-                                                        {
-                                                            customer.mobileNumber
-                                                        }
-                                                    </td>
-
-                                                    <td>
-                                                        {customer.village ||
-                                                            "—"}
-                                                    </td>
-
-                                                    <td>
-                                                        {customer.city ||
-                                                            "—"}
-                                                    </td>
-
-                                                    <td>
-                                                        <span
-                                                            className={`badge ${getStatusClass(
-                                                                customer
-                                                            )}`}
-                                                        >
-                                                            {getStatusLabel(
-                                                                customer
-                                                            )}
-                                                        </span>
-                                                    </td>
-
-                                                    <td>
-                                                        <div className="customer-action-buttons">
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm"
-                                                                onClick={() =>
-                                                                    handleViewCustomer(
-                                                                        customer
-                                                                    )
-                                                                }
-                                                            >
-                                                                View
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm customer-edit-btn"
-                                                                onClick={() =>
-                                                                    handleEditCustomer(
-                                                                        customer
-                                                                    )
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </button>
-
-                                                            <button
-                                                                type="button"
-                                                                className="btn sm customer-delete-btn"
-                                                                onClick={() =>
-                                                                    handleDeleteCustomer(
-                                                                        customer
-                                                                    )
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </button>
-
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "customerId"
                                             )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        ID
+                                        {getSortIndicator(
+                                            "customerId"
                                         )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                    </th>
 
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                totalRecords={totalRecords}
-                                pageSize={pageSize}
-                                onPageChange={
-                                    handlePageChange
-                                }
-                                onPageSizeChange={
-                                    handlePageSizeChange
-                                }
-                            />
-                        </>
-                    )}
-            </div>
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "customerName"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        CUSTOMER
+                                        {getSortIndicator(
+                                            "customerName"
+                                        )}
+                                    </th>
 
-            {/* ==================================================================
-                VIEW CUSTOMER
-            ================================================================== */}
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "mobileNumber"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        MOBILE
+                                        {getSortIndicator(
+                                            "mobileNumber"
+                                        )}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "village"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        VILLAGE
+                                        {getSortIndicator(
+                                            "village"
+                                        )}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "city"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        CITY
+                                        {getSortIndicator(
+                                            "city"
+                                        )}
+                                    </th>
+
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "status"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        STATUS
+                                        {getSortIndicator(
+                                            "status"
+                                        )}
+                                    </th>
+
+                                    <th>
+                                        ACTIONS
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {paginatedCustomers.map(
+                                    (customer) => (
+                                        <tr
+                                            key={
+                                                customer.customerId
+                                            }
+                                        >
+
+                                            <td>
+                                                {
+                                                    customer.customerId
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    customer.customerName ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    customer.mobileNumber ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    customer.village ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    customer.city ||
+                                                    "-"
+                                                }
+                                            </td>
+
+                                            <td>
+                                                {
+                                                    getStatusLabel(
+                                                        customer
+                                                    )
+                                                }
+                                            </td>
+
+                                            <td>
+                                                <div className="table-actions">
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn view-btn"
+                                                        onClick={() =>
+                                                            handleView(
+                                                                customer.customerId
+                                                            )
+                                                        }
+                                                    >
+                                                        View
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        onClick={() =>
+                                                            handleEdit(
+                                                                customer.customerId
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                customer
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+
+                        {/* ------------------------------------------------
+                            PAGINATION
+                        ------------------------------------------------ */}
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalRecords={totalRecords}
+                            pageSize={pageSize}
+                            onPageChange={
+                                handlePageChange
+                            }
+                            onPageSizeChange={
+                                handlePageSizeChange
+                            }
+                        />
+                    </div>
+                )}
+            </section>
+
+            {/* ==================================================
+                VIEW CUSTOMER MODAL
+            ================================================== */}
 
             <ViewModal
                 isOpen={
@@ -955,7 +1104,11 @@ function Customer() {
                 }
                 onClose={closeViewModal}
                 title="Customer Details"
-                subtitle="View customer information"
+                subtitle={
+                    selectedCustomer
+                        ? `Customer ID: ${selectedCustomer.customerId}`
+                        : "Customer information"
+                }
                 loading={viewLoading}
                 error={viewError}
                 size="lg"
@@ -982,49 +1135,56 @@ function Customer() {
                         <DetailItem
                             label="Customer Name"
                             value={
-                                selectedCustomer.customerName
+                                selectedCustomer.customerName ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="Mobile Number"
                             value={
-                                selectedCustomer.mobileNumber
+                                selectedCustomer.mobileNumber ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="Alternate Mobile"
                             value={
-                                selectedCustomer.alternateMobile
+                                selectedCustomer.alternateMobile ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="Village"
                             value={
-                                selectedCustomer.village
+                                selectedCustomer.village ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="City"
                             value={
-                                selectedCustomer.city
+                                selectedCustomer.city ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="Pincode"
                             value={
-                                selectedCustomer.pincode
+                                selectedCustomer.pincode ||
+                                "-"
                             }
                         />
 
                         <DetailItem
                             label="GST Number"
                             value={
-                                selectedCustomer.gstNumber
+                                selectedCustomer.gstNumber ||
+                                "-"
                             }
                         />
 
@@ -1039,7 +1199,7 @@ function Customer() {
 
                         <DetailItem
                             label="Created At"
-                            value={formatCreatedAt(
+                            value={formatDateTime(
                                 selectedCustomer.createdAt
                             )}
                         />
@@ -1047,7 +1207,8 @@ function Customer() {
                         <DetailItem
                             label="Address"
                             value={
-                                selectedCustomer.address
+                                selectedCustomer.address ||
+                                "-"
                             }
                             fullWidth
                         />
@@ -1055,7 +1216,8 @@ function Customer() {
                         <DetailItem
                             label="Remarks"
                             value={
-                                selectedCustomer.remarks
+                                selectedCustomer.remarks ||
+                                "-"
                             }
                             fullWidth
                         />
@@ -1064,9 +1226,9 @@ function Customer() {
                 )}
             </ViewModal>
 
-            {/* ==================================================================
+            {/* ==================================================
                 ADD CUSTOMER
-            ================================================================== */}
+            ================================================== */}
 
             <AddCustomerModal
                 isOpen={showAddCustomerModal}
@@ -1078,24 +1240,20 @@ function Customer() {
                 }}
             />
 
-            {/* ==================================================================
-                EDIT CUSTOMER
-            ================================================================== */}
+            {/* ==================================================
+                EDIT CUSTOMER MODAL
+            ================================================== */}
 
             <FormModal
                 isOpen={Boolean(editingCustomer)}
-                onClose={
-                    closeEditCustomerModal
-                }
+                onClose={closeEditModal}
                 title="Edit Customer"
                 subtitle={
-                    editingCustomer?.customerId
+                    editingCustomer
                         ? `Customer ID: ${editingCustomer.customerId}`
-                        : "Update customer information"
+                        : "Update customer information."
                 }
-                onSubmit={
-                    handleUpdateCustomer
-                }
+                onSubmit={handleUpdateCustomer}
                 submitLabel="Save Changes"
                 cancelLabel="Cancel"
                 saving={editSaving}
@@ -1110,245 +1268,229 @@ function Customer() {
                         </p>
                     </div>
                 ) : (
-                    <>
-                        <div className="form-section">
+                    <div className="edit-form-grid">
 
-                            <h4>
-                                Customer Information
-                            </h4>
+                        {/* CUSTOMER NAME */}
 
-                            <div className="form-grid">
+                        <div className="fld">
+                            <label htmlFor="editCustomerName">
+                                Customer Name *
+                            </label>
 
-                                <div className="fld">
-                                    <label htmlFor="edit-customer-name">
-                                        Customer Name{" "}
-                                        <span className="required">
-                                            *
-                                        </span>
-                                    </label>
-
-                                    <input
-                                        id="edit-customer-name"
-                                        name="customerName"
-                                        type="text"
-                                        value={
-                                            editForm.customerName
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter customer name"
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-mobile-number">
-                                        Mobile Number{" "}
-                                        <span className="required">
-                                            *
-                                        </span>
-                                    </label>
-
-                                    <input
-                                        id="edit-mobile-number"
-                                        name="mobileNumber"
-                                        type="text"
-                                        value={
-                                            editForm.mobileNumber
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter mobile number"
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-alternate-mobile">
-                                        Alternate Mobile
-                                    </label>
-
-                                    <input
-                                        id="edit-alternate-mobile"
-                                        name="alternateMobile"
-                                        type="text"
-                                        value={
-                                            editForm.alternateMobile
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter alternate mobile"
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-gst-number">
-                                        GST Number
-                                    </label>
-
-                                    <input
-                                        id="edit-gst-number"
-                                        name="gstNumber"
-                                        type="text"
-                                        value={
-                                            editForm.gstNumber
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter GST number"
-                                    />
-                                </div>
-
-                            </div>
+                            <input
+                                id="editCustomerName"
+                                name="customerName"
+                                type="text"
+                                value={
+                                    editForm.customerName
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter customer name"
+                                required
+                            />
                         </div>
 
-                        <div className="form-section">
+                        {/* MOBILE NUMBER */}
 
-                            <h4>
-                                Address Information
-                            </h4>
+                        <div className="fld">
+                            <label htmlFor="editMobileNumber">
+                                Mobile Number *
+                            </label>
 
-                            <div className="form-grid">
-
-                                <div className="fld">
-                                    <label htmlFor="edit-village">
-                                        Village
-                                    </label>
-
-                                    <input
-                                        id="edit-village"
-                                        name="village"
-                                        type="text"
-                                        value={
-                                            editForm.village
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter village"
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-city">
-                                        City
-                                    </label>
-
-                                    <input
-                                        id="edit-city"
-                                        name="city"
-                                        type="text"
-                                        value={
-                                            editForm.city
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter city"
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-pincode">
-                                        Pincode
-                                    </label>
-
-                                    <input
-                                        id="edit-pincode"
-                                        name="pincode"
-                                        type="text"
-                                        value={
-                                            editForm.pincode
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter pincode"
-                                    />
-                                </div>
-
-                                <div className="fld full">
-                                    <label htmlFor="edit-address">
-                                        Address
-                                    </label>
-
-                                    <textarea
-                                        id="edit-address"
-                                        name="address"
-                                        value={
-                                            editForm.address
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter address"
-                                        rows="3"
-                                    />
-                                </div>
-
-                            </div>
+                            <input
+                                id="editMobileNumber"
+                                name="mobileNumber"
+                                type="text"
+                                value={
+                                    editForm.mobileNumber
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter mobile number"
+                                required
+                            />
                         </div>
 
-                        <div className="form-section">
+                        {/* ALTERNATE MOBILE */}
 
-                            <h4>
-                                Additional Information
-                            </h4>
+                        <div className="fld">
+                            <label htmlFor="editAlternateMobile">
+                                Alternate Mobile
+                            </label>
 
-                            <div className="form-grid">
-
-                                <div className="fld full">
-                                    <label htmlFor="edit-remarks">
-                                        Remarks
-                                    </label>
-
-                                    <textarea
-                                        id="edit-remarks"
-                                        name="remarks"
-                                        value={
-                                            editForm.remarks
-                                        }
-                                        onChange={
-                                            handleEditFormChange
-                                        }
-                                        placeholder="Enter remarks"
-                                        rows="3"
-                                    />
-                                </div>
-
-                            </div>
+                            <input
+                                id="editAlternateMobile"
+                                name="alternateMobile"
+                                type="text"
+                                value={
+                                    editForm.alternateMobile
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter alternate mobile"
+                            />
                         </div>
-                    </>
+
+                        {/* GST NUMBER */}
+
+                        <div className="fld">
+                            <label htmlFor="editGstNumber">
+                                GST Number
+                            </label>
+
+                            <input
+                                id="editGstNumber"
+                                name="gstNumber"
+                                type="text"
+                                value={
+                                    editForm.gstNumber
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter GST number"
+                            />
+                        </div>
+
+                        {/* VILLAGE */}
+
+                        <div className="fld">
+                            <label htmlFor="editVillage">
+                                Village
+                            </label>
+
+                            <input
+                                id="editVillage"
+                                name="village"
+                                type="text"
+                                value={
+                                    editForm.village
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter village"
+                            />
+                        </div>
+
+                        {/* CITY */}
+
+                        <div className="fld">
+                            <label htmlFor="editCity">
+                                City
+                            </label>
+
+                            <input
+                                id="editCity"
+                                name="city"
+                                type="text"
+                                value={
+                                    editForm.city
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter city"
+                            />
+                        </div>
+
+                        {/* PINCODE */}
+
+                        <div className="fld">
+                            <label htmlFor="editPincode">
+                                Pincode
+                            </label>
+
+                            <input
+                                id="editPincode"
+                                name="pincode"
+                                type="text"
+                                value={
+                                    editForm.pincode
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                placeholder="Enter pincode"
+                            />
+                        </div>
+
+                        {/* ADDRESS */}
+
+                        <div className="fld edit-full">
+                            <label htmlFor="editAddress">
+                                Address
+                            </label>
+
+                            <textarea
+                                id="editAddress"
+                                name="address"
+                                value={
+                                    editForm.address
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                rows={3}
+                                placeholder="Enter address"
+                            />
+                        </div>
+
+                        {/* REMARKS */}
+
+                        <div className="fld edit-full">
+                            <label htmlFor="editRemarks">
+                                Remarks
+                            </label>
+
+                            <textarea
+                                id="editRemarks"
+                                name="remarks"
+                                value={
+                                    editForm.remarks
+                                }
+                                onChange={
+                                    handleEditFormChange
+                                }
+                                rows={3}
+                                placeholder="Enter remarks..."
+                            />
+                        </div>
+
+                    </div>
                 )}
             </FormModal>
 
-            {/* ==================================================================
-                DELETE CUSTOMER
-            ================================================================== */}
+            {/* ==================================================
+                DELETE CONFIRMATION MODAL
+            ================================================== */}
 
             <DeleteConfirmModal
                 isOpen={Boolean(deletingCustomer)}
-                onClose={
-                    closeDeleteCustomerModal
-                }
-                onConfirm={
-                    confirmDeleteCustomer
-                }
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
                 title="Delete Customer"
                 subtitle="Please confirm this action"
-                message="Are you sure you want to deactivate this customer record?"
+                message="Are you sure you want to delete this customer?"
                 itemName={
                     deletingCustomer
-                        ? `${deletingCustomer.customerName || "Customer"} (ID: ${deletingCustomer.customerId})`
+                        ? `Customer: ${
+                              deletingCustomer.customerName ||
+                              "Customer"
+                          } (ID: ${
+                              deletingCustomer.customerId
+                          })`
                         : ""
                 }
                 confirming={deleteSaving}
                 error={deleteError}
             />
 
-        </section>
+        </div>
     );
 }
 
