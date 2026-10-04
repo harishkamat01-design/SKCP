@@ -18,7 +18,7 @@
   --color-purple: #6e5dc6;
 
   /* SKCP Design System — Layout */
-  --sidebar-width: 210px;
+  --sidebar-width: 232px;
   --content-padding: 18px;
 
   /* SKCP Design System — Radius */
@@ -254,10 +254,10 @@ a {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  text-align: left;
   gap: 8px;
-  padding: 5px 14px;
+  padding: 7px 14px;
   margin: 0;
   border-radius: 0;
   font-size: 12px;
@@ -3998,6 +3998,7 @@ td.mu {
   padding: 6px 14px 2px;
   letter-spacing: 0;
   text-transform: none;
+  text-align: center;
 }
 
 

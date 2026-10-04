@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import jsPDF from "jspdf";
 
 import Pagination from "../../../components/ui/Pagination";
@@ -264,8 +264,8 @@ const formatPdfDate = (date) => {
     }
 
     return sortDirection === "asc"
-      ? " ▲"
-      : " ▼";
+      ? " ?"
+      : " ?";
   };
 
   const activeOrders = useMemo(() => {
@@ -1314,8 +1314,8 @@ const formatPdfDate = (date) => {
 
 
     // ============================================================
-// DOWNLOAD UPCOMING DELIVERIES PDF
-// ============================================================
+    // DOWNLOAD UPCOMING DELIVERIES PDF
+    // ============================================================
 
 const handleDownloadUpcomingDeliveriesPdf = () => {
   if (
@@ -1725,6 +1725,2021 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
   );
 };
 
+// ============================================================
+// DOWNLOAD SALES REPORT PDF
+// ============================================================
+
+const handleDownloadSalesPdf = () => {
+  if (
+    !salesReport ||
+    salesReport.rows.length === 0
+  ) {
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  const leftMargin = 12;
+  const rightMargin = pageWidth - 12;
+
+  let y = 18;
+
+  const addPageIfNeeded = (requiredHeight = 15) => {
+    if (y + requiredHeight > pageHeight - 20) {
+      doc.addPage();
+      y = 20;
+      return true;
+    }
+
+    return false;
+  };
+
+  // ============================================================
+  // HEADER
+  // ============================================================
+
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Shree Kundodari Cement Products",
+    leftMargin,
+    y
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    "SALES REPORT",
+    rightMargin,
+    y,
+    { align: "right" }
+  );
+
+  y += 9;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+
+  const periodText =
+  fromDate && toDate
+    ? `${formatPdfDate(fromDate)} - ${formatPdfDate(toDate)}`
+    : fromDate
+      ? formatPdfDate(fromDate)
+      : toDate
+        ? formatPdfDate(toDate)
+        : "All Dates";
+
+  doc.text(
+    `Report Period: ${periodText}`,
+    leftMargin,
+    y
+  );
+
+  y += 10;
+
+  // ============================================================
+  // SALES SUMMARY
+  // ============================================================
+
+  addPageIfNeeded(40);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Sales Summary",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+
+  doc.text(
+    `Total Sales Value: ${
+
+
+      `INR ${Number(
+      salesReport.totalSalesValue || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`
+
+  }`,
+    leftMargin,
+    y
+  );
+
+  doc.text(
+    `Units Sold: ${Number(
+      salesReport.totalUnitsSold || 0
+    ).toLocaleString("en-IN")}`,
+    85,
+    y
+  );
+
+  doc.text(
+    `Orders: ${Number(
+      salesReport.orderCount || 0
+    ).toLocaleString("en-IN")}`,
+    150,
+    y
+  );
+
+  y += 12;
+
+  // ============================================================
+  // SALES DETAILS
+  // ============================================================
+
+  addPageIfNeeded(50);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Sales Details",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+
+  const colDate = 12;
+  const colOrderId = 35;
+  const colCustomer = 52;
+  const colProduct = 95;
+  const colQuantity = 120;
+  const colUnitPrice = 145;
+  const colSalesValue = 175;
+
+  doc.text(
+    "Date",
+    colDate,
+    y
+  );
+
+  doc.text(
+    "Order ID",
+    colOrderId,
+    y
+  );
+
+  doc.text(
+    "Customer",
+    colCustomer,
+    y
+  );
+
+  doc.text(
+    "Product ID",
+    colProduct,
+    y
+  );
+
+  doc.text(
+    "Quantity",
+    colQuantity,
+    y
+  );
+
+  doc.text(
+    "Unit Price",
+    colUnitPrice,
+    y
+  );
+
+  doc.text(
+    "Sales Value",
+    colSalesValue,
+    y
+  );
+
+  y += 5;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+
+  salesReport.rows.forEach(
+    (row) => {
+      addPageIfNeeded(12);
+
+      doc.text(
+        formatPdfDate(row.orderDate),
+        colDate,
+        y
+      );
+
+      doc.text(
+        `#${String(row.orderId || "-")}`,
+        colOrderId,
+        y
+      );
+
+      doc.text(
+        String(
+          row.customerName || "-"
+        ).substring(0, 22),
+        colCustomer,
+        y
+      );
+
+      doc.text(
+        String(
+          row.productId || "-"
+        ),
+        colProduct,
+        y
+      );
+
+      doc.text(
+        Number(
+          row.quantity || 0
+        ).toLocaleString("en-IN"),
+        colQuantity,
+        y
+      );
+
+      doc.text(
+        `INR ${Number(
+            row.unitPrice || 0
+          ).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+        colUnitPrice,
+        y
+      );
+
+      doc.text(
+        `INR ${Number(
+            row.salesValue || 0
+          ).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+        colSalesValue,
+        y
+      );
+
+      y += 7;
+    }
+  );
+
+  // ============================================================
+  // FOOTER + PAGE NUMBERS
+  // ============================================================
+
+  const totalPages =
+    doc.getNumberOfPages();
+
+  for (
+    let page = 1;
+    page <= totalPages;
+    page++
+  ) {
+    doc.setPage(page);
+
+    const footerY =
+      pageHeight - 10;
+
+    doc.setFontSize(8);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      "SKCP - Kumta - 581343, Karnataka",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Page ${page} of ${totalPages}`,
+      rightMargin,
+      footerY,
+      { align: "right" }
+    );
+  }
+
+  // ============================================================
+  // SAVE PDF
+  // ============================================================
+
+  const fromPart =
+    fromDate
+      ? formatPdfDate(fromDate)
+      : "All";
+
+  const toPart =
+    toDate
+      ? formatPdfDate(toDate)
+      : "Dates";
+
+  doc.save(
+    `SKCP-Sales-Report-${fromPart}-to-${toPart}.pdf`
+  );
+};
+
+// ============================================================
+// DOWNLOAD PRODUCTION REPORT PDF
+// ============================================================
+
+const handleDownloadProductionPdf = () => {
+  if (
+    !productionReport ||
+    productionReport.rows.length === 0
+  ) {
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  const leftMargin = 12;
+  const rightMargin = pageWidth - 12;
+
+  let y = 18;
+
+  const addPageIfNeeded = (requiredHeight = 15) => {
+    if (y + requiredHeight > pageHeight - 20) {
+      doc.addPage();
+      y = 20;
+      return true;
+    }
+
+    return false;
+  };
+
+  // ============================================================
+  // HEADER
+  // ============================================================
+
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Shree Kundodari Cement Products",
+    leftMargin,
+    y
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    "PRODUCTION REPORT",
+    rightMargin,
+    y,
+    { align: "right" }
+  );
+
+  y += 9;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const periodText =
+    fromDate && toDate
+      ? `${formatPdfDate(fromDate)} - ${formatPdfDate(toDate)}`
+      : fromDate
+        ? formatPdfDate(fromDate)
+        : toDate
+          ? formatPdfDate(toDate)
+          : "All Dates";
+
+  doc.text(
+    `Report Period: ${periodText}`,
+    leftMargin,
+    y
+  );
+
+  y += 10;
+
+  // ============================================================
+  // PRODUCTION SUMMARY
+  // ============================================================
+
+  addPageIfNeeded(40);
+
+  doc.setFontSize(12);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.text(
+    "Production Summary",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.text(
+    `Total Production: ${Number(
+      productionReport.totalProduction || 0
+    ).toLocaleString("en-IN")}`,
+    leftMargin,
+    y
+  );
+
+  doc.text(
+    `Cement Used: ${Number(
+      productionReport.totalCementBags || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    85,
+    y
+  );
+
+  doc.text(
+    `Production Records: ${Number(
+      productionReport.recordCount || 0
+    ).toLocaleString("en-IN")}`,
+    155,
+    y
+  );
+
+  y += 7;
+
+  doc.text(
+    `Average Production: ${Number(
+      productionReport.averageProduction || 0
+    ).toLocaleString("en-IN", {
+      maximumFractionDigits: 2,
+    })}`,
+    leftMargin,
+    y
+  );
+
+  y += 12;
+
+  // ============================================================
+  // PRODUCTION DETAILS
+  // ============================================================
+
+  addPageIfNeeded(50);
+
+  doc.setFontSize(12);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.text(
+    "Production Details",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(7);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  const colDate = 12;
+  const colProductionId = 31;
+  const colProduct = 51;
+  const colSize = 88;
+  const colQuantity = 107;
+  const colCement = 130;
+  const colAsset = 156;
+  const colStatus = 187;
+
+  doc.text(
+    "Date",
+    colDate,
+    y
+  );
+
+  doc.text(
+    "Production ID",
+    colProductionId,
+    y
+  );
+
+  doc.text(
+    "Product",
+    colProduct,
+    y
+  );
+
+  doc.text(
+    "Size",
+    colSize,
+    y
+  );
+
+  doc.text(
+    "Quantity",
+    colQuantity,
+    y
+  );
+
+  doc.text(
+    "Cement Bags",
+    colCement,
+    y
+  );
+
+  doc.text(
+    "Asset",
+    colAsset,
+    y
+  );
+
+  doc.text(
+    "Status",
+    colStatus,
+    y
+  );
+
+  y += 5;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  productionReport.rows.forEach(
+    (row) => {
+      addPageIfNeeded(12);
+
+      doc.text(
+        formatPdfDate(
+          row.productionDate
+        ),
+        colDate,
+        y
+      );
+
+      doc.text(
+        `#${String(
+          row.productionId || "-"
+        )}`,
+        colProductionId,
+        y
+      );
+
+      doc.text(
+        String(
+          row.productName || "-"
+        ).substring(0, 18),
+        colProduct,
+        y
+      );
+
+      doc.text(
+        String(
+          row.productSize || "-"
+        ).substring(0, 12),
+        colSize,
+        y
+      );
+
+      doc.text(
+        Number(
+          row.quantityProduced || 0
+        ).toLocaleString("en-IN"),
+        colQuantity,
+        y
+      );
+
+      doc.text(
+        Number(
+          row.totalCementBags || 0
+        ).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        colCement,
+        y
+      );
+
+      doc.text(
+        String(
+          row.assetName || "-"
+        ).substring(0, 15),
+        colAsset,
+        y
+      );
+
+      doc.text(
+        String(
+          row.status || "-"
+        ).substring(0, 12),
+        colStatus,
+        y
+      );
+
+      y += 7;
+    }
+  );
+
+  // ============================================================
+  // FOOTER + PAGE NUMBERS
+  // ============================================================
+
+  const totalPages =
+    doc.getNumberOfPages();
+
+  for (
+    let page = 1;
+    page <= totalPages;
+    page++
+  ) {
+    doc.setPage(page);
+
+    const footerY =
+      pageHeight - 10;
+
+    doc.setFontSize(8);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      "SKCP - Kumta - 581343, Karnataka",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Page ${page} of ${totalPages}`,
+      rightMargin,
+      footerY,
+      { align: "right" }
+    );
+  }
+
+  // ============================================================
+  // SAVE PDF
+  // ============================================================
+
+  const fromPart =
+    fromDate
+      ? formatPdfDate(fromDate)
+      : "All";
+
+  const toPart =
+    toDate
+      ? formatPdfDate(toDate)
+      : "Dates";
+
+  doc.save(
+    `SKCP-Production-Report-${fromPart}-to-${toPart}.pdf`
+  );
+};
+
+// ============================================================
+// DOWNLOAD PAYMENT REPORT PDF
+// ============================================================
+
+const handleDownloadPaymentPdf = () => {
+  if (
+    !paymentReport ||
+    paymentReport.rows.length === 0
+  ) {
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  const leftMargin = 12;
+  const rightMargin = pageWidth - 12;
+
+  let y = 18;
+
+  const addPageIfNeeded = (requiredHeight = 15) => {
+    if (y + requiredHeight > pageHeight - 20) {
+      doc.addPage();
+      y = 20;
+      return true;
+    }
+
+    return false;
+  };
+
+  // ============================================================
+  // HEADER
+  // ============================================================
+
+  doc.setFontSize(20);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.text(
+    "Shree Kundodari Cement Products",
+    leftMargin,
+    y
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    "PAYMENT REPORT",
+    rightMargin,
+    y,
+    { align: "right" }
+  );
+
+  y += 9;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const periodText =
+    fromDate && toDate
+      ? `${formatPdfDate(fromDate)} - ${formatPdfDate(toDate)}`
+      : fromDate
+        ? formatPdfDate(fromDate)
+        : toDate
+          ? formatPdfDate(toDate)
+          : "All Dates";
+
+  doc.text(
+    `Report Period: ${periodText}`,
+    leftMargin,
+    y
+  );
+
+  y += 10;
+
+  // ============================================================
+  // PAYMENT SUMMARY
+  // ============================================================
+
+  addPageIfNeeded(45);
+
+  doc.setFontSize(12);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.text(
+    "Payment Summary",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.text(
+    `Total Payments Received: INR ${Number(
+      paymentReport.totalPaymentsReceived || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    leftMargin,
+    y
+  );
+
+  doc.text(
+    `Allocated Amount: INR ${Number(
+      paymentReport.totalAllocatedAmount || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    105,
+    y
+  );
+
+  y += 7;
+
+  doc.text(
+    `Unallocated Amount: INR ${Number(
+      paymentReport.totalUnallocatedAmount || 0
+    ).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    leftMargin,
+    y
+  );
+
+  doc.text(
+    `Payment Transactions: ${Number(
+      paymentReport.transactionCount || 0
+    ).toLocaleString("en-IN")}`,
+    105,
+    y
+  );
+
+  y += 12;
+
+  // ============================================================
+  // PAYMENT DETAILS
+  // ============================================================
+
+  addPageIfNeeded(50);
+
+  doc.setFontSize(12);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.text(
+    "Payment Details",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(6.5);
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  const colDate = 12;
+  const colPaymentId = 29;
+  const colCustomer = 47;
+  const colMode = 82;
+  const colReceived = 105;
+  const colAllocated = 132;
+  const colUnallocated = 160;
+  const colReceivedBy = 188;
+  const colStatus = 211;
+
+  doc.text(
+    "Date",
+    colDate,
+    y
+  );
+
+  doc.text(
+    "Payment ID",
+    colPaymentId,
+    y
+  );
+
+  doc.text(
+    "Customer",
+    colCustomer,
+    y
+  );
+
+  doc.text(
+    "Payment Mode",
+    colMode,
+    y
+  );
+
+  doc.text(
+    "Received",
+    colReceived,
+    y
+  );
+
+  doc.text(
+    "Allocated",
+    colAllocated,
+    y
+  );
+
+  doc.text(
+    "Unallocated",
+    colUnallocated,
+    y
+  );
+
+  doc.text(
+    "Received By",
+    colReceivedBy,
+    y
+  );
+
+  doc.text(
+    "Status",
+    colStatus,
+    y
+  );
+
+  y += 5;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  paymentReport.rows.forEach(
+    (row) => {
+      addPageIfNeeded(12);
+
+      doc.text(
+        formatPdfDate(
+          row.paymentDate
+        ),
+        colDate,
+        y
+      );
+
+      doc.text(
+        `#${String(
+          row.paymentId || "-"
+        )}`,
+        colPaymentId,
+        y
+      );
+
+      doc.text(
+        String(
+          row.customerName || "-"
+        ).substring(0, 18),
+        colCustomer,
+        y
+      );
+
+      doc.text(
+        String(
+          row.paymentMode || "-"
+        ).substring(0, 14),
+        colMode,
+        y
+      );
+
+      doc.text(
+        `INR ${Number(
+          row.amountReceived || 0
+        ).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        colReceived,
+        y
+      );
+
+      doc.text(
+        `INR ${Number(
+          row.allocatedAmount || 0
+        ).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        colAllocated,
+        y
+      );
+
+      doc.text(
+        `INR ${Number(
+          row.unallocatedAmount || 0
+        ).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        colUnallocated,
+        y
+      );
+
+      doc.text(
+        String(
+          row.receivedBy || "-"
+        ).substring(0, 12),
+        colReceivedBy,
+        y
+      );
+
+      doc.text(
+        String(
+          row.recordStatus || "-"
+        ).substring(0, 10),
+        colStatus,
+        y
+      );
+
+      y += 7;
+    }
+  );
+
+  // ============================================================
+  // FOOTER + PAGE NUMBERS
+  // ============================================================
+
+  const totalPages =
+    doc.getNumberOfPages();
+
+  for (
+    let page = 1;
+    page <= totalPages;
+    page++
+  ) {
+    doc.setPage(page);
+
+    const footerY =
+      pageHeight - 10;
+
+    doc.setFontSize(8);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      "SKCP - Kumta - 581343, Karnataka",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Page ${page} of ${totalPages}`,
+      rightMargin,
+      footerY,
+      { align: "right" }
+    );
+  }
+
+  // ============================================================
+  // SAVE PDF
+  // ============================================================
+
+  const fromPart =
+    fromDate
+      ? formatPdfDate(fromDate)
+      : "All";
+
+  const toPart =
+    toDate
+      ? formatPdfDate(toDate)
+      : "Dates";
+
+  doc.save(
+    `SKCP-Payment-Report-${fromPart}-to-${toPart}.pdf`
+  );
+};
+
+
+
+const handleDownloadAttendancePdf = () => {
+  if (
+    !attendanceReport ||
+    attendanceReport.rows.length === 0
+  ) {
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  const leftMargin = 12;
+  const rightMargin = pageWidth - 12;
+
+  let y = 18;
+
+  const addPageIfNeeded = (requiredHeight = 15) => {
+    if (y + requiredHeight > pageHeight - 20) {
+      doc.addPage();
+      y = 20;
+      return true;
+    }
+
+    return false;
+  };
+
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text(
+    "Shree Kundodari Cement Products",
+    leftMargin,
+    y
+  );
+
+  doc.setFontSize(10);
+  doc.text(
+    "ATTENDANCE REPORT",
+    rightMargin,
+    y,
+    { align: "right" }
+  );
+
+  y += 9;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+
+  const periodText =
+    fromDate && toDate
+      ? `${formatPdfDate(fromDate)} - ${formatPdfDate(toDate)}`
+      : fromDate
+        ? formatPdfDate(fromDate)
+        : toDate
+          ? formatPdfDate(toDate)
+          : "All Dates";
+
+  doc.text(
+    `Report Period: ${periodText}`,
+    leftMargin,
+    y
+  );
+
+  y += 10;
+
+  // Attendance Summary
+  addPageIfNeeded(45);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+
+doc.text(
+  "Attendance Summary",
+  leftMargin,
+  y
+);
+
+y += 8;
+
+doc.setFontSize(10);
+doc.setFont("helvetica", "normal");
+
+doc.text(
+  `Total Records: ${Number(
+    attendanceReport.totalAttendanceRecords || 0
+  ).toLocaleString("en-IN")}`,
+  leftMargin,
+  y
+);
+
+y += 6;
+
+doc.text(
+  `Present Days: ${Number(
+    attendanceReport.presentDays || 0
+  ).toLocaleString("en-IN")}`,
+  leftMargin,
+  y
+);
+
+y += 6;
+
+doc.text(
+  `Half Days: ${Number(
+    attendanceReport.halfDays || 0
+  ).toLocaleString("en-IN")}`,
+  leftMargin,
+  y
+);
+
+y += 6;
+
+doc.text(
+  `Absent / Leave: ${Number(
+    (attendanceReport.absentDays || 0) +
+    (attendanceReport.leaveDays || 0)
+  ).toLocaleString("en-IN")}`,
+  leftMargin,
+  y
+);
+
+y += 6;
+
+doc.text(
+  `Attendance Amount: INR ${Number(
+    attendanceReport.totalAttendanceAmount || 0
+  ).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`,
+  leftMargin,
+  y
+);
+
+y += 14;
+
+
+
+  // Detailed Attendance
+  addPageIfNeeded(50);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Detailed Attendance",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+
+  const colDate = 12;
+  const colId = 30;
+  const colLabour = 43;
+  const colStatus = 79;
+  const colRate = 101;
+  const colAmount = 123;
+  const colLeaveReason = 145;
+  const colRemarks = 172;
+  const colRecordStatus = 198;
+
+  doc.text(
+    "Date",
+    colDate,
+    y
+  );
+
+  doc.text(
+    "ID",
+    colId,
+    y
+  );
+
+  doc.text(
+    "Labour",
+    colLabour,
+    y
+  );
+
+  doc.text(
+    "Attendance",
+    colStatus,
+    y
+  );
+
+  doc.text(
+    "Daily Rate",
+    colRate,
+    y
+  );
+
+  doc.text(
+    "Amount",
+    colAmount,
+    y
+  );
+
+  doc.text(
+    "Leave Reason",
+    colLeaveReason,
+    y
+  );
+
+  doc.text(
+    "Remarks",
+    colRemarks,
+    y
+  );
+
+  doc.text(
+    "Status",
+    colRecordStatus,
+    y
+  );
+
+  y += 5;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+
+  attendanceReport.rows.forEach((row) => {
+    addPageIfNeeded(12);
+
+    doc.text(
+      formatPdfDate(row.attendanceDate),
+      colDate,
+      y
+    );
+
+    doc.text(
+      `#${String(row.attendanceId || "-")}`,
+      colId,
+      y
+    );
+
+    doc.text(
+      String(
+        row.labourName ||
+          `Labour #${row.labourId}` ||
+          "-"
+      ).substring(0, 18),
+      colLabour,
+      y
+    );
+
+    doc.text(
+      String(
+        row.attendanceStatus || "-"
+      ).substring(0, 10),
+      colStatus,
+      y
+    );
+
+    doc.text(
+      `INR ${Number(
+        row.dailyRate || 0
+      ).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      colRate,
+      y
+    );
+
+    doc.text(
+      `INR ${Number(
+        row.dailyAmount || 0
+      ).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      colAmount,
+      y
+    );
+
+    doc.text(
+      String(
+        row.leaveReason || "-"
+      ).substring(0, 16),
+      colLeaveReason,
+      y
+    );
+
+    doc.text(
+      String(
+        row.remarks || "-"
+      ).substring(0, 16),
+      colRemarks,
+      y
+    );
+
+    doc.text(
+      String(
+        row.status || "-"
+      ).substring(0, 10),
+      colRecordStatus,
+      y
+    );
+
+    y += 7;
+  });
+
+  const totalPages =
+    doc.getNumberOfPages();
+
+  for (
+    let page = 1;
+    page <= totalPages;
+    page++
+  ) {
+    doc.setPage(page);
+
+    const footerY =
+      pageHeight - 10;
+
+    doc.setFontSize(8);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      "SKCP - Kumta - 581343, Karnataka",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Page ${page} of ${totalPages}`,
+      rightMargin,
+      footerY,
+      { align: "right" }
+    );
+  }
+
+  const fromPart =
+    fromDate
+      ? formatPdfDate(fromDate)
+      : "All";
+
+  const toPart =
+    toDate
+      ? formatPdfDate(toDate)
+      : "Dates";
+
+  doc.save(
+    `SKCP-Attendance-Report-${fromPart}-to-${toPart}.pdf`
+  );
+};
+
+const handleDownloadInventoryPdf = () => {
+  if (
+    !inventoryReport ||
+    (
+      inventoryReport.finishedGoodsRows?.length === 0 &&
+      inventoryReport.rawMaterialRows?.length === 0
+    )
+  ) {
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth =
+    doc.internal.pageSize.getWidth();
+
+  const pageHeight =
+    doc.internal.pageSize.getHeight();
+
+  const leftMargin = 12;
+  const rightMargin = pageWidth - 12;
+
+  let y = 18;
+
+  const addPageIfNeeded = (requiredHeight = 15) => {
+    if (y + requiredHeight > pageHeight - 20) {
+      doc.addPage();
+      y = 20;
+      return true;
+    }
+
+    return false;
+  };
+
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Shree Kundodari Cement Products",
+    leftMargin,
+    y
+  );
+
+  doc.setFontSize(10);
+  doc.text(
+    "INVENTORY REPORT",
+    rightMargin,
+    y,
+    { align: "right" }
+  );
+
+  y += 9;
+
+  doc.line(
+    leftMargin,
+    y,
+    rightMargin,
+    y
+  );
+
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+
+  const periodText =
+    fromDate && toDate
+      ? `${formatPdfDate(fromDate)} - ${formatPdfDate(toDate)}`
+      : fromDate
+        ? formatPdfDate(fromDate)
+        : toDate
+          ? formatPdfDate(toDate)
+          : "All Dates";
+
+  doc.text(
+    `Report Period: ${periodText}`,
+    leftMargin,
+    y
+  );
+
+  y += 12;
+
+  // =========================================================
+  // INVENTORY SUMMARY
+  // =========================================================
+
+  addPageIfNeeded(40);
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    "Inventory Summary",
+    leftMargin,
+    y
+  );
+
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+
+  doc.text(
+    `Finished Goods Records: ${Number(
+      inventoryReport.finishedGoodsRows?.length || 0
+    ).toLocaleString("en-IN")}`,
+    leftMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.text(
+    `Raw Material Records: ${Number(
+      inventoryReport.rawMaterialRows?.length || 0
+    ).toLocaleString("en-IN")}`,
+    leftMargin,
+    y
+  );
+
+  y += 6;
+
+  doc.text(
+    `Low Stock Items: ${Number(
+      inventoryReport.lowStockCount || 0
+    ).toLocaleString("en-IN")}`,
+    leftMargin,
+    y
+  );
+
+  y += 14;
+
+  // =========================================================
+  // FINISHED GOODS INVENTORY
+  // =========================================================
+
+  if (
+    inventoryReport.finishedGoodsRows &&
+    inventoryReport.finishedGoodsRows.length > 0
+  ) {
+    addPageIfNeeded(50);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+
+    doc.text(
+      "Finished Goods Inventory",
+      leftMargin,
+      y
+    );
+
+    y += 8;
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+
+    const colFgId = 12;
+    const colFgProduct = 35;
+    const colFgCurrent = 68;
+    const colFgMinimum = 98;
+    const colFgStatus = 126;
+    const colFgDate = 157;
+    const colFgNotes = 178;
+
+    doc.text(
+      "Stock ID",
+      colFgId,
+      y
+    );
+
+    doc.text(
+      "Product",
+      colFgProduct,
+      y
+    );
+
+    doc.text(
+      "Current Stock",
+      colFgCurrent,
+      y
+    );
+
+    doc.text(
+      "Minimum",
+      colFgMinimum,
+      y
+    );
+
+    doc.text(
+      "Status",
+      colFgStatus,
+      y
+    );
+
+    doc.text(
+      "Last Updated",
+      colFgDate,
+      y
+    );
+
+    doc.text(
+      "Notes",
+      colFgNotes,
+      y
+    );
+
+    y += 5;
+
+    doc.line(
+      leftMargin,
+      y,
+      rightMargin,
+      y
+    );
+
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+
+    inventoryReport.finishedGoodsRows.forEach(
+      (row) => {
+        addPageIfNeeded(12);
+
+        doc.text(
+          `#${String(
+            row.finishedGoodsStockId || "-"
+          )}`,
+          colFgId,
+          y
+        );
+
+        doc.text(
+          String(
+            row.notes || "-"
+          ).substring(0, 20),
+          colFgNotes,
+          y
+        );
+
+        doc.text(
+          Number(
+            row.currentStock || 0
+          ).toLocaleString("en-IN"),
+          colFgCurrent,
+          y
+        );
+
+        doc.text(
+          Number(
+            row.minimumStock || 0
+          ).toLocaleString("en-IN"),
+          colFgMinimum,
+          y
+        );
+
+        doc.text(
+          String(
+            row.status || "-"
+          ).substring(0, 12),
+          colFgStatus,
+          y
+        );
+
+        doc.text(
+          formatPdfDate(
+            row.lastUpdatedDate
+          ),
+          colFgDate,
+          y
+        );
+
+        doc.text(
+          String(
+            row.notes || "-"
+          ).substring(0, 18),
+          colFgNotes,
+          y
+        );
+
+        y += 7;
+      }
+    );
+
+    y += 8;
+  }
+
+  // =========================================================
+  // RAW MATERIAL INVENTORY
+  // =========================================================
+
+  if (
+    inventoryReport.rawMaterialRows &&
+    inventoryReport.rawMaterialRows.length > 0
+  ) {
+    addPageIfNeeded(50);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+
+    doc.text(
+      "Raw Material Inventory",
+      leftMargin,
+      y
+    );
+
+    y += 8;
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+
+    const colRmId = 12;
+    const colRmName = 34;
+    const colRmUnit = 83;
+    const colRmCurrent = 105;
+    const colRmMinimum = 136;
+    const colRmStatus = 166;
+
+    doc.text(
+      "Stock ID",
+      colRmId,
+      y
+    );
+
+    doc.text(
+      "Raw Material",
+      colRmName,
+      y
+    );
+
+    doc.text(
+      "Unit",
+      colRmUnit,
+      y
+    );
+
+    doc.text(
+      "Current Stock",
+      colRmCurrent,
+      y
+    );
+
+    doc.text(
+      "Minimum",
+      colRmMinimum,
+      y
+    );
+
+    doc.text(
+      "Status",
+      colRmStatus,
+      y
+    );
+
+    y += 5;
+
+    doc.line(
+      leftMargin,
+      y,
+      rightMargin,
+      y
+    );
+
+    y += 6;
+
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    inventoryReport.rawMaterialRows.forEach(
+      (row) => {
+        addPageIfNeeded(12);
+
+        doc.text(
+          `#${String(
+            row.rawMaterialStockId || "-"
+          )}`,
+          colRmId,
+          y
+        );
+
+        doc.text(
+          String(
+            row.rawMaterialName ||
+              `Raw Material #${row.rawMaterialId}`
+          ).substring(0, 25),
+          colRmName,
+          y
+        );
+
+        doc.text(
+          String(
+            row.rawMaterialUnit || "-"
+          ).substring(0, 10),
+          colRmUnit,
+          y
+        );
+
+        doc.text(
+          Number(
+            row.currentStock || 0
+          ).toLocaleString("en-IN", {
+            maximumFractionDigits: 2,
+          }),
+          colRmCurrent,
+          y
+        );
+
+        doc.text(
+          Number(
+            row.minimumStock || 0
+          ).toLocaleString("en-IN", {
+            maximumFractionDigits: 2,
+          }),
+          colRmMinimum,
+          y
+        );
+
+        doc.text(
+          String(
+            row.stockStatus || "-"
+          ).substring(0, 12),
+          colRmStatus,
+          y
+        );
+
+        y += 7;
+      }
+    );
+  }
+
+  // =========================================================
+  // FOOTER
+  // =========================================================
+
+  const totalPages =
+    doc.getNumberOfPages();
+
+  for (
+    let page = 1;
+    page <= totalPages;
+    page++
+  ) {
+    doc.setPage(page);
+
+    const footerY =
+      pageHeight - 10;
+
+    doc.setFontSize(8);
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.text(
+      "SKCP - Kumta - 581343, Karnataka",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Page ${page} of ${totalPages}`,
+      rightMargin,
+      footerY,
+      { align: "right" }
+    );
+  }
+
+  const fromPart =
+    fromDate
+      ? formatPdfDate(fromDate)
+      : "All";
+
+  const toPart =
+    toDate
+      ? formatPdfDate(toDate)
+      : "Dates";
+
+  doc.save(
+    `SKCP-Inventory-Report-${fromPart}-to-${toPart}.pdf`
+  );
+};
 
   /* ============================================================
      TABLE SORTING
@@ -2021,21 +4036,128 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
   }[reportType];
 
   return (
-    <div className="module-container">
+    <div className="page">
 
       {/* ========================================================
-          REPORT HEADER
+          REPORT HEADER + FILTERS
       ======================================================== */}
 
-      <div className="module-header">
-        <h1>SKCP Reports</h1>
+      <section className="card">
 
-        <p>
-          Operational reports for sales,
-          production, payments, attendance,
-          inventory, and upcoming deliveries.
-        </p>
-      </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h2>SKCP Reports</h2>
+
+            <p>
+              Operational reports for sales,
+              production, payments, attendance,
+              inventory, and upcoming deliveries.
+            </p>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr 1fr auto",
+            alignItems: "end",
+            gap: "16px",
+            marginTop: "16px",
+          }}
+        >
+
+          <div className="fld">
+            <label>
+              SKCP Report Type
+            </label>
+
+            <select
+              value={reportType}
+              onChange={(event) =>
+                setReportType(
+                  event.target.value
+                )
+              }
+            >
+              <option value="sales">
+                Sales Report
+              </option>
+
+              <option value="production">
+                Production Report
+              </option>
+
+              <option value="payment">
+                Payment Report
+              </option>
+
+              <option value="attendance">
+                Attendance Report
+              </option>
+
+              <option value="inventory">
+                Inventory Report
+              </option>
+
+              <option value="upcomingDeliveries">
+                Upcoming Deliveries
+              </option>
+            </select>
+          </div>
+
+          <div className="fld">
+            <label>
+              From Date
+            </label>
+
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(event) =>
+                setFromDate(
+                  event.target.value
+                )
+              }
+            />
+          </div>
+
+          <div className="fld">
+            <label>
+              To Date
+            </label>
+
+            <input
+              type="date"
+              value={toDate}
+              onChange={(event) =>
+                setToDate(
+                  event.target.value
+                )
+              }
+            />
+          </div>
+
+          <button
+            type="button"
+            className="btn secondary"
+            onClick={() => {
+              setFromDate("");
+              setToDate("");
+            }}
+          >
+            Clear
+          </button>
+        </div>
+
+      </section>
 
       {/* ========================================================
           LOADING
@@ -2063,104 +4185,10 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
         <>
 
           {/* ==================================================
-              REPORT FILTERS
-          ================================================== */}
-
-          <div className="module-card">
-            <div className="section-header">
-              <div>
-                <h2>
-                  SKCP Report Filters
-                </h2>
-
-                <p>
-                  Select the report and
-                  reporting period.
-                </p>
-              </div>
-            </div>
-
-            <div className="reports-filter-grid">
-
-              <div className="reports-filter-field">
-                <label>
-                  SKCP Report Type
-                </label>
-
-                <select
-                  value={reportType}
-                  onChange={(event) =>
-                    setReportType(
-                      event.target.value
-                    )
-                  }
-                >
-                  <option value="sales">
-                    Sales Report
-                  </option>
-
-                  <option value="production">
-                    Production Report
-                  </option>
-
-                  <option value="payment">
-                    Payment Report
-                  </option>
-
-                  <option value="attendance">
-                    Attendance Report
-                  </option>
-
-                  <option value="inventory">
-                    Inventory Report
-                  </option>
-
-                  <option value="upcomingDeliveries">
-                    Upcoming Deliveries
-                  </option>
-                </select>
-              </div>
-
-              <div className="reports-filter-field">
-                <label>
-                  From Date
-                </label>
-
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(event) =>
-                    setFromDate(
-                      event.target.value
-                    )
-                  }
-                />
-              </div>
-
-              <div className="reports-filter-field">
-                <label>
-                  To Date
-                </label>
-
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(event) =>
-                    setToDate(
-                      event.target.value
-                    )
-                  }
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* ==================================================
               REPORT SUMMARY
           ================================================== */}
 
-          <div className="module-card">
+          <div className="card">
             <div className="section-header">
               <div>
                 <h2>
@@ -2527,26 +4555,92 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
             </div>
           </div>
 
-          {/* ==================================================
+            {/* ==================================================
               SELECTED REPORT
-          ================================================== */}
+             ================================================== */}
 
-          <div className="module-card">
-            <div className="section-header">
-              <div>
-                <h2>
-                  {reportTitle}
-                </h2>
-
-                <p>
-                  {fromDate || toDate
-                    ? `${fromDate || "Start"} to ${
-                        toDate || "Today"
-                      }`
-                    : "All available records"}
-                </p>
-              </div>
+          <div className="card">
+                      <div
+            className="section-header"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "16px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <h2>{reportTitle}</h2>
+              <p>
+                {fromDate || toDate
+                  ? `${fromDate || "Start"} to ${toDate || "Today"}`
+                  : "All available records"}
+              </p>
             </div>
+
+            {reportType === "sales" && (
+              <button
+                type="button"
+                className="action-btn view-btn"
+                onClick={handleDownloadSalesPdf}
+              >
+                Download PDF
+              </button>
+            )}
+
+            {reportType === "production" && (
+              <button
+                type="button"
+                className="action-btn view-btn"
+                onClick={handleDownloadProductionPdf}
+              >
+                Download PDF
+              </button>
+            )}
+
+
+              {reportType === "payment" && (
+                <button
+                  type="button"
+                  className="action-btn view-btn"
+                  onClick={handleDownloadPaymentPdf}
+                >
+                  Download PDF
+                </button>
+              )}
+
+            {reportType === "attendance" && (
+              <button
+                type="button"
+                className="action-btn view-btn"
+                onClick={handleDownloadAttendancePdf}
+              >
+                Download PDF
+              </button>
+            )}
+
+          {reportType === "inventory" && (
+              <button
+                type="button"
+                className="action-btn view-btn"
+                onClick={handleDownloadInventoryPdf}
+              >
+                Download PDF
+              </button>
+            )}
+
+
+            {reportType === "upcomingDeliveries" && (
+              <button
+                type="button"
+                className="action-btn view-btn"
+                onClick={handleDownloadUpcomingDeliveriesPdf}
+              >
+                Download PDF
+              </button>
+            )}
+          </div>
 
             {/* ==================================================
                 SALES REPORT
@@ -3612,437 +5706,487 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
             )}
 
             {/* ==================================================
-    UPCOMING DELIVERIES REPORT
-================================================== */}
+                UPCOMING DELIVERIES REPORT
+            ================================================== */}
 
-{reportType ===
-  "upcomingDeliveries" && (
-  <div className="table-wrap">
+            {reportType ===
+              "upcomingDeliveries" && (
+              <div>
 
-    {/* ==================================================
-        1. PRODUCTION SUMMARY BY SIZE
-    ================================================== */}
+                {/* ==================================================
+                    1. PRODUCTION SUMMARY BY SIZE
+                ================================================== */}
 
-    {upcomingDeliveriesReport.productionSummary &&
-      upcomingDeliveriesReport.productionSummary.length >
-        0 && (
-        <div
-          style={{
-            marginBottom: "32px",
-          }}
-        >
-          <div className="card-body">
-            <h3>
-              Production Summary by Size
-            </h3>
-
-            <button
-              type="button"
-              className="action-btn view-btn"
-              onClick={
-                handleDownloadUpcomingDeliveriesPdf
-              }
-            >
-              Download PDF
-            </button>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Size</th>
-                  <th>Required Qty</th>
-                  <th>Available Stock</th>
-                  <th>
-                    Production Required
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {upcomingDeliveriesReport.productionSummary.map(
-                  (summary) => (
-                    <tr
-                      key={
-                        summary.productId
-                      }
+                {upcomingDeliveriesReport.productionSummary &&
+                  upcomingDeliveriesReport.productionSummary.length >
+                    0 && (
+                    <section
+                      className="card"
+                      style={{
+                        marginTop: "24px",
+                      }}
                     >
-                      <td>
-                        {summary.productSize}
-                      </td>
 
-                      <td>
-                        {summary.requiredQuantity.toLocaleString(
-                          "en-IN"
-                        )}
-                      </td>
+                      <div className="section-header">
+                        <div>
+                          <h3>
+                            Production Summary by Size
+                          </h3>
 
-                      <td>
-                        {summary.availableStock.toLocaleString(
-                          "en-IN"
-                        )}
-                      </td>
+                          <p>
+                            Production requirement based on
+                            upcoming deliveries and available stock.
+                          </p>
+                        </div>
+                      </div>
 
-                      <td>
-                        {summary.productionRequired.toLocaleString(
-                          "en-IN"
-                        )}
-                      </td>
-                    </tr>
-                  )
-                )}
+                      <table>
+                        <thead>
+                          <tr>
 
-                {/* TOTAL */}
-                <tr>
-                  <td>
-                    <strong>
-                      TOTAL
-                    </strong>
-                  </td>
+                            <th>
+                              Size
+                            </th>
 
-                  <td>
-                    <strong>
-                      {upcomingDeliveriesReport
-                        .productionSummaryTotals
-                        .requiredQuantity.toLocaleString(
-                          "en-IN"
-                        )}
-                    </strong>
-                  </td>
+                            <th>
+                              Required Qty
+                            </th>
 
-                  <td>
-                    <strong>
-                      {upcomingDeliveriesReport
-                        .productionSummaryTotals
-                        .availableStock.toLocaleString(
-                          "en-IN"
-                        )}
-                    </strong>
-                  </td>
+                            <th>
+                              Available Stock
+                            </th>
 
-                  <td>
-                    <strong>
-                      {upcomingDeliveriesReport
-                        .productionSummaryTotals
-                        .productionRequired.toLocaleString(
-                          "en-IN"
-                        )}
-                    </strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                            <th>
+                              Production Required
+                            </th>
 
-    {/* ==================================================
-        2. DETAILED UPCOMING DELIVERIES
-    ================================================== */}
+                          </tr>
+                        </thead>
 
-    <div className="card-body">
+                        <tbody>
 
-      <h3>
-        Detailed Upcoming Deliveries
-      </h3>
+                          {upcomingDeliveriesReport.productionSummary.map(
+                            (summary) => (
+                              <tr
+                                key={
+                                  summary.productId
+                                }
+                              >
 
-      {upcomingDeliveriesReport.rows.length ===
-      0 ? (
-        <div>
-          No upcoming delivery data
-          available for the selected period.
-        </div>
-      ) : (
-        <>
+                                <td>
+                                  {summary.productSize}
+                                </td>
 
-          <table>
-            <thead>
-              <tr>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "deliveryDateSort"
-                      )
-                    }
-                  >
-                    Delivery Date
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "deliveryDateSort",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "orderId"
-                      )
-                    }
-                  >
-                    Order ID
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "orderId",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "customerName"
-                      )
-                    }
-                  >
-                    Customer
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "customerName",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "productName"
-                      )
-                    }
-                  >
-                    Product
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "productName",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "productSize"
-                      )
-                    }
-                  >
-                    Size
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "productSize",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "requiredQuantity"
-                      )
-                    }
-                  >
-                    Required Qty
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "requiredQuantity",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "availableStock"
-                      )
-                    }
-                  >
-                    Available Stock
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "availableStock",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "productionRequired"
-                      )
-                    }
-                  >
-                    Production Required
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "productionRequired",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-                <th>
-                  <button
-                    type="button"
-                    className="table-sort-btn"
-                    onClick={() =>
-                      handleUpcomingDeliveriesSortAndReset(
-                        "deliveryStatus"
-                      )
-                    }
-                  >
-                    Delivery Status
-                    {getSortIndicator(
-                      upcomingDeliveriesSortKey,
-                      "deliveryStatus",
-                      upcomingDeliveriesSortDirection
-                    )}
-                  </button>
-                </th>
-
-              </tr>
-            </thead>
-
-            <tbody>
-              {paginatedUpcomingDeliveriesRows.map(
-                (row) => (
-                  <tr
-                    key={
-                      row.orderItemId
-                    }
-                  >
-                    <td>
-                      {row.deliveryDate
-                        ? row.deliveryDate
-                            .split(", ")
-                            .map(
-                              (
-                                date,
-                                index
-                              ) => (
-                                <div
-                                  key={`${row.orderItemId}-${date}-${index}`}
-                                >
-                                  {formatDate(
-                                    date
+                                <td>
+                                  {summary.requiredQuantity.toLocaleString(
+                                    "en-IN"
                                   )}
-                                </div>
-                              )
+                                </td>
+
+                                <td>
+                                  {summary.availableStock.toLocaleString(
+                                    "en-IN"
+                                  )}
+                                </td>
+
+                                <td>
+                                  {summary.productionRequired.toLocaleString(
+                                    "en-IN"
+                                  )}
+                                </td>
+
+                              </tr>
                             )
-                        : "—"}
-                    </td>
+                          )}
 
-                    <td>
-                      #{row.orderId}
-                    </td>
+                          {/* TOTAL */}
 
-                    <td>
-                      {row.customerName}
-                    </td>
+                          <tr>
 
-                    <td>
-                      {row.productName}
-                    </td>
+                            <td>
+                              <strong>
+                                TOTAL
+                              </strong>
+                            </td>
 
-                    <td>
-                      {row.productSize}
-                    </td>
+                            <td>
+                              <strong>
+                                {
+                                  upcomingDeliveriesReport
+                                    .productionSummaryTotals
+                                    .requiredQuantity
+                                .toLocaleString(
+                                  "en-IN"
+                                )}
+                              </strong>
+                            </td>
 
-                    <td>
-                      {row.requiredQuantity.toLocaleString(
-                        "en-IN"
-                      )}
-                    </td>
+                            <td>
+                              <strong>
+                                {
+                                  upcomingDeliveriesReport
+                                    .productionSummaryTotals
+                                    .availableStock
+                                .toLocaleString(
+                                  "en-IN"
+                                )}
+                              </strong>
+                            </td>
 
-                    <td>
-                      {row.availableStock.toLocaleString(
-                        "en-IN"
-                      )}
-                    </td>
+                            <td>
+                              <strong>
+                                {
+                                  upcomingDeliveriesReport
+                                    .productionSummaryTotals
+                                    .productionRequired
+                                .toLocaleString(
+                                  "en-IN"
+                                )}
+                              </strong>
+                            </td>
 
-                    <td>
-                      {row.productionRequired.toLocaleString(
-                        "en-IN"
-                      )}
-                    </td>
+                          </tr>
 
-                    <td>
-                      <span
-                        className={`status ${
-                          row.deliveryStatus ===
-                          "IN_PROGRESS"
-                            ? "warning"
-                            : "active"
-                        }`}
-                      >
-                        {
-                          row.deliveryStatus
+                        </tbody>
+                      </table>
+
+                    </section>
+                  )}
+
+                {/* ==================================================
+                    2. DETAILED UPCOMING DELIVERIES
+                ================================================== */}
+
+                <section
+                  className="card"
+                  style={{
+                    marginTop: "24px",
+                  }}
+                >
+
+                  <div className="section-header">
+                    <div>
+                      <h3>
+                        Detailed Upcoming Deliveries
+                      </h3>
+
+                      <p>
+                        Detailed delivery requirements and
+                        production status.
+                      </p>
+                    </div>
+                  </div>
+
+                  {upcomingDeliveriesReport.rows.length ===
+                  0 ? (
+                    <div className="card-body">
+                      No upcoming delivery data
+                      available for the selected period.
+                    </div>
+                  ) : (
+                    <>
+
+                      <table>
+                        <thead>
+                          <tr>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "deliveryDateSort"
+                                  )
+                                }
+                              >
+                                Delivery Date
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "deliveryDateSort",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "orderId"
+                                  )
+                                }
+                              >
+                                Order ID
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "orderId",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "customerName"
+                                  )
+                                }
+                              >
+                                Customer
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "customerName",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "productName"
+                                  )
+                                }
+                              >
+                                Product
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "productName",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "productSize"
+                                  )
+                                }
+                              >
+                                Size
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "productSize",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "requiredQuantity"
+                                  )
+                                }
+                              >
+                                Required Qty
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "requiredQuantity",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "availableStock"
+                                  )
+                                }
+                              >
+                                Available Stock
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "availableStock",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "productionRequired"
+                                  )
+                                }
+                              >
+                                Production Required
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "productionRequired",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                            <th>
+                              <button
+                                type="button"
+                                className="table-sort-btn"
+                                onClick={() =>
+                                  handleUpcomingDeliveriesSortAndReset(
+                                    "deliveryStatus"
+                                  )
+                                }
+                              >
+                                Delivery Status
+
+                                {getSortIndicator(
+                                  upcomingDeliveriesSortKey,
+                                  "deliveryStatus",
+                                  upcomingDeliveriesSortDirection
+                                )}
+                              </button>
+                            </th>
+
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {paginatedUpcomingDeliveriesRows.map(
+                            (row) => (
+                              <tr
+                                key={
+                                  row.orderItemId
+                                }
+                              >
+
+                                <td>
+                                  {row.deliveryDate
+                                    ? row.deliveryDate
+                                        .split(", ")
+                                        .map(
+                                          (
+                                            date,
+                                            index
+                                          ) => (
+                                            <div
+                                              key={`${row.orderItemId}-${date}-${index}`}
+                                            >
+                                              {formatDate(
+                                                date
+                                              )}
+                                            </div>
+                                          )
+                                        )
+                                    : "—"}
+                                </td>
+
+                                <td>
+                                  #{row.orderId}
+                                </td>
+
+                                <td>
+                                  {row.customerName}
+                                </td>
+
+                                <td>
+                                  {row.productName}
+                                </td>
+
+                                <td>
+                                  {row.productSize}
+                                </td>
+
+                                <td>
+                                  {row.requiredQuantity.toLocaleString(
+                                    "en-IN"
+                                  )}
+                                </td>
+
+                                <td>
+                                  {row.availableStock.toLocaleString(
+                                    "en-IN"
+                                  )}
+                                </td>
+
+                                <td>
+                                  {row.productionRequired.toLocaleString(
+                                    "en-IN"
+                                  )}
+                                </td>
+
+                                <td>
+                                  <span
+                                    className={`status ${
+                                      row.deliveryStatus ===
+                                      "IN_PROGRESS"
+                                        ? "warning"
+                                        : "active"
+                                    }`}
+                                  >
+                                    {
+                                      row.deliveryStatus
+                                    }
+                                  </span>
+                                </td>
+
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+
+                      </table>
+
+                      <Pagination
+                        currentPage={
+                          upcomingDeliveriesCurrentPage
                         }
-                      </span>
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                        totalPages={
+                          upcomingDeliveriesTotalPages
+                        }
+                        totalRecords={
+                          upcomingDeliveriesTotalRecords
+                        }
+                        pageSize={
+                          upcomingDeliveriesPageSize
+                        }
+                        onPageChange={
+                          handleUpcomingDeliveriesPageChange
+                        }
+                        onPageSizeChange={
+                          handleUpcomingDeliveriesPageSizeChange
+                        }
+                      />
 
-          <Pagination
-            currentPage={
-              upcomingDeliveriesCurrentPage
-            }
-            totalPages={
-              upcomingDeliveriesTotalPages
-            }
-            totalRecords={
-              upcomingDeliveriesTotalRecords
-            }
-            pageSize={
-              upcomingDeliveriesPageSize
-            }
-            onPageChange={
-              handleUpcomingDeliveriesPageChange
-            }
-            onPageSizeChange={
-              handleUpcomingDeliveriesPageSizeChange
-            }
-          />
+                    </>
+                  )}
 
-        </>
-      )}
+                </section>
 
-    </div>
-
-  </div>
-)}
+              </div>
+            )}
 
             {/* ==================================================
                 INVENTORY REPORT
@@ -4056,7 +6200,7 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
                     FINISHED GOODS INVENTORY
                 ============================================== */}
 
-                <div className="table-wrap">
+                <div className="card">
 
                   <div className="section-header">
                     <div>
@@ -4309,7 +6453,7 @@ const handleDownloadUpcomingDeliveriesPdf = () => {
                 ============================================== */}
 
                 <div
-                  className="table-wrap"
+                  className="card"
                   style={{
                     marginTop: "24px",
                   }}
