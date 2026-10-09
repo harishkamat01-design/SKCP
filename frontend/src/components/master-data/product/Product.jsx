@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+
 import {
     apiGet,
     apiPost,
@@ -17,6 +18,49 @@ import {
     DetailGrid,
     DetailItem,
 } from "../../ui/common/DetailGrid";
+
+// ============================================================
+// PRODUCT MASTER OPTIONS
+// ============================================================
+
+const PRODUCT_NAME_OPTIONS = [
+    "Solid Block",
+];
+
+const PRODUCT_SIZE_OPTIONS = [
+    {
+        value: "4-inch",
+        label: "4-inch Block — 8 × 4 × 16",
+        description: "4-inch Block",
+        height: 8,
+        width: 4,
+        length: 16,
+    },
+    {
+        value: "6-inch",
+        label: "6-inch Block — 8 × 6 × 16",
+        description: "6-inch Block",
+        height: 8,
+        width: 6,
+        length: 16,
+    },
+    {
+        value: "8-inch",
+        label: "8-inch Block — 8 × 8 × 16",
+        description: "8-inch Block",
+        height: 8,
+        width: 8,
+        length: 16,
+    },
+    {
+        value: "1 foot",
+        label: "1 foot Block — 8 × 6 × 12",
+        description: "1 foot Block",
+        height: 8,
+        width: 6,
+        length: 12,
+    },
+];
 
 function Product() {
     const [products, setProducts] = useState([]);
@@ -41,6 +85,7 @@ function Product() {
         width: "",
         height: "",
         unit: "",
+        price: "",
         description: "",
     });
 
@@ -70,6 +115,7 @@ function Product() {
         width: "",
         height: "",
         unit: "",
+        price: "",
         description: "",
         status: "ACTIVE",
     });
@@ -83,6 +129,83 @@ function Product() {
     const [deleteSaving, setDeleteSaving] = useState(false);
 
     // ============================================================
+    // FIND SIZE MASTER
+    // ============================================================
+
+    const getSizeOption = (size) => {
+        const normalizedSize = String(size ?? "")
+            .trim()
+            .toLowerCase();
+
+        return PRODUCT_SIZE_OPTIONS.find(
+            (option) =>
+                option.value.toLowerCase() === normalizedSize ||
+                option.description.toLowerCase() === normalizedSize ||
+                option.label.toLowerCase() === normalizedSize
+        );
+    };
+
+    // ============================================================
+    // APPLY SIZE TO ADD FORM
+    // ============================================================
+
+    const applyAddSize = (size) => {
+        const selectedSize = getSizeOption(size);
+
+        if (!selectedSize) {
+            setAddForm((previous) => ({
+                ...previous,
+                size: "",
+                length: "",
+                width: "",
+                height: "",
+                description: "",
+            }));
+
+            return;
+        }
+
+        setAddForm((previous) => ({
+            ...previous,
+            size: selectedSize.value,
+            length: selectedSize.length,
+            width: selectedSize.width,
+            height: selectedSize.height,
+            description: selectedSize.description,
+        }));
+    };
+
+    // ============================================================
+    // APPLY SIZE TO EDIT FORM
+    // ============================================================
+
+    const applyEditSize = (size) => {
+        const selectedSize = getSizeOption(size);
+
+        if (!selectedSize) {
+            setEditForm((previous) => ({
+                ...previous,
+                size: "",
+                length: "",
+                width: "",
+                height: "",
+                description: "",
+            }));
+
+            return;
+        }
+
+        setEditForm((previous) => ({
+            ...previous,
+            size: selectedSize.value,
+            length: selectedSize.length,
+            width: selectedSize.width,
+            height: selectedSize.height,
+            description: selectedSize.description,
+        }));
+    };
+
+    // ============================================================
     // GET ALL PRODUCTS
     // ============================================================
 
@@ -93,11 +216,43 @@ function Product() {
 
             const result = await apiGet("/api/products");
 
-            setProducts(
-                Array.isArray(result?.data)
-                    ? result.data
-                    : []
+            const productList = Array.isArray(result?.data)
+                ? result.data
+                : [];
+
+            /*
+             * The product list response does not currently include
+             * description, while the individual product response does.
+             *
+             * Fetch the complete product details so the Product List
+             * table can display the actual description.
+             */
+            const productsWithDetails = await Promise.all(
+                productList.map(async (product) => {
+                    try {
+                        const detailResult = await apiGet(
+                            `/api/products/${product.productId}`
+                        );
+
+                        return {
+                            ...product,
+                            description:
+                                detailResult?.data?.description ??
+                                product.description ??
+                                null,
+                        };
+                    } catch (detailError) {
+                        console.error(
+                            `Error fetching details for product ${product.productId}:`,
+                            detailError
+                        );
+
+                        return product;
+                    }
+                })
             );
+
+            setProducts(productsWithDetails);
         } catch (err) {
             console.error(
                 "Error fetching products:",
@@ -158,7 +313,7 @@ function Product() {
     // ============================================================
 
     const filteredProducts = useMemo(() => {
-        const search = searchTerm
+        const search = String(searchTerm ?? "")
             .trim()
             .toLowerCase();
 
@@ -238,6 +393,7 @@ function Product() {
             width: "",
             height: "",
             unit: "",
+            price: "",
             description: "",
         });
 
@@ -265,6 +421,11 @@ function Product() {
     const handleAddChange = (event) => {
         const { name, value } = event.target;
 
+        if (name === "size") {
+            applyAddSize(value);
+            return;
+        }
+
         setAddForm((previous) => ({
             ...previous,
             [name]: value,
@@ -284,18 +445,34 @@ function Product() {
 
         try {
             const payload = {
-                productCode:
-                    addForm.productCode.trim(),
-                productName:
-                    addForm.productName.trim(),
-                size:
-                    addForm.size.trim(),
+                productCode: String(
+                    addForm.productCode ?? ""
+                ).trim(),
+
+                productName: String(
+                    addForm.productName ?? ""
+                ).trim(),
+
+                size: String(
+                    addForm.size ?? ""
+                ).trim(),
+
                 length: Number(addForm.length),
+
                 width: Number(addForm.width),
+
                 height: Number(addForm.height),
-                unit: addForm.unit.trim(),
+
+                unit: String(
+                    addForm.unit ?? ""
+                ).trim(),
+
+                price: Number(addForm.price),
+
                 description:
-                    addForm.description.trim() || null,
+                    String(
+                        addForm.description ?? ""
+                    ).trim() || null,
             };
 
             await apiPost(
@@ -385,27 +562,52 @@ function Product() {
 
             const product = result.data;
 
+            const selectedSize = getSizeOption(
+                product.size
+            );
+
             setEditingProduct(product);
 
             setEditForm({
                 productCode:
                     product.productCode || "",
+
                 productName:
                     product.productName || "",
+
                 size:
-                    product.size || "",
+                    selectedSize?.value ||
+                    String(product.size ?? ""),
+
                 length:
-                    product.length ?? "",
+                    selectedSize?.length ??
+                    product.length ??
+                    "",
+
                 width:
-                    product.width ?? "",
+                    selectedSize?.width ??
+                    product.width ??
+                    "",
+
                 height:
-                    product.height ?? "",
+                    selectedSize?.height ??
+                    product.height ??
+                    "",
+
                 unit:
                     product.unit || "",
+
+                price:
+                    product.price ?? "",
+
                 description:
-                    product.description || "",
+                    product.description ||
+                    selectedSize?.description ||
+                    "",
+
                 status:
-                    product.status || "ACTIVE",
+                    product.status ||
+                    "ACTIVE",
             });
         } catch (err) {
             console.error(
@@ -428,6 +630,11 @@ function Product() {
 
     const handleEditChange = (event) => {
         const { name, value } = event.target;
+
+        if (name === "size") {
+            applyEditSize(value);
+            return;
+        }
 
         setEditForm((previous) => ({
             ...previous,
@@ -452,23 +659,35 @@ function Product() {
 
         try {
             const payload = {
-                productCode:
-                    editForm.productCode.trim(),
-                productName:
-                    editForm.productName.trim(),
-                size:
-                    editForm.size.trim(),
-                length:
-                    Number(editForm.length),
-                width:
-                    Number(editForm.width),
-                height:
-                    Number(editForm.height),
-                unit:
-                    editForm.unit.trim(),
+                productCode: String(
+                    editForm.productCode ?? ""
+                ).trim(),
+
+                productName: String(
+                    editForm.productName ?? ""
+                ).trim(),
+
+                size: String(
+                    editForm.size ?? ""
+                ).trim(),
+
+                length: Number(editForm.length),
+
+                width: Number(editForm.width),
+
+                height: Number(editForm.height),
+
+                unit: String(
+                    editForm.unit ?? ""
+                ).trim(),
+
+                price: Number(editForm.price),
+
                 description:
-                    editForm.description.trim() ||
-                    null,
+                    String(
+                        editForm.description ?? ""
+                    ).trim() || null,
+
                 status:
                     editForm.status,
             };
@@ -486,25 +705,50 @@ function Product() {
 
             setEditingProduct(result.data);
 
+            const updatedSize = getSizeOption(
+                result.data.size
+            );
+
             setEditForm({
                 productCode:
                     result.data.productCode || "",
+
                 productName:
                     result.data.productName || "",
+
                 size:
-                    result.data.size || "",
+                    updatedSize?.value ||
+                    String(result.data.size ?? ""),
+
                 length:
-                    result.data.length ?? "",
+                    updatedSize?.length ??
+                    result.data.length ??
+                    "",
+
                 width:
-                    result.data.width ?? "",
+                    updatedSize?.width ??
+                    result.data.width ??
+                    "",
+
                 height:
-                    result.data.height ?? "",
+                    updatedSize?.height ??
+                    result.data.height ??
+                    "",
+
                 unit:
                     result.data.unit || "",
+
+                price:
+                    result.data.price ?? "",
+
                 description:
-                    result.data.description || "",
+                    result.data.description ||
+                    updatedSize?.description ||
+                    "",
+
                 status:
-                    result.data.status || "ACTIVE",
+                    result.data.status ||
+                    "ACTIVE",
             });
         } catch (err) {
             console.error(
@@ -627,6 +871,7 @@ function Product() {
                 >
                     <div>
                         <h2>Products</h2>
+
                         <p>
                             Manage product information and records.
                         </p>
@@ -688,6 +933,7 @@ function Product() {
 
             <section className="card">
                 <h2>Product List</h2>
+
                 <p>
                     {totalRecords} product
                     {totalRecords === 1 ? "" : "s"}
@@ -784,6 +1030,46 @@ function Product() {
                                                 : " ▼")}
                                     </th>
 
+                                    {/* PRICE AFTER SIZE */}
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "price"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Price
+                                        {sortKey ===
+                                            "price" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
+                                    {/* DESCRIPTION */}
+                                    <th
+                                        onClick={() =>
+                                            handleSort(
+                                                "description"
+                                            )
+                                        }
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        Description
+                                        {sortKey ===
+                                            "description" &&
+                                            (sortDirection ===
+                                            "asc"
+                                                ? " ▲"
+                                                : " ▼")}
+                                    </th>
+
                                     <th
                                         onClick={() =>
                                             handleSort(
@@ -841,6 +1127,23 @@ function Product() {
                                                 }
                                             </td>
 
+                                            {/* PRICE AFTER SIZE */}
+                                            <td>
+                                                ₹
+                                                {Number(
+                                                    product.price ??
+                                                        0
+                                                ).toFixed(2)}
+                                            </td>
+
+                                            {/* DESCRIPTION */}
+                                            <td>
+                                                {
+                                                    product.description ||
+                                                    "—"
+                                                }
+                                            </td>
+
                                             <td>
                                                 <span
                                                     className={
@@ -857,7 +1160,13 @@ function Product() {
                                             </td>
 
                                             <td>
-                                                <div className="action-buttons">
+                                                <div
+                                                    className="action-buttons"
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: "6px",
+                                                    }}
+                                                >
                                                     <button
                                                         type="button"
                                                         className="action-btn view-btn"
@@ -882,20 +1191,23 @@ function Product() {
                                                         Edit
                                                     </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="action-btn delete-btn"
-                                                        onClick={() =>
-                                                            handleOpenDeleteProduct(
-                                                                product
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            deleteSaving
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    {product.status ===
+                                                        "ACTIVE" && (
+                                                        <button
+                                                            type="button"
+                                                            className="action-btn delete-btn"
+                                                            onClick={() =>
+                                                                handleOpenDeleteProduct(
+                                                                    product
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                deleteSaving
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -1019,6 +1331,13 @@ function Product() {
                             />
 
                             <DetailItem
+                                label="Price"
+                                value={`₹${Number(
+                                    selectedProduct.price ?? 0
+                                ).toFixed(2)}`}
+                            />
+
+                            <DetailItem
                                 label="Status"
                                 value={
                                     selectedProduct.status
@@ -1069,7 +1388,88 @@ function Product() {
                     <div className="form-grid">
                         <div className="fld">
                             <label>
-                                Product Code
+                                Product Name{" "}
+                                <span className="required">
+                                    *
+                                </span>
+                            </label>
+
+                            <select
+                                name="productName"
+                                value={
+                                    addForm.productName
+                                }
+                                onChange={
+                                    handleAddChange
+                                }
+                                required
+                            >
+                                <option value="">
+                                    Select Product Name
+                                </option>
+
+                                {PRODUCT_NAME_OPTIONS.map(
+                                    (productName) => (
+                                        <option
+                                            key={
+                                                productName
+                                            }
+                                            value={
+                                                productName
+                                            }
+                                        >
+                                            {productName}
+                                        </option>
+                                    )
+                                )}
+                            </select>
+                        </div>
+
+                        <div className="fld">
+                            <label>
+                                Size{" "}
+                                <span className="required">
+                                    *
+                                </span>
+                            </label>
+
+                            <select
+                                name="size"
+                                value={
+                                    addForm.size
+                                }
+                                onChange={
+                                    handleAddChange
+                                }
+                                required
+                            >
+                                <option value="">
+                                    Select Size
+                                </option>
+
+                                {PRODUCT_SIZE_OPTIONS.map(
+                                    (option) => (
+                                        <option
+                                            key={
+                                                option.value
+                                            }
+                                            value={
+                                                option.value
+                                            }
+                                        >
+                                            {option.label}
+                                        </option>
+                                    )
+                                )}
+                            </select>
+                        </div>
+
+                        <div className="fld">
+                            <label>
+                                Product Code{" "}
+                                <span className="required">
+                                    *
+                                </span>
                             </label>
 
                             <input
@@ -1086,56 +1486,49 @@ function Product() {
                             />
                         </div>
 
+                        {/* UNIT BEFORE PRICE */}
                         <div className="fld">
                             <label>
-                                Product Name
-                            </label>
-
-                            <input
-                                name="productName"
-                                type="text"
-                                value={
-                                    addForm.productName
-                                }
-                                onChange={
-                                    handleAddChange
-                                }
-                                minLength={2}
-                                maxLength={100}
-                                required
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label>
-                                Size
-                            </label>
-
-                            <input
-                                name="size"
-                                type="text"
-                                value={addForm.size}
-                                onChange={
-                                    handleAddChange
-                                }
-                                maxLength={10}
-                                required
-                            />
-                        </div>
-
-                        <div className="fld">
-                            <label>
-                                Unit
+                                Unit{" "}
+                                <span className="required">
+                                    *
+                                </span>
                             </label>
 
                             <input
                                 name="unit"
                                 type="text"
-                                value={addForm.unit}
+                                value={
+                                    addForm.unit
+                                }
                                 onChange={
                                     handleAddChange
                                 }
                                 maxLength={20}
+                                required
+                            />
+                        </div>
+
+                        {/* PRICE AFTER UNIT */}
+                        <div className="fld">
+                            <label>
+                                Price{" "}
+                                <span className="required">
+                                    *
+                                </span>
+                            </label>
+
+                            <input
+                                name="price"
+                                type="number"
+                                step="0.25"
+                                min="0.00"
+                                value={
+                                    addForm.price
+                                }
+                                onChange={
+                                    handleAddChange
+                                }
                                 required
                             />
                         </div>
@@ -1150,60 +1543,57 @@ function Product() {
                     <div className="form-grid">
                         <div className="fld">
                             <label>
-                                Length
+                                Length{" "}
+                                <span className="required">
+                                    *
+                                </span>
                             </label>
 
                             <input
                                 name="length"
                                 type="number"
-                                step="0.01"
-                                min="0.01"
                                 value={
                                     addForm.length
                                 }
-                                onChange={
-                                    handleAddChange
-                                }
+                                readOnly
                                 required
                             />
                         </div>
 
                         <div className="fld">
                             <label>
-                                Width
+                                Width{" "}
+                                <span className="required">
+                                    *
+                                </span>
                             </label>
 
                             <input
                                 name="width"
                                 type="number"
-                                step="0.01"
-                                min="0.01"
                                 value={
                                     addForm.width
                                 }
-                                onChange={
-                                    handleAddChange
-                                }
+                                readOnly
                                 required
                             />
                         </div>
 
                         <div className="fld">
                             <label>
-                                Height
+                                Height{" "}
+                                <span className="required">
+                                    *
+                                </span>
                             </label>
 
                             <input
                                 name="height"
                                 type="number"
-                                step="0.01"
-                                min="0.01"
                                 value={
                                     addForm.height
                                 }
-                                onChange={
-                                    handleAddChange
-                                }
+                                readOnly
                                 required
                             />
                         </div>
@@ -1276,7 +1666,96 @@ function Product() {
                                 <div className="form-grid">
                                     <div className="fld">
                                         <label>
-                                            Product Code
+                                            Product Name{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <select
+                                            name="productName"
+                                            value={
+                                                editForm.productName
+                                            }
+                                            onChange={
+                                                handleEditChange
+                                            }
+                                            required
+                                        >
+                                            <option value="">
+                                                Select Product Name
+                                            </option>
+
+                                            {PRODUCT_NAME_OPTIONS.map(
+                                                (
+                                                    productName
+                                                ) => (
+                                                    <option
+                                                        key={
+                                                            productName
+                                                        }
+                                                        value={
+                                                            productName
+                                                        }
+                                                    >
+                                                        {
+                                                            productName
+                                                        }
+                                                    </option>
+                                                )
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    <div className="fld">
+                                        <label>
+                                            Size{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <select
+                                            name="size"
+                                            value={
+                                                editForm.size
+                                            }
+                                            onChange={
+                                                handleEditChange
+                                            }
+                                            required
+                                        >
+                                            <option value="">
+                                                Select Size
+                                            </option>
+
+                                            {PRODUCT_SIZE_OPTIONS.map(
+                                                (
+                                                    option
+                                                ) => (
+                                                    <option
+                                                        key={
+                                                            option.value
+                                                        }
+                                                        value={
+                                                            option.value
+                                                        }
+                                                    >
+                                                        {
+                                                            option.label
+                                                        }
+                                                    </option>
+                                                )
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    <div className="fld">
+                                        <label>
+                                            Product Code{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
                                         </label>
 
                                         <input
@@ -1292,45 +1771,13 @@ function Product() {
                                         />
                                     </div>
 
+                                    {/* UNIT BEFORE PRICE */}
                                     <div className="fld">
                                         <label>
-                                            Product Name
-                                        </label>
-
-                                        <input
-                                            name="productName"
-                                            type="text"
-                                            value={
-                                                editForm.productName
-                                            }
-                                            onChange={
-                                                handleEditChange
-                                            }
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="fld">
-                                        <label>
-                                            Size
-                                        </label>
-
-                                        <input
-                                            name="size"
-                                            type="text"
-                                            value={
-                                                editForm.size
-                                            }
-                                            onChange={
-                                                handleEditChange
-                                            }
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="fld">
-                                        <label>
-                                            Unit
+                                            Unit{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
                                         </label>
 
                                         <input
@@ -1338,6 +1785,30 @@ function Product() {
                                             type="text"
                                             value={
                                                 editForm.unit
+                                            }
+                                            onChange={
+                                                handleEditChange
+                                            }
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* PRICE AFTER UNIT */}
+                                    <div className="fld">
+                                        <label>
+                                            Price{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            name="price"
+                                            type="number"
+                                            step="0.25"
+                                            min="0.00"
+                                            value={
+                                                editForm.price
                                             }
                                             onChange={
                                                 handleEditChange
@@ -1356,60 +1827,57 @@ function Product() {
                                 <div className="form-grid">
                                     <div className="fld">
                                         <label>
-                                            Length
+                                            Length{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
                                         </label>
 
                                         <input
                                             name="length"
                                             type="number"
-                                            step="0.01"
-                                            min="0.01"
                                             value={
                                                 editForm.length
                                             }
-                                            onChange={
-                                                handleEditChange
-                                            }
+                                            readOnly
                                             required
                                         />
                                     </div>
 
                                     <div className="fld">
                                         <label>
-                                            Width
+                                            Width{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
                                         </label>
 
                                         <input
                                             name="width"
                                             type="number"
-                                            step="0.01"
-                                            min="0.01"
                                             value={
                                                 editForm.width
                                             }
-                                            onChange={
-                                                handleEditChange
-                                            }
+                                            readOnly
                                             required
                                         />
                                     </div>
 
                                     <div className="fld">
                                         <label>
-                                            Height
+                                            Height{" "}
+                                            <span className="required">
+                                                *
+                                            </span>
                                         </label>
 
                                         <input
                                             name="height"
                                             type="number"
-                                            step="0.01"
-                                            min="0.01"
                                             value={
                                                 editForm.height
                                             }
-                                            onChange={
-                                                handleEditChange
-                                            }
+                                            readOnly
                                             required
                                         />
                                     </div>
@@ -1435,6 +1903,7 @@ function Product() {
                                             onChange={
                                                 handleEditChange
                                             }
+                                            maxLength={500}
                                         />
                                     </div>
 

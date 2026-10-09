@@ -16,6 +16,25 @@ import Pagination from "../../ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
 
+// =========================================================
+// SKILL TYPE OPTIONS
+// =========================================================
+
+const SKILL_TYPE_OPTIONS = [
+  "Mason",
+  "Helper",
+  "Machine Operator",
+  "Production Worker",
+  "Curing Worker",
+  "Loading Worker",
+  "Unloading Worker",
+  "Material Handler",
+  "Quality Checker",
+  "Maintenance Worker",
+  "Driver",
+  "Other",
+];
+
 function Labour() {
   // =========================================================
   // STATE
@@ -166,11 +185,58 @@ function Labour() {
   };
 
   // =========================================================
+  // RATE CALCULATIONS
+  // =========================================================
+
+  const getNumericDailyRate = () => {
+    const value = Number(formData.dailyRate);
+
+    if (
+      !formData.dailyRate ||
+      Number.isNaN(value) ||
+      value <= 0
+    ) {
+      return 0;
+    }
+
+    return value;
+  };
+
+  const dailyRate = getNumericDailyRate();
+
+  const weeklyRate = dailyRate * 6;
+  const monthlyRate = dailyRate * 26;
+
+  // =========================================================
   // FORM INPUT HANDLER
   // =========================================================
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+
+    // Phone - allow digits only and maximum 10 digits
+    if (name === "phone") {
+      const digitsOnly = value
+        .replace(/\D/g, "")
+        .slice(0, 10);
+
+      setFormData((previousData) => ({
+        ...previousData,
+        [name]: digitsOnly,
+      }));
+
+      return;
+    }
+
+    // Daily Rate
+    if (name === "dailyRate") {
+      setFormData((previousData) => ({
+        ...previousData,
+        [name]: value,
+      }));
+
+      return;
+    }
 
     setFormData((previousData) => ({
       ...previousData,
@@ -335,27 +401,125 @@ function Labour() {
       setSubmitting(true);
       setFormError("");
 
+      const labourName =
+        formData.labourName.trim();
+
+      const phone =
+        formData.phone.trim();
+
+      const address =
+        formData.address.trim();
+
+      const joiningDate =
+        formData.joiningDate;
+
+      const skillType =
+        formData.skillType.trim();
+
+      const dailyRateValue =
+        Number(formData.dailyRate);
+
+      // =====================================================
+      // FRONTEND VALIDATION
+      // =====================================================
+
+      if (!labourName) {
+        throw new Error(
+          "Labour Name is required."
+        );
+      }
+
+      if (!phone) {
+        throw new Error(
+          "Phone is required."
+        );
+      }
+
+      if (!/^\d{10}$/.test(phone)) {
+        throw new Error(
+          "Phone number must contain exactly 10 digits."
+        );
+      }
+
+      if (!joiningDate) {
+        throw new Error(
+          "Joining Date is required."
+        );
+      }
+
+      if (!skillType) {
+        throw new Error(
+          "Skill Type is required."
+        );
+      }
+
+      if (
+        !SKILL_TYPE_OPTIONS.includes(skillType)
+      ) {
+        throw new Error(
+          "Please select a valid Skill Type."
+        );
+      }
+
+      if (
+        !formData.dailyRate ||
+        Number.isNaN(dailyRateValue) ||
+        dailyRateValue <= 0
+      ) {
+        throw new Error(
+          "Daily Rate is required."
+        );
+      }
+
+      if (dailyRateValue % 25 !== 0) {
+        throw new Error(
+          "Daily Rate must be in increments of ₹25."
+        );
+      }
+
+      // =====================================================
+      // FRONTEND DUPLICATE PHONE CHECK
+      // =====================================================
+
+      const duplicateLabour =
+        labours.find((labour) => {
+          if (
+            formMode === "edit" &&
+            selectedLabour &&
+            labour.labourId ===
+              selectedLabour.labourId
+          ) {
+            return false;
+          }
+
+          return (
+            String(labour.phone || "").trim() ===
+              phone
+          );
+        });
+
+      if (duplicateLabour) {
+        throw new Error(
+          "Phone number already exists. Please enter a different Phone number."
+        );
+      }
+
+      // =====================================================
+      // PAYLOAD
+      // =====================================================
+
       const payload = {
-        labourName:
-          formData.labourName.trim(),
-
-        phone:
-          formData.phone.trim(),
-
-        address:
-          formData.address.trim(),
-
-        joiningDate:
-          formData.joiningDate,
-
-        skillType:
-          formData.skillType.trim(),
-
-        dailyRate:
-          Number(formData.dailyRate),
+        labourName,
+        phone,
+        address,
+        joiningDate,
+        skillType,
+        dailyRate: dailyRateValue,
       };
 
+      // =====================================================
       // CREATE
+      // =====================================================
 
       if (formMode === "add") {
         await apiPost(
@@ -368,7 +532,9 @@ function Labour() {
         );
       }
 
+      // =====================================================
       // UPDATE
+      // =====================================================
 
       if (
         formMode === "edit" &&
@@ -497,24 +663,26 @@ function Labour() {
         return dateValue;
       }
 
-      const datePart = date.toLocaleDateString(
-        "en-IN",
-        {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }
-      );
+      const datePart =
+        date.toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+        );
 
-      const timePart = date.toLocaleTimeString(
-        "en-IN",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        }
-      );
+      const timePart =
+        date.toLocaleTimeString(
+          "en-IN",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+          }
+        );
 
       return `${datePart} ${timePart}`;
     } catch {
@@ -583,7 +751,9 @@ function Labour() {
         >
           <div>
             <h2>Labour</h2>
-            <p>Manage labour information and records.</p>
+            <p>
+              Manage labour information and records.
+            </p>
           </div>
 
           <button
@@ -691,157 +861,98 @@ function Labour() {
 
               <thead>
                 <tr>
-
-                  <th
-                    onClick={() =>
-                      handleSort("labourId")
-                    }
-                  >
-                    ID{" "}
-                    <span className="sort-indicator">
-                      {getSortIndicator("labourId")}
-                    </span>
+                  <th onClick={()=>handleSort("labourId")}>
+                    ID <span className="sort-indicator">{getSortIndicator("labourId")}</span>
                   </th>
 
-                  <th
-                    onClick={() =>
-                      handleSort("labourName")
-                    }
-                  >
-                    Labour{" "}
-                    <span className="sort-indicator">
-                      {getSortIndicator("labourName")}
-                    </span>
+                  <th onClick={()=>handleSort("labourName")}>
+                    Labour <span className="sort-indicator">{getSortIndicator("labourName")}</span>
                   </th>
 
-                  <th
-                    onClick={() =>
-                      handleSort("phone")
-                    }
-                  >
-                    Phone{" "}
-                    <span className="sort-indicator">
-                      {getSortIndicator("phone")}
-                    </span>
+                  <th onClick={()=>handleSort("phone")}>
+                    Phone <span className="sort-indicator">{getSortIndicator("phone")}</span>
                   </th>
 
-                  <th
-                    onClick={() =>
-                      handleSort("skillType")
-                    }
-                  >
-                    Skill Type{" "}
-                    <span className="sort-indicator">
-                      {getSortIndicator("skillType")}
-                    </span>
+                  <th onClick={()=>handleSort("dailyRate")}>
+                    Daily Rate <span className="sort-indicator">{getSortIndicator("dailyRate")}</span>
                   </th>
 
-                  <th
-                    onClick={() =>
-                      handleSort("status")
-                    }
-                  >
-                    Status{" "}
-                    <span className="sort-indicator">
-                      {getSortIndicator("status")}
-                    </span>
+                  <th onClick={()=>handleSort("skillType")}>
+                    Skill Type <span className="sort-indicator">{getSortIndicator("skillType")}</span>
+                  </th>
+
+                  <th onClick={()=>handleSort("status")}>
+                    Status <span className="sort-indicator">{getSortIndicator("status")}</span>
                   </th>
 
                   <th>Actions</th>
-
                 </tr>
               </thead>
 
-              <tbody>
+                            <tbody>
+                {paginatedRecords.map((labour) => (
+                  <tr key={labour.labourId}>
+                    <td>{labour.labourId}</td>
 
-                {paginatedRecords.map(
-                  (labour) => (
+                    <td>
+                      <strong>{labour.labourName || "-"}</strong>
+                    </td>
 
-                    <tr
-                      key={labour.labourId}
-                    >
+                    <td>{labour.phone || "-"}</td>
 
-                      <td>
-                        {labour.labourId}
-                      </td>
+                    <td>{formatCurrency(labour.dailyRate)}</td>
 
-                      <td>
-                        <strong>
-                          {labour.labourName || "-"}
-                        </strong>
-                      </td>
+                    <td>{labour.skillType || "-"}</td>
 
-                      <td>
-                        {labour.phone || "-"}
-                      </td>
+                    <td>
+                      <span
+                        className={
+                          labour.status === "ACTIVE"
+                            ? "badge bg"
+                            : "badge br"
+                        }
+                      >
+                        {labour.status || "-"}
+                      </span>
+                    </td>
 
-                      <td>
-                        {labour.skillType || "-"}
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            labour.status === "ACTIVE"
-                              ? "badge bg"
-                              : "badge br"
-                          }
+                    <td>
+                      <div
+                            className="action-buttons"
+                            style={{
+                                display: "flex",
+                                gap: "6px",
+                            }}
                         >
-                          {labour.status || "-"}
-                        </span>
-                      </td>
+                        <button
+                          type="button"
+                          className="action-btn view-btn"
+                          onClick={() => handleViewLabour(labour)}
+                        >
+                          View
+                        </button>
 
-                      <td>
+                        <button
+                          type="button"
+                          className="action-btn edit-btn"
+                          onClick={() => handleEditLabour(labour)}
+                        >
+                          Edit
+                        </button>
 
-                        <div className="action-buttons">
-
+                        {labour.status === "ACTIVE" && (
                           <button
                             type="button"
-                            className="action-btn view-btn"
-                            onClick={() =>
-                              handleViewLabour(
-                                labour
-                              )
-                            }
+                            className="action-btn delete-btn"
+                            onClick={() => handleDeleteLabour(labour)}
                           >
-                            View
+                            Delete
                           </button>
-
-                          <button
-                            type="button"
-                            className="action-btn edit-btn"
-                            onClick={() =>
-                              handleEditLabour(
-                                labour
-                              )
-                            }
-                          >
-                            Edit
-                          </button>
-
-                          {labour.status === "ACTIVE" && (
-                            <button
-                              type="button"
-                              className="action-btn delete-btn"
-                              onClick={() =>
-                                handleDeleteLabour(
-                                  labour
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          )}
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-
-                  )
-                )}
-
+                                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
 
             </table>
@@ -910,6 +1021,39 @@ function Labour() {
             />
 
             <DetailItem
+              label="Daily Rate"
+              value={formatCurrency(
+                selectedLabour.dailyRate
+              )}
+            />
+
+            <DetailItem
+              label="Weekly Rate"
+              value={
+                selectedLabour.dailyRate
+                  ? formatCurrency(
+                      Number(
+                        selectedLabour.dailyRate
+                      ) * 7
+                    )
+                  : "-"
+              }
+            />
+
+            <DetailItem
+              label="Monthly Rate"
+              value={
+                selectedLabour.dailyRate
+                  ? formatCurrency(
+                      Number(
+                        selectedLabour.dailyRate
+                      ) * 30
+                    )
+                  : "-"
+              }
+            />
+
+            <DetailItem
               label="Address"
               value={
                 selectedLabour.address || "-"
@@ -929,13 +1073,6 @@ function Labour() {
               value={
                 selectedLabour.skillType || "-"
               }
-            />
-
-            <DetailItem
-              label="Daily Rate"
-              value={formatCurrency(
-                selectedLabour.dailyRate
-              )}
             />
 
             <DetailItem
@@ -1005,10 +1142,12 @@ function Labour() {
 
           <div className="form-grid">
 
+            {/* LABOUR NAME */}
+
             <div className="fld">
 
               <label htmlFor="labour-name">
-                Labour Name
+                Labour Name <span>*</span>
               </label>
 
               <input
@@ -1022,27 +1161,35 @@ function Labour() {
 
             </div>
 
+            {/* PHONE */}
+
             <div className="fld">
 
               <label htmlFor="labour-phone">
-                Phone
+                Phone <span>*</span>
               </label>
 
               <input
                 id="labour-phone"
                 type="text"
                 name="phone"
+                inputMode="numeric"
+                maxLength="10"
+                pattern="[0-9]{10}"
                 value={formData.phone}
                 onChange={handleInputChange}
+                placeholder="10-digit mobile number"
                 required
               />
 
             </div>
 
+            {/* JOINING DATE */}
+
             <div className="fld">
 
               <label htmlFor="labour-joining-date">
-                Joining Date
+                Joining Date <span>*</span>
               </label>
 
               <input
@@ -1056,38 +1203,102 @@ function Labour() {
 
             </div>
 
+            {/* SKILL TYPE */}
+
             <div className="fld">
 
               <label htmlFor="labour-skill-type">
-                Skill Type
+                Skill Type <span>*</span>
               </label>
 
-              <input
+              <select
                 id="labour-skill-type"
-                type="text"
                 name="skillType"
                 value={formData.skillType}
                 onChange={handleInputChange}
                 required
-              />
+              >
+                <option value="">
+                  Select Skill Type
+                </option>
+
+                {SKILL_TYPE_OPTIONS.map(
+                  (skillType) => (
+                    <option
+                      key={skillType}
+                      value={skillType}
+                    >
+                      {skillType}
+                    </option>
+                  )
+                )}
+
+              </select>
 
             </div>
+
+            {/* DAILY RATE */}
 
             <div className="fld">
 
               <label htmlFor="labour-daily-rate">
-                Daily Rate
+                Daily Rate <span>*</span>
               </label>
 
               <input
                 id="labour-daily-rate"
                 type="number"
                 name="dailyRate"
-                min="0.01"
-                step="0.01"
+                min="25"
+                step="25"
                 value={formData.dailyRate}
                 onChange={handleInputChange}
+                placeholder="Enter daily rate"
                 required
+              />
+
+            </div>
+
+            {/* WEEKLY RATE */}
+
+            <div className="fld">
+
+              <label htmlFor="labour-weekly-rate">
+                Weekly Rate
+              </label>
+
+              <input
+                id="labour-weekly-rate"
+                type="text"
+                value={
+                  dailyRate > 0
+                    ? formatCurrency(weeklyRate)
+                    : ""
+                }
+                placeholder="Auto calculated"
+                readOnly
+              />
+
+            </div>
+
+            {/* MONTHLY RATE */}
+
+            <div className="fld">
+
+              <label htmlFor="labour-monthly-rate">
+                Monthly Rate
+              </label>
+
+              <input
+                id="labour-monthly-rate"
+                type="text"
+                value={
+                  dailyRate > 0
+                    ? formatCurrency(monthlyRate)
+                    : ""
+                }
+                placeholder="Auto calculated"
+                readOnly
               />
 
             </div>
@@ -1095,6 +1306,8 @@ function Labour() {
           </div>
 
         </div>
+
+        {/* ADDRESS */}
 
         <div className="customer-modal-section">
 

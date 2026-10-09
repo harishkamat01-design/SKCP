@@ -34,10 +34,11 @@ import NavIcon from "./components/ui/NavIcon";
 
 function App()
 {
-
     const [activeSection, setActiveSection] = useState("dashboard");
     const [paymentContext, setPaymentContext] = useState(null);
-    const [isDark, setIsDark] = useState(() => localStorage.getItem("skcp_theme") === "dark");
+    const [isDark, setIsDark] = useState(
+      () => localStorage.getItem("skcp_theme") === "dark"
+    );
     const [currentLang, setCurrentLang] = useState("en");
 
     const [isAuthenticated, setIsAuthenticated] = useState(
@@ -58,7 +59,11 @@ function App()
         "data-theme",
         isDark ? "dark" : "light"
       );
-      localStorage.setItem("skcp_theme", isDark ? "dark" : "light");
+
+      localStorage.setItem(
+        "skcp_theme",
+        isDark ? "dark" : "light"
+      );
     }, [isDark]);
 
     const handleOpenPayment = (context) => {
@@ -74,6 +79,20 @@ function App()
       }
 
       setActiveSection(section);
+    };
+
+    const getUserImage = () => {
+      const role = sessionStorage.getItem("skcp_role");
+
+      const userImages = {
+        ADMIN: "/assets/Pandurang Timmappa Kamat.png",
+        PRODUCTION_MANAGER: "/assets/Rekha Kamat.png",
+        B2B: "/assets/Ravi Kamat.png",
+        STORE_MANAGER: "/assets/Sunidhi Kamat.png",
+        LOGISTICS: "/assets/Harish Kamat.png",
+      };
+
+      return userImages[role] || "/assets/skcp-logo.png";
     };
 
     const renderActiveSection = () => {
@@ -222,98 +241,113 @@ function App()
       );
     }
 
-        return (
-          <div className={isDark ? "app dark" : "app"}>
+    return (
+      <div className={isDark ? "app dark" : "app"}>
 
-            <main className="main">
+        <main className="main">
 
-              <header className="topbar">
+          <header className="topbar">
 
-                {/* ==================================================
-                    SKCP BRAND TILE
-                ================================================== */}
-                <div className="topbar-brand">
-                  <div className="brand-logo">
-                    <img src="/assets/skcp-logo.png" alt="SKCP" />
-                  </div>
-
-                  <div className="brand-info">
-                    <div className="brand-name">
-                      Shree Kundodari Cement Products
-                    </div>
-
-                    <div className="brand-sub brand-sub-italic">
-                      B2B MANAGEMENT PORTAL
-                    </div>
-                  </div>
-                </div>
-
-                {/* ==================================================
-                    LANGUAGE + CURRENT PAGE TILE
-                ================================================== */}
-                <div className="topbar-navigation">
-
-                  <div className="topbar-language">
-                    <button
-                      type="button"
-                      className={`lang-btn ${
-                        currentLang === "en" ? "active" : ""
-                      }`}
-                      onClick={() => setCurrentLang("en")}
-                      aria-pressed={currentLang === "en"}
-                    >
-                      English
-                    </button>
-
-                    <button
-                      type="button"
-                      className={`lang-btn ${
-                        currentLang === "kn" ? "active" : ""
-                      }`}
-                      onClick={() => setCurrentLang("kn")}
-                      aria-pressed={currentLang === "kn"}
-                    >
-                      ಕನ್ನಡ
-                    </button>
-                  </div>
-
-                  <div className="topbar-title">
-                    <NavIcon type={getPageIcon()} />
-                    <span>{getPageTitle()}</span>
-                  </div>
-
-                </div>
-
-                {/* ==================================================
-                    USER TILE
-                ================================================== */}
-                <div className="topbar-user">
-                  {sessionStorage.getItem("skcp_user")} ·{" "}
-                  {sessionStorage.getItem("skcp_role")}
-                </div>
-
-              </header>
-
-              <section className="content">
-                <Sidebar
-                  isDark={isDark}
-                  setIsDark={setIsDark}
-                  currentLang={currentLang}
-                  setCurrentLang={setCurrentLang}
-                  setActiveSection={handleSectionChange}
-                  activeSection={activeSection}
-                  onLogout={handleLogout}
+            {/* ==================================================
+                SKCP BRAND TILE
+            ================================================== */}
+            <div className="topbar-brand">
+              <div className="brand-logo">
+                <img
+                  src="/assets/skcp-logo.png"
+                  alt="SKCP"
                 />
+              </div>
 
-                <div className="application-content">
-                  {renderActiveSection()}
+              <div className="brand-info">
+                <div className="brand-name">
+                  Shree Kundodari Cement Products
                 </div>
-              </section>
 
-            </main>
+                <div className="brand-sub brand-sub-italic">
+                  B2B MANAGEMENT PORTAL
+                </div>
+              </div>
+            </div>
 
-          </div>
-        );
+            {/* ==================================================
+                LANGUAGE + CURRENT PAGE TILE
+            ================================================== */}
+            <div className="topbar-navigation">
+
+              <div className="topbar-language">
+                <button
+                  type="button"
+                  className={`lang-btn ${
+                    currentLang === "en" ? "active" : ""
+                  }`}
+                  onClick={() => setCurrentLang("en")}
+                  aria-pressed={currentLang === "en"}
+                >
+                  English
+                </button>
+
+                <button
+                  type="button"
+                  className={`lang-btn ${
+                    currentLang === "kn" ? "active" : ""
+                  }`}
+                  onClick={() => setCurrentLang("kn")}
+                  aria-pressed={currentLang === "kn"}
+                >
+                  ಕನ್ನಡ
+                </button>
+              </div>
+
+              <div className="topbar-title">
+                <NavIcon type={getPageIcon()} />
+                <span>{getPageTitle()}</span>
+              </div>
+
+            </div>
+
+            {/* ==================================================
+                USER TILE
+            ================================================== */}
+            <div className="topbar-user">
+
+              <img
+                className="topbar-user-image"
+                src={getUserImage()}
+                alt={
+                  sessionStorage.getItem("skcp_user") || "SKCP User"
+                }
+              />
+
+              <span>
+                {sessionStorage.getItem("skcp_user")} ·{" "}
+                {sessionStorage.getItem("skcp_role")}
+              </span>
+
+            </div>
+
+          </header>
+
+          <section className="content">
+            <Sidebar
+              isDark={isDark}
+              setIsDark={setIsDark}
+              currentLang={currentLang}
+              setCurrentLang={setCurrentLang}
+              setActiveSection={handleSectionChange}
+              activeSection={activeSection}
+              onLogout={handleLogout}
+            />
+
+            <div className="application-content">
+              {renderActiveSection()}
+            </div>
+          </section>
+
+        </main>
+
+      </div>
+    );
 }
 
 export default App;

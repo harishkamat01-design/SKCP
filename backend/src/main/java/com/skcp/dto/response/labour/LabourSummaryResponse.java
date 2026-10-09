@@ -1,5 +1,5 @@
 package com.skcp.dto.response.labour;
-
+import java.math.BigDecimal;
 /*
  * Lightweight response DTO used for labour lists and search results.
  *
@@ -21,7 +21,7 @@ public class LabourSummaryResponse
     private String labourName;
 
     private String phone;
-
+    private BigDecimal dailyRate;
     private String skillType;
 
     private String status;
@@ -69,6 +69,17 @@ public class LabourSummaryResponse
     {
         this.phone = phone;
     }
+
+public BigDecimal getDailyRate()
+    {
+        return dailyRate;
+    }
+
+    public void setDailyRate(BigDecimal dailyRate)
+    {
+        this.dailyRate = dailyRate;
+    }
+
 
     public String getSkillType()
     {

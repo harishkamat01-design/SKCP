@@ -74,6 +74,8 @@ public class Attendance
     )
     private String attendanceStatus;
 
+    @Column(name = "day_type", nullable = false, length = 20)
+    private String dayType = "FULL_DAY";
 
     // ============================================================
     // LEAVE / ABSENCE REASON
@@ -243,6 +245,13 @@ public class Attendance
         this.attendanceStatus = attendanceStatus;
     }
 
+    public String getDayType() {
+        return dayType;
+    }
+
+    public void setDayType(String dayType) {
+        this.dayType = dayType;
+    }
 
     public String getLeaveReason()
     {
@@ -333,10 +342,10 @@ public class Attendance {
     @Column(name = "attendance_id")
     private Integer attendanceId;
 
-    
+
      //Parent Table Mapping
      //Many Attendance records belong to ONE Labour
-     
+
     @ManyToOne
     @JoinColumn(name = "labour_id", nullable = false)
     private Labour labour;
@@ -368,7 +377,7 @@ public class Attendance {
     }
 
     // Default Constructor
-    public Attendance() 
+    public Attendance()
     {
 
     }

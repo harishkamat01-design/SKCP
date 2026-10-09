@@ -45,11 +45,11 @@ public class PurchaseService {
     }
 
     public List<PurchaseSummaryResponse> getAllPurchases() {
-        return purchaseRepository.findByStatus("ACTIVE")
-                .stream()
-                .map(PurchaseMapper::toSummaryResponse)
-                .toList();
-    }
+    return purchaseRepository.findAll()
+            .stream()
+            .map(PurchaseMapper::toSummaryResponse)
+            .toList();
+        }
 
     public PurchaseResponse getPurchaseById(Integer id) {
         Purchase purchase =

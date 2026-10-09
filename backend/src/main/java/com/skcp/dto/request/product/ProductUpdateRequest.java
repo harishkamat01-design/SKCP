@@ -64,13 +64,17 @@ public class ProductUpdateRequest {
 
 
     // ============================================================
-    // UNIT
+    // UNIT AND PRICE
     // ============================================================
 
     @NotBlank(message = "Unit is required")
     @Size(max = 20, message = "Unit must not exceed 20 characters")
     private String unit;
 
+
+    @NotNull(message = "Product price is required")
+    @DecimalMin(value = "0.00", message = "Product price must not be negative")
+    private BigDecimal price;
 
     // ============================================================
     // DESCRIPTION
@@ -154,6 +158,13 @@ public class ProductUpdateRequest {
         this.unit = unit;
     }
 
+     public BigDecimal getPrice() {
+    return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public String getDescription() {
         return description;

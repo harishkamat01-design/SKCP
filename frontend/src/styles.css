@@ -329,10 +329,21 @@ a {
 }
 
 
+/* ==================================================
+   LOGGED-IN USER IMAGE
+   ================================================== */
+
 .topbar-user {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-user-image {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
   flex-shrink: 0;
 }
 
@@ -2270,7 +2281,7 @@ td.mu {
 
 /* =========================================================
    CUSTOMER VIEW MODAL
-  
+
    ========================================================= */
 
 .customer-modal-overlay {
@@ -4918,7 +4929,7 @@ td.mu {
 
 /* Slight readability layer behind the login card */
 .skcp-login-card::before {
-  content: ""; 
+  content: "";
   position: absolute;
   inset: -14px;
   z-index: -1;
@@ -5058,7 +5069,7 @@ td.mu {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  
+
   border-top: 0.5px solid var(--border);
 }
 
@@ -5092,7 +5103,7 @@ td.mu {
 
 .brand-name {
   font-family: var(--font-head);
-  font-size: 13.5px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
@@ -5127,3 +5138,83 @@ td.mu {
   color: var(--text);
   white-space: nowrap;
 }
+
+
+
+
+/* =========================================================
+   SKCP CEMENT THEME — LIGHT MODE
+   ========================================================= */
+/*
+:root {
+  --skcp-cement-bg: #e8e4e1;
+}
+
+/* Complete application shell
+html,
+body {
+  background: var(--skcp-cement-bg);
+}
+
+body {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Main application
+.app:not(.dark),
+.app:not(.dark) .main,
+.app:not(.dark) .content,
+.app:not(.dark) .application-content {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Topbar
+.app:not(.dark) .topbar {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Sidebar
+.app:not(.dark) .sidebar {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Brand area
+.app:not(.dark) .topbar-brand,
+.app:not(.dark) .brand-logo,
+.app:not(.dark) .brand-info {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Navigation area
+.app:not(.dark) .topbar-navigation,
+.app:not(.dark) .topbar-language,
+.app:not(.dark) .topbar-title {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Logged-in user area
+.app:not(.dark) .topbar-user {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Main cards / tiles
+.app:not(.dark) .card,
+.app:not(.dark) .module-card,
+.app:not(.dark) .oo-card,
+.app:not(.dark) .team-card {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Common page containers
+.app:not(.dark) .page,
+.app:not(.dark) .module-container {
+  background-color: var(--skcp-cement-bg);
+}
+
+/* Sidebar footer
+.app:not(.dark) .sidebar-footer {
+  background-color: var(--skcp-cement-bg);
+}
+
+
+/* ==========SKCP CEMENT THEME — LIGHT MODEcompleted==========================*/

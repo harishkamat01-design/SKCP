@@ -17,6 +17,112 @@ import useTableSort from "../../../hooks/useTableSort";
 import Pagination from "../../ui/Pagination";
 
 function RawMaterial() {
+  // =========================================================
+  // FIXED RAW MATERIAL OPTIONS
+  // =========================================================
+
+  const MATERIAL_NAME_OPTIONS = [
+    "Cement",
+    "Fly Ash",
+    "Hardner",
+    "Jelly",
+    "Sand",
+    "Water",
+  ];
+
+  const UNIT_OPTIONS = [
+    "TON",
+    "BAG",
+    "LITER",
+    "CUBIC_METER",
+  ];
+
+  const MATERIAL_CATEGORY_OPTIONS = [
+    "Binding material",
+  ];
+
+  // =========================================================
+  // MATERIAL NAME → UNIT MAPPING
+  // =========================================================
+  // The Unit is determined automatically from Material Name.
+  // Users should not manually select or change the Unit.
+  // =========================================================
+
+  const MATERIAL_UNIT_MAP = {
+    Cement: "BAG",
+    "Fly Ash": "TON",
+    Hardner: "LITER",
+    Jelly: "CUBIC_METER",
+    Sand: "CUBIC_METER",
+    Water: "LITER",
+  };
+
+  // =========================================================
+  // NORMALIZE MATERIAL NAME
+  // =========================================================
+  // Supports old stored value "Hardener" and displays/uses
+  // the final SKCP spelling "Hardner".
+  // =========================================================
+
+  const normalizeMaterialName = (materialName) => {
+    if (!materialName) {
+      return "";
+    }
+
+    const normalizedName = String(materialName).trim();
+
+    if (
+      normalizedName.toLowerCase() === "hardener"
+    ) {
+      return "Hardner";
+    }
+
+    return normalizedName;
+  };
+
+  // =========================================================
+  // GET AUTOMATIC UNIT
+  // =========================================================
+
+  const getUnitForMaterial = (materialName) => {
+    const normalizedMaterialName =
+      normalizeMaterialName(materialName);
+
+    return (
+      MATERIAL_UNIT_MAP[normalizedMaterialName] || ""
+    );
+  };
+
+  // =========================================================
+  // NORMALIZE RAW MATERIAL RECORD
+  // =========================================================
+  // Ensures old records also follow the final SKCP
+  // Material Name and Unit terminology when displayed.
+  // =========================================================
+
+  const normalizeRawMaterialRecord = (material) => {
+    if (!material) {
+      return material;
+    }
+
+    const materialName = normalizeMaterialName(
+      material.materialName,
+    );
+
+    const automaticUnit =
+      getUnitForMaterial(materialName);
+
+    return {
+      ...material,
+      materialName,
+      unit: automaticUnit || material.unit || "",
+    };
+  };
+
+  // =========================================================
+  // COMMON STATE
+  // =========================================================
+
   const [searchKeyword, setSearchKeyword] = useState("");
   const [rawMaterials, setRawMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +132,8 @@ function RawMaterial() {
   // VIEW RAW MATERIAL STATE
   // =========================================================
 
-  const [selectedRawMaterial, setSelectedRawMaterial] = useState(null);
+  const [selectedRawMaterial, setSelectedRawMaterial] =
+    useState(null);
   const [viewLoading, setViewLoading] = useState(false);
   const [viewError, setViewError] = useState("");
 
@@ -34,7 +141,8 @@ function RawMaterial() {
   // EDIT RAW MATERIAL STATE
   // =========================================================
 
-  const [editingRawMaterial, setEditingRawMaterial] = useState(null);
+  const [editingRawMaterial, setEditingRawMaterial] =
+    useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
@@ -52,8 +160,10 @@ function RawMaterial() {
   // ADD RAW MATERIAL STATE
   // =========================================================
 
-  const [showAddRawMaterialModal, setShowAddRawMaterialModal] =
-    useState(false);
+  const [
+    showAddRawMaterialModal,
+    setShowAddRawMaterialModal,
+  ] = useState(false);
 
   const [addSaving, setAddSaving] = useState(false);
   const [addError, setAddError] = useState("");
@@ -70,7 +180,8 @@ function RawMaterial() {
   // DELETE RAW MATERIAL STATE
   // =========================================================
 
-  const [deletingRawMaterial, setDeletingRawMaterial] = useState(null);
+  const [deletingRawMaterial, setDeletingRawMaterial] =
+    useState(null);
   const [deleteSaving, setDeleteSaving] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -85,11 +196,16 @@ function RawMaterial() {
 
       const result = await apiGet("/api/raw-materials");
 
-      setRawMaterials(
-        Array.isArray(result?.data) ? result.data : [],
-      );
+      const records = Array.isArray(result?.data)
+        ? result.data.map(normalizeRawMaterialRecord)
+        : [];
+
+      setRawMaterials(records);
     } catch (err) {
-      console.error("Error fetching raw materials:", err);
+      console.error(
+        "Error fetching raw materials:",
+        err,
+      );
 
       setError(
         err.message ||
@@ -193,6 +309,131 @@ function RawMaterial() {
   };
 
   // =========================================================
+  // DUPLICATE CHECK
+  // =========================================================
+
+  const isDuplicateRawMaterial = (
+    form,
+    excludeRawMaterialId = null,
+  ) => {
+    const materialName = normalizeMaterialName(
+      form.materialName,
+    )
+      .trim()
+      .toLowerCase();
+
+    const materialCategory = form.materialCategory
+      ?.trim()
+      .toLowerCase();
+
+    const unit = (
+      getUnitForMaterial(form.materialName) ||
+      form.unit ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+    return rawMaterials.some((material) => {
+      if (
+        excludeRawMaterialId !== null &&
+        material.rawMaterialId === excludeRawMaterialId
+      ) {
+        return false;
+      }
+
+      const existingMaterialName =
+        normalizeMaterialName(
+          material.materialName,
+        )
+          .trim()
+          .toLowerCase();
+
+      const existingUnit = (
+        getUnitForMaterial(
+          material.materialName,
+        ) ||
+        material.unit ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+      return (
+        existingMaterialName === materialName &&
+        material.materialCategory
+          ?.trim()
+          .toLowerCase() === materialCategory &&
+        existingUnit === unit
+      );
+    });
+  };
+
+  // =========================================================
+  // ADD FORM VALIDATION
+  // =========================================================
+
+  const validateAddForm = () => {
+    if (!addForm.materialName) {
+      return "Please select Material Name.";
+    }
+
+    const automaticUnit =
+      getUnitForMaterial(addForm.materialName);
+
+    if (!automaticUnit) {
+      return "Unable to determine Unit for the selected Material Name.";
+    }
+
+    if (!addForm.materialCategory) {
+      return "Please select Material Category.";
+    }
+
+    if (isDuplicateRawMaterial(addForm)) {
+      return (
+        "This raw material already exists with the same Material Name, Unit and Material Category."
+      );
+    }
+
+    return "";
+  };
+
+  // =========================================================
+  // EDIT FORM VALIDATION
+  // =========================================================
+
+  const validateEditForm = () => {
+    if (!editForm.materialName) {
+      return "Please select Material Name.";
+    }
+
+    const automaticUnit =
+      getUnitForMaterial(editForm.materialName);
+
+    if (!automaticUnit) {
+      return "Unable to determine Unit for the selected Material Name.";
+    }
+
+    if (!editForm.materialCategory) {
+      return "Please select Material Category.";
+    }
+
+    if (
+      editingRawMaterial &&
+      isDuplicateRawMaterial(
+        editForm,
+        editingRawMaterial.rawMaterialId,
+      )
+    ) {
+      return (
+        "Another raw material already exists with the same Material Name, Unit and Material Category."
+      );
+    }
+
+    return "";
+  };
+
+  // =========================================================
   // VIEW RAW MATERIAL
   // =========================================================
 
@@ -206,7 +447,13 @@ function RawMaterial() {
         `/api/raw-materials/${rawMaterialId}`,
       );
 
-      setSelectedRawMaterial(result?.data || null);
+      const rawMaterial = result?.data;
+
+      setSelectedRawMaterial(
+        rawMaterial
+          ? normalizeRawMaterialRecord(rawMaterial)
+          : null,
+      );
     } catch (err) {
       console.error(
         "Error fetching raw material details:",
@@ -251,15 +498,28 @@ function RawMaterial() {
         );
       }
 
-      setEditingRawMaterial(rawMaterial);
+      const normalizedRawMaterial =
+        normalizeRawMaterialRecord(rawMaterial);
+
+      setEditingRawMaterial(
+        normalizedRawMaterial,
+      );
 
       setEditForm({
-        materialName: rawMaterial.materialName || "",
+        materialName:
+          normalizedRawMaterial.materialName || "",
         materialCategory:
-          rawMaterial.materialCategory || "",
-        unit: rawMaterial.unit || "",
-        description: rawMaterial.description || "",
-        status: rawMaterial.status || "ACTIVE",
+          normalizedRawMaterial.materialCategory || "",
+        unit:
+          getUnitForMaterial(
+            normalizedRawMaterial.materialName,
+          ) ||
+          normalizedRawMaterial.unit ||
+          "",
+        description:
+          normalizedRawMaterial.description || "",
+        status:
+          normalizedRawMaterial.status || "ACTIVE",
       });
     } catch (err) {
       console.error(
@@ -279,6 +539,25 @@ function RawMaterial() {
   const handleEditChange = (event) => {
     const { name, value } = event.target;
 
+    if (name === "materialName") {
+      const normalizedMaterialName =
+        normalizeMaterialName(value);
+
+      const automaticUnit =
+        getUnitForMaterial(
+          normalizedMaterialName,
+        );
+
+      setEditForm((previousForm) => ({
+        ...previousForm,
+        materialName:
+          normalizedMaterialName,
+        unit: automaticUnit,
+      }));
+
+      return;
+    }
+
     setEditForm((previousForm) => ({
       ...previousForm,
       [name]: value,
@@ -292,6 +571,28 @@ function RawMaterial() {
       return;
     }
 
+    const validationError =
+      validateEditForm();
+
+    if (validationError) {
+      setEditError(validationError);
+      return;
+    }
+
+    const automaticUnit =
+      getUnitForMaterial(
+        editForm.materialName,
+      );
+
+    const payload = {
+      ...editForm,
+      materialName:
+        normalizeMaterialName(
+          editForm.materialName,
+        ),
+      unit: automaticUnit,
+    };
+
     try {
       setEditSaving(true);
       setEditError("");
@@ -299,10 +600,11 @@ function RawMaterial() {
 
       const result = await apiPut(
         `/api/raw-materials/${editingRawMaterial.rawMaterialId}`,
-        editForm,
+        payload,
       );
 
-      const updatedRawMaterial = result?.data;
+      const updatedRawMaterial =
+        result?.data;
 
       if (!updatedRawMaterial) {
         throw new Error(
@@ -310,13 +612,20 @@ function RawMaterial() {
         );
       }
 
-      setRawMaterials((previousRawMaterials) =>
-        previousRawMaterials.map((material) =>
-          material.rawMaterialId ===
-          updatedRawMaterial.rawMaterialId
-            ? updatedRawMaterial
-            : material,
-        ),
+      const normalizedUpdatedRawMaterial =
+        normalizeRawMaterialRecord(
+          updatedRawMaterial,
+        );
+
+      setRawMaterials(
+        (previousRawMaterials) =>
+          previousRawMaterials.map(
+            (material) =>
+              material.rawMaterialId ===
+              normalizedUpdatedRawMaterial.rawMaterialId
+                ? normalizedUpdatedRawMaterial
+                : material,
+          ),
       );
 
       setEditSuccess(
@@ -370,6 +679,25 @@ function RawMaterial() {
   const handleAddChange = (event) => {
     const { name, value } = event.target;
 
+    if (name === "materialName") {
+      const normalizedMaterialName =
+        normalizeMaterialName(value);
+
+      const automaticUnit =
+        getUnitForMaterial(
+          normalizedMaterialName,
+        );
+
+      setAddForm((previousForm) => ({
+        ...previousForm,
+        materialName:
+          normalizedMaterialName,
+        unit: automaticUnit,
+      }));
+
+      return;
+    }
+
     setAddForm((previousForm) => ({
       ...previousForm,
       [name]: value,
@@ -379,6 +707,28 @@ function RawMaterial() {
   const handleCreateRawMaterial = async (event) => {
     event.preventDefault();
 
+    const validationError =
+      validateAddForm();
+
+    if (validationError) {
+      setAddError(validationError);
+      return;
+    }
+
+    const automaticUnit =
+      getUnitForMaterial(
+        addForm.materialName,
+      );
+
+    const payload = {
+      ...addForm,
+      materialName:
+        normalizeMaterialName(
+          addForm.materialName,
+        ),
+      unit: automaticUnit,
+    };
+
     try {
       setAddSaving(true);
       setAddError("");
@@ -386,10 +736,11 @@ function RawMaterial() {
 
       const result = await apiPost(
         "/api/raw-materials",
-        addForm,
+        payload,
       );
 
-      const createdRawMaterial = result?.data;
+      const createdRawMaterial =
+        result?.data;
 
       if (!createdRawMaterial) {
         throw new Error(
@@ -397,10 +748,17 @@ function RawMaterial() {
         );
       }
 
-      setRawMaterials((previousRawMaterials) => [
-        ...previousRawMaterials,
-        createdRawMaterial,
-      ]);
+      const normalizedCreatedRawMaterial =
+        normalizeRawMaterialRecord(
+          createdRawMaterial,
+        );
+
+      setRawMaterials(
+        (previousRawMaterials) => [
+          ...previousRawMaterials,
+          normalizedCreatedRawMaterial,
+        ],
+      );
 
       setAddSuccess(
         "Raw material created successfully.",
@@ -435,7 +793,9 @@ function RawMaterial() {
   // DELETE RAW MATERIAL
   // =========================================================
 
-  const handleOpenDeleteRawMaterial = (material) => {
+  const handleOpenDeleteRawMaterial = (
+    material,
+  ) => {
     setDeleteError("");
     setDeletingRawMaterial(material);
   };
@@ -450,42 +810,56 @@ function RawMaterial() {
     setDeleteError("");
   };
 
-  const handleConfirmDeleteRawMaterial = async () => {
-    if (!deletingRawMaterial) {
-      return;
-    }
+  const handleConfirmDeleteRawMaterial =
+    async () => {
+      if (!deletingRawMaterial) {
+        return;
+      }
 
-    try {
-      setDeleteSaving(true);
-      setDeleteError("");
+      try {
+        setDeleteSaving(true);
+        setDeleteError("");
 
-      await apiDelete(
-        `/api/raw-materials/${deletingRawMaterial.rawMaterialId}`,
-      );
+        const rawMaterialId =
+          deletingRawMaterial.rawMaterialId;
 
-      setRawMaterials((previousRawMaterials) =>
-        previousRawMaterials.filter(
-          (material) =>
-            material.rawMaterialId !==
-            deletingRawMaterial.rawMaterialId,
-        ),
-      );
+        await apiDelete(
+          `/api/raw-materials/${rawMaterialId}`,
+        );
 
-      setDeletingRawMaterial(null);
-    } catch (err) {
-      console.error(
-        "Error deleting raw material:",
-        err,
-      );
+        /*
+         * Keep the record in the table and change its
+         * status to INACTIVE because SKCP uses soft delete.
+         */
+        setRawMaterials(
+          (previousRawMaterials) =>
+            previousRawMaterials.map(
+              (material) =>
+                material.rawMaterialId ===
+                rawMaterialId
+                  ? {
+                      ...material,
+                      status: "INACTIVE",
+                    }
+                  : material,
+            ),
+        );
 
-      setDeleteError(
-        err.message ||
-          "Unable to delete raw material. Please try again.",
-      );
-    } finally {
-      setDeleteSaving(false);
-    }
-  };
+        setDeletingRawMaterial(null);
+      } catch (err) {
+        console.error(
+          "Error deleting raw material:",
+          err,
+        );
+
+        setDeleteError(
+          err.message ||
+            "Unable to delete raw material. Please try again.",
+        );
+      } finally {
+        setDeleteSaving(false);
+      }
+    };
 
   // =========================================================
   // DATE FORMATTER
@@ -503,18 +877,20 @@ function RawMaterial() {
         return value;
       }
 
-      const datePart = date.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      });
+      const datePart =
+        date.toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
 
-      const timePart = date.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      });
+      const timePart =
+        date.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        });
 
       return `${datePart} ${timePart}`;
     } catch {
@@ -531,7 +907,9 @@ function RawMaterial() {
       <div className="page">
         <section className="card">
           <h2>Raw Materials</h2>
-          <p>Loading raw material records...</p>
+          <p>
+            Loading raw material records...
+          </p>
         </section>
       </div>
     );
@@ -557,13 +935,17 @@ function RawMaterial() {
         >
           <div>
             <h2>Raw Materials</h2>
-            <p>Manage raw material information and records.</p>
+            <p>
+              Manage raw material information and records.
+            </p>
           </div>
 
           <button
             type="button"
             className="action-btn view-btn"
-            onClick={handleOpenAddRawMaterialModal}
+            onClick={
+              handleOpenAddRawMaterialModal
+            }
           >
             Add Raw Material
           </button>
@@ -595,7 +977,9 @@ function RawMaterial() {
               placeholder="Search by ID, material, category, unit, status..."
               value={searchKeyword}
               onChange={(event) =>
-                setSearchKeyword(event.target.value)
+                setSearchKeyword(
+                  event.target.value,
+                )
               }
             />
           </div>
@@ -613,7 +997,9 @@ function RawMaterial() {
         {error && (
           <div
             className="form-error"
-            style={{ marginTop: "12px" }}
+            style={{
+              marginTop: "12px",
+            }}
           >
             {error}
           </div>
@@ -631,7 +1017,9 @@ function RawMaterial() {
 
         <p>
           {totalRecords} raw material
-          {totalRecords === 1 ? "" : "s"}
+          {totalRecords === 1
+            ? ""
+            : "s"}
         </p>
 
         {!error && deleteError && (
@@ -658,34 +1046,55 @@ function RawMaterial() {
 
                   <th
                     onClick={() =>
-                      handleSort("rawMaterialId")
+                      handleSort(
+                        "rawMaterialId",
+                      )
                     }
+                    style={{
+                      cursor: "pointer",
+                    }}
                   >
                     ID{" "}
                     <span className="sort-indicator">
-                      {getSortIndicator("rawMaterialId")}
+                      {getSortIndicator(
+                        "rawMaterialId",
+                      )}
                     </span>
                   </th>
 
                   <th
                     onClick={() =>
-                      handleSort("materialName")
+                      handleSort(
+                        "materialName",
+                      )
                     }
+                    style={{
+                      cursor: "pointer",
+                    }}
                   >
                     Material{" "}
                     <span className="sort-indicator">
-                      {getSortIndicator("materialName")}
+                      {getSortIndicator(
+                        "materialName",
+                      )}
                     </span>
                   </th>
 
                   <th
                     onClick={() =>
-                      handleSort("materialCategory")
+                      handleSort(
+                        "materialCategory",
+                      )
                     }
+                    style={{
+                      cursor: "pointer",
+                    }}
                   >
                     Category{" "}
                     <span className="sort-indicator">
-                      {getSortIndicator("materialCategory")}
+                      {getSortIndicator(
+                        "materialCategory",
+                      )}
                     </span>
                   </th>
 
@@ -693,10 +1102,15 @@ function RawMaterial() {
                     onClick={() =>
                       handleSort("unit")
                     }
+                    style={{
+                      cursor: "pointer",
+                    }}
                   >
                     Unit{" "}
                     <span className="sort-indicator">
-                      {getSortIndicator("unit")}
+                      {getSortIndicator(
+                        "unit",
+                      )}
                     </span>
                   </th>
 
@@ -704,10 +1118,15 @@ function RawMaterial() {
                     onClick={() =>
                       handleSort("status")
                     }
+                    style={{
+                      cursor: "pointer",
+                    }}
                   >
                     Status{" "}
                     <span className="sort-indicator">
-                      {getSortIndicator("status")}
+                      {getSortIndicator(
+                        "status",
+                      )}
                     </span>
                   </th>
 
@@ -718,101 +1137,137 @@ function RawMaterial() {
 
               <tbody>
 
-                {paginatedRecords.map((material) => (
+                {paginatedRecords.map(
+                  (material) => {
 
-                  <tr key={material.rawMaterialId}>
+                    const normalizedMaterial =
+                      normalizeRawMaterialRecord(
+                        material,
+                      );
 
-                    <td>
-                      {material.rawMaterialId}
-                    </td>
-
-                    <td>
-                      <strong>
-                        {material.materialName || "-"}
-                      </strong>
-                    </td>
-
-                    <td>
-                      {material.materialCategory || "-"}
-                    </td>
-
-                    <td>
-                      {material.unit || "-"}
-                    </td>
-
-                    <td>
-                      <span
-                        className={
-                          material.status === "ACTIVE"
-                            ? "badge bg"
-                            : "badge br"
+                    return (
+                      <tr
+                        key={
+                          material.rawMaterialId
                         }
                       >
-                        {material.status || "-"}
-                      </span>
-                    </td>
 
-                    <td>
-
-                      <div className="action-buttons">
-
-                        <button
-                          type="button"
-                          className="action-btn view-btn"
-                          onClick={() =>
-                            handleViewRawMaterial(
-                              material.rawMaterialId,
-                            )
-                          }
-                        >
-                          View
-                        </button>
-
-                        <button
-                          type="button"
-                          className="action-btn edit-btn"
-                          onClick={() =>
-                            handleEditRawMaterial(
-                              material.rawMaterialId,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingRawMaterial?.rawMaterialId ===
-                              material.rawMaterialId
-                          }
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          className="action-btn delete-btn"
-                          onClick={() =>
-                            handleOpenDeleteRawMaterial(
-                              material,
-                            )
-                          }
-                          disabled={
-                            deleteSaving &&
-                            deletingRawMaterial?.rawMaterialId ===
-                              material.rawMaterialId
-                          }
-                        >
-                          {deleteSaving &&
-                          deletingRawMaterial?.rawMaterialId ===
+                        <td>
+                          {
                             material.rawMaterialId
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
+                          }
+                        </td>
 
-                      </div>
+                        <td>
+                          <strong>
+                            {
+                              normalizedMaterial.materialName ||
+                              "-"
+                            }
+                          </strong>
+                        </td>
 
-                    </td>
+                        <td>
+                          {
+                            normalizedMaterial.materialCategory ||
+                            "-"
+                          }
+                        </td>
 
-                  </tr>
+                        <td>
+                          {
+                            normalizedMaterial.unit ||
+                            "-"
+                          }
+                        </td>
 
-                ))}
+                        <td>
+                          <span
+                            className={
+                              material.status ===
+                              "ACTIVE"
+                                ? "badge bg"
+                                : "badge br"
+                            }
+                          >
+                            {
+                              material.status ||
+                              "-"
+                            }
+                          </span>
+                        </td>
+
+                        <td>
+
+                          <div
+                            className="action-buttons"
+                            style={{
+                              display: "flex",
+                              gap: "6px",
+                            }}
+                          >
+
+                            <button
+                              type="button"
+                              className="action-btn view-btn"
+                              onClick={() =>
+                                handleViewRawMaterial(
+                                  material.rawMaterialId,
+                                )
+                              }
+                            >
+                              View
+                            </button>
+
+                            <button
+                              type="button"
+                              className="action-btn edit-btn"
+                              onClick={() =>
+                                handleEditRawMaterial(
+                                  material.rawMaterialId,
+                                )
+                              }
+                              disabled={
+                                deleteSaving &&
+                                deletingRawMaterial?.rawMaterialId ===
+                                  material.rawMaterialId
+                              }
+                            >
+                              Edit
+                            </button>
+
+                            {material.status ===
+                              "ACTIVE" && (
+                              <button
+                                type="button"
+                                className="action-btn delete-btn"
+                                onClick={() =>
+                                  handleOpenDeleteRawMaterial(
+                                    material,
+                                  )
+                                }
+                                disabled={
+                                  deleteSaving &&
+                                  deletingRawMaterial?.rawMaterialId ===
+                                    material.rawMaterialId
+                                }
+                              >
+                                {deleteSaving &&
+                                deletingRawMaterial?.rawMaterialId ===
+                                  material.rawMaterialId
+                                  ? "Deleting..."
+                                  : "Delete"}
+                              </button>
+                            )}
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+                    );
+                  },
+                )}
 
               </tbody>
 
@@ -823,8 +1278,12 @@ function RawMaterial() {
               totalPages={totalPages}
               totalRecords={totalRecords}
               pageSize={pageSize}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
+              onPageChange={
+                handlePageChange
+              }
+              onPageSizeChange={
+                handlePageSizeChange
+              }
             />
 
           </div>
@@ -842,7 +1301,9 @@ function RawMaterial() {
           !!viewError ||
           !!selectedRawMaterial
         }
-        onClose={handleCloseRawMaterialModal}
+        onClose={
+          handleCloseRawMaterialModal
+        }
         title="Raw Material Details"
         subtitle="View raw material information"
         loading={viewLoading}
@@ -852,7 +1313,9 @@ function RawMaterial() {
           <button
             type="button"
             className="btn"
-            onClick={handleCloseRawMaterialModal}
+            onClick={
+              handleCloseRawMaterialModal
+            }
           >
             Close
           </button>
@@ -865,22 +1328,36 @@ function RawMaterial() {
 
               <DetailItem
                 label="Raw Material ID"
-                value={selectedRawMaterial.rawMaterialId}
+                value={
+                  selectedRawMaterial.rawMaterialId
+                }
               />
 
               <DetailItem
                 label="Material Name"
-                value={selectedRawMaterial.materialName}
+                value={
+                  normalizeMaterialName(
+                    selectedRawMaterial.materialName,
+                  )
+                }
               />
 
               <DetailItem
                 label="Material Category"
-                value={selectedRawMaterial.materialCategory}
+                value={
+                  selectedRawMaterial.materialCategory
+                }
               />
 
               <DetailItem
                 label="Unit"
-                value={selectedRawMaterial.unit}
+                value={
+                  getUnitForMaterial(
+                    selectedRawMaterial.materialName,
+                  ) ||
+                  selectedRawMaterial.unit ||
+                  "-"
+                }
               />
 
               <DetailItem
@@ -894,7 +1371,10 @@ function RawMaterial() {
                         : "badge br"
                     }
                   >
-                    {selectedRawMaterial.status || "-"}
+                    {
+                      selectedRawMaterial.status ||
+                      "-"
+                    }
                   </span>
                 }
               />
@@ -908,7 +1388,10 @@ function RawMaterial() {
 
               <DetailItem
                 label="Description"
-                value={selectedRawMaterial.description}
+                value={
+                  selectedRawMaterial.description ||
+                  "-"
+                }
                 fullWidth
               />
 
@@ -940,7 +1423,9 @@ function RawMaterial() {
 
         {editLoading && (
           <div className="empty-state">
-            <p>Loading raw material details...</p>
+            <p>
+              Loading raw material details...
+            </p>
           </div>
         )}
 
@@ -957,91 +1442,135 @@ function RawMaterial() {
 
                 <div className="form-grid">
 
+                  {/* MATERIAL NAME */}
                   <div className="fld">
 
                     <label htmlFor="edit-material-name">
-                      Material Name
+                      Material Name{" "}
+                      <span>*</span>
                     </label>
 
-                    <input
+                    <select
                       id="edit-material-name"
                       name="materialName"
-                      type="text"
-                      value={editForm.materialName}
-                      onChange={handleEditChange}
-                      minLength={2}
-                      maxLength={100}
+                      value={
+                        editForm.materialName
+                      }
+                      onChange={
+                        handleEditChange
+                      }
                       required
-                    />
+                    >
+                      <option value="">
+                        Select Material Name
+                      </option>
+
+                      {MATERIAL_NAME_OPTIONS.map(
+                        (materialName) => (
+                          <option
+                            key={materialName}
+                            value={materialName}
+                          >
+                            {materialName}
+                          </option>
+                        ),
+                      )}
+
+                    </select>
 
                   </div>
 
+                  {/* MATERIAL CATEGORY */}
                   <div className="fld">
 
                     <label htmlFor="edit-material-category">
-                      Material Category
+                      Material Category{" "}
+                      <span>*</span>
                     </label>
 
-                    <input
+                    <select
                       id="edit-material-category"
                       name="materialCategory"
-                      type="text"
-                      value={editForm.materialCategory}
-                      onChange={handleEditChange}
-                      maxLength={50}
+                      value={
+                        editForm.materialCategory
+                      }
+                      onChange={
+                        handleEditChange
+                      }
                       required
-                    />
+                    >
+                      <option value="">
+                        Select Material Category
+                      </option>
+
+                      {MATERIAL_CATEGORY_OPTIONS.map(
+                        (category) => (
+                          <option
+                            key={category}
+                            value={category}
+                          >
+                            {category}
+                          </option>
+                        ),
+                      )}
+
+                    </select>
 
                   </div>
 
+                  {/* UNIT */}
                   <div className="fld">
 
                     <label htmlFor="edit-material-unit">
-                      Unit
+                      Unit{" "}
+                      <span>*</span>
                     </label>
 
                     <select
                       id="edit-material-unit"
                       name="unit"
-                      value={editForm.unit}
-                      onChange={handleEditChange}
+                      value={
+                        editForm.unit
+                      }
+                      disabled
                       required
                     >
                       <option value="">
                         Select Unit
                       </option>
 
-                      <option value="BAG">
-                        BAG
-                      </option>
-
-                      <option value="CUBIC_METER">
-                        CUBIC_METER
-                      </option>
-
-                      <option value="TON">
-                        TON
-                      </option>
-
-                      <option value="LITRE">
-                        LITRE
-                      </option>
+                      {UNIT_OPTIONS.map(
+                        (unit) => (
+                          <option
+                            key={unit}
+                            value={unit}
+                          >
+                            {unit}
+                          </option>
+                        ),
+                      )}
 
                     </select>
 
                   </div>
 
+                  {/* STATUS */}
                   <div className="fld">
 
                     <label htmlFor="edit-material-status">
-                      Status
+                      Status{" "}
+                      <span>*</span>
                     </label>
 
                     <select
                       id="edit-material-status"
                       name="status"
-                      value={editForm.status}
-                      onChange={handleEditChange}
+                      value={
+                        editForm.status
+                      }
+                      onChange={
+                        handleEditChange
+                      }
                       required
                     >
                       <option value="ACTIVE">
@@ -1077,8 +1606,12 @@ function RawMaterial() {
                     <textarea
                       id="edit-material-description"
                       name="description"
-                      value={editForm.description}
-                      onChange={handleEditChange}
+                      value={
+                        editForm.description
+                      }
+                      onChange={
+                        handleEditChange
+                      }
                     />
 
                   </div>
@@ -1097,11 +1630,17 @@ function RawMaterial() {
           ===================================================== */}
 
       <FormModal
-        isOpen={showAddRawMaterialModal}
-        onClose={handleCloseAddRawMaterialModal}
+        isOpen={
+          showAddRawMaterialModal
+        }
+        onClose={
+          handleCloseAddRawMaterialModal
+        }
         title="Add Raw Material"
         subtitle="Enter raw material information"
-        onSubmit={handleCreateRawMaterial}
+        onSubmit={
+          handleCreateRawMaterial
+        }
         submitLabel="Add Raw Material"
         cancelLabel="Cancel"
         saving={addSaving}
@@ -1118,75 +1657,113 @@ function RawMaterial() {
 
           <div className="form-grid">
 
+            {/* MATERIAL NAME */}
             <div className="fld">
 
               <label htmlFor="add-material-name">
-                Material Name
+                Material Name{" "}
+                <span>*</span>
               </label>
 
-              <input
+              <select
                 id="add-material-name"
                 name="materialName"
-                type="text"
-                value={addForm.materialName}
-                onChange={handleAddChange}
-                minLength={2}
-                maxLength={100}
+                value={
+                  addForm.materialName
+                }
+                onChange={
+                  handleAddChange
+                }
                 required
-              />
+              >
+                <option value="">
+                  Select Material Name
+                </option>
+
+                {MATERIAL_NAME_OPTIONS.map(
+                  (materialName) => (
+                    <option
+                      key={materialName}
+                      value={materialName}
+                    >
+                      {materialName}
+                    </option>
+                  ),
+                )}
+
+              </select>
 
             </div>
 
+            {/* MATERIAL CATEGORY */}
             <div className="fld">
 
               <label htmlFor="add-material-category">
-                Material Category
+                Material Category{" "}
+                <span>*</span>
               </label>
 
-              <input
+              <select
                 id="add-material-category"
                 name="materialCategory"
-                type="text"
-                value={addForm.materialCategory}
-                onChange={handleAddChange}
-                maxLength={50}
+                value={
+                  addForm.materialCategory
+                }
+                onChange={
+                  handleAddChange
+                }
                 required
-              />
+              >
+                <option value="">
+                  Select Material Category
+                </option>
+
+                {MATERIAL_CATEGORY_OPTIONS.map(
+                  (category) => (
+                    <option
+                      key={category}
+                      value={category}
+                    >
+                      {category}
+                    </option>
+                  ),
+                )}
+
+              </select>
 
             </div>
 
+            {/* UNIT */}
             <div className="fld">
 
               <label htmlFor="add-material-unit">
-                Unit
+                Unit{" "}
+                <span>*</span>
               </label>
 
               <select
                 id="add-material-unit"
                 name="unit"
-                value={addForm.unit}
-                onChange={handleAddChange}
+                value={
+                  addForm.unit
+                }
+                disabled
                 required
               >
                 <option value="">
                   Select Unit
                 </option>
 
-                <option value="BAG">
-                  BAG
-                </option>
-
-                <option value="CUBIC_METER">
-                  CUBIC_METER
-                </option>
-
-                <option value="TON">
-                  TON
-                </option>
-
-                <option value="LITRE">
-                  LITRE
-                </option>
+                {UNIT_OPTIONS.map(
+                  (unit) => (
+                    <option
+                      key={unit}
+                      value={unit}
+                    >
+                      {unit}
+                    </option>
+                  ),
+                )}
 
               </select>
 
@@ -1213,8 +1790,12 @@ function RawMaterial() {
               <textarea
                 id="add-material-description"
                 name="description"
-                value={addForm.description}
-                onChange={handleAddChange}
+                value={
+                  addForm.description
+                }
+                onChange={
+                  handleAddChange
+                }
               />
 
             </div>
@@ -1230,13 +1811,21 @@ function RawMaterial() {
           ===================================================== */}
 
       <DeleteConfirmModal
-        isOpen={!!deletingRawMaterial}
-        onClose={handleCloseDeleteRawMaterial}
-        onConfirm={handleConfirmDeleteRawMaterial}
+        isOpen={
+          !!deletingRawMaterial
+        }
+        onClose={
+          handleCloseDeleteRawMaterial
+        }
+        onConfirm={
+          handleConfirmDeleteRawMaterial
+        }
         title="Delete Raw Material"
         subtitle="Deactivate raw material record"
         message="Are you sure you want to delete this raw material?"
-        itemName={deletingRawMaterial?.materialName}
+        itemName={
+          deletingRawMaterial?.materialName
+        }
         confirming={deleteSaving}
         error={deleteError}
       />

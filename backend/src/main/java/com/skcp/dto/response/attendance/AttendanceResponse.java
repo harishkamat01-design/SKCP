@@ -53,7 +53,7 @@ public class AttendanceResponse
 
     private RecordStatus status;
 
-
+    private String dayType;
     // ============================================================
     // AUDIT
     // ============================================================
@@ -111,6 +111,13 @@ public class AttendanceResponse
         this.attendanceStatus = attendanceStatus;
     }
 
+    public String getDayType() {
+        return dayType;
+    }
+
+    public void setDayType(String dayType) {
+        this.dayType = dayType;
+    }
 
     public String getLeaveReason()
     {

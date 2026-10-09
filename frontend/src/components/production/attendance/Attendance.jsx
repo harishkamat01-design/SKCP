@@ -11,12 +11,26 @@ import {
     apiDelete,
 } from "../../../services/api";
 
+import ViewModal from "../../../components/ui/common/ViewModal";
+import FormModal from "../../../components/ui/common/FormModal";
+import DeleteConfirmModal from "../../../components/ui/common/DeleteConfirmModal";
+
+import {
+    DetailGrid,
+    DetailItem,
+} from "../../../components/ui/common/DetailGrid";
+
+import { jsPDF } from "jspdf";
+
 function Attendance() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+
     const [attendance, setAttendance] = useState([]);
     const [labours, setLabours] = useState([]);
 
@@ -27,19 +41,21 @@ function Attendance() {
     // VIEW MODAL
     // ============================================================
 
-    const [selectedAttendance, setSelectedAttendance] = useState(null);
+    const [selectedAttendance, setSelectedAttendance] =
+        useState(null);
 
     // ============================================================
     // EDIT MODAL
     // ============================================================
 
-    const [editingAttendance, setEditingAttendance] = useState(null);
+    const [editingAttendance, setEditingAttendance] =
+        useState(null);
 
     const [editForm, setEditForm] = useState({
         attendanceDate: "",
         attendanceStatus: "PRESENT",
+        dayType: "FULL_DAY",
         leaveReason: "",
-        dailyRate: "",
         remarks: "",
     });
 
@@ -56,8 +72,8 @@ function Attendance() {
         labourId: "",
         attendanceDate: "",
         attendanceStatus: "PRESENT",
+        dayType: "FULL_DAY",
         leaveReason: "",
-        dailyRate: "",
         remarks: "",
     });
 
@@ -68,24 +84,24 @@ function Attendance() {
     // DELETE MODAL
     // ============================================================
 
-    const [deletingAttendance, setDeletingAttendance] = useState(null);
+    const [deletingAttendance, setDeletingAttendance] =
+        useState(null);
 
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState("");
 
     // ============================================================
-    // WEEKLY SUMMARY
+    // WEEKLY ATTENDANCE
     // ============================================================
 
-    const [selectedLabourId, setSelectedLabourId] = useState("");
+    const [selectedLabourId, setSelectedLabourId] =
+        useState("");
+
     const [weekStartDate, setWeekStartDate] = useState("");
 
-    const [weeklySummary, setWeeklySummary] = useState(null);
-
-    const [showWeeklySummaryModal, setShowWeeklySummaryModal] =
+    const [showWeeklyAttendance, setShowWeeklyAttendance] =
         useState(false);
 
-    const [summaryLoading, setSummaryLoading] = useState(false);
     const [summaryError, setSummaryError] = useState("");
 
     // ============================================================
@@ -151,6 +167,61 @@ function Attendance() {
     };
 
     // ============================================================
+    // LABOUR HELPERS
+    // ============================================================
+
+    const getSelectedLabour = (labourId) => {
+        return labours.find(
+            (labour) =>
+                String(labour.labourId) ===
+                String(labourId)
+        );
+    };
+
+    const getLabourDailyRate = (labourId) => {
+        const labour = getSelectedLabour(labourId);
+
+        return labour?.dailyRate ?? 0;
+    };
+
+    // ============================================================
+    // DAILY AMOUNT DISPLAY CALCULATION
+    // ============================================================
+
+    /*
+     * Attendance payment rules:
+     *
+     * PRESENT + FULL_DAY  = 100%
+     * PRESENT + HALF_DAY  = 50%
+     *
+     * ABSENT  + FULL_DAY  = 0%
+     * ABSENT  + HALF_DAY  = 50%
+     *
+     * HOLIDAY + FULL_DAY  = 0%
+     * HOLIDAY + HALF_DAY  = 50%
+     */
+    const calculateDisplayAmount = (
+        dailyRate,
+        attendanceStatus,
+        dayType
+    ) => {
+        const rate = Number(dailyRate || 0);
+
+        if (dayType === "HALF_DAY") {
+            return rate / 2;
+        }
+
+        if (
+            dayType === "FULL_DAY" &&
+            attendanceStatus === "PRESENT"
+        ) {
+            return rate;
+        }
+
+        return 0;
+    };
+
+    // ============================================================
     // ADD ATTENDANCE
     // ============================================================
 
@@ -161,8 +232,8 @@ function Attendance() {
             labourId: "",
             attendanceDate: "",
             attendanceStatus: "PRESENT",
+            dayType: "FULL_DAY",
             leaveReason: "",
-            dailyRate: "",
             remarks: "",
         });
 
@@ -181,6 +252,23 @@ function Attendance() {
     const handleAddChange = (event) => {
         const { name, value } = event.target;
 
+        if (name === "attendanceStatus") {
+            setAddForm((previous) => ({
+                ...previous,
+                attendanceStatus: value,
+                dayType:
+                    previous.dayType === "HALF_DAY"
+                        ? "HALF_DAY"
+                        : "FULL_DAY",
+                leaveReason:
+                    value === "ABSENT"
+                        ? previous.leaveReason
+                        : "",
+            }));
+
+            return;
+        }
+
         setAddForm((previous) => ({
             ...previous,
             [name]: value,
@@ -198,16 +286,6 @@ function Attendance() {
         if (!addForm.attendanceDate) {
             setAddError(
                 "Please select an attendance date."
-            );
-            return;
-        }
-
-        if (
-            addForm.dailyRate === "" ||
-            Number.isNaN(Number(addForm.dailyRate))
-        ) {
-            setAddError(
-                "Please enter a valid daily rate."
             );
             return;
         }
@@ -235,15 +313,17 @@ function Attendance() {
                 attendanceStatus:
                     addForm.attendanceStatus,
 
+                dayType:
+                    addForm.dayType === "HALF_DAY"
+                        ? "HALF_DAY"
+                        : "FULL_DAY",
+
                 leaveReason:
                     addForm.attendanceStatus ===
                     "ABSENT"
                         ? addForm.leaveReason.trim() ||
                           null
                         : null,
-
-                dailyRate:
-                    Number(addForm.dailyRate),
 
                 remarks:
                     addForm.remarks.trim() || null,
@@ -270,8 +350,8 @@ function Attendance() {
                 labourId: "",
                 attendanceDate: "",
                 attendanceStatus: "PRESENT",
+                dayType: "FULL_DAY",
                 leaveReason: "",
-                dailyRate: "",
                 remarks: "",
             });
 
@@ -288,60 +368,6 @@ function Attendance() {
             );
         } finally {
             setAddLoading(false);
-        }
-    };
-
-    // ============================================================
-    // FETCH WEEKLY SUMMARY
-    // ============================================================
-
-    const closeWeeklySummaryModal = () => {
-        setShowWeeklySummaryModal(false);
-    };
-
-    const fetchWeeklySummary = async () => {
-        if (!selectedLabourId || !weekStartDate) {
-            setSummaryError(
-                "Please select a labour and week start date."
-            );
-
-            return;
-        }
-
-        try {
-            setSummaryLoading(true);
-            setSummaryError("");
-            setWeeklySummary(null);
-
-            const params = new URLSearchParams({
-                labourId: selectedLabourId,
-                weekStartDate: weekStartDate,
-            });
-
-            const result = await apiGet(
-                `/api/attendance/summary/weekly?${params.toString()}`
-            );
-
-            console.log(
-                "Weekly Attendance Summary:",
-                result
-            );
-
-            setWeeklySummary(result.data || null);
-
-            setShowWeeklySummaryModal(true);
-        } catch (err) {
-            console.error(
-                "Error fetching weekly attendance summary:",
-                err
-            );
-
-            setSummaryError(
-                err.message ||
-                    "Unable to load weekly attendance summary."
-            );
-        } finally {
-            setSummaryLoading(false);
         }
     };
 
@@ -363,22 +389,27 @@ function Attendance() {
 
     const handleEdit = (record) => {
         setEditError("");
-
         setEditingAttendance(record);
+
+        const attendanceStatus =
+            record.attendanceStatus ||
+            "PRESENT";
+
+        const dayType =
+            record.dayType === "HALF_DAY"
+                ? "HALF_DAY"
+                : "FULL_DAY";
 
         setEditForm({
             attendanceDate:
                 record.attendanceDate || "",
 
-            attendanceStatus:
-                record.attendanceStatus ||
-                "PRESENT",
+            attendanceStatus,
+
+            dayType,
 
             leaveReason:
                 record.leaveReason || "",
-
-            dailyRate:
-                record.dailyRate ?? "",
 
             remarks:
                 record.remarks || "",
@@ -397,6 +428,26 @@ function Attendance() {
     const handleEditChange = (event) => {
         const { name, value } = event.target;
 
+        if (name === "attendanceStatus") {
+            setEditForm((previous) => ({
+                ...previous,
+
+                attendanceStatus: value,
+
+                dayType:
+                    previous.dayType === "HALF_DAY"
+                        ? "HALF_DAY"
+                        : "FULL_DAY",
+
+                leaveReason:
+                    value === "ABSENT"
+                        ? previous.leaveReason
+                        : "",
+            }));
+
+            return;
+        }
+
         setEditForm((previous) => ({
             ...previous,
             [name]: value,
@@ -414,12 +465,20 @@ function Attendance() {
             return;
         }
 
+        if (!editForm.attendanceDate) {
+            setEditError(
+                "Please select an attendance date."
+            );
+
+            return;
+        }
+
         if (
-            editForm.dailyRate === "" ||
-            Number.isNaN(Number(editForm.dailyRate))
+            editForm.attendanceStatus === "ABSENT" &&
+            !editForm.leaveReason.trim()
         ) {
             setEditError(
-                "Please enter a valid daily rate."
+                "Please enter a leave reason for absent attendance."
             );
 
             return;
@@ -429,12 +488,24 @@ function Attendance() {
             setEditLoading(true);
             setEditError("");
 
+            const dayType =
+                editForm.dayType === "HALF_DAY"
+                    ? "HALF_DAY"
+                    : "FULL_DAY";
+
             const payload = {
+                labourId:
+                    Number(
+                        editingAttendance.labourId
+                    ),
+
                 attendanceDate:
                     editForm.attendanceDate,
 
                 attendanceStatus:
                     editForm.attendanceStatus,
+
+                dayType,
 
                 leaveReason:
                     editForm.attendanceStatus ===
@@ -442,9 +513,6 @@ function Attendance() {
                         ? editForm.leaveReason.trim() ||
                           null
                         : null,
-
-                dailyRate:
-                    Number(editForm.dailyRate),
 
                 remarks:
                     editForm.remarks.trim() || null,
@@ -465,21 +533,9 @@ function Attendance() {
                 result
             );
 
-            const updatedLabourId =
-                editingAttendance.labourId;
-
             setEditingAttendance(null);
 
             await fetchAttendance();
-
-            if (
-                selectedLabourId &&
-                weekStartDate &&
-                String(selectedLabourId) ===
-                    String(updatedLabourId)
-            ) {
-                await fetchWeeklySummary();
-            }
         } catch (err) {
             console.error(
                 "Error updating attendance:",
@@ -555,34 +611,60 @@ function Attendance() {
     };
 
     // ============================================================
-    // SEARCH
+    // SEARCH + DATE FILTER
     // ============================================================
 
     const filteredAttendance = useMemo(() => {
-        const keyword = searchKeyword.toLowerCase().trim();
+        const keyword =
+            searchKeyword.toLowerCase().trim();
 
-        if (!keyword) {
-            return attendance;
-        }
+        return attendance.filter((record) => {
+            const matchesSearch =
+                !keyword ||
+                String(record.labourName || "")
+                    .toLowerCase()
+                    .includes(keyword) ||
+                String(record.labourId || "")
+                    .toLowerCase()
+                    .includes(keyword) ||
+                String(record.attendanceDate || "")
+                    .toLowerCase()
+                    .includes(keyword) ||
+                String(record.attendanceStatus || "")
+                    .toLowerCase()
+                    .includes(keyword) ||
+                String(record.dayType || "")
+                    .toLowerCase()
+                    .includes(keyword) ||
+                String(record.status || "")
+                    .toLowerCase()
+                    .includes(keyword);
 
-        return attendance.filter((record) =>
-            String(record.labourName || "")
-                .toLowerCase()
-                .includes(keyword) ||
-            String(record.labourId || "")
-                .toLowerCase()
-                .includes(keyword) ||
-            String(record.attendanceDate || "")
-                .toLowerCase()
-                .includes(keyword) ||
-            String(record.attendanceStatus || "")
-                .toLowerCase()
-                .includes(keyword) ||
-            String(record.status || "")
-                .toLowerCase()
-                .includes(keyword)
-        );
-    }, [attendance, searchKeyword]);
+            const recordDate =
+                String(
+                    record.attendanceDate || ""
+                ).substring(0, 10);
+
+            const matchesFromDate =
+                !dateFrom ||
+                recordDate >= dateFrom;
+
+            const matchesToDate =
+                !dateTo ||
+                recordDate <= dateTo;
+
+            return (
+                matchesSearch &&
+                matchesFromDate &&
+                matchesToDate
+            );
+        });
+    }, [
+        attendance,
+        searchKeyword,
+        dateFrom,
+        dateTo,
+    ]);
 
     // ============================================================
     // SORTING
@@ -612,6 +694,170 @@ function Attendance() {
         handlePageChange,
         handlePageSizeChange,
     } = usePagination(sortedRecords, 10);
+
+    // ============================================================
+    // DAILY ATTENDANCE TOTAL
+    // ============================================================
+
+    const totalDailyAmount = useMemo(() => {
+        return sortedRecords.reduce((total, record) => {
+            const amount = calculateDisplayAmount(
+                record.dailyRate,
+                record.attendanceStatus,
+                record.dayType
+            );
+
+            return total + Number(amount || 0);
+        }, 0);
+    }, [sortedRecords]);
+
+    // ============================================================
+    // WEEKLY ATTENDANCE RECORDS
+    // ============================================================
+
+    const weeklyAttendanceRecords = useMemo(() => {
+        if (
+            !showWeeklyAttendance ||
+            !selectedLabourId ||
+            !weekStartDate
+        ) {
+            return [];
+        }
+
+        const startDate = new Date(
+            `${weekStartDate}T00:00:00`
+        );
+
+        if (Number.isNaN(startDate.getTime())) {
+            return [];
+        }
+
+        const endDate = new Date(startDate);
+
+        endDate.setDate(
+            endDate.getDate() + 6
+        );
+
+        const startText =
+            startDate.toISOString().substring(0, 10);
+
+        const endText =
+            endDate.toISOString().substring(0, 10);
+
+        return attendance
+            .filter((record) => {
+                const recordDate =
+                    String(
+                        record.attendanceDate || ""
+                    ).substring(0, 10);
+
+                return (
+                    String(record.labourId) ===
+                        String(selectedLabourId) &&
+                    recordDate >= startText &&
+                    recordDate <= endText
+                );
+            })
+            .sort((a, b) => {
+                const dateA = String(
+                    a.attendanceDate || ""
+                ).substring(0, 10);
+
+                const dateB = String(
+                    b.attendanceDate || ""
+                ).substring(0, 10);
+
+                if (dateA !== dateB) {
+                    return dateB.localeCompare(dateA);
+                }
+
+                return (
+                    Number(
+                        b.attendanceId || 0
+                    ) -
+                    Number(
+                        a.attendanceId || 0
+                    )
+                );
+            });
+    }, [
+        attendance,
+        selectedLabourId,
+        weekStartDate,
+        showWeeklyAttendance,
+    ]);
+
+    // ============================================================
+    // WEEKLY INFORMATION
+    // ============================================================
+
+    const weeklyEndDate = useMemo(() => {
+        if (!weekStartDate) {
+            return "";
+        }
+
+        const startDate = new Date(
+            `${weekStartDate}T00:00:00`
+        );
+
+        if (Number.isNaN(startDate.getTime())) {
+            return "";
+        }
+
+        startDate.setDate(
+            startDate.getDate() + 6
+        );
+
+        return startDate
+            .toISOString()
+            .substring(0, 10);
+    }, [weekStartDate]);
+
+    const weeklyTotalAmount = useMemo(() => {
+        return weeklyAttendanceRecords.reduce(
+            (total, record) => {
+                return (
+                    total +
+                    Number(
+                        calculateDisplayAmount(
+                            record.dailyRate,
+                            record.attendanceStatus,
+                            record.dayType
+                        ) || 0
+                    )
+                );
+            },
+            0
+        );
+    }, [weeklyAttendanceRecords]);
+
+    // ============================================================
+    // WEEKLY SUMMARY COUNTS
+    // ============================================================
+
+    const weeklyPresentDays = useMemo(() => {
+        return weeklyAttendanceRecords.filter(
+            (record) =>
+                record.attendanceStatus ===
+                "PRESENT"
+        ).length;
+    }, [weeklyAttendanceRecords]);
+
+    const weeklyAbsentDays = useMemo(() => {
+        return weeklyAttendanceRecords.filter(
+            (record) =>
+                record.attendanceStatus ===
+                "ABSENT"
+        ).length;
+    }, [weeklyAttendanceRecords]);
+
+    const weeklyHolidayDays = useMemo(() => {
+        return weeklyAttendanceRecords.filter(
+            (record) =>
+                record.attendanceStatus ===
+                "HOLIDAY"
+        ).length;
+    }, [weeklyAttendanceRecords]);
 
     // ============================================================
     // FORMAT CURRENCY
@@ -656,13 +902,952 @@ function Attendance() {
             date.getDate()
         ).padStart(2, "0");
 
-        const month = String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
+        const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
 
-        const year = date.getFullYear();
+        const month =
+            monthNames[date.getMonth()];
 
-        return `${day}-${month}-${year}`;
+        const year =
+            date.getFullYear();
+
+        return `${day} ${month} ${year}`;
+    };
+
+    // ============================================================
+    // FORMAT DAY TYPE
+    // ============================================================
+
+    const formatDayType = (dayType) => {
+        if (dayType === "HALF_DAY") {
+            return "Half Day";
+        }
+
+        if (dayType === "FULL_DAY") {
+            return "Full Day";
+        }
+
+        return "-";
+    };
+
+    // ============================================================
+    // CLEAR FILTERS
+    // ============================================================
+
+    const clearFilters = () => {
+        setSearchKeyword("");
+        setDateFrom("");
+        setDateTo("");
+    };
+
+    // ============================================================
+    // CLEAR WEEKLY FILTERS
+    // ============================================================
+
+    const clearWeeklyFilters = () => {
+        setSelectedLabourId("");
+        setWeekStartDate("");
+        setShowWeeklyAttendance(false);
+        setSummaryError("");
+    };
+
+    // ============================================================
+    // VIEW WEEKLY ATTENDANCE
+    // ============================================================
+
+    const handleViewWeeklyAttendance = () => {
+        if (!selectedLabourId || !weekStartDate) {
+            setSummaryError(
+                "Please select a labour and week start date."
+            );
+
+            return;
+        }
+
+        setSummaryError("");
+        setShowWeeklyAttendance(true);
+    };
+
+    // ============================================================
+    // PDF FORMATTERS
+    // ============================================================
+
+    const formatPdfCurrency = (amount) => {
+        return `INR ${Number(
+            amount || 0
+        ).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
+    };
+
+    const formatPdfDate = (date) => {
+        return formatDate(date);
+    };
+
+    // ============================================================
+    // DOWNLOAD DAILY ATTENDANCE PDF
+    // ============================================================
+
+    const handleDownloadAttendancePdf = () => {
+        if (
+            !sortedRecords ||
+            sortedRecords.length === 0
+        ) {
+            return;
+        }
+
+        const doc = new jsPDF();
+
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+        const pageHeight =
+            doc.internal.pageSize.getHeight();
+
+        const leftMargin = 12;
+
+        const rightMargin =
+            pageWidth - 12;
+
+        let y = 18;
+
+        const addPageIfNeeded = (
+            requiredHeight = 15
+        ) => {
+            if (
+                y + requiredHeight >
+                pageHeight - 20
+            ) {
+                doc.addPage();
+
+                y = 20;
+
+                return true;
+            }
+
+            return false;
+        };
+
+        doc.setFontSize(20);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Shree Kundodari Cement Products",
+            leftMargin,
+            y
+        );
+
+        doc.setFontSize(10);
+
+        doc.text(
+            "DAILY ATTENDANCE LIST",
+            rightMargin,
+            y,
+            {
+                align: "right",
+            }
+        );
+
+        y += 9;
+
+        doc.setLineWidth(0.5);
+
+        doc.line(
+            leftMargin,
+            y,
+            rightMargin,
+            y
+        );
+
+        y += 12;
+
+        doc.setFontSize(11);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Attendance Information",
+            leftMargin,
+            y
+        );
+
+        y += 8;
+
+        doc.setFontSize(10);
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        const periodText =
+            dateFrom || dateTo
+                ? `${formatPdfDate(
+                      dateFrom
+                  )} - ${formatPdfDate(
+                      dateTo
+                  )}`
+                : "All Dates";
+
+        doc.text(
+            `Attendance Period: ${periodText}`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Search: ${
+                searchKeyword.trim() ||
+                "All Attendance"
+            }`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Total Records: ${sortedRecords.length}`,
+            leftMargin,
+            y
+        );
+
+        y += 14;
+
+        addPageIfNeeded(45);
+
+        doc.setFontSize(11);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Attendance Records",
+            leftMargin,
+            y
+        );
+
+        y += 8;
+
+        doc.setFontSize(7);
+
+        doc.text(
+            "ID",
+            12,
+            y
+        );
+
+        doc.text(
+            "Date",
+            25,
+            y
+        );
+
+        doc.text(
+            "Labour",
+            43,
+            y
+        );
+
+        doc.text(
+            "Attendance",
+            78,
+            y
+        );
+
+        doc.text(
+            "Day Type",
+            106,
+            y
+        );
+
+        doc.text(
+            "Daily Rate",
+            133,
+            y
+        );
+
+        doc.text(
+            "Amount",
+            161,
+            y
+        );
+
+        doc.text(
+            "Status",
+            184,
+            y
+        );
+
+        y += 5;
+
+        doc.line(
+            leftMargin,
+            y,
+            rightMargin,
+            y
+        );
+
+        y += 6;
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        sortedRecords.forEach(
+            (record) => {
+                addPageIfNeeded(10);
+
+                const displayDailyRate =
+                    record.dailyRate;
+
+                const displayDailyAmount =
+                    calculateDisplayAmount(
+                        record.dailyRate,
+                        record.attendanceStatus,
+                        record.dayType
+                    );
+
+                doc.text(
+                    String(
+                        record.attendanceId ||
+                            "-"
+                    ),
+                    12,
+                    y
+                );
+
+                doc.text(
+                    formatPdfDate(
+                        record.attendanceDate
+                    ),
+                    25,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.labourName ||
+                            "-"
+                    ),
+                    43,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.attendanceStatus ||
+                            "-"
+                    ),
+                    78,
+                    y
+                );
+
+                doc.text(
+                    formatDayType(
+                        record.dayType
+                    ),
+                    106,
+                    y
+                );
+
+                doc.text(
+                    formatPdfCurrency(
+                        displayDailyRate
+                    ),
+                    133,
+                    y
+                );
+
+                doc.text(
+                    formatPdfCurrency(
+                        displayDailyAmount
+                    ),
+                    161,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.status ||
+                            "-"
+                    ),
+                    184,
+                    y
+                );
+
+                y += 7;
+            }
+        );
+
+        y += 5;
+
+        addPageIfNeeded(30);
+
+        let totalDailyAmount = 0;
+
+        sortedRecords.forEach(
+            (record) => {
+                totalDailyAmount +=
+                    calculateDisplayAmount(
+                        record.dailyRate,
+                        record.attendanceStatus,
+                        record.dayType
+                    );
+            }
+        );
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.setFontSize(9);
+
+        doc.text(
+            `Total Attendance Records: ${sortedRecords.length}`,
+            105,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Total Daily Amount: ${formatPdfCurrency(
+                totalDailyAmount
+            )}`,
+            105,
+            y
+        );
+
+        const totalPages =
+            doc.getNumberOfPages();
+
+        for (
+            let page = 1;
+            page <= totalPages;
+            page++
+        ) {
+            doc.setPage(page);
+
+            const footerY =
+                pageHeight - 10;
+
+            doc.setFontSize(8);
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+            doc.text(
+                "SKCP - Kumta - 581343, Karnataka",
+                pageWidth / 2,
+                footerY,
+                {
+                    align: "center",
+                }
+            );
+
+            doc.text(
+                `Page ${page} of ${totalPages}`,
+                rightMargin,
+                footerY,
+                {
+                    align: "right",
+                }
+            );
+        }
+
+        const safeFromDate =
+            dateFrom || "All";
+
+        const safeToDate =
+            dateTo || "Dates";
+
+        doc.save(
+            `SKCP-Daily-Attendance-${safeFromDate}-to-${safeToDate}.pdf`
+        );
+    };
+
+    // ============================================================
+    // DOWNLOAD WEEKLY ATTENDANCE PDF
+    // ============================================================
+
+    const handleDownloadWeeklyAttendancePdf = () => {
+        if (
+            !selectedLabourId ||
+            !weekStartDate ||
+            weeklyAttendanceRecords.length === 0
+        ) {
+            return;
+        }
+
+        const selectedLabour =
+            getSelectedLabour(
+                selectedLabourId
+            );
+
+        const labourName =
+            weeklyAttendanceRecords[0]
+                ?.labourName ||
+            selectedLabour?.labourName ||
+            "Labour";
+
+        const doc = new jsPDF();
+
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+        const pageHeight =
+            doc.internal.pageSize.getHeight();
+
+        const leftMargin = 12;
+
+        const rightMargin =
+            pageWidth - 12;
+
+        let y = 18;
+
+        const addPageIfNeeded = (
+            requiredHeight = 15
+        ) => {
+            if (
+                y + requiredHeight >
+                pageHeight - 20
+            ) {
+                doc.addPage();
+
+                y = 20;
+
+                return true;
+            }
+
+            return false;
+        };
+
+        // --------------------------------------------------------
+        // HEADER
+        // --------------------------------------------------------
+
+        doc.setFontSize(20);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Shree Kundodari Cement Products",
+            leftMargin,
+            y
+        );
+
+        doc.setFontSize(10);
+
+        doc.text(
+            "WEEKLY ATTENDANCE SUMMARY",
+            rightMargin,
+            y,
+            {
+                align: "right",
+            }
+        );
+
+        y += 9;
+
+        doc.setLineWidth(0.5);
+
+        doc.line(
+            leftMargin,
+            y,
+            rightMargin,
+            y
+        );
+
+        // --------------------------------------------------------
+        // WEEK INFORMATION
+        // --------------------------------------------------------
+
+        y += 12;
+
+        doc.setFontSize(11);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Weekly Attendance Information",
+            leftMargin,
+            y
+        );
+
+        y += 8;
+
+        doc.setFontSize(10);
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        doc.text(
+            `Labour ID: ${selectedLabourId}`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Labour: ${labourName}`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Week Start: ${formatPdfDate(
+                weekStartDate
+            )}`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Week End: ${formatPdfDate(
+                weeklyEndDate
+            )}`,
+            leftMargin,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Total Records: ${weeklyAttendanceRecords.length}`,
+            leftMargin,
+            y
+        );
+
+        y += 14;
+
+        // --------------------------------------------------------
+        // SUMMARY COUNTS
+        // --------------------------------------------------------
+
+        doc.setFontSize(10);
+
+        doc.text(
+            `Present Days: ${weeklyPresentDays}`,
+            leftMargin,
+            y
+        );
+
+        doc.text(
+            `Absent Days: ${weeklyAbsentDays}`,
+            75,
+            y
+        );
+
+        doc.text(
+            `Holiday Days: ${weeklyHolidayDays}`,
+            135,
+            y
+        );
+
+        y += 12;
+
+        // --------------------------------------------------------
+        // TABLE
+        // --------------------------------------------------------
+
+        addPageIfNeeded(45);
+
+        doc.setFontSize(11);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.text(
+            "Attendance Records",
+            leftMargin,
+            y
+        );
+
+        y += 8;
+
+        doc.setFontSize(7);
+
+        doc.text(
+            "ID",
+            12,
+            y
+        );
+
+        doc.text(
+            "Date",
+            25,
+            y
+        );
+
+        doc.text(
+            "Labour",
+            43,
+            y
+        );
+
+        doc.text(
+            "Attendance",
+            78,
+            y
+        );
+
+        doc.text(
+            "Day Type",
+            106,
+            y
+        );
+
+        doc.text(
+            "Daily Rate",
+            133,
+            y
+        );
+
+        doc.text(
+            "Amount",
+            161,
+            y
+        );
+
+        doc.text(
+            "Status",
+            184,
+            y
+        );
+
+        y += 5;
+
+        doc.line(
+            leftMargin,
+            y,
+            rightMargin,
+            y
+        );
+
+        y += 6;
+
+        doc.setFont(
+            "helvetica",
+            "normal"
+        );
+
+        weeklyAttendanceRecords.forEach(
+            (record) => {
+                addPageIfNeeded(10);
+
+                const displayDailyAmount =
+                    calculateDisplayAmount(
+                        record.dailyRate,
+                        record.attendanceStatus,
+                        record.dayType
+                    );
+
+                doc.text(
+                    String(
+                        record.attendanceId ||
+                            "-"
+                    ),
+                    12,
+                    y
+                );
+
+                doc.text(
+                    formatPdfDate(
+                        record.attendanceDate
+                    ),
+                    25,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.labourName ||
+                            labourName ||
+                            "-"
+                    ),
+                    43,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.attendanceStatus ||
+                            "-"
+                    ),
+                    78,
+                    y
+                );
+
+                doc.text(
+                    formatDayType(
+                        record.dayType
+                    ),
+                    106,
+                    y
+                );
+
+                doc.text(
+                    formatPdfCurrency(
+                        record.dailyRate
+                    ),
+                    133,
+                    y
+                );
+
+                doc.text(
+                    formatPdfCurrency(
+                        displayDailyAmount
+                    ),
+                    161,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        record.status ||
+                            "-"
+                    ),
+                    184,
+                    y
+                );
+
+                y += 7;
+            }
+        );
+
+        // --------------------------------------------------------
+        // TOTAL
+        // --------------------------------------------------------
+
+        y += 5;
+
+        addPageIfNeeded(30);
+
+        doc.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        doc.setFontSize(9);
+
+        doc.text(
+            `Total Attendance Records: ${weeklyAttendanceRecords.length}`,
+            105,
+            y
+        );
+
+        y += 7;
+
+        doc.text(
+            `Weekly Amount: ${formatPdfCurrency(
+                weeklyTotalAmount
+            )}`,
+            105,
+            y
+        );
+
+        // --------------------------------------------------------
+        // FOOTER
+        // --------------------------------------------------------
+
+        const totalPages =
+            doc.getNumberOfPages();
+
+        for (
+            let page = 1;
+            page <= totalPages;
+            page++
+        ) {
+            doc.setPage(page);
+
+            const footerY =
+                pageHeight - 10;
+
+            doc.setFontSize(8);
+
+            doc.setFont(
+                "helvetica",
+                "normal"
+            );
+
+            doc.text(
+                "SKCP - Kumta - 581343, Karnataka",
+                pageWidth / 2,
+                footerY,
+                {
+                    align: "center",
+                }
+            );
+
+            doc.text(
+                `Page ${page} of ${totalPages}`,
+                rightMargin,
+                footerY,
+                {
+                    align: "right",
+                }
+            );
+        }
+
+        const safeLabourName = String(
+            labourName || "Labour"
+        )
+            .replace(
+                /[^a-zA-Z0-9-_]/g,
+                "-"
+            )
+            .replace(
+                /-+/g,
+                "-"
+            );
+
+        doc.save(
+            `SKCP-Weekly-Attendance-${safeLabourName}-${weekStartDate}.pdf`
+        );
     };
 
     // ============================================================
@@ -720,6 +1905,19 @@ function Attendance() {
                         Add Attendance
                     </button>
                 </div>
+            </section>
+
+            {/* ====================================================
+                DAILY ATTENDANCE LIST
+            ==================================================== */}
+
+            <section className="card">
+                <h2>Daily Attendance List</h2>
+
+                <p>
+                    {totalRecords} attendance record
+                    {totalRecords === 1 ? "" : "s"}
+                </p>
 
                 <div
                     style={{
@@ -728,21 +1926,22 @@ function Attendance() {
                         gap: "16px",
                         flexWrap: "wrap",
                         marginTop: "16px",
+                        marginBottom: "16px",
                     }}
                 >
                     <div
                         className="fld"
                         style={{
-                            width: "420px",
+                            width: "320px",
                             maxWidth: "100%",
                         }}
                     >
-                        <label htmlFor="attendance-search">
+                        <label htmlFor="daily-attendance-search">
                             Search Attendance
                         </label>
 
                         <input
-                            id="attendance-search"
+                            id="daily-attendance-search"
                             type="text"
                             placeholder="Search by labour name, ID, date or status..."
                             value={searchKeyword}
@@ -754,126 +1953,66 @@ function Attendance() {
                         />
                     </div>
 
-                    <button
-                        type="button"
-                        className="btn secondary"
-                        onClick={() =>
-                            setSearchKeyword("")
-                        }
-                        disabled={!searchKeyword}
-                    >
-                        Clear
-                    </button>
-                </div>
-            </section>
-
-            {/* ====================================================
-                WEEKLY SUMMARY
-            ==================================================== */}
-
-            <section className="card">
-                <h2>Weekly Attendance Summary</h2>
-
-                <p style={{ marginBottom: "16px" }}> 
-                    View weekly attendance and labour
-                    payment summary.
-                </p>
-
-                <div className="attendance-summary-filters">
                     <div className="fld">
-                        <label htmlFor="attendance-labour">
-                            Labour
-                        </label>
-
-                        <select
-                            id="attendance-labour"
-                            value={selectedLabourId}
-                            onChange={(event) => {
-                                setSelectedLabourId(
-                                    event.target.value
-                                );
-
-                                setWeeklySummary(null);
-                                setSummaryError("");
-                            }}
-                        >
-                            <option value="">
-                                Select Labour
-                            </option>
-
-                            {labours
-                                .filter(
-                                    (labour) =>
-                                        labour.status ===
-                                        "ACTIVE"
-                                )
-                                .map((labour) => (
-                                    <option
-                                        key={
-                                            labour.labourId
-                                        }
-                                        value={
-                                            labour.labourId
-                                        }
-                                    >
-                                        {
-                                            labour.labourName
-                                        }
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-
-                    <div className="fld">
-                        <label htmlFor="week-start-date">
-                            Week Start Date
+                        <label htmlFor="attendance-date-from">
+                            From Date
                         </label>
 
                         <input
-                            id="week-start-date"
+                            id="attendance-date-from"
                             type="date"
-                            value={weekStartDate}
-                            onChange={(event) => {
-                                setWeekStartDate(
+                            value={dateFrom}
+                            onChange={(event) =>
+                                setDateFrom(
                                     event.target.value
-                                );
+                                )
+                            }
+                        />
+                    </div>
 
-                                setWeeklySummary(null);
-                                setSummaryError("");
-                            }}
+                    <div className="fld">
+                        <label htmlFor="attendance-date-to">
+                            To Date
+                        </label>
+
+                        <input
+                            id="attendance-date-to"
+                            type="date"
+                            value={dateTo}
+                            onChange={(event) =>
+                                setDateTo(
+                                    event.target.value
+                                )
+                            }
                         />
                     </div>
 
                     <button
                         type="button"
-                        className="action-btn view-btn"
-                        onClick={fetchWeeklySummary}
-                        disabled={summaryLoading}
+                        className="btn secondary"
+                        onClick={clearFilters}
+                        disabled={
+                            !searchKeyword &&
+                            !dateFrom &&
+                            !dateTo
+                        }
                     >
-                        {summaryLoading
-                            ? "Loading..."
-                            : "View Weekly Summary"}
+                        Clear
+                    </button>
+
+                    <button
+                        type="button"
+                        className="action-btn view-btn"
+                        onClick={
+                            handleDownloadAttendancePdf
+                        }
+                        disabled={
+                            sortedRecords.length === 0
+                        }
+                    >
+                        Download PDF
                     </button>
                 </div>
-
-                {summaryError && (
-                    <p className="form-error">
-                        {summaryError}
-                    </p>
-                )}
-            </section>
-
-            {/* ====================================================
-                ATTENDANCE LIST
-            ==================================================== */}
-
-            <section className="card">
-                <h2>Attendance List</h2>
-
-                <p>
-                    {totalRecords} attendance record
-                    {totalRecords === 1 ? "" : "s"}
-                </p>
 
                 {error && (
                     <div className="form-error">
@@ -965,6 +2104,26 @@ function Attendance() {
                                             ATTENDANCE
                                             {sortKey ===
                                                 "attendanceStatus" &&
+                                                (sortDirection ===
+                                                "asc"
+                                                    ? " ▲"
+                                                    : " ▼")}
+                                        </button>
+                                    </th>
+
+                                    <th>
+                                        <button
+                                            type="button"
+                                            className="table-sort-btn"
+                                            onClick={() =>
+                                                handleSort(
+                                                    "dayType"
+                                                )
+                                            }
+                                        >
+                                            DAY TYPE
+                                            {sortKey ===
+                                                "dayType" &&
                                                 (sortDirection ===
                                                 "asc"
                                                     ? " ▲"
@@ -1073,6 +2232,12 @@ function Attendance() {
                                             </td>
 
                                             <td>
+                                                {formatDayType(
+                                                    record.dayType
+                                                )}
+                                            </td>
+
+                                            <td>
                                                 {formatCurrency(
                                                     record.dailyRate
                                                 )}
@@ -1080,7 +2245,11 @@ function Attendance() {
 
                                             <td>
                                                 {formatCurrency(
-                                                    record.dailyAmount
+                                                    calculateDisplayAmount(
+                                                        record.dailyRate,
+                                                        record.attendanceStatus,
+                                                        record.dayType
+                                                    )
                                                 )}
                                             </td>
 
@@ -1099,7 +2268,13 @@ function Attendance() {
                                             </td>
 
                                             <td>
-                                                <div className="action-buttons">
+                                                <div
+                                                    className="action-buttons"
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: "6px",
+                                                    }}
+                                                >
                                                     <button
                                                         type="button"
                                                         className="action-btn view-btn"
@@ -1141,6 +2316,28 @@ function Attendance() {
                                     )
                                 )}
                             </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        <strong>
+                                            Total
+                                        </strong>
+                                    </td>
+
+                                    <td colSpan="5"></td>
+
+                                    <td>
+                                        <strong>
+                                            {formatCurrency(
+                                                totalDailyAmount
+                                            )}
+                                        </strong>
+                                    </td>
+
+                                    <td colSpan="3"></td>
+                                </tr>
+                            </tfoot>
                         </table>
 
                         <Pagination
@@ -1158,1019 +2355,933 @@ function Attendance() {
             </section>
 
             {/* ====================================================
+                WEEKLY ATTENDANCE SUMMARY
+            ==================================================== */}
+
+            <section className="card">
+                <h2>Weekly Attendance Summary</h2>
+
+                <p style={{ marginBottom: "16px" }}>
+                    View detailed attendance records and
+                    labour payment for a selected week.
+                </p>
+
+                <div className="attendance-summary-filters">
+                    <div className="fld">
+                        <label htmlFor="attendance-labour">
+                            Labour
+                        </label>
+
+                        <select
+                            id="attendance-labour"
+                            value={selectedLabourId}
+                            onChange={(event) => {
+                                setSelectedLabourId(
+                                    event.target.value
+                                );
+
+                                setShowWeeklyAttendance(
+                                    false
+                                );
+
+                                setSummaryError("");
+                            }}
+                        >
+                            <option value="">
+                                Select Labour
+                            </option>
+
+                            {labours
+                                .filter(
+                                    (labour) =>
+                                        String(
+                                            labour.status
+                                        ).toUpperCase() ===
+                                        "ACTIVE"
+                                )
+                                .map((labour) => (
+                                    <option
+                                        key={
+                                            labour.labourId
+                                        }
+                                        value={
+                                            labour.labourId
+                                        }
+                                    >
+                                        {
+                                            labour.labourName
+                                        }
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+
+                    <div className="fld">
+                        <label htmlFor="week-start-date">
+                            Week Start Date
+                        </label>
+
+                        <input
+                            id="week-start-date"
+                            type="date"
+                            value={weekStartDate}
+                            onChange={(event) => {
+                                setWeekStartDate(
+                                    event.target.value
+                                );
+
+                                setShowWeeklyAttendance(
+                                    false
+                                );
+
+                                setSummaryError("");
+                            }}
+                        />
+                    </div>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                        }}
+                    >
+                        <button
+                            type="button"
+                            className="action-btn view-btn"
+                            onClick={
+                                handleViewWeeklyAttendance
+                            }
+                        >
+                            View Weekly Attendance
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn secondary"
+                            onClick={
+                                clearWeeklyFilters
+                            }
+                            disabled={
+                                !selectedLabourId &&
+                                !weekStartDate
+                            }
+                        >
+                            Clear
+                        </button>
+
+                        {showWeeklyAttendance && (
+                            <button
+                                type="button"
+                                className="action-btn view-btn"
+                                onClick={
+                                    handleDownloadWeeklyAttendancePdf
+                                }
+                                disabled={
+                                    weeklyAttendanceRecords.length ===
+                                    0
+                                }
+                            >
+                                Download PDF
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {summaryError && (
+                    <p className="form-error">
+                        {summaryError}
+                    </p>
+                )}
+
+                {showWeeklyAttendance && (
+                    <>
+                        <div
+                            style={{
+                                marginTop: "20px",
+                                marginBottom: "16px",
+                            }}
+                        >
+                            <h3>
+                                {weeklyAttendanceRecords[0]
+                                    ?.labourName ||
+                                    getSelectedLabour(
+                                        selectedLabourId
+                                    )?.labourName ||
+                                    "Labour"}
+                                {" - "}
+                                {formatDate(
+                                    weekStartDate
+                                )}
+                                {" to "}
+                                {formatDate(
+                                    weeklyEndDate
+                                )}
+                            </h3>
+
+                            <p>
+                                {weeklyAttendanceRecords.length}{" "}
+                                attendance record
+                                {weeklyAttendanceRecords.length ===
+                                1
+                                    ? ""
+                                    : "s"}
+                                {" | "}
+                                Present:{" "}
+                                {weeklyPresentDays}
+                                {" | "}
+                                Absent:{" "}
+                                {weeklyAbsentDays}
+                                {" | "}
+                                Holiday:{" "}
+                                {weeklyHolidayDays}
+                            </p>
+                        </div>
+
+                        {weeklyAttendanceRecords.length ===
+                            0 && (
+                            <p>
+                                No attendance records found
+                                for the selected labour and
+                                week.
+                            </p>
+                        )}
+
+                        {weeklyAttendanceRecords.length >
+                            0 && (
+                            <div className="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>DATE</th>
+                                            <th>LABOUR</th>
+                                            <th>
+                                                ATTENDANCE
+                                            </th>
+                                            <th>
+                                                DAY TYPE
+                                            </th>
+                                            <th>
+                                                DAILY RATE
+                                            </th>
+                                            <th>
+                                                DAILY AMOUNT
+                                            </th>
+                                            <th>
+                                                REMARKS
+                                            </th>
+                                            <th>
+                                                STATUS
+                                            </th>
+                                            <th>
+                                                ACTIONS
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {weeklyAttendanceRecords.map(
+                                            (record) => (
+                                                <tr
+                                                    key={
+                                                        record.attendanceId
+                                                    }
+                                                >
+                                                    <td>
+                                                        {
+                                                            record.attendanceId
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {formatDate(
+                                                            record.attendanceDate
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        <strong>
+                                                            {
+                                                                record.labourName
+                                                            }
+                                                        </strong>
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            record.attendanceStatus
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {formatDayType(
+                                                            record.dayType
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {formatCurrency(
+                                                            record.dailyRate
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {formatCurrency(
+                                                            calculateDisplayAmount(
+                                                                record.dailyRate,
+                                                                record.attendanceStatus,
+                                                                record.dayType
+                                                            )
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            record.remarks ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            record.status ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        <div
+                                                            className="action-buttons"
+                                                            style={{
+                                                                display:
+                                                                    "flex",
+                                                                gap: "6px",
+                                                            }}
+                                                        >
+                                                            <button
+                                                                type="button"
+                                                                className="action-btn view-btn"
+                                                                onClick={() =>
+                                                                    handleView(
+                                                                        record
+                                                                    )
+                                                                }
+                                                            >
+                                                                View
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="action-btn edit-btn"
+                                                                onClick={() =>
+                                                                    handleEdit(
+                                                                        record
+                                                                    )
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="action-btn delete-btn"
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        record
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <strong>
+                                                    Total
+                                                </strong>
+                                            </td>
+
+                                            <td colSpan="5"></td>
+
+                                            <td>
+                                                <strong>
+                                                    {formatCurrency(
+                                                        weeklyTotalAmount
+                                                    )}
+                                                </strong>
+                                            </td>
+
+                                            <td colSpan="3"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        )}
+                    </>
+                )}
+            </section>
+
+            {/* ====================================================
                 ADD ATTENDANCE MODAL
             ==================================================== */}
 
-            {showAddModal && (
-                <div
-                    className="modal-overlay"
-                    onClick={closeAddModal}
+            <FormModal
+                isOpen={showAddModal}
+                onClose={closeAddModal}
+                title="Add Attendance"
+                subtitle="Record new labour attendance information"
+                size="lg"
+                onSubmit={handleCreateAttendance}
+                submitLabel={
+                    addLoading
+                        ? "Saving..."
+                        : "Add Attendance"
+                }
+                saving={addLoading}
+                error={addError}
+                formId="attendance-add-form"
+            >
+                <form
+                    id="attendance-add-form"
+                    onSubmit={handleCreateAttendance}
                 >
-                    <div
-                        className="modal attendance-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-                        <div className="modal-header">
-                            <div>
-                                <h2>
-                                    Add Attendance
-                                </h2>
+                    <div className="form-grid">
+                        <div className="fld">
+                            <label htmlFor="add-labour">
+                                Labour
+                            </label>
 
-                                <p>
-                                    Record new labour
-                                    attendance
-                                    information
-                                </p>
-                            </div>
-
-                            <button
-                                type="button"
-                                className="modal-close"
-                                onClick={
-                                    closeAddModal
+                            <select
+                                id="add-labour"
+                                name="labourId"
+                                value={addForm.labourId}
+                                onChange={
+                                    handleAddChange
                                 }
-                                disabled={addLoading}
-                                aria-label="Close"
+                                required
                             >
-                                ×
-                            </button>
+                                <option value="">
+                                    Select Labour
+                                </option>
+
+                                {labours
+                                    .filter(
+                                        (labour) =>
+                                            String(
+                                                labour.status
+                                            ).toUpperCase() ===
+                                            "ACTIVE"
+                                    )
+                                    .map((labour) => (
+                                        <option
+                                            key={
+                                                labour.labourId
+                                            }
+                                            value={
+                                                labour.labourId
+                                            }
+                                        >
+                                            {
+                                                labour.labourName
+                                            }
+                                        </option>
+                                    ))}
+                            </select>
                         </div>
 
-                        <form
-                            onSubmit={
-                                handleCreateAttendance
-                            }
-                        >
-                            <div className="edit-form-grid">
-                                <div className="fld">
-                                    <label htmlFor="add-labour">
-                                        Labour
-                                    </label>
+                        <div className="fld">
+                            <label htmlFor="add-attendance-date">
+                                Attendance Date
+                            </label>
 
-                                    <select
-                                        id="add-labour"
-                                        name="labourId"
-                                        value={
+                            <input
+                                id="add-attendance-date"
+                                type="date"
+                                name="attendanceDate"
+                                value={
+                                    addForm.attendanceDate
+                                }
+                                onChange={
+                                    handleAddChange
+                                }
+                                required
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="add-attendance-status">
+                                Attendance Status
+                            </label>
+
+                            <select
+                                id="add-attendance-status"
+                                name="attendanceStatus"
+                                value={
+                                    addForm.attendanceStatus
+                                }
+                                onChange={
+                                    handleAddChange
+                                }
+                                required
+                            >
+                                <option value="PRESENT">
+                                    PRESENT
+                                </option>
+
+                                <option value="ABSENT">
+                                    ABSENT
+                                </option>
+
+                                <option value="HOLIDAY">
+                                    HOLIDAY
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="add-day-type">
+                                Day Type
+                            </label>
+
+                            <select
+                                id="add-day-type"
+                                name="dayType"
+                                value={addForm.dayType}
+                                onChange={
+                                    handleAddChange
+                                }
+                                required
+                            >
+                                <option value="FULL_DAY">
+                                    Full Day
+                                </option>
+
+                                <option value="HALF_DAY">
+                                    Half Day
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="add-daily-rate">
+                                Daily Rate
+                            </label>
+
+                            <input
+                                id="add-daily-rate"
+                                type="text"
+                                value={formatCurrency(
+                                    getLabourDailyRate(
+                                        addForm.labourId
+                                    )
+                                )}
+                                readOnly
+                            />
+                        </div>
+
+                        <div className="fld">
+                            <label htmlFor="add-daily-amount">
+                                Daily Amount
+                            </label>
+
+                            <input
+                                id="add-daily-amount"
+                                type="text"
+                                value={formatCurrency(
+                                    calculateDisplayAmount(
+                                        getLabourDailyRate(
                                             addForm.labourId
-                                        }
-                                        onChange={
-                                            handleAddChange
-                                        }
-                                        required
-                                    >
-                                        <option value="">
-                                            Select Labour
-                                        </option>
-
-                                        {labours
-                                            .filter(
-                                                (labour) =>
-                                                    labour.status ===
-                                                    "ACTIVE"
-                                            )
-                                            .map(
-                                                (
-                                                    labour
-                                                ) => (
-                                                    <option
-                                                        key={
-                                                            labour.labourId
-                                                        }
-                                                        value={
-                                                            labour.labourId
-                                                        }
-                                                    >
-                                                        {
-                                                            labour.labourName
-                                                        }
-                                                    </option>
-                                                )
-                                            )}
-                                    </select>
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="add-attendance-date">
-                                        Attendance Date
-                                    </label>
-
-                                    <input
-                                        id="add-attendance-date"
-                                        type="date"
-                                        name="attendanceDate"
-                                        value={
-                                            addForm.attendanceDate
-                                        }
-                                        onChange={
-                                            handleAddChange
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="add-attendance-status">
-                                        Attendance Status
-                                    </label>
-
-                                    <select
-                                        id="add-attendance-status"
-                                        name="attendanceStatus"
-                                        value={
-                                            addForm.attendanceStatus
-                                        }
-                                        onChange={
-                                            handleAddChange
-                                        }
-                                        required
-                                    >
-                                        <option value="PRESENT">
-                                            PRESENT
-                                        </option>
-
-                                        <option value="ABSENT">
-                                            ABSENT
-                                        </option>
-
-                                        <option value="HOLIDAY">
-                                            HOLIDAY
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="add-daily-rate">
-                                        Daily Rate
-                                    </label>
-
-                                    <input
-                                        id="add-daily-rate"
-                                        type="number"
-                                        name="dailyRate"
-                                        step="0.01"
-                                        min="0"
-                                        value={
-                                            addForm.dailyRate
-                                        }
-                                        onChange={
-                                            handleAddChange
-                                        }
-                                        placeholder="Enter daily rate"
-                                        required
-                                    />
-                                </div>
-
-                                {addForm.attendanceStatus ===
-                                    "ABSENT" && (
-                                    <div className="fld edit-full">
-                                        <label htmlFor="add-leave-reason">
-                                            Leave Reason
-                                        </label>
-
-                                        <input
-                                            id="add-leave-reason"
-                                            type="text"
-                                            name="leaveReason"
-                                            value={
-                                                addForm.leaveReason
-                                            }
-                                            onChange={
-                                                handleAddChange
-                                            }
-                                            placeholder="Enter leave reason"
-                                        />
-                                    </div>
+                                        ),
+                                        addForm.attendanceStatus,
+                                        addForm.dayType
+                                    )
                                 )}
-
-                                <div className="fld edit-full">
-                                    <label htmlFor="add-remarks">
-                                        Remarks
-                                    </label>
-
-                                    <textarea
-                                        id="add-remarks"
-                                        name="remarks"
-                                        rows="3"
-                                        value={
-                                            addForm.remarks
-                                        }
-                                        onChange={
-                                            handleAddChange
-                                        }
-                                        placeholder="Enter remarks"
-                                    />
-                                </div>
-                            </div>
-
-                            {addError && (
-                                <p className="form-error">
-                                    {addError}
-                                </p>
-                            )}
-
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn-secondary"
-                                    onClick={
-                                        closeAddModal
-                                    }
-                                    disabled={
-                                        addLoading
-                                    }
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="action-btn view-btn"
-                                    disabled={
-                                        addLoading
-                                    }
-                                >
-                                    {addLoading
-                                        ? "Saving..."
-                                        : "Add Attendance"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* ====================================================
-                WEEKLY SUMMARY MODAL
-            ==================================================== */}
-
-            {showWeeklySummaryModal &&
-                weeklySummary && (
-                    <div
-                        className="modal-overlay"
-                        onClick={
-                            closeWeeklySummaryModal
-                        }
-                    >
-                        <div
-                            className="modal attendance-modal"
-                            onClick={(event) =>
-                                event.stopPropagation()
-                            }
-                        >
-                            <div className="modal-header">
-                                <div>
-                                    <h2>
-                                        Weekly Attendance
-                                        Summary
-                                    </h2>
-
-                                    <p>
-                                        Labour attendance
-                                        and payment
-                                        summary
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="modal-close"
-                                    onClick={
-                                        closeWeeklySummaryModal
-                                    }
-                                    aria-label="Close"
-                                >
-                                    ×
-                                </button>
-                            </div>
-
-                            <div className="details-grid">
-                                <div className="detail-item">
-                                    <span>
-                                        Labour
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.labourName ||
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Labour ID
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.labourId ||
-                                            selectedLabourId ||
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Week Start Date
-                                    </span>
-
-                                    <strong>
-                                        {formatDate(
-                                            weeklySummary.weekStartDate ||
-                                                weekStartDate
-                                        )}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Week End Date
-                                    </span>
-
-                                    <strong>
-                                        {formatDate(
-                                            weeklySummary.weekEndDate
-                                        )}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Present Days
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.presentDays ??
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Absent Days
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.absentDays ??
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Holiday Days
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.holidayDays ??
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Total Days
-                                    </span>
-
-                                    <strong>
-                                        {weeklySummary.totalDays ??
-                                            "-"}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Total Amount
-                                    </span>
-
-                                    <strong>
-                                        {formatCurrency(
-                                            weeklySummary.totalAmount
-                                        )}
-                                    </strong>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span>
-                                        Total Payment
-                                    </span>
-
-                                    <strong>
-                                        {formatCurrency(
-                                            weeklySummary.totalPayment
-                                        )}
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn-secondary"
-                                    onClick={
-                                        closeWeeklySummaryModal
-                                    }
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-            {/* ====================================================
-                VIEW MODAL
-            ==================================================== */}
-
-            {selectedAttendance && (
-                <div
-                    className="modal-overlay"
-                    onClick={closeViewModal}
-                >
-                    <div
-                        className="modal attendance-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-                        <div className="modal-header">
-                            <div>
-                                <h2>
-                                    Attendance Details
-                                </h2>
-
-                                <p>
-                                    View attendance
-                                    information
-                                </p>
-                            </div>
-
-                            <button
-                                type="button"
-                                className="modal-close"
-                                onClick={
-                                    closeViewModal
-                                }
-                                aria-label="Close"
-                            >
-                                ×
-                            </button>
+                                readOnly
+                            />
                         </div>
 
-                        <div className="details-grid">
-                            <div className="detail-item">
-                                <span>
-                                    Attendance ID
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.attendanceId
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Attendance Date
-                                </span>
-
-                                <strong>
-                                    {formatDate(
-                                        selectedAttendance.attendanceDate
-                                    )}
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Labour
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.labourName
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Labour ID
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.labourId
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Attendance Status
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.attendanceStatus
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
+                        {addForm.attendanceStatus ===
+                            "ABSENT" && (
+                            <div className="fld">
+                                <label htmlFor="add-leave-reason">
                                     Leave Reason
-                                </span>
+                                </label>
 
-                                <strong>
-                                    {
-                                        selectedAttendance.leaveReason ||
-                                        "-"
+                                <input
+                                    id="add-leave-reason"
+                                    type="text"
+                                    name="leaveReason"
+                                    value={
+                                        addForm.leaveReason
                                     }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Daily Rate
-                                </span>
-
-                                <strong>
-                                    {formatCurrency(
-                                        selectedAttendance.dailyRate
-                                    )}
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Daily Amount
-                                </span>
-
-                                <strong>
-                                    {formatCurrency(
-                                        selectedAttendance.dailyAmount
-                                    )}
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Record Status
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.status ||
-                                        "-"
+                                    onChange={
+                                        handleAddChange
                                     }
-                                </strong>
+                                    placeholder="Enter leave reason"
+                                />
                             </div>
+                        )}
 
-                            <div className="detail-item">
-                                <span>
-                                    Created At
-                                </span>
+                        <div className="fld">
+                            <label htmlFor="add-remarks">
+                                Remarks
+                            </label>
 
-                                <strong>
-                                    {selectedAttendance.createdAt
-                                        ? (() => {
-                                              const date =
-                                                  new Date(
-                                                      selectedAttendance.createdAt
-                                                  );
-
-                                              if (
-                                                  Number.isNaN(
-                                                      date.getTime()
-                                                  )
-                                              ) {
-                                                  return selectedAttendance.createdAt;
-                                              }
-
-                                              const day =
-                                                  String(
-                                                      date.getDate()
-                                                  ).padStart(
-                                                      2,
-                                                      "0"
-                                                  );
-
-                                              const month =
-                                                  String(
-                                                      date.getMonth() +
-                                                          1
-                                                  ).padStart(
-                                                      2,
-                                                      "0"
-                                                  );
-
-                                              const year =
-                                                  date.getFullYear();
-
-                                              const time =
-                                                  date.toLocaleTimeString(
-                                                      "en-IN",
-                                                      {
-                                                          hour: "2-digit",
-                                                          minute: "2-digit",
-                                                          second: "2-digit",
-                                                          hour12: true,
-                                                      }
-                                                  );
-
-                                              return `${day}-${month}-${year} ${time}`;
-                                          })()
-                                        : "-"}
-                                </strong>
-                            </div>
-
-                            <div className="detail-item detail-full">
-                                <span>
-                                    Remarks
-                                </span>
-
-                                <strong>
-                                    {
-                                        selectedAttendance.remarks ||
-                                        "-"
-                                    }
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={
-                                    closeViewModal
+                            <textarea
+                                id="add-remarks"
+                                name="remarks"
+                                rows="3"
+                                value={
+                                    addForm.remarks
                                 }
-                            >
-                                Close
-                            </button>
+                                onChange={
+                                    handleAddChange
+                                }
+                                placeholder="Enter remarks"
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+                </form>
+            </FormModal>
 
             {/* ====================================================
-                EDIT MODAL
+                VIEW ATTENDANCE MODAL
             ==================================================== */}
 
-            {editingAttendance && (
-                <div
-                    className="modal-overlay"
-                    onClick={closeEditModal}
-                >
-                    <div
-                        className="modal attendance-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
+            <ViewModal
+                isOpen={!!selectedAttendance}
+                onClose={closeViewModal}
+                title="Attendance Details"
+                subtitle={
+                    selectedAttendance
+                        ? `Attendance information of labour ID ${selectedAttendance.labourId}`
+                        : ""
+                }
+                size="lg"
+            >
+                {selectedAttendance && (
+                    <DetailGrid>
+                        <DetailItem
+                            label="Attendance ID"
+                            value={
+                                selectedAttendance.attendanceId
+                            }
+                        />
+
+                        <DetailItem
+                            label="Labour"
+                            value={
+                                selectedAttendance.labourName ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Attendance Date"
+                            value={formatDate(
+                                selectedAttendance.attendanceDate
+                            )}
+                        />
+
+                        <DetailItem
+                            label="Attendance Status"
+                            value={
+                                selectedAttendance.attendanceStatus ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Day Type"
+                            value={formatDayType(
+                                selectedAttendance.dayType
+                            )}
+                        />
+
+                        <DetailItem
+                            label="Daily Rate"
+                            value={formatCurrency(
+                                selectedAttendance.dailyRate
+                            )}
+                        />
+
+                        <DetailItem
+                            label="Daily Amount"
+                            value={formatCurrency(
+                                calculateDisplayAmount(
+                                    selectedAttendance.dailyRate,
+                                    selectedAttendance.attendanceStatus,
+                                    selectedAttendance.dayType
+                                )
+                            )}
+                        />
+
+                        <DetailItem
+                            label="Leave Reason"
+                            value={
+                                selectedAttendance.leaveReason ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Remarks"
+                            value={
+                                selectedAttendance.remarks ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Status"
+                            value={
+                                selectedAttendance.status ||
+                                "-"
+                            }
+                        />
+
+                        <DetailItem
+                            label="Created At"
+                            value={
+                                selectedAttendance.createdAt ||
+                                "-"
+                            }
+                        />
+                    </DetailGrid>
+                )}
+            </ViewModal>
+
+            {/* ====================================================
+                EDIT ATTENDANCE MODAL
+            ==================================================== */}
+
+            <FormModal
+                isOpen={!!editingAttendance}
+                onClose={closeEditModal}
+                title="Edit Attendance"
+                subtitle={
+                    editingAttendance
+                        ? `Update attendance information of labour ID ${editingAttendance.labourId}`
+                        : "Update attendance information"
+                }
+                size="lg"
+                onSubmit={handleUpdateAttendance}
+                submitLabel="Update Attendance"
+                saving={editLoading}
+                error={editError}
+                formId="attendance-edit-form"
+            >
+                {editingAttendance && (
+                    <form
+                        id="attendance-edit-form"
+                        onSubmit={
+                            handleUpdateAttendance
                         }
                     >
-                        <div className="modal-header">
-                            <div>
-                                <h2>
-                                    Edit Attendance
-                                </h2>
+                        <div className="form-grid">
+                            <div className="fld">
+                                <label htmlFor="edit-labour">
+                                    Labour
+                                </label>
 
-                                <p>
-                                    Update attendance
-                                    information
-                                </p>
+                                <input
+                                    id="edit-labour"
+                                    type="text"
+                                    value={
+                                        editingAttendance.labourName ||
+                                        ""
+                                    }
+                                    readOnly
+                                />
                             </div>
 
-                            <button
-                                type="button"
-                                className="modal-close"
-                                onClick={
-                                    closeEditModal
-                                }
-                                disabled={editLoading}
-                                aria-label="Close"
-                            >
-                                ×
-                            </button>
-                        </div>
+                            <div className="fld">
+                                <label htmlFor="edit-attendance-date">
+                                    Attendance Date
+                                </label>
 
-                        <form
-                            onSubmit={
-                                handleUpdateAttendance
-                            }
-                        >
-                            <div className="edit-form-grid">
+                                <input
+                                    id="edit-attendance-date"
+                                    type="date"
+                                    name="attendanceDate"
+                                    value={
+                                        editForm.attendanceDate
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-attendance-status">
+                                    Attendance Status
+                                </label>
+
+                                <select
+                                    id="edit-attendance-status"
+                                    name="attendanceStatus"
+                                    value={
+                                        editForm.attendanceStatus
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                >
+                                    <option value="PRESENT">
+                                        PRESENT
+                                    </option>
+
+                                    <option value="ABSENT">
+                                        ABSENT
+                                    </option>
+
+                                    <option value="HOLIDAY">
+                                        HOLIDAY
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-day-type">
+                                    Day Type
+                                </label>
+
+                                <select
+                                    id="edit-day-type"
+                                    name="dayType"
+                                    value={
+                                        editForm.dayType
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                >
+                                    <option value="FULL_DAY">
+                                        Full Day
+                                    </option>
+
+                                    <option value="HALF_DAY">
+                                        Half Day
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-daily-rate">
+                                    Daily Rate
+                                </label>
+
+                                <input
+                                    id="edit-daily-rate"
+                                    type="text"
+                                    value={formatCurrency(
+                                        editingAttendance.dailyRate
+                                    )}
+                                    readOnly
+                                />
+                            </div>
+
+                            <div className="fld">
+                                <label htmlFor="edit-daily-amount">
+                                    Daily Amount
+                                </label>
+
+                                <input
+                                    id="edit-daily-amount"
+                                    type="text"
+                                    value={formatCurrency(
+                                        calculateDisplayAmount(
+                                            editingAttendance.dailyRate,
+                                            editForm.attendanceStatus,
+                                            editForm.dayType
+                                        )
+                                    )}
+                                    readOnly
+                                />
+                            </div>
+
+                            {editForm.attendanceStatus ===
+                                "ABSENT" && (
                                 <div className="fld">
-                                    <label htmlFor="edit-labour">
-                                        Labour
+                                    <label htmlFor="edit-leave-reason">
+                                        Leave Reason
                                     </label>
 
                                     <input
-                                        id="edit-labour"
+                                        id="edit-leave-reason"
                                         type="text"
+                                        name="leaveReason"
                                         value={
-                                            editingAttendance.labourName ||
-                                            ""
-                                        }
-                                        disabled
-                                    />
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-attendance-date">
-                                        Attendance Date
-                                    </label>
-
-                                    <input
-                                        id="edit-attendance-date"
-                                        type="date"
-                                        name="attendanceDate"
-                                        value={
-                                            editForm.attendanceDate
+                                            editForm.leaveReason
                                         }
                                         onChange={
                                             handleEditChange
                                         }
-                                        required
+                                        placeholder="Enter leave reason"
                                     />
                                 </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-attendance-status">
-                                        Attendance Status
-                                    </label>
-
-                                    <select
-                                        id="edit-attendance-status"
-                                        name="attendanceStatus"
-                                        value={
-                                            editForm.attendanceStatus
-                                        }
-                                        onChange={
-                                            handleEditChange
-                                        }
-                                        required
-                                    >
-                                        <option value="PRESENT">
-                                            PRESENT
-                                        </option>
-
-                                        <option value="ABSENT">
-                                            ABSENT
-                                        </option>
-
-                                        <option value="HOLIDAY">
-                                            HOLIDAY
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div className="fld">
-                                    <label htmlFor="edit-daily-rate">
-                                        Daily Rate
-                                    </label>
-
-                                    <input
-                                        id="edit-daily-rate"
-                                        type="number"
-                                        name="dailyRate"
-                                        step="0.01"
-                                        min="0"
-                                        value={
-                                            editForm.dailyRate
-                                        }
-                                        onChange={
-                                            handleEditChange
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                {editForm.attendanceStatus ===
-                                    "ABSENT" && (
-                                    <div className="fld edit-full">
-                                        <label htmlFor="edit-leave-reason">
-                                            Leave Reason
-                                        </label>
-
-                                        <input
-                                            id="edit-leave-reason"
-                                            type="text"
-                                            name="leaveReason"
-                                            value={
-                                                editForm.leaveReason
-                                            }
-                                            onChange={
-                                                handleEditChange
-                                            }
-                                            placeholder="Enter leave reason"
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="fld edit-full">
-                                    <label htmlFor="edit-remarks">
-                                        Remarks
-                                    </label>
-
-                                    <textarea
-                                        id="edit-remarks"
-                                        name="remarks"
-                                        rows="3"
-                                        value={
-                                            editForm.remarks
-                                        }
-                                        onChange={
-                                            handleEditChange
-                                        }
-                                        placeholder="Enter remarks"
-                                    />
-                                </div>
-                            </div>
-
-                            {editError && (
-                                <p className="form-error">
-                                    {editError}
-                                </p>
                             )}
 
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn-secondary"
-                                    onClick={
-                                        closeEditModal
-                                    }
-                                    disabled={
-                                        editLoading
-                                    }
-                                >
-                                    Cancel
-                                </button>
+                            <div className="fld">
+                                <label htmlFor="edit-remarks">
+                                    Remarks
+                                </label>
 
-                                <button
-                                    type="submit"
-                                    className="action-btn view-btn"
-                                    disabled={
-                                        editLoading
+                                <textarea
+                                    id="edit-remarks"
+                                    name="remarks"
+                                    rows="3"
+                                    value={
+                                        editForm.remarks
                                     }
-                                >
-                                    {editLoading
-                                        ? "Updating..."
-                                        : "Update Attendance"}
-                                </button>
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    placeholder="Enter remarks"
+                                />
                             </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                        </div>
+                    </form>
+                )}
+            </FormModal>
 
             {/* ====================================================
                 DELETE CONFIRMATION MODAL
             ==================================================== */}
 
-            {deletingAttendance && (
-                <div
-                    className="modal-overlay"
-                    onClick={closeDeleteModal}
-                >
-                    <div
-                        className="modal attendance-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-                        <div className="modal-header">
-                            <div>
-                                <h2>
-                                    Delete Attendance
-                                </h2>
-
-                                <p>
-                                    Confirm attendance
-                                    record deletion
-                                </p>
-                            </div>
-
-                            <button
-                                type="button"
-                                className="modal-close"
-                                onClick={
-                                    closeDeleteModal
-                                }
-                                disabled={
-                                    deleteLoading
-                                }
-                                aria-label="Close"
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        <p>
-                            Are you sure you want to
-                            delete this attendance
-                            record?
-                        </p>
-
-                        <div className="details-grid">
-                            <div className="detail-item">
-                                <span>
-                                    Attendance ID
-                                </span>
-
-                                <strong>
-                                    {
-                                        deletingAttendance.attendanceId
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Attendance Date
-                                </span>
-
-                                <strong>
-                                    {formatDate(
-                                        deletingAttendance.attendanceDate
-                                    )}
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Labour
-                                </span>
-
-                                <strong>
-                                    {
-                                        deletingAttendance.labourName
-                                    }
-                                </strong>
-                            </div>
-
-                            <div className="detail-item">
-                                <span>
-                                    Attendance Status
-                                </span>
-
-                                <strong>
-                                    {
-                                        deletingAttendance.attendanceStatus
-                                    }
-                                </strong>
-                            </div>
-                        </div>
-
-                        <p>
-                            This will mark the attendance
-                            record as{" "}
-                            <strong>INACTIVE</strong>.
-                            The record will not be
-                            physically removed from the
-                            database.
-                        </p>
-
-                        {deleteError && (
-                            <p className="form-error">
-                                {deleteError}
-                            </p>
-                        )}
-
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={
-                                    closeDeleteModal
-                                }
-                                disabled={
-                                    deleteLoading
-                                }
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                type="button"
-                                className="action-btn delete-btn"
-                                onClick={
-                                    handleConfirmDelete
-                                }
-                                disabled={
-                                    deleteLoading
-                                }
-                            >
-                                {deleteLoading
-                                    ? "Deleting..."
-                                    : "Delete Attendance"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <DeleteConfirmModal
+                isOpen={!!deletingAttendance}
+                onClose={closeDeleteModal}
+                onConfirm={handleConfirmDelete}
+                title="Delete Attendance"
+                subtitle="Confirm attendance record deletion"
+                message="Are you sure you want to delete this attendance record?"
+                itemName={
+                    deletingAttendance
+                        ? `${
+                              deletingAttendance.labourName ||
+                              "Labour"
+                          } - ${formatDate(
+                              deletingAttendance.attendanceDate
+                          )}`
+                        : ""
+                }
+                confirming={deleteLoading}
+                error={deleteError}
+            />
         </div>
     );
 }

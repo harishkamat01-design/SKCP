@@ -910,7 +910,13 @@ function Asset() {
 
                                             <td>
 
-                                                <div className="action-buttons">
+                                               <div
+                                                    className="action-buttons"
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: "6px",
+                                                    }}
+                                                >
 
                                                     <button
                                                         type="button"

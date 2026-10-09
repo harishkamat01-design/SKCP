@@ -1055,7 +1055,12 @@ function RawMaterialStock() {
                                                 </td>
 
                                                 <td>
-                                                    <div className="action-buttons">
+                                                    <div className="action-buttons"
+                                                        style={{
+                                                                display: "flex",
+                                                                gap: "6px",
+                                                            }}
+                                                        >
                                                         <button
                                                             type="button"
                                                             className="action-btn view-btn"

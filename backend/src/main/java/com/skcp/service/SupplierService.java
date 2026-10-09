@@ -5,9 +5,10 @@ import com.skcp.dto.request.supplier.SupplierUpdateRequest;
 import com.skcp.dto.response.supplier.SupplierResponse;
 import com.skcp.dto.response.supplier.SupplierSummaryResponse;
 import com.skcp.entity.Supplier;
+import com.skcp.exception.DuplicateResourceException;
+import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.mapper.SupplierMapper;
 import com.skcp.repository.SupplierRepository;
-import com.skcp.exception.ResourceNotFoundException;
 
 import org.springframework.stereotype.Service;
 
@@ -40,25 +41,25 @@ public class SupplierService
                 .toList();
     }*/
 
-                public List<SupplierSummaryResponse> getAllSuppliers()
-                {
-                List<Supplier> suppliers = supplierRepository.findAll();
+    public List<SupplierSummaryResponse> getAllSuppliers()
+    {
+        List<Supplier> suppliers = supplierRepository.findAll();
 
-                suppliers.forEach(supplier ->
-                        System.out.println(
-                                "SUPPLIER DEBUG -> ID: "
-                                + supplier.getSupplierId()
-                                + " | NAME: "
-                                + supplier.getSupplierName()
-                                + " | REMARKS: "
-                                + supplier.getRemarks()
-                        )
-                );
+        suppliers.forEach(supplier ->
+                System.out.println(
+                        "SUPPLIER DEBUG -> ID: "
+                        + supplier.getSupplierId()
+                        + " | NAME: "
+                        + supplier.getSupplierName()
+                        + " | REMARKS: "
+                        + supplier.getRemarks()
+                )
+        );
 
-                return suppliers.stream()
-                        .map(SupplierMapper::toSummaryResponse)
-                        .toList();
-                }
+        return suppliers.stream()
+                .map(SupplierMapper::toSummaryResponse)
+                .toList();
+    }
 
 
     // ============================================================
@@ -86,6 +87,17 @@ public class SupplierService
             SupplierCreateRequest request
     )
     {
+        if (supplierRepository.existsByPhoneAndStatus(
+                request.getPhone(),
+                "ACTIVE"))
+        {
+            throw new DuplicateResourceException(
+                    "Supplier with phone number "
+                            + request.getPhone()
+                            + " already exists"
+            );
+        }
+
         Supplier supplier = SupplierMapper.toEntity(request);
 
         Supplier savedSupplier = supplierRepository.save(supplier);
@@ -110,6 +122,18 @@ public class SupplierService
                         )
                 );
 
+        if (supplierRepository.existsByPhoneAndStatusAndSupplierIdNot(
+                request.getPhone(),
+                "ACTIVE",
+                id))
+        {
+            throw new DuplicateResourceException(
+                    "Supplier with phone number "
+                            + request.getPhone()
+                            + " already exists"
+            );
+        }
+
         SupplierMapper.updateEntity(
                 existingSupplier,
                 request
@@ -120,17 +144,14 @@ public class SupplierService
 
         return SupplierMapper.toResponse(updatedSupplier);
     }
-    
-
-    
 
 
-        // ============================================================
-        // DELETE SUPPLIER - SOFT DELETE
-        // ============================================================
+    // ============================================================
+    // DELETE SUPPLIER - SOFT DELETE
+    // ============================================================
 
-        public void deleteSupplier(Integer id)
-        {
+    public void deleteSupplier(Integer id)
+    {
         Supplier supplier = supplierRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -141,52 +162,6 @@ public class SupplierService
         supplier.setStatus("INACTIVE");
 
         supplierRepository.save(supplier);
-        }
-
+    }
 
 }
-
-
-
-/*
-package com.skcp.service;
-
-import com.skcp.entity.Supplier;
-import com.skcp.repository.SupplierRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class SupplierService {
-
-    // Dependency Injection
-    private final SupplierRepository supplierRepository;
-
-    // Constructor Injection
-    public SupplierService(SupplierRepository supplierRepository) {
-        this.supplierRepository = supplierRepository;
-    }
-
-    // Get all suppliers
-    public List<Supplier> getAllSuppliers() {
-        return supplierRepository.findAll();
-    }
-
-    // Save supplier
-    public Supplier saveSupplier(Supplier supplier) {
-        return supplierRepository.save(supplier);
-    }
-
-    // Find supplier by ID
-    public Supplier getSupplierById(Integer id) {
-        return supplierRepository.findById(id).orElse(null);
-    }
-
-    // Delete supplier
-    public void deleteSupplier(Integer id) {
-        supplierRepository.deleteById(id);
-    }
-}
-
-*/

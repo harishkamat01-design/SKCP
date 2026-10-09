@@ -1,6 +1,8 @@
     package com.skcp.dto.response.product;
 
-    public class ProductSummaryResponse {
+import java.math.BigDecimal;
+
+public class ProductSummaryResponse {
 
         // ============================================================
         // PRODUCT ID
@@ -24,11 +26,11 @@
 
 
         // ============================================================
-        // SIZE
+        // SIZE AND PRICE
         // ============================================================
 
         private String size;
-
+        private BigDecimal price;
 
         // ============================================================
         // STATUS
@@ -76,6 +78,13 @@
             this.size = size;
         }
 
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public void setPrice(BigDecimal price) {
+            this.price = price;
+        }
 
         public String getStatus() {
             return status;

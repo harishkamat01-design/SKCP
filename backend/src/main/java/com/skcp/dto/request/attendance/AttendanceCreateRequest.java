@@ -38,6 +38,9 @@ public class AttendanceCreateRequest
     )
     private String attendanceStatus;
 
+    @NotBlank
+    @Pattern(regexp = "FULL_DAY|HALF_DAY")
+    private String dayType = "FULL_DAY";
 
     // ============================================================
     // LEAVE REASON
@@ -108,6 +111,15 @@ public class AttendanceCreateRequest
     {
         this.attendanceStatus =
                 normalize(attendanceStatus);
+    }
+
+
+    public String getDayType() {
+    return dayType;
+    }
+
+    public void setDayType(String dayType) {
+        this.dayType = dayType == null ? null : dayType.trim().toUpperCase();
     }
 
 

@@ -66,12 +66,23 @@ public class CustomerService
     // ============================================================
 
     public CustomerResponse createCustomer(
-            CustomerCreateRequest request)
-    {
+        CustomerCreateRequest request)
+{
         logger.info(
                 "Creating new customer: {}",
                 request.getCustomerName()
         );
+
+        if (customerRepository.existsByMobileNumberAndStatus(
+                request.getMobileNumber(),
+                "ACTIVE"))
+        {
+                throw new DuplicateResourceException(
+                        "Customer with mobile number "
+                                + request.getMobileNumber()
+                                + " already exists"
+                );
+        }
 
         Customer customer =
                 customerMapper.toEntity(request);
@@ -82,7 +93,7 @@ public class CustomerService
                 customerRepository.save(customer);
 
         return customerMapper.toResponse(savedCustomer);
-    }
+}
 
     // ============================================================
     // UPDATE CUSTOMER
@@ -93,17 +104,29 @@ public class CustomerService
             CustomerUpdateRequest request)
     {
         Customer existingCustomer =
-                customerRepository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Customer not found with id: " + id
-                                )
-                        );
+        customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Customer not found with id: " + id
+                        )
+                );
 
-        customerMapper.updateEntity(
-                request,
-                existingCustomer
-        );
+                if (customerRepository.existsByMobileNumberAndStatusAndCustomerIdNot(
+                        request.getMobileNumber(),
+                        "ACTIVE",
+                        id))
+                {
+                throw new DuplicateResourceException(
+                        "Customer with mobile number "
+                                + request.getMobileNumber()
+                                + " already exists"
+                );
+                }
+
+                customerMapper.updateEntity(
+                        request,
+                        existingCustomer
+                );
 
         Customer updatedCustomer =
                 customerRepository.save(existingCustomer);
@@ -165,7 +188,7 @@ public class CustomerService
     }
 }
 
-/* 
+/*
 package com.skcp.service;
 
 import com.skcp.dto.request.customer.CustomerCreateRequest;
@@ -308,7 +331,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Service
-public class CustomerService 
+public class CustomerService
 {
     private static final Logger logger =
         LoggerFactory.getLogger(CustomerService.class);
@@ -319,14 +342,14 @@ public class CustomerService
 
     public CustomerService(
             CustomerRepository customerRepository,
-            CustomerMapper customerMapper) 
+            CustomerMapper customerMapper)
     {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
     }
 
 
-    public List<CustomerSummaryResponse> getAllCustomers() 
+    public List<CustomerSummaryResponse> getAllCustomers()
     {
         return customerRepository.findAll()
                 .stream()
@@ -335,7 +358,7 @@ public class CustomerService
     }
 
 
-    public CustomerResponse getCustomerById(Integer id) 
+    public CustomerResponse getCustomerById(Integer id)
     {
         Customer customer = customerRepository.findById(id).orElse(null);
 
@@ -347,8 +370,8 @@ public class CustomerService
     }
 
 
-    public CustomerResponse createCustomer(CustomerCreateRequest request) 
-    {    
+    public CustomerResponse createCustomer(CustomerCreateRequest request)
+    {
          // logger.info("Creating new customer"); - this line of code replaced by below code
          logger.info("Creating new customer: {}", request.getCustomerName());   // logger added
 
@@ -364,11 +387,11 @@ public class CustomerService
 
     public CustomerResponse updateCustomer(
             Integer id,
-            CustomerUpdateRequest request) 
+            CustomerUpdateRequest request)
     {
         Customer existingCustomer = customerRepository.findById(id).orElse(null);
 
-            if (existingCustomer == null) 
+            if (existingCustomer == null)
             {
                 return null;
             }
@@ -381,11 +404,11 @@ public class CustomerService
     }
 
 
-    public boolean deleteCustomer(Integer id) 
+    public boolean deleteCustomer(Integer id)
     {
     Customer customer = customerRepository.findById(id).orElse(null);
 
-        if (customer == null) 
+        if (customer == null)
             {
             return false;
             }
@@ -394,7 +417,7 @@ public class CustomerService
         return true;
      }
 }
-   
+
 */
 
 /*
@@ -415,19 +438,19 @@ public class CustomerService
 */
 
 //===================================================================================================================//
-/*  
+/*
     Below code is before the implementation of DTO and Mapper concept.
     Before DTOs: Controller → Customer entity → Service → Repository
     The controller was directly sending database entities to the service: saveCustomer(Customer customer)
-    
+
     After DTOs: Controller → Request DTO → Service → Mapper → Customer entity → Repository
     and back: Repository → Customer entity → Mapper → Response DTO → Controller
 
     So the service must change completely because it becomes the central place that uses the mapper.
-    
+
     What stays the same:Customer entity, CustomerRepository, Database table, Database save/find/delete operations
 
-    What changes: 
+    What changes:
     getAllCustomers()     → returns summary DTOs, not entities
     getCustomerById()     → returns response DTO, not entity
     createCustomer()      → accepts CustomerCreateRequest
@@ -446,7 +469,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CustomerService 
+public class CustomerService
 {
     // Dependency Injection
     private final CustomerRepository customerRepository;
@@ -472,10 +495,10 @@ public class CustomerService
     }
 
     // Delete customer
-    public void deleteCustomer(Integer id) {   
+    public void deleteCustomer(Integer id) {
         customerRepository.deleteById(id);
     }
 }
-    
+
 */
 //===================================================================================================================//

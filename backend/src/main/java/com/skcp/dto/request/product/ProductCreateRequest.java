@@ -4,10 +4,9 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import java.math.BigDecimal;
 
-public class ProductCreateRequest 
+public class ProductCreateRequest
 {
 
     @NotBlank(message = "Product code is required")
@@ -37,95 +36,107 @@ public class ProductCreateRequest
     @Size(max = 20, message = "Unit must not exceed 20 characters")
     private String unit;
 
+    @NotNull(message = "Product price is required")
+    @DecimalMin(value = "0.00", message = "Product price must not be negative")
+    private BigDecimal price;
+
     @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
 
 
     // Default Constructor
 
-    public ProductCreateRequest() 
+    public ProductCreateRequest()
     {
     }
 
 
     // Getters and Setters
 
-    public String getProductCode() 
+    public String getProductCode()
     {
         return productCode;
     }
 
-    public void setProductCode(String productCode) 
+    public void setProductCode(String productCode)
     {
         this.productCode = normalize(productCode);
     }
 
-    public String getProductName() 
+    public String getProductName()
     {
         return productName;
     }
 
-    public void setProductName(String productName) 
+    public void setProductName(String productName)
     {
         this.productName = normalize(productName);
     }
 
-    public String getSize() 
+    public String getSize()
     {
         return size;
     }
 
-    public void setSize(String size) 
+    public void setSize(String size)
     {
         this.size = normalize(size);
     }
 
-    public BigDecimal getLength() 
+    public BigDecimal getLength()
     {
         return length;
     }
 
-    public void setLength(BigDecimal length) 
+    public void setLength(BigDecimal length)
     {
         this.length = length;
     }
 
-    public BigDecimal getWidth() 
+    public BigDecimal getWidth()
     {
         return width;
     }
 
-    public void setWidth(BigDecimal width) 
+    public void setWidth(BigDecimal width)
     {
         this.width = width;
     }
 
-    public BigDecimal getHeight() 
+    public BigDecimal getHeight()
     {
         return height;
     }
 
-    public void setHeight(BigDecimal height) 
+    public void setHeight(BigDecimal height)
     {
         this.height = height;
     }
 
-    public String getUnit() 
+    public String getUnit()
     {
         return unit;
     }
 
-    public void setUnit(String unit) 
+    public void setUnit(String unit)
     {
         this.unit = normalize(unit);
     }
 
-    public String getDescription() 
+    public BigDecimal getPrice() {
+    return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+  }
+
+    public String getDescription()
     {
         return description;
     }
 
-    public void setDescription(String description) 
+    public void setDescription(String description)
     {
         this.description = normalize(description);
     }
@@ -133,7 +144,7 @@ public class ProductCreateRequest
 
     // Private helper method
 
-    private String normalize(String value) 
+    private String normalize(String value)
     {
 
         if (value == null) {

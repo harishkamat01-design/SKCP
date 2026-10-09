@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+
 import {
     apiGet,
     apiPost,
@@ -19,20 +20,29 @@ import Pagination from "../../../components/ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
 
+import { jsPDF } from "jspdf";
+
 function Production() {
     // ============================================================
     // STATE
     // ============================================================
 
     const [searchKeyword, setSearchKeyword] = useState("");
+
+    const [productionSizeFilter, setProductionSizeFilter] =
+        useState("");
+
     const [productionDateFrom, setProductionDateFrom] =
         useState("");
+
     const [productionDateTo, setProductionDateTo] =
         useState("");
+
     const [dateFilterError, setDateFilterError] =
         useState("");
 
     const [productions, setProductions] = useState([]);
+    const [products, setProducts] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -53,6 +63,8 @@ function Production() {
 
     const [editForm, setEditForm] = useState({
         productionDate: "",
+        size: "",
+        assetId: "",
         quantityProduced: "",
         morningCementBags: "",
         afternoonCementBags: "",
@@ -70,7 +82,7 @@ function Production() {
 
     const [addForm, setAddForm] = useState({
         productionDate: "",
-        productId: "",
+        size: "",
         assetId: "",
         quantityProduced: "",
         morningCementBags: "",
@@ -97,6 +109,7 @@ function Production() {
 
     useEffect(() => {
         fetchProductions();
+        fetchProducts();
     }, []);
 
     // ============================================================
@@ -138,12 +151,80 @@ function Production() {
     };
 
     // ============================================================
+    // FETCH PRODUCT MASTER
+    // ============================================================
+
+    const fetchProducts = async () => {
+        try {
+            const result = await apiGet(
+                "/api/products"
+            );
+
+            const productList =
+                Array.isArray(result?.data)
+                    ? result.data
+                    : [];
+
+            setProducts(productList);
+        } catch (err) {
+            console.error(
+                "Error fetching products:",
+                err
+            );
+
+            setError(
+                err.message ||
+                    "Unable to load product master records."
+            );
+        }
+    };
+
+    // ============================================================
+    // SIZE OPTIONS
+    // ============================================================
+
+    const sizeOptions = useMemo(
+        () => [
+            {
+                size: "4-inch",
+                dimension: "8 × 4 × 16",
+                displayName:
+                    "4-inch Block — 8 × 4 × 16",
+            },
+            {
+                size: "6-inch",
+                dimension: "8 × 6 × 16",
+                displayName:
+                    "6-inch Block — 8 × 6 × 16",
+            },
+            {
+                size: "8-inch",
+                dimension: "8 × 8 × 16",
+                displayName:
+                    "8-inch Block — 8 × 8 × 16",
+            },
+            {
+                size: "1 foot",
+                dimension: "8 × 6 × 12",
+                displayName:
+                    "1 foot Block — 8 × 6 × 12",
+            },
+        ],
+        []
+    );
+
+    // ============================================================
     // FILTER + SEARCH
     // ============================================================
 
     const filteredProductions = useMemo(() => {
         const keyword =
             searchKeyword.toLowerCase().trim();
+
+        const selectedSize =
+            productionSizeFilter
+                .toLowerCase()
+                .trim();
 
         return productions.filter(
             (production) => {
@@ -198,6 +279,10 @@ function Production() {
                         keyword
                     );
 
+                const matchesSize =
+                    !selectedSize ||
+                    productSize === selectedSize;
+
                 const matchesFromDate =
                     !productionDateFrom ||
                     productionDate >=
@@ -210,6 +295,7 @@ function Production() {
 
                 return (
                     matchesSearch &&
+                    matchesSize &&
                     matchesFromDate &&
                     matchesToDate
                 );
@@ -218,9 +304,36 @@ function Production() {
     }, [
         productions,
         searchKeyword,
+        productionSizeFilter,
         productionDateFrom,
         productionDateTo,
     ]);
+
+    // ============================================================
+    // FILTERED TOTALS
+    // ============================================================
+
+    const totalQuantity = useMemo(() => {
+        return filteredProductions.reduce(
+            (total, production) =>
+                total +
+                Number(
+                    production.quantityProduced || 0
+                ),
+            0
+        );
+    }, [filteredProductions]);
+
+    const totalCementBags = useMemo(() => {
+        return filteredProductions.reduce(
+            (total, production) =>
+                total +
+                Number(
+                    production.totalCementBags || 0
+                ),
+            0
+        );
+    }, [filteredProductions]);
 
     // ============================================================
     // SORTING
@@ -298,6 +411,7 @@ function Production() {
 
     const handleClearFilters = () => {
         setSearchKeyword("");
+        setProductionSizeFilter("");
         setProductionDateFrom("");
         setProductionDateTo("");
         setDateFilterError("");
@@ -367,15 +481,20 @@ function Production() {
         }
 
         const datePart =
-            date.toLocaleDateString("en-GB");
+            date.toLocaleDateString(
+                "en-GB"
+            );
 
         const timePart =
-            date.toLocaleTimeString("en-IN", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true,
-            });
+            date.toLocaleTimeString(
+                "en-IN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                }
+            );
 
         return `${datePart} ${timePart}`;
     };
@@ -403,6 +522,664 @@ function Production() {
             }
         )}`;
     };
+
+    // ============================================================
+    // PDF HELPERS
+    // ============================================================
+
+    const formatPdfCurrency = (amount) =>
+        `INR ${Number(
+            amount || 0
+        ).toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }
+        )}`;
+
+    const safePdfText = (value) => {
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "-";
+        }
+
+        return String(value);
+    };
+
+    const drawPdfTitle = (
+        doc,
+        title,
+        subtitle
+    ) => {
+        const pageWidth =
+            doc.internal.pageSize.getWidth();
+
+        doc.setFontSize(18);
+        doc.setFont(undefined, "bold");
+
+        doc.text(
+            title,
+            pageWidth / 2,
+            22,
+            {
+                align: "center",
+            }
+        );
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, "normal");
+
+        doc.text(
+            subtitle,
+            pageWidth / 2,
+            30,
+            {
+                align: "center",
+            }
+        );
+
+        doc.line(
+            14,
+            35,
+            pageWidth - 14,
+            35
+        );
+    };
+
+    const drawPdfTableHeader = (
+        doc,
+        columns,
+        y
+    ) => {
+        let x = 14;
+
+        doc.setFontSize(8);
+        doc.setFont(undefined, "bold");
+
+        columns.forEach(
+            (column) => {
+                doc.text(
+                    column.label,
+                    x,
+                    y
+                );
+
+                x += column.width;
+            }
+        );
+
+        doc.line(
+            14,
+            y + 2,
+            196,
+            y + 2
+        );
+
+        doc.setFont(undefined, "normal");
+    };
+
+    // ============================================================
+    // DOWNLOAD PRODUCTION LIST PDF
+    // ============================================================
+
+    const handleDownloadProductionListPdf =
+        () => {
+            if (productionDateFrom && productionDateTo) {
+                if (
+                    productionDateFrom >
+                    productionDateTo
+                ) {
+                    setDateFilterError(
+                        "Production Date From cannot be later than Production Date To."
+                    );
+                    return;
+                }
+            }
+
+            const doc = new jsPDF(
+                "p",
+                "mm",
+                "a4"
+            );
+
+            const logoUrl =
+                "/assets/skcp-logo.png";
+
+            try {
+                doc.addImage(
+                    logoUrl,
+                    "PNG",
+                    14,
+                    10,
+                    22,
+                    22
+                );
+            } catch (error) {
+                console.warn(
+                    "Production PDF logo could not be loaded:",
+                    error
+                );
+            }
+
+            drawPdfTitle(
+                doc,
+                "SKCP Production List",
+                `Generated on ${new Date().toLocaleDateString(
+                    "en-GB"
+                )}`
+            );
+
+            let y = 45;
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, "normal");
+
+            if (productionSizeFilter) {
+                const selectedSize =
+                    sizeOptions.find(
+                        (option) =>
+                            option.size ===
+                            productionSizeFilter
+                    );
+
+                doc.text(
+                    `Size: ${selectedSize?.displayName || productionSizeFilter}`,
+                    14,
+                    y
+                );
+
+                y += 5;
+            }
+
+            if (productionDateFrom) {
+                doc.text(
+                    `From Date: ${formatDate(
+                        productionDateFrom
+                    )}`,
+                    14,
+                    y
+                );
+
+                y += 5;
+            }
+
+            if (productionDateTo) {
+                doc.text(
+                    `To Date: ${formatDate(
+                        productionDateTo
+                    )}`,
+                    14,
+                    y
+                );
+
+                y += 5;
+            }
+
+            if (searchKeyword) {
+                doc.text(
+                    `Search: ${searchKeyword}`,
+                    14,
+                    y
+                );
+
+                y += 5;
+            }
+
+            y += 5;
+
+            const columns = [
+                {
+                    label: "ID",
+                    width: 12,
+                },
+                {
+                    label: "DATE",
+                    width: 24,
+                },
+                {
+                    label: "PRODUCT",
+                    width: 36,
+                },
+                {
+                    label: "SIZE",
+                    width: 25,
+                },
+                {
+                    label: "QTY",
+                    width: 20,
+                },
+                {
+                    label: "CEMENT",
+                    width: 24,
+                },
+                {
+                    label: "ASSET",
+                    width: 30,
+                },
+                {
+                    label: "STATUS",
+                    width: 25,
+                },
+            ];
+
+            drawPdfTableHeader(
+                doc,
+                columns,
+                y
+            );
+
+            y += 8;
+
+            doc.setFontSize(7);
+
+            const records =
+                sortedRecords;
+
+            records.forEach(
+                (production) => {
+                    if (y > 280) {
+                        doc.addPage();
+
+                        y = 20;
+
+                        drawPdfTableHeader(
+                            doc,
+                            columns,
+                            y
+                        );
+
+                        y += 8;
+                    }
+
+                    let x = 14;
+
+                    const row = [
+                        safePdfText(
+                            production.productionId
+                        ),
+                        formatDate(
+                            production.productionDate
+                        ),
+                        safePdfText(
+                            production.productName
+                        ),
+                        safePdfText(
+                            production.productSize
+                        ),
+                        safePdfText(
+                            production.quantityProduced
+                        ),
+                        safePdfText(
+                            production.totalCementBags
+                        ),
+                        safePdfText(
+                            production.assetName
+                        ),
+                        safePdfText(
+                            production.status
+                        ),
+                    ];
+
+                    row.forEach(
+                        (
+                            value,
+                            index
+                        ) => {
+                            const column =
+                                columns[
+                                    index
+                                ];
+
+                            let text =
+                                String(
+                                    value
+                                );
+
+                            if (
+                                text.length >
+                                22
+                            ) {
+                                text =
+                                    text.substring(
+                                        0,
+                                        20
+                                    ) +
+                                    "...";
+                            }
+
+                            doc.text(
+                                text,
+                                x,
+                                y
+                            );
+
+                            x +=
+                                column.width;
+                        }
+                    );
+
+                    y += 7;
+                }
+            );
+
+            if (
+                records.length > 0
+            ) {
+                y += 3;
+
+                if (y > 275) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(8);
+                doc.setFont(
+                    undefined,
+                    "bold"
+                );
+
+                doc.line(
+                    14,
+                    y,
+                    196,
+                    y
+                );
+
+                y += 6;
+
+                doc.text(
+                    "TOTAL",
+                    14,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        totalQuantity
+                    ),
+                    106,
+                    y
+                );
+
+                doc.text(
+                    String(
+                        totalCementBags
+                    ),
+                    150,
+                    y
+                );
+
+                doc.setFont(
+                    undefined,
+                    "normal"
+                );
+            }
+
+            if (
+                records.length ===
+                0
+            ) {
+                doc.setFontSize(10);
+
+                doc.text(
+                    "No production records found.",
+                    14,
+                    y
+                );
+            }
+
+            const totalPdfPages =
+                doc.internal
+                    .getNumberOfPages();
+
+            for (
+                let page = 1;
+                page <= totalPdfPages;
+                page++
+            ) {
+                doc.setPage(page);
+
+                const pageWidth =
+                    doc.internal.pageSize.getWidth();
+
+                const pageHeight =
+                    doc.internal.pageSize.getHeight();
+
+                doc.setFontSize(8);
+
+                doc.text(
+                    `Page ${page} of ${totalPdfPages}`,
+                    pageWidth / 2,
+                    pageHeight - 10,
+                    {
+                        align: "center",
+                    }
+                );
+            }
+
+            const today =
+                new Date()
+                    .toLocaleDateString(
+                        "en-GB"
+                    )
+                    .replaceAll(
+                        "/",
+                        "-"
+                    );
+
+            const sizeSuffix =
+                productionSizeFilter
+                    ? `_${productionSizeFilter.replaceAll(
+                          " ",
+                          "-"
+                      )}`
+                    : "";
+
+            doc.save(
+                `SKCP_Production_List${sizeSuffix}_${today}.pdf`
+            );
+        };
+
+    // ============================================================
+    // DOWNLOAD INDIVIDUAL PRODUCTION PDF
+    // ============================================================
+
+    const handleDownloadProductionPdf =
+        (production) => {
+            if (!production) {
+                return;
+            }
+
+            const doc = new jsPDF(
+                "p",
+                "mm",
+                "a4"
+            );
+
+            const logoUrl =
+                "/assets/skcp-logo.png";
+
+            try {
+                doc.addImage(
+                    logoUrl,
+                    "PNG",
+                    14,
+                    10,
+                    22,
+                    22
+                );
+            } catch (error) {
+                console.warn(
+                    "Production PDF logo could not be loaded:",
+                    error
+                );
+            }
+
+            drawPdfTitle(
+                doc,
+                "SKCP Production Details",
+                "Production Information"
+            );
+
+            let y = 45;
+
+            const addPdfDetail = (
+                label,
+                value
+            ) => {
+                doc.setFontSize(10);
+
+                doc.setFont(
+                    undefined,
+                    "bold"
+                );
+
+                doc.text(
+                    `${label}:`,
+                    18,
+                    y
+                );
+
+                doc.setFont(
+                    undefined,
+                    "normal"
+                );
+
+                const wrapped =
+                    doc.splitTextToSize(
+                        safePdfText(
+                            value
+                        ),
+                        115
+                    );
+
+                doc.text(
+                    wrapped,
+                    65,
+                    y
+                );
+
+                y +=
+                    Math.max(
+                        8,
+                        wrapped.length *
+                            5
+                    );
+            };
+
+            addPdfDetail(
+                "Production ID",
+                production.productionId
+            );
+
+            addPdfDetail(
+                "Production Date",
+                formatDate(
+                    production.productionDate
+                )
+            );
+
+            addPdfDetail(
+                "Product",
+                production.productName
+            );
+
+            addPdfDetail(
+                "Size",
+                production.productSize
+            );
+
+            addPdfDetail(
+                "Quantity Produced",
+                production.quantityProduced
+            );
+
+            addPdfDetail(
+                "Morning Cement Bags",
+                production.morningCementBags
+            );
+
+            addPdfDetail(
+                "Afternoon Cement Bags",
+                production.afternoonCementBags
+            );
+
+            addPdfDetail(
+                "Total Cement Bags",
+                production.totalCementBags
+            );
+
+            addPdfDetail(
+                "Asset",
+                production.assetName
+            );
+
+            addPdfDetail(
+                "Asset ID",
+                production.assetId
+            );
+
+            addPdfDetail(
+                "Record Status",
+                production.status
+            );
+
+            addPdfDetail(
+                "Created At",
+                formatDateTime(
+                    production.createdAt
+                )
+            );
+
+            y += 3;
+
+            doc.setFontSize(10);
+            doc.setFont(
+                undefined,
+                "bold"
+            );
+
+            doc.text(
+                "Remarks:",
+                18,
+                y
+            );
+
+            doc.setFont(
+                undefined,
+                "normal"
+            );
+
+            const remarks =
+                doc.splitTextToSize(
+                    safePdfText(
+                        production.remarks
+                    ),
+                    155
+                );
+
+            doc.text(
+                remarks,
+                18,
+                y + 7
+            );
+
+            const invoiceDate =
+                production.productionDate
+                    ? production.productionDate.replaceAll(
+                          "-",
+                          ""
+                      )
+                    : "Production";
+
+            doc.save(
+                `SKCP_Production_${invoiceDate}_${production.productionId}.pdf`
+            );
+        };
 
     // ============================================================
     // VIEW PRODUCTION
@@ -449,7 +1226,7 @@ function Production() {
 
         setAddForm({
             productionDate: "",
-            productId: "",
+            size: "",
             assetId: "",
             quantityProduced: "",
             morningCementBags: "",
@@ -469,11 +1246,38 @@ function Production() {
         setAddError("");
     };
 
-    const handleAddChange = (event) => {
+    // ============================================================
+    // ADD FORM CHANGE
+    // ============================================================
+
+    const handleAddChange = (
+        event
+    ) => {
         const {
             name,
             value,
         } = event.target;
+
+        if (name === "size") {
+            const selectedSize =
+                sizeOptions.find(
+                    (option) =>
+                        option.size ===
+                        value
+                );
+
+            setAddForm(
+                (previous) => ({
+                    ...previous,
+                    size: value,
+                    remarks:
+                        selectedSize?.dimension ||
+                        "",
+                })
+            );
+
+            return;
+        }
 
         setAddForm(
             (previous) => ({
@@ -483,120 +1287,172 @@ function Production() {
         );
     };
 
-    const handleCreateProduction = async (
-        event
-    ) => {
-        event.preventDefault();
+    // ============================================================
+    // CREATE PRODUCTION
+    // ============================================================
 
-        if (!addForm.productionDate) {
-            setAddError(
-                "Please select a production date."
-            );
-            return;
-        }
+    const handleCreateProduction =
+        async (event) => {
+            event.preventDefault();
 
-        if (!addForm.productId) {
-            setAddError(
-                "Please enter a product ID."
-            );
-            return;
-        }
+            if (!addForm.productionDate) {
+                setAddError(
+                    "Please select a production date."
+                );
+                return;
+            }
 
-        if (!addForm.quantityProduced) {
-            setAddError(
-                "Please enter the quantity produced."
-            );
-            return;
-        }
+            if (!addForm.size) {
+                setAddError(
+                    "Please select a size."
+                );
+                return;
+            }
 
-        try {
-            setAddLoading(true);
-            setAddError("");
+            const selectedSize =
+                sizeOptions.find(
+                    (option) =>
+                        option.size ===
+                        addForm.size
+                );
 
-            const payload = {
-                productionDate:
-                    addForm.productionDate,
+            const selectedProduct =
+                products.find(
+                    (product) =>
+                        String(
+                            product.size ?? ""
+                        )
+                            .trim()
+                            .toLowerCase() ===
+                            String(
+                                addForm.size ?? ""
+                            )
+                                .trim()
+                                .toLowerCase() &&
+                        String(
+                            product.status ??
+                                "ACTIVE"
+                        )
+                            .trim()
+                            .toUpperCase() ===
+                            "ACTIVE"
+                );
 
-                productId:
-                    Number(
-                        addForm.productId
-                    ),
+            const productId =
+                selectedProduct?.productId;
 
-                assetId:
-                    addForm.assetId
-                        ? Number(
-                              addForm.assetId
-                          )
-                        : null,
+            if (!selectedSize) {
+                setAddError(
+                    "Please select a valid product size."
+                );
+                return;
+            }
 
-                quantityProduced:
-                    Number(
-                        addForm.quantityProduced
-                    ),
+            if (
+                !selectedProduct ||
+                !productId
+            ) {
+                setAddError(
+                    `Unable to determine the Product ID for size "${addForm.size}". Please check the Product Master.`
+                );
+                return;
+            }
 
-                morningCementBags:
-                    addForm.morningCementBags ===
-                    ""
-                        ? 0
-                        : Number(
-                              addForm.morningCementBags
-                          ),
+            if (!addForm.quantityProduced) {
+                setAddError(
+                    "Please enter the quantity produced."
+                );
+                return;
+            }
 
-                afternoonCementBags:
-                    addForm.afternoonCementBags ===
-                    ""
-                        ? 0
-                        : Number(
-                              addForm.afternoonCementBags
-                          ),
+            try {
+                setAddLoading(true);
+                setAddError("");
 
-                remarks:
-                    addForm.remarks.trim() ||
-                    null,
-            };
+                const payload = {
+                    productionDate:
+                        addForm.productionDate,
 
-            console.log(
-                "Creating production with payload:",
-                payload
-            );
+                    productId:
+                        Number(
+                            productId
+                        ),
 
-            const result = await apiPost(
-                "/api/productions",
-                payload
-            );
+                    assetId:
+                        addForm.assetId
+                            ? Number(
+                                  addForm.assetId
+                              )
+                            : null,
 
-            console.log(
-                "Production created:",
-                result
-            );
+                    quantityProduced:
+                        Number(
+                            addForm.quantityProduced
+                        ),
 
-            setShowAddModal(false);
+                    morningCementBags:
+                        addForm.morningCementBags ===
+                        ""
+                            ? 0
+                            : Number(
+                                  addForm.morningCementBags
+                              ),
 
-            setAddForm({
-                productionDate: "",
-                productId: "",
-                assetId: "",
-                quantityProduced: "",
-                morningCementBags: "",
-                afternoonCementBags: "",
-                remarks: "",
-            });
+                    afternoonCementBags:
+                        addForm.afternoonCementBags ===
+                        ""
+                            ? 0
+                            : Number(
+                                  addForm.afternoonCementBags
+                              ),
 
-            await fetchProductions();
-        } catch (err) {
-            console.error(
-                "Error creating production:",
-                err
-            );
+                    remarks:
+                        addForm.remarks.trim() ||
+                        null,
+                };
 
-            setAddError(
-                err.message ||
-                    "Unable to create production record."
-            );
-        } finally {
-            setAddLoading(false);
-        }
-    };
+                console.log(
+                    "Creating production with payload:",
+                    payload
+                );
+
+                const result = await apiPost(
+                    "/api/productions",
+                    payload
+                );
+
+                console.log(
+                    "Production created:",
+                    result
+                );
+
+                setShowAddModal(false);
+
+                setAddForm({
+                    productionDate: "",
+                    size: "",
+                    assetId: "",
+                    quantityProduced: "",
+                    morningCementBags: "",
+                    afternoonCementBags: "",
+                    remarks: "",
+                });
+
+                await fetchProductions();
+            } catch (err) {
+                console.error(
+                    "Error creating production:",
+                    err
+                );
+
+                setAddError(
+                    err.message ||
+                        "Unable to create production record."
+                );
+            } finally {
+                setAddLoading(false);
+            }
+        };
 
     // ============================================================
     // EDIT PRODUCTION
@@ -607,6 +1463,23 @@ function Production() {
     ) => {
         setEditError("");
 
+        const existingSize =
+            String(
+                production.productSize ||
+                    ""
+            )
+                .trim()
+                .toLowerCase();
+
+        const matchedSize =
+            sizeOptions.find(
+                (option) =>
+                    option.size
+                        .trim()
+                        .toLowerCase() ===
+                    existingSize
+            );
+
         setEditingProduction(
             production
         );
@@ -614,6 +1487,15 @@ function Production() {
         setEditForm({
             productionDate:
                 production.productionDate ||
+                "",
+
+            size:
+                matchedSize?.size ||
+                production.productSize ||
+                "",
+
+            assetId:
+                production.assetId ??
                 "",
 
             quantityProduced:
@@ -629,6 +1511,7 @@ function Production() {
                 "",
 
             remarks:
+                matchedSize?.dimension ||
                 production.remarks ||
                 "",
         });
@@ -646,6 +1529,10 @@ function Production() {
         setEditError("");
     };
 
+    // ============================================================
+    // EDIT FORM CHANGE
+    // ============================================================
+
     const handleEditChange = (
         event
     ) => {
@@ -653,6 +1540,38 @@ function Production() {
             name,
             value,
         } = event.target;
+
+        // --------------------------------------------------------
+        // SIZE CHANGE
+        // --------------------------------------------------------
+        // Same behavior as Add Production.
+        //
+        // Size changes:
+        // 1. Edit Size
+        // 2. Resolve Product ID from Product Master
+        // 3. Automatically update Remarks with dimensions
+        // --------------------------------------------------------
+
+        if (name === "size") {
+            const selectedSize =
+                sizeOptions.find(
+                    (option) =>
+                        option.size ===
+                        value
+                );
+
+            setEditForm(
+                (previous) => ({
+                    ...previous,
+                    size: value,
+                    remarks:
+                        selectedSize?.dimension ||
+                        "",
+                })
+            );
+
+            return;
+        }
 
         setEditForm(
             (previous) => ({
@@ -683,6 +1602,13 @@ function Production() {
                 return;
             }
 
+            if (!editForm.size) {
+                setEditError(
+                    "Please select a size."
+                );
+                return;
+            }
+
             if (
                 editForm.quantityProduced ===
                     "" ||
@@ -698,6 +1624,59 @@ function Production() {
                 return;
             }
 
+            // ----------------------------------------------------
+            // RESOLVE PRODUCT ID FROM PRODUCT MASTER
+            // ----------------------------------------------------
+
+            const selectedSize =
+                sizeOptions.find(
+                    (option) =>
+                        option.size ===
+                        editForm.size
+                );
+
+            const selectedProduct =
+                products.find(
+                    (product) =>
+                        String(
+                            product.size ?? ""
+                        )
+                            .trim()
+                            .toLowerCase() ===
+                            String(
+                                editForm.size ?? ""
+                            )
+                                .trim()
+                                .toLowerCase() &&
+                        String(
+                            product.status ??
+                                "ACTIVE"
+                        )
+                            .trim()
+                            .toUpperCase() ===
+                            "ACTIVE"
+                );
+
+            const productId =
+                selectedProduct?.productId;
+
+            if (!selectedSize) {
+                setEditError(
+                    "Please select a valid product size."
+                );
+                return;
+            }
+
+            if (
+                !selectedProduct ||
+                !productId
+            ) {
+                setEditError(
+                    `Unable to determine the Product ID for size "${editForm.size}". Please check the Product Master.`
+                );
+                return;
+            }
+
             try {
                 setEditLoading(true);
                 setEditError("");
@@ -708,13 +1687,13 @@ function Production() {
 
                     productId:
                         Number(
-                            editingProduction.productId
+                            productId
                         ),
 
                     assetId:
-                        editingProduction.assetId
+                        editForm.assetId
                             ? Number(
-                                  editingProduction.assetId
+                                  editForm.assetId
                               )
                             : null,
 
@@ -739,8 +1718,9 @@ function Production() {
                                   editForm.afternoonCementBags
                               ),
 
+                    // Remarks are controlled by Size.
                     remarks:
-                        editForm.remarks.trim() ||
+                        selectedSize.dimension ||
                         null,
                 };
 
@@ -763,6 +1743,16 @@ function Production() {
                 setEditingProduction(
                     null
                 );
+
+                setEditForm({
+                    productionDate: "",
+                    size: "",
+                    assetId: "",
+                    quantityProduced: "",
+                    morningCementBags: "",
+                    afternoonCementBags: "",
+                    remarks: "",
+                });
 
                 await fetchProductions();
             } catch (err) {
@@ -788,6 +1778,7 @@ function Production() {
         production
     ) => {
         setDeleteError("");
+
         setDeletingProduction(
             production
         );
@@ -859,6 +1850,7 @@ function Production() {
             <div className="page">
                 <section className="card">
                     <h2>Production</h2>
+
                     <p>
                         Loading production records...
                     </p>
@@ -877,7 +1869,8 @@ function Production() {
                 <div
                     style={{
                         display: "flex",
-                        justifyContent: "space-between",
+                        justifyContent:
+                            "space-between",
                         alignItems: "center",
                         gap: "16px",
                         flexWrap: "wrap",
@@ -902,10 +1895,15 @@ function Production() {
                     </button>
                 </div>
 
+                {/* ==================================================
+                    SEARCH / FILTER AREA
+                ================================================== */}
+
                 <div
                     style={{
                         display: "flex",
-                        alignItems: "flex-end",
+                        alignItems:
+                            "flex-end",
                         gap: "16px",
                         flexWrap: "wrap",
                         marginTop: "16px",
@@ -914,7 +1912,8 @@ function Production() {
                     <div
                         className="fld production-search"
                         style={{
-                            flex: "2 1 320px",
+                            flex:
+                                "2 1 320px",
                         }}
                     >
                         <label htmlFor="production-search">
@@ -943,7 +1942,59 @@ function Production() {
                     <div
                         className="fld"
                         style={{
-                            flex: "1 1 180px",
+                            flex:
+                                "1.5 1 240px",
+                        }}
+                    >
+                        <label htmlFor="production-size-filter">
+                            Search by Size
+                        </label>
+
+                        <select
+                            id="production-size-filter"
+                            value={
+                                productionSizeFilter
+                            }
+                            onChange={(
+                                event
+                            ) =>
+                                setProductionSizeFilter(
+                                    event
+                                        .target
+                                        .value
+                                )
+                            }
+                        >
+                            <option value="">
+                                All Sizes
+                            </option>
+
+                            {sizeOptions.map(
+                                (
+                                    option
+                                ) => (
+                                    <option
+                                        key={
+                                            option.size
+                                        }
+                                        value={
+                                            option.size
+                                        }
+                                    >
+                                        {
+                                            option.displayName
+                                        }
+                                    </option>
+                                )
+                            )}
+                        </select>
+                    </div>
+
+                    <div
+                        className="fld"
+                        style={{
+                            flex:
+                                "1 1 180px",
                         }}
                     >
                         <label htmlFor="production-date-from">
@@ -965,7 +2016,8 @@ function Production() {
                     <div
                         className="fld"
                         style={{
-                            flex: "1 1 180px",
+                            flex:
+                                "1 1 180px",
                         }}
                     >
                         <label htmlFor="production-date-to">
@@ -992,11 +2044,22 @@ function Production() {
                         }
                         disabled={
                             !searchKeyword &&
+                            !productionSizeFilter &&
                             !productionDateFrom &&
                             !productionDateTo
                         }
                     >
                         Clear
+                    </button>
+
+                    <button
+                        type="button"
+                        className="action-btn view-btn"
+                        onClick={
+                            handleDownloadProductionListPdf
+                        }
+                    >
+                        Download PDF
                     </button>
                 </div>
 
@@ -1011,6 +2074,10 @@ function Production() {
                     </div>
                 )}
             </section>
+
+            {/* ====================================================
+                PRODUCTION LIST
+            ==================================================== */}
 
             <section className="card">
                 <h2>Production List</h2>
@@ -1253,7 +2320,14 @@ function Production() {
                                                 </td>
 
                                                 <td>
-                                                    <div className="action-buttons">
+                                                    <div
+                                                        className="action-buttons"
+                                                        style={{
+                                                            display:
+                                                                "flex",
+                                                            gap: "6px",
+                                                        }}
+                                                    >
                                                         <button
                                                             type="button"
                                                             className="action-btn view-btn"
@@ -1278,23 +2352,66 @@ function Production() {
                                                             Edit
                                                         </button>
 
-                                                        <button
-                                                            type="button"
-                                                            className="action-btn delete-btn"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    production
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                        {production.status !==
+                                                            "CANCELLED" && (
+                                                            <button
+                                                                type="button"
+                                                                className="action-btn delete-btn"
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        production
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
                                         )
                                     )}
                                 </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                        <td
+                                            colSpan="4"
+                                            style={{
+                                                textAlign:
+                                                    "right",
+                                                fontWeight:
+                                                    "bold",
+                                            }}
+                                        >
+                                            Total
+                                        </td>
+
+                                        <td
+                                            style={{
+                                                fontWeight:
+                                                    "bold",
+                                            }}
+                                        >
+                                            {totalQuantity}
+                                        </td>
+
+                                        <td
+                                            style={{
+                                                fontWeight:
+                                                    "bold",
+                                            }}
+                                        >
+                                            {
+                                                totalCementBags
+                                            }
+                                        </td>
+
+                                        <td
+                                            colSpan="3"
+                                        ></td>
+                                    </tr>
+                                </tfoot>
                             </table>
 
                             <Pagination
@@ -1336,15 +2453,38 @@ function Production() {
                 subtitle="View production information"
                 size="lg"
                 footer={
-                    <button
-                        type="button"
-                        className="btn"
-                        onClick={
-                            closeViewModal
-                        }
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent:
+                                "flex-end",
+                            alignItems:
+                                "center",
+                            gap: "8px",
+                        }}
                     >
-                        Close
-                    </button>
+                        <button
+                            type="button"
+                            className="action-btn view-btn"
+                            onClick={() =>
+                                handleDownloadProductionPdf(
+                                    selectedProduction
+                                )
+                            }
+                        >
+                            Download PDF
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn"
+                            onClick={
+                                closeViewModal
+                            }
+                        >
+                            Close
+                        </button>
+                    </div>
                 }
             >
                 {selectedProduction && (
@@ -1371,16 +2511,9 @@ function Production() {
                         />
 
                         <DetailItem
-                            label="Product Size"
+                            label="Size"
                             value={
                                 selectedProduction.productSize
-                            }
-                        />
-
-                        <DetailItem
-                            label="Product ID"
-                            value={
-                                selectedProduction.productId
                             }
                         />
 
@@ -1464,7 +2597,7 @@ function Production() {
                     closeAddModal
                 }
                 title="Add Production"
-                subtitle="Record new production information"
+                subtitle="Daily production information at the End of the day"
                 onSubmit={
                     handleCreateProduction
                 }
@@ -1503,24 +2636,44 @@ function Production() {
                     </div>
 
                     <div className="fld">
-                        <label htmlFor="add-product-id">
-                            Product ID
+                        <label htmlFor="add-production-size">
+                            Size
                         </label>
 
-                        <input
-                            id="add-product-id"
-                            type="number"
-                            name="productId"
-                            min="1"
+                        <select
+                            id="add-production-size"
+                            name="size"
                             value={
-                                addForm.productId
+                                addForm.size
                             }
                             onChange={
                                 handleAddChange
                             }
-                            placeholder="Enter product ID"
                             required
-                        />
+                        >
+                            <option value="">
+                                Select size
+                            </option>
+
+                            {sizeOptions.map(
+                                (
+                                    option
+                                ) => (
+                                    <option
+                                        key={
+                                            option.size
+                                        }
+                                        value={
+                                            option.size
+                                        }
+                                    >
+                                        {
+                                            option.displayName
+                                        }
+                                    </option>
+                                )
+                            )}
+                        </select>
                     </div>
 
                     <div className="fld">
@@ -1661,6 +2814,10 @@ function Production() {
                         </div>
 
                         <div className="form-grid">
+                            {/* ------------------------------------
+                                PRODUCTION ID
+                            ------------------------------------ */}
+
                             <div className="fld">
                                 <label htmlFor="edit-production-id">
                                     Production ID
@@ -1676,21 +2833,9 @@ function Production() {
                                 />
                             </div>
 
-                            <div className="fld">
-                                <label htmlFor="edit-production-product">
-                                    Product
-                                </label>
-
-                                <input
-                                    id="edit-production-product"
-                                    type="text"
-                                    value={
-                                        editingProduction.productName ||
-                                        ""
-                                    }
-                                    disabled
-                                />
-                            </div>
+                            {/* ------------------------------------
+                                PRODUCTION DATE
+                            ------------------------------------ */}
 
                             <div className="fld">
                                 <label htmlFor="edit-production-date">
@@ -1711,6 +2856,79 @@ function Production() {
                                 />
                             </div>
 
+                            {/* ------------------------------------
+                                SIZE
+                            ------------------------------------ */}
+
+                            <div className="fld">
+                                <label htmlFor="edit-production-size">
+                                    Size
+                                </label>
+
+                                <select
+                                    id="edit-production-size"
+                                    name="size"
+                                    value={
+                                        editForm.size
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    required
+                                >
+                                    <option value="">
+                                        Select size
+                                    </option>
+
+                                    {sizeOptions.map(
+                                        (
+                                            option
+                                        ) => (
+                                            <option
+                                                key={
+                                                    option.size
+                                                }
+                                                value={
+                                                    option.size
+                                                }
+                                            >
+                                                {
+                                                    option.displayName
+                                                }
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+
+                            {/* ------------------------------------
+                                ASSET ID
+                            ------------------------------------ */}
+
+                            <div className="fld">
+                                <label htmlFor="edit-asset-id">
+                                    Asset ID
+                                </label>
+
+                                <input
+                                    id="edit-asset-id"
+                                    type="number"
+                                    name="assetId"
+                                    min="1"
+                                    value={
+                                        editForm.assetId
+                                    }
+                                    onChange={
+                                        handleEditChange
+                                    }
+                                    placeholder="Enter asset ID"
+                                />
+                            </div>
+
+                            {/* ------------------------------------
+                                QUANTITY PRODUCED
+                            ------------------------------------ */}
+
                             <div className="fld">
                                 <label htmlFor="edit-quantity-produced">
                                     Quantity Produced
@@ -1728,9 +2946,14 @@ function Production() {
                                     onChange={
                                         handleEditChange
                                     }
+                                    placeholder="Enter quantity"
                                     required
                                 />
                             </div>
+
+                            {/* ------------------------------------
+                                MORNING CEMENT BAGS
+                            ------------------------------------ */}
 
                             <div className="fld">
                                 <label htmlFor="edit-morning-cement-bags">
@@ -1749,8 +2972,13 @@ function Production() {
                                     onChange={
                                         handleEditChange
                                     }
+                                    placeholder="Enter morning bags"
                                 />
                             </div>
+
+                            {/* ------------------------------------
+                                AFTERNOON CEMENT BAGS
+                            ------------------------------------ */}
 
                             <div className="fld">
                                 <label htmlFor="edit-afternoon-cement-bags">
@@ -1769,8 +2997,13 @@ function Production() {
                                     onChange={
                                         handleEditChange
                                     }
+                                    placeholder="Enter afternoon bags"
                                 />
                             </div>
+
+                            {/* ------------------------------------
+                                TOTAL CEMENT BAGS
+                            ------------------------------------ */}
 
                             <div className="fld">
                                 <label htmlFor="edit-total-cement-bags">
@@ -1794,21 +3027,9 @@ function Production() {
                                 />
                             </div>
 
-                            <div className="fld">
-                                <label htmlFor="edit-production-asset">
-                                    Asset
-                                </label>
-
-                                <input
-                                    id="edit-production-asset"
-                                    type="text"
-                                    value={
-                                        editingProduction.assetName ||
-                                        ""
-                                    }
-                                    disabled
-                                />
-                            </div>
+                            {/* ------------------------------------
+                                REMARKS
+                            ------------------------------------ */}
 
                             <div className="fld f-full">
                                 <label htmlFor="edit-production-remarks">
@@ -1822,10 +3043,7 @@ function Production() {
                                     value={
                                         editForm.remarks
                                     }
-                                    onChange={
-                                        handleEditChange
-                                    }
-                                    placeholder="Enter remarks"
+                                    readOnly
                                 />
                             </div>
                         </div>

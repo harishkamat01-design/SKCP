@@ -25,6 +25,7 @@ public class ProductMapper {
         product.setWidth(request.getWidth());
         product.setHeight(request.getHeight());
         product.setUnit(request.getUnit());
+        product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
 
         return product;
@@ -46,6 +47,7 @@ public class ProductMapper {
         product.setWidth(request.getWidth());
         product.setHeight(request.getHeight());
         product.setUnit(request.getUnit());
+        product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
         product.setStatus(request.getStatus());
     }
@@ -67,6 +69,7 @@ public class ProductMapper {
         response.setWidth(product.getWidth());
         response.setHeight(product.getHeight());
         response.setUnit(product.getUnit());
+        response.setPrice(product.getPrice());
         response.setDescription(product.getDescription());
         response.setStatus(product.getStatus());
         response.setCreatedAt(product.getCreatedAt());
@@ -87,6 +90,7 @@ public class ProductMapper {
         response.setProductCode(product.getProductCode());
         response.setProductName(product.getProductName());
         response.setSize(product.getSize());
+        response.setPrice(product.getPrice());
         response.setStatus(product.getStatus());
 
         return response;

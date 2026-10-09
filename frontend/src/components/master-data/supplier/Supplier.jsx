@@ -320,7 +320,8 @@ function Supplier() {
         }));
     };
 
-    const handleAddSubmit = async () => {
+    const handleAddSubmit = async (event) => {
+    event.preventDefault();
         try {
             setAddSaving(true);
             setAddError("");
@@ -346,6 +347,9 @@ function Supplier() {
                 gstNumber: "",
                 remarks: "",
             });
+
+
+
         } catch (err) {
             console.error(
                 "Error adding supplier:",
@@ -507,7 +511,7 @@ function Supplier() {
 
                         <input
                             type="text"
-                            placeholder="Search by supplier, phone, contact person, GST, remarks, status..."
+                            placeholder="Search by supplier, phone, contact person name, GST, remarks, status..."
                             value={searchKeyword}
                             onChange={(event) =>
                                 setSearchKeyword(event.target.value)
@@ -700,7 +704,13 @@ function Supplier() {
                                             </td>
 
                                             <td>
-                                                <div className="action-buttons">
+                                                <div
+                                                        className="action-buttons"
+                                                        style={{
+                                                            display: "flex",
+                                                            gap: "6px",
+                                                        }}
+                                                    >
                                                     <button
                                                         type="button"
                                                         className="action-btn view-btn"
@@ -725,6 +735,7 @@ function Supplier() {
                                                         Edit
                                                     </button>
 
+                                                    {supplier.status === "ACTIVE" && (
                                                     <button
                                                         type="button"
                                                         className="action-btn delete-btn"
@@ -736,6 +747,7 @@ function Supplier() {
                                                     >
                                                         Delete
                                                     </button>
+                                                )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -804,9 +816,9 @@ function Supplier() {
                             />
 
                             <DetailItem
-                                label="Contact Person"
+                                label="Contact Person Name"
                                 value={
-                                    selectedSupplier.contactPerson
+                                    selectedSupplier.contactPersonName
                                 }
                             />
 
@@ -913,7 +925,7 @@ function Supplier() {
                         <div className="form-grid">
                             <div className="fld">
                                 <label>
-                                    Supplier Name
+                                     Supplier Name <span className="required">*</span>
                                 </label>
 
                                 <input
@@ -930,14 +942,14 @@ function Supplier() {
 
                             <div className="fld">
                                 <label>
-                                    Contact Person
+                                    Contact Person Name
                                 </label>
 
                                 <input
                                     type="text"
-                                    name="contactPerson"
+                                    name="contactPersonName"
                                     value={
-                                        editForm.contactPerson
+                                        editForm.contactPersonName
                                     }
                                     onChange={
                                         handleEditChange
@@ -947,7 +959,7 @@ function Supplier() {
 
                             <div className="fld">
                                 <label>
-                                    Phone
+                                    Phone <span className="required">*</span>
                                 </label>
 
                                 <input
@@ -959,6 +971,7 @@ function Supplier() {
                                     onChange={
                                         handleEditChange
                                     }
+                                    maxLength={10}
                                 />
                             </div>
 
@@ -976,6 +989,7 @@ function Supplier() {
                                     onChange={
                                         handleEditChange
                                     }
+                                    maxLength={10}
                                 />
                             </div>
 
@@ -1068,7 +1082,7 @@ function Supplier() {
                 <div className="form-grid">
                     <div className="fld">
                         <label>
-                            Supplier Name
+                            Supplier Name <span className="required">*</span>
                         </label>
 
                         <input
@@ -1080,19 +1094,20 @@ function Supplier() {
                             onChange={
                                 handleAddChange
                             }
+                            required
                         />
                     </div>
 
                     <div className="fld">
                         <label>
-                            Contact Person
+                            Contact Person Name
                         </label>
 
                         <input
                             type="text"
-                            name="contactPerson"
+                            name="contactPersonName"
                             value={
-                                addForm.contactPerson
+                                addForm.contactPersonName
                             }
                             onChange={
                                 handleAddChange
@@ -1102,16 +1117,16 @@ function Supplier() {
 
                     <div className="fld">
                         <label>
-                            Phone
+                            Phone <span className="required">*</span>
                         </label>
 
                         <input
                             type="text"
                             name="phone"
                             value={addForm.phone}
-                            onChange={
-                                handleAddChange
-                            }
+                            onChange={handleAddChange}
+                            required
+                            maxLength={10}
                         />
                     </div>
 
@@ -1129,6 +1144,7 @@ function Supplier() {
                             onChange={
                                 handleAddChange
                             }
+                            maxLength={10}
                         />
                     </div>
 

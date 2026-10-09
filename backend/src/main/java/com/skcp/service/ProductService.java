@@ -1,4 +1,6 @@
 package com.skcp.service;
+
+import com.skcp.exception.DuplicateResourceException;
 import com.skcp.exception.ResourceNotFoundException;
 import com.skcp.dto.request.product.ProductCreateRequest;
 import com.skcp.dto.request.product.ProductUpdateRequest;
@@ -24,12 +26,11 @@ public class ProductService {
 
     public ProductService(
             ProductRepository productRepository,
-            ProductMapper     productMapper) 
-            {
+            ProductMapper productMapper) {
 
-            this.productRepository = productRepository;
-            this.productMapper = productMapper;
-             }
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+    }
 
 
     // ============================================================
@@ -37,23 +38,33 @@ public class ProductService {
     // ============================================================
 
     public ProductResponse createProduct(
-            ProductCreateRequest request) 
-            {
+            ProductCreateRequest request) {
 
-            Product product = productMapper.toEntity(request);
+        // --------------------------------------------------------
+        // DUPLICATE PRODUCT CODE CHECK
+        // --------------------------------------------------------
 
-            Product savedProduct = productRepository.save(product);
+        if (productRepository.existsByProductCode(
+                request.getProductCode())) {
 
-            return productMapper.toResponse(savedProduct);
-            }
+            throw new DuplicateResourceException(
+                    "Product Code already exists. Please enter a different Product Code."
+            );
+        }
+
+        Product product = productMapper.toEntity(request);
+
+        Product savedProduct = productRepository.save(product);
+
+        return productMapper.toResponse(savedProduct);
+    }
 
 
     // ============================================================
     // GET ALL PRODUCTS
     // ============================================================
 
-    public List<ProductSummaryResponse> getAllProducts() 
-    {
+    public List<ProductSummaryResponse> getAllProducts() {
 
         List<Product> products = productRepository.findAll();
 
@@ -68,17 +79,16 @@ public class ProductService {
     // ============================================================
 
     public ProductResponse getProductById(
-            Integer productId) 
-            {
+            Integer productId) {
 
-                Product product = productRepository.findById(productId)
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Product not found with id: "
-                        + productId));
+                        new ResourceNotFoundException(
+                                "Product not found with id: "
+                                        + productId));
 
-            return productMapper.toResponse(product);
-            }
+        return productMapper.toResponse(product);
+    }
 
 
     // ============================================================
@@ -87,43 +97,53 @@ public class ProductService {
 
     public ProductResponse updateProduct(
             Integer productId,
-            ProductUpdateRequest request) 
-            {
+            ProductUpdateRequest request) {
 
-                Product product = productRepository.findById(productId)
-                        .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Product not found with id: "
-                        + productId));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id: "
+                                        + productId));
 
-                productMapper.updateEntity(request, product);
+        // --------------------------------------------------------
+        // DUPLICATE PRODUCT CODE CHECK
+        // --------------------------------------------------------
 
-                Product updatedProduct =
-                        productRepository.save(product);
+        if (productRepository.existsByProductCodeAndProductIdNot(
+                request.getProductCode(),
+                productId)) {
 
-                return productMapper.toResponse(updatedProduct);
-           }
+            throw new DuplicateResourceException(
+                    "Product Code already exists. Please enter a different Product Code."
+            );
+        }
+
+        productMapper.updateEntity(request, product);
+
+        Product updatedProduct =
+                productRepository.save(product);
+
+        return productMapper.toResponse(updatedProduct);
+    }
 
 
-        // ============================================================
-        // DELETE / INACTIVATE PRODUCT (SOFT DELETE)
-        // ============================================================
+    // ============================================================
+    // DELETE / INACTIVATE PRODUCT (SOFT DELETE)
+    // ============================================================
 
-        public void deleteProduct(Integer productId) {
+    public void deleteProduct(Integer productId) {
 
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() ->
-        new ResourceNotFoundException(
-                "Product not found with id: "
-                        + productId));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id: "
+                                        + productId));
 
-            product.setStatus("INACTIVE");
+        product.setStatus("INACTIVE");
 
-            productRepository.save(product);
-            }
+        productRepository.save(product);
+    }
 }
-
-
 
 
 /*

@@ -29,6 +29,10 @@ public class AttendanceMapper
                 request.getAttendanceStatus()
         );
 
+        attendance.setDayType(
+                request.getDayType()
+        );
+
         attendance.setLeaveReason(
                 request.getLeaveReason()
         );
@@ -67,7 +71,9 @@ public class AttendanceMapper
         attendance.setAttendanceStatus(
                 request.getAttendanceStatus()
         );
-
+        attendance.setDayType(
+                request.getDayType()
+        );
         attendance.setLeaveReason(
                 request.getLeaveReason()
         );
@@ -110,7 +116,9 @@ public class AttendanceMapper
         response.setAttendanceStatus(
                 attendance.getAttendanceStatus()
         );
-
+        response.setDayType(
+                attendance.getDayType()
+        );
         response.setLeaveReason(
                 attendance.getLeaveReason()
         );
@@ -238,7 +246,7 @@ public class AttendanceMapper
          */
 
 
-/* 
+/*
 
         attendance.setAttendanceDate(
                 request.getAttendanceDate()
@@ -262,7 +270,7 @@ public class AttendanceMapper
          *
          * Service recalculates them.
          */
-    
+
 
 
     // ============================================================

@@ -93,6 +93,7 @@ public class LabourMapper
         response.setLabourId(labour.getLabourId());
         response.setLabourName(labour.getLabourName());
         response.setPhone(labour.getPhone());
+        response.setDailyRate(labour.getDailyRate());
         response.setSkillType(labour.getSkillType());
         response.setStatus(labour.getStatus());
 

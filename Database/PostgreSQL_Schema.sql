@@ -13,10 +13,10 @@ ENCODING = 'UTF8'
 TEMPLATE = template0;
 
 -- Connect to the database
---\c skcp_db;  
+--\c skcp_db;
 
 /******************
- \c skcp_db;  
+ \c skcp_db;
 This works only inside psql (SQL Shell).
 It does NOT work in
 pgAdmin Query Tool
@@ -40,7 +40,7 @@ SET search_path TO skcp;
 -- Purpose: Stores customer master information
 -- ==========================================================
 
-CREATE TABLE customer 
+CREATE TABLE customer
 (
     customer_id SERIAL PRIMARY KEY,
     customer_name VARCHAR(100) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE customer
 
 -- ==========================================================
 -- Table : supplier
--- Domain: Master Data 
+-- Domain: Master Data
 -- Purpose: Stores supplier master information
 -- ==========================================================
 
@@ -75,7 +75,7 @@ CREATE TABLE supplier
     address TEXT,
     gst_number VARCHAR(30),
     remarks VARCHAR(500),
-    
+
     status VARCHAR(10)
         NOT NULL
         DEFAULT 'ACTIVE'
@@ -118,6 +118,9 @@ CREATE TABLE product
     unit VARCHAR(20)
         NOT NULL
         DEFAULT 'INCH',
+    price DECIMAL(10,2)
+        NOT NULL
+        CHECK (price >= 0),
 
     description TEXT,
 
@@ -381,6 +384,11 @@ CREATE TABLE attendance
         NOT NULL
         CHECK (attendance_status IN ('PRESENT', 'ABSENT', 'HOLIDAY')),
 
+    day_type VARCHAR(20)
+        NOT NULL
+        DEFAULT 'FULL_DAY'
+        CHECK (day_type IN ('FULL_DAY', 'HALF_DAY')),
+
     leave_reason VARCHAR(100),
 
     daily_rate DECIMAL(10,2) NOT NULL,
@@ -480,7 +488,7 @@ CREATE TABLE curing_stock
     -- Date production was completed
     production_date DATE NOT NULL,
 
-    -- Automatically calculated in Spring Boot not by PostgreSQL in this case as it is Business Logic and 
+    -- Automatically calculated in Spring Boot not by PostgreSQL in this case as it is Business Logic and
     -- we can chage the days from 3 to 5 days from Servie Layer
     -- expected_ready_date = production_date + 3 days
     expected_ready_date DATE NOT NULL,
@@ -576,7 +584,7 @@ CREATE TABLE orders
             'COMPLETED',
             'CANCELLED'
         )),
-    
+
     record_status VARCHAR(10)
     NOT NULL
     DEFAULT 'ACTIVE'
@@ -808,7 +816,7 @@ CREATE TABLE payment
 -- ==========================================================
 -- Table : payment_allocation
 -- Domain: Finance
--- Purpose: Stores payment allocation against customer orders   
+-- Purpose: Stores payment allocation against customer orders
 -- ==========================================================
 
 CREATE TABLE payment_allocation
