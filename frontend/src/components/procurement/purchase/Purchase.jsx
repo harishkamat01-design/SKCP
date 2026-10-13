@@ -7,7 +7,7 @@ import {
     apiPut,
     apiDelete,
 } from "../../../services/api";
-
+import "./Purchase.css";
 import ViewModal from "../../ui/common/ViewModal";
 import FormModal from "../../ui/common/FormModal";
 import DeleteConfirmModal from "../../ui/common/DeleteConfirmModal";
@@ -2283,7 +2283,7 @@ function Purchase() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page purchase-page">
                 <section className="card">
                     <h2>
                         Purchases
@@ -2303,7 +2303,7 @@ function Purchase() {
        ============================================================ */
 
     return (
-        <div className="page">
+        <div className="page purchase-page">
             <section className="card">
                 <div
                     style={{
@@ -2799,7 +2799,7 @@ function Purchase() {
             {/* =====================================================
                 VIEW PURCHASE
                 ===================================================== */}
-
+<div className="purchase-modal-theme">
             <ViewModal
                 isOpen={
                     viewLoading ||
@@ -3062,12 +3062,15 @@ function Purchase() {
                         </DetailGrid>
                     </>
                 )}
-            </ViewModal>
+              </ViewModal>
+</div>
+
+            
 
             {/* =====================================================
                 EDIT PURCHASE
                 ===================================================== */}
-
+            <div className="purchase-modal-theme">
             <FormModal
                 isOpen={
                     editLoading ||
@@ -3479,11 +3482,11 @@ function Purchase() {
                     </>
                 ) : null}
             </FormModal>
-
+</div>
             {/* =====================================================
                 ADD PURCHASE
                 ===================================================== */}
-
+<div className="purchase-modal-theme">
             <FormModal
                 isOpen={
                     showAddPurchaseModal
@@ -3883,11 +3886,11 @@ function Purchase() {
                     Add Item
                 </button>
             </FormModal>
-
+</div>
             {/* =====================================================
                 DELETE
                 ===================================================== */}
-
+<div className="purchase-modal-theme">
             <DeleteConfirmModal
                 isOpen={Boolean(
                     deleteTarget
@@ -3916,6 +3919,7 @@ function Purchase() {
                     deleteError
                 }
             />
+            </div>
         </div>
     );
 }

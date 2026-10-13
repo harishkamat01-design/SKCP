@@ -15,7 +15,7 @@ import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../ui/Pagination";
 
 import AddCustomerModal from "./AddCustomerModal";
-
+import "./Customer.css";
 const initialForm = {
     customerName: "",
     mobileNumber: "",
@@ -672,7 +672,7 @@ function Customer() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page customer-page">
                 <section className="card">
                     <h2>Customers</h2>
 
@@ -689,7 +689,7 @@ function Customer() {
     // ============================================================
 
     return (
-        <div className="page">
+        <div className="page customer-page">
 
             {/* ==================================================
                 HEADER + SEARCH + FILTERS

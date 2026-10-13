@@ -1,0 +1,674 @@
+
+/* =========================================================
+   SKCP — DELIVERY MODULE
+   Blue theme based on RawMaterialStock.css
+   Supports light mode, dark mode and responsive layouts
+   ========================================================= */
+
+/* -------------------------
+   Light Theme
+   ------------------------- */
+
+.deliveries-page {
+    --delivery-accent: #3974c6;
+    --delivery-accent-hover: #2f63ab;
+    --delivery-accent-soft: #dceaff;
+
+    --delivery-text: #263247;
+    --delivery-muted: #68747c;
+
+    --delivery-card: #edf5ff;
+    --delivery-card-border: #cbdff8;
+
+    --delivery-table-header: #dceaff;
+    --delivery-table-hover: #e8f1ff;
+    --delivery-table-border: #d5e2f2;
+
+    --delivery-input-bg: #ffffff;
+    --delivery-input-border: #cbd5e1;
+    --delivery-input-text: #263247;
+
+    --delivery-success: #18794e;
+    --delivery-success-bg: #dcfce7;
+
+    --delivery-warning: #92400e;
+    --delivery-warning-bg: #fef3c7;
+
+    --delivery-danger: #b42318;
+    --delivery-danger-bg: #fee4e2;
+
+    --delivery-button-secondary-bg: #ffffff;
+    --delivery-button-secondary-border: #cbd5e1;
+
+    color: var(--delivery-text);
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.deliveries-page *,
+.deliveries-page *::before,
+.deliveries-page *::after {
+    box-sizing: border-box;
+}
+
+/* -------------------------
+   Main Page and Cards
+   ------------------------- */
+
+.deliveries-page .card {
+    background: var(--delivery-card);
+    border: 1px solid var(--delivery-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
+    min-width: 0;
+    box-shadow: 0 2px 6px rgb(38 50 71 / 5%);
+}
+
+.deliveries-page h2 {
+    color: var(--delivery-text);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.deliveries-page p {
+    color: var(--delivery-muted);
+    line-height: 1.5;
+}
+
+.deliveries-page h3,
+.deliveries-page h4 {
+    color: var(--delivery-text);
+}
+
+.deliveries-page small {
+    color: var(--delivery-muted);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+/* -------------------------
+   Form Fields
+   ------------------------- */
+
+.deliveries-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.deliveries-page .fld label,
+.deliveries-page label {
+    color: var(--delivery-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.deliveries-page input,
+.deliveries-page select,
+.deliveries-page textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--delivery-input-border);
+    border-radius: 7px;
+    background: var(--delivery-input-bg);
+    color: var(--delivery-input-text);
+    font: inherit;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.deliveries-page textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.deliveries-page input:focus,
+.deliveries-page select:focus,
+.deliveries-page textarea:focus {
+    outline: none;
+    border-color: var(--delivery-accent);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 15%);
+}
+
+.deliveries-page input:disabled,
+.deliveries-page select:disabled,
+.deliveries-page textarea:disabled {
+    background: rgb(128 128 128 / 8%);
+    color: var(--delivery-muted);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.deliveries-page input::placeholder,
+.deliveries-page textarea::placeholder {
+    color: var(--delivery-muted);
+    opacity: 0.8;
+}
+
+/* -------------------------
+   Search and Filters
+   ------------------------- */
+
+.deliveries-page .production-search {
+    width: 100%;
+    max-width: 360px;
+    min-width: 180px;
+}
+
+.deliveries-page .production-search input {
+    width: 100%;
+}
+
+.deliveries-page .fld input[type="date"] {
+    min-width: 0;
+}
+
+.deliveries-page .fld input[type="checkbox"] {
+    width: auto;
+    accent-color: var(--delivery-accent);
+}
+
+.deliveries-page .form-error {
+    color: var(--delivery-danger);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* -------------------------
+   Buttons
+   ------------------------- */
+
+.deliveries-page .btn,
+.deliveries-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.deliveries-page .btn {
+    background: var(--delivery-accent);
+    border-color: var(--delivery-accent);
+    color: #ffffff;
+}
+
+.deliveries-page .btn:hover:not(:disabled) {
+    background: var(--delivery-accent-hover);
+    border-color: var(--delivery-accent-hover);
+}
+
+.deliveries-page .btn.secondary {
+    background: var(--delivery-button-secondary-bg);
+    color: var(--delivery-text);
+    border-color: var(--delivery-button-secondary-border);
+}
+
+.deliveries-page .btn.secondary:hover:not(:disabled) {
+    background: var(--delivery-accent-soft);
+    border-color: var(--delivery-accent);
+}
+
+.deliveries-page .action-btn {
+    padding: 6px 10px;
+    min-height: 32px;
+}
+
+.deliveries-page .view-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+
+    /*background: #e8f1ff;
+    color: #2459a6;
+    border-color: #bfd5fa;*/
+}
+
+.deliveries-page .view-btn:hover:not(:disabled) {
+        background: #d7e7ff;
+    border-color: #a9c7f0;
+    
+    /*background: #d5e6ff;*/
+}
+
+.deliveries-page .edit-btn {
+
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+
+    /*
+    background: #fff4d6;
+    color: #855b00;
+    border-color: #f1d58a; */
+}
+
+.deliveries-page .edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+    /*
+    background: #ffebba; */
+ }
+
+.deliveries-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.deliveries-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+.deliveries-page button:disabled,
+.deliveries-page .btn:disabled,
+.deliveries-page .action-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* -------------------------
+   Table
+   ------------------------- */
+
+.deliveries-page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--delivery-table-border);
+    border-radius: 9px;
+    background: var(--delivery-card);
+    margin-top: 14px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.deliveries-page table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    color: var(--delivery-text);
+    font-size: 0.88rem;
+}
+
+.deliveries-page .table-wrap table {
+    min-width: 900px;
+}
+
+.deliveries-page thead th {
+    background: var(--delivery-table-header);
+    color: var(--delivery-text);
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--delivery-table-border);
+    white-space: nowrap;
+}
+
+.deliveries-page thead th[style*="cursor"] {
+    user-select: none;
+}
+
+.deliveries-page tbody td,
+.deliveries-page tfoot td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--delivery-table-border);
+    vertical-align: middle;
+}
+
+.deliveries-page tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.deliveries-page tbody tr:hover {
+    background: var(--delivery-table-hover);
+}
+
+.deliveries-page tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.deliveries-page tfoot td {
+    background: var(--delivery-table-header);
+    font-weight: 700;
+}
+
+.deliveries-page .table-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.deliveries-page td {
+    overflow-wrap: anywhere;
+}
+
+.deliveries-page th {
+    overflow-wrap: normal;
+}
+
+/* -------------------------
+   Edit Form Grid
+   Used by the Edit Delivery modal
+   ------------------------- */
+
+.edit-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.edit-form-grid > * {
+    min-width: 0;
+}
+
+.edit-form-grid .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.edit-form-grid .fld input,
+.edit-form-grid .fld select,
+.edit-form-grid .fld textarea {
+    width: 100%;
+    min-width: 0;
+}
+
+.edit-full {
+    grid-column: 1 / -1;
+}
+
+/* -------------------------
+   Loading and Empty States
+   ------------------------- */
+
+.deliveries-page .card > p {
+    margin-top: 8px;
+}
+
+.deliveries-page .table-wrap tbody td[colspan] {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--delivery-muted);
+}
+
+/* -------------------------
+   Pagination
+   ------------------------- */
+
+.deliveries-page .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* -------------------------
+   Dark Theme
+   Works when a parent element
+   has data-theme="dark"
+   ------------------------- */
+
+[data-theme="dark"] .deliveries-page {
+    --delivery-accent: #79aaf5;
+    --delivery-accent-hover: #9bc0ff;
+    --delivery-accent-soft: #293d59;
+
+    --delivery-text: #e8edf2;
+    --delivery-muted: #aab5c0;
+
+    --delivery-card: #202a35;
+    --delivery-card-border: #394653;
+
+    --delivery-table-header: #293d59;
+    --delivery-table-hover: #28374a;
+    --delivery-table-border: #394653;
+
+    --delivery-input-bg: #18212b;
+    --delivery-input-border: #465565;
+    --delivery-input-text: #e8edf2;
+
+    --delivery-success: #86efac;
+    --delivery-success-bg: #173b2c;
+
+    --delivery-warning: #fcd34d;
+    --delivery-warning-bg: #473617;
+
+    --delivery-danger: #fca5a5;
+    --delivery-danger-bg: #482626;
+
+    --delivery-button-secondary-bg: #263442;
+    --delivery-button-secondary-border: #465565;
+}
+
+[data-theme="dark"] .deliveries-page .view-btn {
+    background: #243a58;
+    color: #a9ccff;
+    border-color: #405b80;
+}
+
+[data-theme="dark"] .deliveries-page .view-btn:hover {
+    background: #304c70;
+}
+
+[data-theme="dark"] .deliveries-page .edit-btn {
+    background: #473a20;
+    color: #fcd978;
+    border-color: #69552b;
+}
+
+[data-theme="dark"] .deliveries-page .edit-btn:hover {
+    background: #5a4825;
+}
+
+[data-theme="dark"] .deliveries-page .delete-btn {
+    background: #482626;
+    color: #fca5a5;
+    border-color: #754040;
+}
+
+[data-theme="dark"] .deliveries-page .delete-btn:hover {
+    background: #5a3030;
+}
+
+/* Alternative dark-mode class used by some themes */
+
+.dark .deliveries-page {
+    --delivery-accent: #79aaf5;
+    --delivery-accent-hover: #9bc0ff;
+    --delivery-accent-soft: #293d59;
+
+    --delivery-text: #e8edf2;
+    --delivery-muted: #aab5c0;
+
+    --delivery-card: #202a35;
+    --delivery-card-border: #394653;
+
+    --delivery-table-header: #293d59;
+    --delivery-table-hover: #28374a;
+    --delivery-table-border: #394653;
+
+    --delivery-input-bg: #18212b;
+    --delivery-input-border: #465565;
+    --delivery-input-text: #e8edf2;
+
+    --delivery-danger: #fca5a5;
+    --delivery-danger-bg: #482626;
+
+    --delivery-button-secondary-bg: #263442;
+    --delivery-button-secondary-border: #465565;
+}
+
+.dark .deliveries-page .view-btn {
+    background: #243a58;
+    color: #a9ccff;
+    border-color: #405b80;
+}
+
+.dark .deliveries-page .edit-btn {
+    background: #473a20;
+    color: #fcd978;
+    border-color: #69552b;
+}
+
+.dark .deliveries-page .delete-btn {
+    background: #482626;
+    color: #fca5a5;
+    border-color: #754040;
+}
+
+/* -------------------------
+   Responsive: Tablets
+   ------------------------- */
+
+@media (max-width: 900px) {
+    .deliveries-page .card {
+        padding: 16px;
+    }
+
+    .deliveries-page .production-search {
+        max-width: 100%;
+    }
+
+    .deliveries-page .table-wrap table {
+        min-width: 850px;
+    }
+
+    .edit-form-grid {
+        gap: 12px;
+    }
+}
+
+/* -------------------------
+   Responsive: Mobile
+   ------------------------- */
+
+@media (max-width: 640px) {
+    .deliveries-page .card {
+        padding: 12px;
+        border-radius: 9px;
+        margin-bottom: 14px;
+    }
+
+    .deliveries-page h2 {
+        font-size: 1.15rem;
+    }
+
+    .deliveries-page .production-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .deliveries-page .fld {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .deliveries-page input,
+    .deliveries-page select,
+    .deliveries-page textarea {
+        font-size: 16px;
+    }
+
+    .deliveries-page .btn {
+        min-height: 38px;
+    }
+
+    .deliveries-page .table-wrap {
+        border-radius: 7px;
+    }
+
+    .deliveries-page .table-wrap table {
+        min-width: 800px;
+    }
+
+    .deliveries-page thead th,
+    .deliveries-page tbody td,
+    .deliveries-page tfoot td {
+        padding: 9px 10px;
+    }
+
+    .deliveries-page .table-actions {
+        gap: 5px;
+    }
+
+    .deliveries-page .action-btn {
+        padding: 6px 8px;
+        font-size: 0.82rem;
+    }
+
+    .edit-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .edit-full {
+        grid-column: auto;
+    }
+
+    .deliveries-page .pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+/* -------------------------
+   Accessibility
+   ------------------------- */
+
+.deliveries-page button:focus-visible,
+.deliveries-page input:focus-visible,
+.deliveries-page select:focus-visible,
+.deliveries-page textarea:focus-visible {
+    outline: 2px solid var(--delivery-accent);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .deliveries-page *,
+    .deliveries-page *::before,
+    .deliveries-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

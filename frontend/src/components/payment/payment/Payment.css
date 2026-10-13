@@ -1,0 +1,737 @@
+/*
+ * SKCP - Payment Module
+ * Light-blue styling aligned with RawMaterialStock.css
+ */
+
+/* =========================================================
+   PAGE THEME
+   ========================================================= */
+
+.payment-page {
+    --payment-accent: #3974c6;
+    --payment-accent-hover: #2f63ab;
+    --payment-accent-soft: #dceaff;
+    --payment-border: #cbdff8;
+    --payment-text: #263247;
+    --payment-muted: #68747c;
+    --payment-card: #edf5ff;
+    --payment-table-head: #dceaff;
+    --payment-row-hover: #e5efff;
+    --payment-input: #ffffff;
+    --payment-input-border: #cbd5e1;
+    --payment-success: #18794e;
+    --payment-success-bg: #dcfce7;
+    --payment-warning: #92400e;
+    --payment-warning-bg: #fef3c7;
+    --payment-danger: #b42318;
+    --payment-danger-bg: #fee4e2;
+
+    width: 100%;
+    min-width: 0;
+    color: var(--payment-text);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.payment-page *,
+.payment-page *::before,
+.payment-page *::after {
+    box-sizing: border-box;
+}
+
+.payment-page .card {
+    min-width: 0;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid var(--payment-border);
+    border-radius: 12px;
+    background: var(--payment-card);
+    color: var(--payment-text);
+    box-shadow: 0 3px 10px rgb(36 76 130 / 5%);
+}
+
+.payment-page .card:last-child {
+    margin-bottom: 0;
+}
+
+.payment-page h2 {
+    margin: 0 0 8px;
+    color: var(--payment-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.payment-page h3 {
+    margin: 0 0 12px;
+    color: var(--payment-text);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.payment-page p {
+    margin: 6px 0 12px;
+    color: var(--payment-muted);
+}
+
+.payment-page button,
+.payment-page input,
+.payment-page select,
+.payment-page textarea {
+    font: inherit;
+}
+
+.payment-page button {
+    cursor: pointer;
+}
+
+.payment-page button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* =========================================================
+   SEARCH AND DATE FILTERS
+   ========================================================= */
+
+.payment-page .fld {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.payment-page .fld label {
+    display: block;
+    color: var(--payment-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.payment-page .fld input,
+.payment-page .fld select,
+.payment-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid var(--payment-input-border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--payment-input);
+    color: var(--payment-text);
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.payment-page .fld textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+.payment-page .fld input::placeholder,
+.payment-page .fld textarea::placeholder {
+    color: var(--payment-muted);
+    opacity: 0.85;
+}
+
+.payment-page .fld input:focus,
+.payment-page .fld select:focus,
+.payment-page .fld textarea:focus {
+    border-color: var(--payment-accent);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 14%);
+}
+
+.payment-page .fld input:disabled,
+.payment-page .fld select:disabled,
+.payment-page .fld textarea:disabled,
+.payment-page .fld input[readonly],
+.payment-page .fld textarea[readonly] {
+    background: rgb(148 163 184 / 10%);
+    color: var(--payment-muted);
+    cursor: not-allowed;
+}
+
+.payment-page .production-search {
+    flex: 2 1 320px;
+}
+
+/* =========================================================
+   FORM GRID AND ORDER SUMMARY
+   ========================================================= */
+
+.payment-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.payment-page .form-grid > * {
+    min-width: 0;
+}
+
+.payment-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+.payment-page .form-grid + .form-grid {
+    margin-top: 16px;
+}
+
+.payment-page .fld.f-full {
+    grid-column: 1 / -1;
+}
+
+.payment-page .form-grid .fld {
+    margin: 0;
+}
+
+/* The Order Summary currently uses inline spacing/border styles.
+   These rules harmonize its heading and fields with the module. */
+.payment-page .form-grid input[readonly] {
+    font-weight: 600;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.payment-page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--payment-border);
+    border-radius: 9px;
+    background: var(--payment-input);
+    scrollbar-width: thin;
+}
+
+.payment-page table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--payment-text);
+    font-size: 13px;
+    text-align: left;
+}
+
+.payment-page th,
+.payment-page td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--payment-border);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.payment-page th {
+    background: var(--payment-table-head);
+    color: var(--payment-text);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.payment-page thead th {
+    position: relative;
+}
+
+.payment-page tbody tr {
+    background: var(--payment-input);
+    transition: background-color 0.15s ease;
+}
+
+.payment-page tbody tr:hover {
+    background: var(--payment-row-hover);
+}
+
+.payment-page tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.payment-page td {
+    color: var(--payment-text);
+}
+
+.payment-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    text-transform: inherit;
+}
+
+.payment-page .table-sort-btn:hover {
+    color: var(--payment-accent);
+}
+
+.payment-page .table-sort-btn:focus-visible {
+    border-radius: 3px;
+    outline: 2px solid var(--payment-accent);
+    outline-offset: 3px;
+}
+
+.payment-page .table-actions,
+.payment-page .action-buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.payment-page .btn,
+.payment-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 7px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.payment-page .btn {
+    border-color: var(--payment-accent);
+    background: var(--payment-accent);
+    color: #ffffff;
+}
+
+.payment-page .btn:hover:not(:disabled) {
+    border-color: var(--payment-accent-hover);
+    background: var(--payment-accent-hover);
+    box-shadow: 0 2px 5px rgb(47 99 171 / 18%);
+}
+
+.payment-page .btn.secondary {
+    border-color: var(--payment-border);
+    background: var(--payment-input);
+    color: var(--payment-text);
+}
+
+.payment-page .btn.secondary:hover:not(:disabled) {
+    border-color: var(--payment-accent);
+    background: var(--payment-accent-soft);
+    color: var(--payment-accent-hover);
+}
+
+.payment-page .action-btn {
+    padding: 6px 10px;
+}
+
+.payment-page .view-btn {
+    border-color: #3974c6;
+    background: #3974c6;
+    color: #ffffff;
+}
+
+.payment-page .view-btn:hover:not(:disabled) {
+    border-color: #2f63ab;
+    background: #2f63ab;
+}
+
+.payment-page .edit-btn {
+    border-color: #b7791f;
+    background: #fef3c7;
+    color: #854d0e;
+}
+
+.payment-page .edit-btn:hover:not(:disabled) {
+    border-color: #d49a32;
+    background: #fde68a;
+    color: #713f12;
+}
+
+.payment-page .delete-btn {
+    border-color: #f2b8b5;
+    background: #fee4e2;
+    color: #b42318;
+}
+
+.payment-page .delete-btn:hover:not(:disabled) {
+    border-color: #e89a95;
+    background: #fecaca;
+    color: #912018;
+}
+
+.payment-page .btn:focus-visible,
+.payment-page .action-btn:focus-visible {
+    outline: 2px solid var(--payment-accent);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   BADGES / STATUS TEXT
+   ========================================================= */
+
+.payment-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 23px;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.payment-page .badge.bg {
+    background: var(--payment-accent-soft);
+    color: var(--payment-accent-hover);
+}
+
+.payment-page .badge.success,
+.payment-page .badge.bg-success {
+    border-color: #bbf7d0;
+    background: var(--payment-success-bg);
+    color: var(--payment-success);
+}
+
+.payment-page .badge.warning,
+.payment-page .badge.bg-warning {
+    border-color: #fde68a;
+    background: var(--payment-warning-bg);
+    color: var(--payment-warning);
+}
+
+.payment-page .badge.danger,
+.payment-page .badge.bg-danger {
+    border-color: #fecaca;
+    background: var(--payment-danger-bg);
+    color: var(--payment-danger);
+}
+
+/* =========================================================
+   FORM FEEDBACK
+   ========================================================= */
+
+.payment-page .form-error,
+.payment-page .form-success {
+    display: block;
+    margin: 12px 0;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.payment-page .form-error {
+    border-color: #fecaca;
+    background: var(--payment-danger-bg);
+    color: var(--payment-danger);
+}
+
+.payment-page .form-success {
+    border-color: #bbf7d0;
+    background: var(--payment-success-bg);
+    color: var(--payment-success);
+}
+
+.payment-page .form-error:first-child,
+.payment-page .form-success:first-child {
+    margin-top: 0;
+}
+
+/* =========================================================
+   DETAIL GRID (for any DetailGrid content rendered inside page)
+   ========================================================= */
+
+.payment-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.payment-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--payment-border);
+    border-radius: 8px;
+    background: var(--payment-input);
+    overflow-wrap: anywhere;
+}
+
+.payment-page .detail-item label,
+.payment-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--payment-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.payment-page .detail-item .detail-value {
+    color: var(--payment-text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   PAGINATION
+   Styles shared Pagination controls when they render inside
+   the module's normal page subtree.
+   ========================================================= */
+
+.payment-page .pagination,
+.payment-page .pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    color: var(--payment-muted);
+    font-size: 13px;
+}
+
+.payment-page .pagination button,
+.payment-page .pagination-container button {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 5px 9px;
+    border: 1px solid var(--payment-border);
+    border-radius: 6px;
+    background: var(--payment-input);
+    color: var(--payment-text);
+}
+
+.payment-page .pagination button:hover:not(:disabled),
+.payment-page .pagination-container button:hover:not(:disabled) {
+    border-color: var(--payment-accent);
+    background: var(--payment-accent-soft);
+}
+
+.payment-page .pagination select,
+.payment-page .pagination-container select {
+    min-height: 34px;
+    padding: 6px 8px;
+    border: 1px solid var(--payment-input-border);
+    border-radius: 6px;
+    background: var(--payment-input);
+    color: var(--payment-text);
+}
+
+/* =========================================================
+   DARK MODE
+   Supports the theme classes used by the shared SKCP UI.
+   ========================================================= */
+
+.dark .payment-page,
+[data-theme="dark"] .payment-page,
+.dark-mode .payment-page,
+.payment-page.dark,
+.payment-page[data-theme="dark"] {
+    --payment-accent: #79aaf5;
+    --payment-accent-hover: #9bc0ff;
+    --payment-accent-soft: #293d59;
+    --payment-border: #405573;
+    --payment-text: #e8edf2;
+    --payment-muted: #aab5c0;
+    --payment-card: #202a35;
+    --payment-table-head: #293d59;
+    --payment-row-hover: #28374a;
+    --payment-input: #18212b;
+    --payment-input-border: #465565;
+    --payment-success: #86efac;
+    --payment-success-bg: #173b2c;
+    --payment-warning: #fcd34d;
+    --payment-warning-bg: #473617;
+    --payment-danger: #fca5a5;
+    --payment-danger-bg: #482626;
+}
+
+.dark .payment-page .view-btn,
+[data-theme="dark"] .payment-page .view-btn,
+.dark-mode .payment-page .view-btn,
+.payment-page.dark .view-btn,
+.payment-page[data-theme="dark"] .view-btn {
+    border-color: #477fc9;
+    background: #315f9d;
+    color: #ffffff;
+}
+
+.dark .payment-page .view-btn:hover:not(:disabled),
+[data-theme="dark"] .payment-page .view-btn:hover:not(:disabled),
+.dark-mode .payment-page .view-btn:hover:not(:disabled),
+.payment-page.dark .view-btn:hover:not(:disabled),
+.payment-page[data-theme="dark"] .view-btn:hover:not(:disabled) {
+    border-color: #6198e0;
+    background: #3b70b4;
+}
+
+.dark .payment-page .edit-btn,
+[data-theme="dark"] .payment-page .edit-btn,
+.dark-mode .payment-page .edit-btn,
+.payment-page.dark .edit-btn,
+.payment-page[data-theme="dark"] .edit-btn {
+    border-color: #745a2c;
+    background: #473617;
+    color: #fcd34d;
+}
+
+.dark .payment-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .payment-page .edit-btn:hover:not(:disabled),
+.dark-mode .payment-page .edit-btn:hover:not(:disabled),
+.payment-page.dark .edit-btn:hover:not(:disabled),
+.payment-page[data-theme="dark"] .edit-btn:hover:not(:disabled) {
+    border-color: #a17b3b;
+    background: #59441d;
+    color: #fde68a;
+}
+
+.dark .payment-page .delete-btn,
+[data-theme="dark"] .payment-page .delete-btn,
+.dark-mode .payment-page .delete-btn,
+.payment-page.dark .delete-btn,
+.payment-page[data-theme="dark"] .delete-btn {
+    border-color: #754044;
+    background: #482626;
+    color: #fca5a5;
+}
+
+.dark .payment-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .payment-page .delete-btn:hover:not(:disabled),
+.dark-mode .payment-page .delete-btn:hover:not(:disabled),
+.payment-page.dark .delete-btn:hover:not(:disabled),
+.payment-page[data-theme="dark"] .delete-btn:hover:not(:disabled) {
+    border-color: #a4545a;
+    background: #5b2c30;
+    color: #fecaca;
+}
+
+.dark .payment-page .btn.secondary,
+[data-theme="dark"] .payment-page .btn.secondary,
+.dark-mode .payment-page .btn.secondary,
+.payment-page.dark .btn.secondary,
+.payment-page[data-theme="dark"] .btn.secondary {
+    border-color: var(--payment-border);
+    background: var(--payment-input);
+    color: var(--payment-text);
+}
+
+.dark .payment-page .btn.secondary:hover:not(:disabled),
+[data-theme="dark"] .payment-page .btn.secondary:hover:not(:disabled),
+.dark-mode .payment-page .btn.secondary:hover:not(:disabled),
+.payment-page.dark .btn.secondary:hover:not(:disabled),
+.payment-page[data-theme="dark"] .btn.secondary:hover:not(:disabled) {
+    border-color: var(--payment-accent);
+    background: var(--payment-accent-soft);
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .payment-page .card {
+        padding: 16px;
+    }
+
+    .payment-page table {
+        min-width: 1000px;
+    }
+}
+
+@media (max-width: 640px) {
+    .payment-page {
+        font-size: 13px;
+    }
+
+    .payment-page .card {
+        margin-bottom: 14px;
+        padding: 13px;
+        border-radius: 9px;
+    }
+
+    .payment-page h2 {
+        font-size: 18px;
+    }
+
+    .payment-page h3 {
+        font-size: 15px;
+    }
+
+    .payment-page .form-grid,
+    .payment-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .payment-page .form-grid .f-full,
+    .payment-page .fld.f-full {
+        grid-column: auto;
+    }
+
+    .payment-page .production-search {
+        flex-basis: 100%;
+    }
+
+    .payment-page .fld input,
+    .payment-page .fld select,
+    .payment-page .fld textarea {
+        min-height: 40px;
+    }
+
+    .payment-page .table-actions,
+    .payment-page .action-buttons {
+        gap: 5px;
+    }
+
+    .payment-page .action-btn {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    .payment-page .pagination,
+    .payment-page .pagination-container {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .payment-page *,
+    .payment-page *::before,
+    .payment-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

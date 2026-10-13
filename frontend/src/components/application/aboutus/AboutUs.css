@@ -1,0 +1,702 @@
+/* =========================================================
+   SKCP ABOUT US
+   Dashboard-aligned typography, spacing and responsive cards.
+   About Us only. Styles.css remains untouched.
+========================================================= */
+
+.skcp-about-us {
+  --about-text: #263238;
+  --about-muted: #68747c;
+  --about-card: #ffffff;
+  --about-border: #e4e8eb;
+  --about-accent: #c49a35;
+  --about-green-tint: #eaf3ec;
+  --about-blue-tint: #edf2fa;
+  --about-beige-tint: #f5ede2;
+  --about-lavender-tint: #f1eaf5;
+
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 24px;
+  color: var(--about-text);
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+.app.dark .skcp-about-us {
+  --about-text: #e8edf2;
+  --about-muted: #aab5c0;
+  --about-card: #202a35;
+  --about-border: #394653;
+  --about-green-tint: #253b32;
+  --about-blue-tint: #27364d;
+  --about-beige-tint: #40372e;
+  --about-lavender-tint: #382f43;
+}
+
+/* =========================================================
+   COMPANY HEADER
+========================================================= */
+
+.skcp-about-us .about-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 14px;
+}
+
+.skcp-about-us .about-header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 104px;
+  width: 104px;
+  height: 104px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--about-border);
+  border-radius: 12px;
+}
+
+.skcp-about-us .about-header-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.skcp-about-us .about-header-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.skcp-about-us .about-eyebrow {
+  margin: 0 0 8px;
+  color: var(--about-accent);
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+}
+
+.skcp-about-us .about-header h1 {
+  margin: 0;
+  color: var(--about-text);
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+.skcp-about-us .about-tagline {
+  margin-top: 7px;
+  color: var(--about-muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.skcp-about-us .about-intro {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: var(--about-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   SECTION CONTAINERS AND HEADINGS
+========================================================= */
+
+.skcp-about-us .about-section {
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 20px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 14px;
+}
+
+.skcp-about-us .about-section-heading {
+  margin-bottom: 15px;
+}
+
+.skcp-about-us .about-section-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--about-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+}
+
+.skcp-about-us .about-section-heading h2 {
+  margin: 0;
+  color: var(--about-text);
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.35;
+}
+
+.skcp-about-us .about-section-heading p {
+  margin: 5px 0 0;
+  color: var(--about-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BUSINESS HIGHLIGHTS
+========================================================= */
+
+.skcp-about-us .about-highlights {
+  background: var(--about-green-tint);
+}
+
+.skcp-about-us .about-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.skcp-about-us .about-highlight-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 90px;
+  padding: 16px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 11px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.skcp-about-us .about-highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgb(30 45 60 / 7%);
+}
+
+.skcp-about-us .about-highlight-value {
+  color: var(--about-text);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.skcp-about-us .about-highlight-label {
+  margin-top: 5px;
+  color: var(--about-muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   PRODUCTS AND STANDARDS
+========================================================= */
+
+.skcp-about-us .about-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.skcp-about-us .about-product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 142px;
+  padding: 16px 12px;
+  background: var(--about-blue-tint);
+  border: 1px solid var(--about-border);
+  border-radius: 11px;
+  text-align: center;
+}
+
+.skcp-about-us .about-product-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 8px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 10px;
+  font-size: 22px;
+}
+
+.skcp-about-us .about-product-size {
+  color: var(--about-text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.skcp-about-us .about-product-name {
+  margin-top: 4px;
+  color: var(--about-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.skcp-about-us .about-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.skcp-about-us .about-detail-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 13px 14px;
+  background: var(--about-beige-tint);
+  border: 1px solid var(--about-border);
+  border-radius: 10px;
+}
+
+.skcp-about-us .about-detail-card strong {
+  color: var(--about-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.skcp-about-us .about-detail-card span {
+  color: var(--about-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+.skcp-about-us .about-team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.skcp-about-us .about-team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 18px 13px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 11px;
+  text-align: center;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.skcp-about-us .about-team-card:hover {
+  transform: translateY(-2px);
+  border-color: #b8c5cf;
+  box-shadow: 0 4px 12px rgb(30 45 60 / 7%);
+}
+
+.skcp-about-us .about-team-photo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  background: var(--about-blue-tint);
+  border: 1px solid var(--about-border);
+  border-radius: 50%;
+}
+
+.skcp-about-us .about-team-photo img {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.skcp-about-us .about-team-fallback {
+  color: var(--about-muted);
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.skcp-about-us .about-team-name {
+  width: 100%;
+  color: var(--about-text);
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.skcp-about-us .about-team-role {
+  margin-top: 5px;
+  color: var(--about-muted);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   VISION AND MISSION
+========================================================= */
+
+.skcp-about-us .about-purpose-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.skcp-about-us .about-purpose-card {
+  margin-bottom: 0;
+  background: var(--about-lavender-tint);
+}
+
+.skcp-about-us .about-purpose-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.skcp-about-us .about-purpose-card .about-section-heading {
+  margin-bottom: 10px;
+}
+
+.skcp-about-us .about-purpose-card > p {
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   VALUES
+========================================================= */
+
+.skcp-about-us .about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.skcp-about-us .about-value-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  min-height: 145px;
+  padding: 16px 10px;
+  background: var(--about-green-tint);
+  border: 1px solid var(--about-border);
+  border-radius: 11px;
+  text-align: center;
+}
+
+.skcp-about-us .about-value-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.skcp-about-us .about-value-card h3 {
+  margin: 0;
+  color: var(--about-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.skcp-about-us .about-value-card p {
+  margin: 5px 0 0;
+  color: var(--about-muted);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   LOCATION AND CONTACT
+========================================================= */
+
+.skcp-about-us .about-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.skcp-about-us .about-contact-card {
+  min-width: 0;
+  padding: 15px;
+  background: var(--about-card);
+  border: 1px solid var(--about-border);
+  border-radius: 11px;
+}
+
+.skcp-about-us .about-contact-card h3 {
+  margin: 0 0 9px;
+  color: var(--about-text);
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.skcp-about-us .about-contact-lines {
+  color: var(--about-muted);
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.skcp-about-us .about-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 5px;
+  color: var(--about-muted);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+========================================================= */
+
+@media (max-width: 1000px) {
+  .skcp-about-us .about-highlight-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .skcp-about-us .about-team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skcp-about-us .about-values-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .skcp-about-us .about-header {
+    align-items: flex-start;
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .skcp-about-us .about-header-logo {
+    flex-basis: 76px;
+    width: 76px;
+    height: 76px;
+  }
+
+  .skcp-about-us .about-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.07em;
+  }
+
+  .skcp-about-us .about-header h1 {
+    font-size: 20px;
+  }
+
+  .skcp-about-us .about-highlight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skcp-about-us .about-purpose-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .skcp-about-us .about-values-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .skcp-about-us {
+    padding-bottom: 16px;
+  }
+
+  .skcp-about-us .about-header {
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 16px;
+  }
+
+  .skcp-about-us .about-header-logo {
+    flex-basis: 68px;
+    width: 68px;
+    height: 68px;
+  }
+
+  .skcp-about-us .about-intro {
+    font-size: 12px;
+  }
+
+  .skcp-about-us .about-section {
+    margin-bottom: 14px;
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .skcp-about-us .about-section-heading {
+    margin-bottom: 12px;
+  }
+
+  .skcp-about-us .about-section-heading h2 {
+    font-size: 16px;
+  }
+
+  .skcp-about-us .about-highlight-grid {
+    gap: 9px;
+  }
+
+  .skcp-about-us .about-highlight-card {
+    min-height: 78px;
+    padding: 12px;
+  }
+
+  .skcp-about-us .about-highlight-value {
+    font-size: 20px;
+  }
+
+  .skcp-about-us .about-highlight-label {
+    font-size: 10.5px;
+  }
+
+  .skcp-about-us .about-product-grid {
+    gap: 8px;
+  }
+
+  .skcp-about-us .about-product-card {
+    min-height: 125px;
+    padding: 12px 7px;
+  }
+
+  .skcp-about-us .about-product-size {
+    font-size: 18px;
+  }
+
+  .skcp-about-us .about-product-name {
+    font-size: 10px;
+  }
+
+  .skcp-about-us .about-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .skcp-about-us .about-team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .skcp-about-us .about-team-card {
+    padding: 14px 9px;
+  }
+
+  .skcp-about-us .about-team-photo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .skcp-about-us .about-team-name {
+    font-size: 11.5px;
+  }
+
+  .skcp-about-us .about-team-role {
+    font-size: 10.5px;
+  }
+
+  .skcp-about-us .about-values-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .skcp-about-us .about-value-card {
+    min-height: 130px;
+    padding: 13px 8px;
+  }
+
+  .skcp-about-us .about-contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .skcp-about-us .about-footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .skcp-about-us .about-highlight-card,
+  .skcp-about-us .about-team-card {
+    transition: none;
+  }
+
+  .skcp-about-us .about-highlight-card:hover,
+  .skcp-about-us .about-team-card:hover {
+    transform: none;
+  }
+}

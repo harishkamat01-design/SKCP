@@ -38,7 +38,7 @@ public class RawMaterialStockService {
     }
 
     // ============================================================
-    // GET ALL ACTIVE RAW MATERIAL STOCK
+    // GET ALL RAW MATERIAL STOCK
     // ============================================================
 
     public List<RawMaterialStockSummaryResponse> getAllRawMaterialStock() {
@@ -96,18 +96,20 @@ public class RawMaterialStockService {
                         );
 
         // --------------------------------------------------------
-        // PREVENT DUPLICATE ACTIVE STOCK RECORD
+        // PREVENT DUPLICATE MATERIAL + STOCK DATE
         // --------------------------------------------------------
 
         if (rawMaterialStockRepository
-                .existsByRawMaterialRawMaterialIdAndRecordStatus(
+                .existsByRawMaterialRawMaterialIdAndStockDate(
                         request.getRawMaterialId(),
-                        RecordStatus.ACTIVE
+                        request.getStockDate()
                 )) {
 
             throw new IllegalStateException(
-                    "Active raw material stock already exists for raw material id: "
+                    "Stock already exists for raw material id: "
                             + request.getRawMaterialId()
+                            + " on date: "
+                            + request.getStockDate()
             );
         }
 
@@ -125,11 +127,10 @@ public class RawMaterialStockService {
         stock.setRawMaterial(rawMaterial);
 
         // --------------------------------------------------------
-        // SYSTEM-MANAGED FIELDS
+        // SET SYSTEM-MANAGED FIELDS
         // --------------------------------------------------------
 
         stock.setLastUpdatedDate(LocalDate.now());
-
         stock.setRecordStatus(RecordStatus.ACTIVE);
 
         // --------------------------------------------------------
@@ -195,25 +196,23 @@ public class RawMaterialStockService {
                         );
 
         // --------------------------------------------------------
-        // PREVENT MOVING TO ANOTHER RAW MATERIAL THAT ALREADY
-        // HAS AN ACTIVE STOCK RECORD
+        // PREVENT DUPLICATE MATERIAL + STOCK DATE
+        // EXCLUDE THE CURRENT RECORD
         // --------------------------------------------------------
 
-        if (!existingStock.getRawMaterial()
-                .getRawMaterialId()
-                .equals(request.getRawMaterialId())) {
+        if (rawMaterialStockRepository
+                .existsByRawMaterialRawMaterialIdAndStockDateAndRawMaterialStockIdNot(
+                        request.getRawMaterialId(),
+                        request.getStockDate(),
+                        id
+                )) {
 
-            if (rawMaterialStockRepository
-                    .existsByRawMaterialRawMaterialIdAndRecordStatus(
-                            request.getRawMaterialId(),
-                            RecordStatus.ACTIVE
-                    )) {
-
-                throw new IllegalStateException(
-                        "Active raw material stock already exists for raw material id: "
-                                + request.getRawMaterialId()
-                );
-            }
+            throw new IllegalStateException(
+                    "Stock already exists for raw material id: "
+                            + request.getRawMaterialId()
+                            + " on date: "
+                            + request.getStockDate()
+            );
         }
 
         // --------------------------------------------------------
@@ -232,7 +231,7 @@ public class RawMaterialStockService {
         existingStock.setRawMaterial(rawMaterial);
 
         // --------------------------------------------------------
-        // SYSTEM-MANAGED FIELDS
+        // UPDATE SYSTEM-MANAGED FIELDS
         // --------------------------------------------------------
 
         existingStock.setLastUpdatedDate(LocalDate.now());
@@ -249,7 +248,7 @@ public class RawMaterialStockService {
         );
 
         // --------------------------------------------------------
-        // RECORD STATUS
+        // PRESERVE ACTIVE RECORD STATUS
         // --------------------------------------------------------
 
         existingStock.setRecordStatus(RecordStatus.ACTIVE);
@@ -293,7 +292,6 @@ public class RawMaterialStockService {
         // --------------------------------------------------------
 
         stock.setRecordStatus(RecordStatus.INACTIVE);
-
         stock.setLastUpdatedDate(LocalDate.now());
 
         // --------------------------------------------------------
@@ -344,47 +342,3 @@ public class RawMaterialStockService {
         return RawMaterialStockStatus.NORMAL;
     }
 }
-
-
-/*
-package com.skcp.service;
-
-import com.skcp.entity.RawMaterialStock;
-import com.skcp.repository.RawMaterialStockRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class RawMaterialStockService {
-
-    // Dependency Injection
-    private final RawMaterialStockRepository rawMaterialStockRepository;
-
-    // Constructor Injection
-    public RawMaterialStockService(RawMaterialStockRepository rawMaterialStockRepository) {
-        this.rawMaterialStockRepository = rawMaterialStockRepository;
-    }
-
-    // Get all Raw Material Stock records
-    public List<RawMaterialStock> getAllRawMaterialStock() {
-        return rawMaterialStockRepository.findAll();
-    }
-
-    // Save Raw Material Stock
-    public RawMaterialStock saveRawMaterialStock(RawMaterialStock rawMaterialStock) {
-        return rawMaterialStockRepository.save(rawMaterialStock);
-    }
-
-    // Find Raw Material Stock by ID
-    public RawMaterialStock getRawMaterialStockById(Integer id) {
-        return rawMaterialStockRepository.findById(id).orElse(null);
-    }
-
-    // Delete Raw Material Stock
-    public void deleteRawMaterialStock(Integer id) {
-        rawMaterialStockRepository.deleteById(id);
-    }
-}
-
-*/

@@ -6,80 +6,36 @@ import java.time.LocalDateTime;
 
 public class RawMaterialStockResponse {
 
-    // ============================================================
-    // RAW MATERIAL STOCK ID
-    // ============================================================
-
     private Integer rawMaterialStockId;
 
-
-    // ============================================================
-    // RAW MATERIAL
-    // ============================================================
-
     private Integer rawMaterialId;
-
     private String rawMaterialName;
-
     private String rawMaterialUnit;
 
-
-    // ============================================================
-    // STOCK DETAILS
-    // ============================================================
-
-    private BigDecimal currentStockLevel;
-
-    private BigDecimal minimumStockLevel;
-
+    // Stock dates
+    private LocalDate stockDate;
     private LocalDate lastUpdatedDate;
 
-
-    // ============================================================
-    // STOCK STATUS
-    // ============================================================
+    // Stock details
+    private BigDecimal currentStockLevel;
+    private BigDecimal minimumStockLevel;
 
     private String stockStatus;
-
-
-    // ============================================================
-    // RECORD STATUS
-    // ============================================================
-
     private String recordStatus;
 
-
-    // ============================================================
-    // OTHER DETAILS
-    // ============================================================
-
     private String notes;
-
     private LocalDateTime createdAt;
-
-
-    // ============================================================
-    // DEFAULT CONSTRUCTOR
-    // ============================================================
 
     public RawMaterialStockResponse() {
     }
-
-
-    // ============================================================
-    // GETTERS AND SETTERS
-    // ============================================================
 
     public Integer getRawMaterialStockId() {
         return rawMaterialStockId;
     }
 
-    public void setRawMaterialStockId(
-            Integer rawMaterialStockId) {
-
+    public void setRawMaterialStockId(Integer rawMaterialStockId) {
         this.rawMaterialStockId = rawMaterialStockId;
     }
-
 
     public Integer getRawMaterialId() {
         return rawMaterialId;
@@ -89,61 +45,53 @@ public class RawMaterialStockResponse {
         this.rawMaterialId = rawMaterialId;
     }
 
-
     public String getRawMaterialName() {
         return rawMaterialName;
     }
 
-    public void setRawMaterialName(
-            String rawMaterialName) {
-
+    public void setRawMaterialName(String rawMaterialName) {
         this.rawMaterialName = rawMaterialName;
     }
-
 
     public String getRawMaterialUnit() {
         return rawMaterialUnit;
     }
 
-    public void setRawMaterialUnit(
-            String rawMaterialUnit) {
-
+    public void setRawMaterialUnit(String rawMaterialUnit) {
         this.rawMaterialUnit = rawMaterialUnit;
     }
 
+    public LocalDate getStockDate() {
+        return stockDate;
+    }
+
+    public void setStockDate(LocalDate stockDate) {
+        this.stockDate = stockDate;
+    }
 
     public BigDecimal getCurrentStockLevel() {
         return currentStockLevel;
     }
 
-    public void setCurrentStockLevel(
-            BigDecimal currentStockLevel) {
-
+    public void setCurrentStockLevel(BigDecimal currentStockLevel) {
         this.currentStockLevel = currentStockLevel;
     }
-
 
     public BigDecimal getMinimumStockLevel() {
         return minimumStockLevel;
     }
 
-    public void setMinimumStockLevel(
-            BigDecimal minimumStockLevel) {
-
+    public void setMinimumStockLevel(BigDecimal minimumStockLevel) {
         this.minimumStockLevel = minimumStockLevel;
     }
-
 
     public LocalDate getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
-    public void setLastUpdatedDate(
-            LocalDate lastUpdatedDate) {
-
+    public void setLastUpdatedDate(LocalDate lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
-
 
     public String getStockStatus() {
         return stockStatus;
@@ -153,17 +101,13 @@ public class RawMaterialStockResponse {
         this.stockStatus = stockStatus;
     }
 
-
     public String getRecordStatus() {
         return recordStatus;
     }
 
-    public void setRecordStatus(
-            String recordStatus) {
-
+    public void setRecordStatus(String recordStatus) {
         this.recordStatus = recordStatus;
     }
-
 
     public String getNotes() {
         return notes;
@@ -173,14 +117,11 @@ public class RawMaterialStockResponse {
         this.notes = notes;
     }
 
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(
-            LocalDateTime createdAt) {
-
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

@@ -15,6 +15,7 @@ import { DetailGrid, DetailItem } from "../../ui/common/DetailGrid";
 import Pagination from "../../ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
+import "./Asset.css";
 
 function Asset() {
 
@@ -624,7 +625,7 @@ function Asset() {
     if (loading) {
 
         return (
-            <div className="page">
+            <div className="page asset-page">
 
                 <section className="card">
 
@@ -646,7 +647,7 @@ function Asset() {
 
     return (
 
-        <div className="page">
+        <div className="page asset-page">
 
             {/* ====================================================
                 PAGE HEADER + SEARCH

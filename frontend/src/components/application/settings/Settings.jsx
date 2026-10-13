@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./Settings.css";
 
 function Settings() {
     const [isDark, setIsDark] = useState(
@@ -24,154 +25,90 @@ function Settings() {
 
     const showProfileSaved = () => {
         setProfileSaved(true);
-
-        setTimeout(() => {
-            setProfileSaved(false);
-        }, 2500);
+        window.setTimeout(() => setProfileSaved(false), 2500);
     };
 
     const showPricingSaved = () => {
         setPricingSaved(true);
-
-        setTimeout(() => {
-            setPricingSaved(false);
-        }, 2500);
+        window.setTimeout(() => setPricingSaved(false), 2500);
     };
 
+    const toggleAlert = (key) => {
+        setAlertPreferences((previous) => ({
+            ...previous,
+            [key]: !previous[key]
+        }));
+    };
+
+    const renderToggle = (checked, onClick, label) => (
+        <button
+            type="button"
+            className={`sw2 ${checked ? "on" : ""}`}
+            onClick={onClick}
+            aria-pressed={checked}
+            aria-label={label}
+        >
+            {checked ? "ON" : "OFF"}
+        </button>
+    );
+
     return (
-        <div className="page">
-
-            {/* =====================================================
-                SETTINGS HEADER
-            ====================================================== */}
-
-            <section className="card">
-
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: "16px",
-                        flexWrap: "wrap"
-                    }}
-                >
-
-                    <div>
-
-                        <h2>
-                            Settings
-                        </h2>
-
-                        <p>
-                            Manage company, pricing, tax, and application preferences.
-                        </p>
-
-                    </div>
-
-                </div>
-
+        <div className="page skcp-settings">
+            {/* SETTINGS HEADER */}
+            <section className="settings-header">
+                <h2>Settings</h2>
+                <p>
+                    Manage company, pricing, tax, and application preferences.
+                </p>
             </section>
 
-            {/* =====================================================
-                COMPANY PROFILE + PRICING
-            ====================================================== */}
+            {/* COMPANY PROFILE AND PRICING */}
+            <div className="settings-grid">
+                {/* COMPANY PROFILE */}
+                <section className="settings-card">
+                    <h2>Company Profile</h2>
 
-            <div
-                className="g2"
-                style={{
-                    marginTop: "16px"
-                }}
-            >
-
-                {/* ==================================================
-                    COMPANY PROFILE
-                ================================================== */}
-
-                <section className="card">
-
-                    <h2>
-                        Company Profile
-                    </h2>
-
-                    <div
-                        className="form-grid"
-                        style={{
-                            marginTop: "16px"
-                        }}
-                    >
-
+                    <div className="form-grid" style={{ marginTop: "16px" }}>
                         <div className="fld">
-
-                            <label>
-                                Company Name
-                            </label>
-
+                            <label>Company Name</label>
                             <input
                                 value="Shree Kundodari Cement Products"
                                 readOnly
                             />
-
                         </div>
 
                         <div className="fld">
-
-                            <label>
-                                GSTIN
-                            </label>
-
+                            <label>GSTIN</label>
                             <input
                                 placeholder="Enter GSTIN"
+                                aria-label="GSTIN"
                             />
-
                         </div>
 
                         <div className="fld">
-
-                            <label>
-                                Phone
-                            </label>
-
-                            <input
-                                value="+91 94485 37722"
-                                readOnly
-                            />
-
+                            <label>Phone</label>
+                            <input value="+91 94485 37722" readOnly />
                         </div>
 
                         <div className="fld">
-
-                            <label>
-                                Email
-                            </label>
-
+                            <label>Email</label>
                             <input
                                 value="harish.kamat01@gmail.com"
                                 readOnly
                             />
-
                         </div>
 
                         <div className="fld f-full">
-
-                            <label>
-                                Address
-                            </label>
-
+                            <label>Address</label>
                             <textarea
-                                style={{
-                                    minHeight: "44px"
-                                }}
+                                style={{ minHeight: "44px" }}
                                 value="Halkar Road, Kumta, Uttara Kannada — 581343, Karnataka, India"
                                 readOnly
                             />
-
                         </div>
-
                     </div>
 
                     <div className="btn-row">
-
                         <button
                             type="button"
                             className="btn primary"
@@ -179,130 +116,54 @@ function Settings() {
                         >
                             Save
                         </button>
-
                     </div>
 
                     {profileSaved && (
-                        <div className="alert s">
-                            Profile updated
+                        <div className="alert s" role="status">
+                            Demo only: company profile has not been saved.
                         </div>
                     )}
-
                 </section>
 
-                {/* ==================================================
-                    PRICING & TAX
-                ================================================== */}
+                {/* PRICING AND TAX */}
+                <section className="settings-card">
+                    <h2>Pricing &amp; Tax</h2>
 
-                <section className="card">
-
-                    <h2>
-                        Pricing &amp; Tax
-                    </h2>
-
-                    <div
-                        style={{
-                            marginTop: "16px"
-                        }}
-                    >
-
-                        <div
-                            className="fld"
-                            style={{
-                                marginBottom: "16px"
-                            }}
-                        >
-
-                            <label>
-                                GST Rate
-                            </label>
-
+                    <div style={{ marginTop: "16px" }}>
+                        <div className="fld" style={{ marginBottom: "16px" }}>
+                            <label>GST Rate</label>
                             <select defaultValue="18%">
-
-                                <option>
-                                    18%
-                                </option>
-
-                                <option>
-                                    12%
-                                </option>
-
-                                <option>
-                                    5%
-                                </option>
-
+                                <option value="18%">18%</option>
+                                <option value="12%">12%</option>
+                                <option value="5%">5%</option>
                             </select>
-
                         </div>
 
-                        <div
-                            className="fld"
-                            style={{
-                                marginBottom: "16px"
-                            }}
-                        >
-
-                            <label>
-                                Default Payment Terms
-                            </label>
-
+                        <div className="fld" style={{ marginBottom: "16px" }}>
+                            <label>Default Payment Terms</label>
                             <select defaultValue="Advance">
-
-                                <option>
-                                    Advance
-                                </option>
-
-                                <option>
-                                    50-50
-                                </option>
-
-                                <option>
-                                    Net 30
-                                </option>
-
+                                <option value="Advance">Advance</option>
+                                <option value="50-50">50-50</option>
+                                <option value="Net 30">Net 30</option>
                             </select>
-
                         </div>
 
-                        <div
-                            className="fld"
-                            style={{
-                                marginBottom: "16px"
-                            }}
-                        >
-
-                            <label>
-                                Min Order Qty
-                            </label>
-
+                        <div className="fld" style={{ marginBottom: "16px" }}>
+                            <label>Minimum Order Quantity</label>
                             <input
                                 type="number"
+                                min="1"
                                 defaultValue="100"
                             />
-
                         </div>
 
-                        <div
-                            className="fld"
-                            style={{
-                                marginBottom: "16px"
-                            }}
-                        >
-
-                            <label>
-                                UPI ID
-                            </label>
-
-                            <input
-                                placeholder="Enter UPI ID"
-                            />
-
+                        <div className="fld" style={{ marginBottom: "16px" }}>
+                            <label>UPI ID</label>
+                            <input placeholder="Enter UPI ID" />
                         </div>
-
                     </div>
 
                     <div className="btn-row">
-
                         <button
                             type="button"
                             className="btn primary"
@@ -310,234 +171,100 @@ function Settings() {
                         >
                             Save
                         </button>
-
                     </div>
 
                     {pricingSaved && (
-                        <div className="alert s">
-                            Settings saved
+                        <div className="alert s" role="status">
+                            Demo only: pricing preferences have not been saved.
                         </div>
                     )}
-
                 </section>
-
             </div>
 
-            {/* =====================================================
-                ALERT PREFERENCES
-            ====================================================== */}
+            {/* ALERT PREFERENCES */}
+            <section className="settings-card">
+                <h2>Alert Preferences</h2>
 
-            <section
-                className="card"
-                style={{
-                    marginTop: "16px"
-                }}
-            >
-
-                <h2>
-                    Alert Preferences
-                </h2>
-
-                <div
-                    style={{
-                        marginTop: "16px"
-                    }}
-                >
-
-                    {/* LOW STOCK */}
-
+                <div style={{ marginTop: "16px" }}>
                     <div className="settings-row">
-
                         <div>
-
                             <div className="sr-label">
                                 Low cement stock alert
                             </div>
-
                             <div className="sr-sub">
                                 Notify when below 300 bags
                             </div>
-
                         </div>
-
-                        <div
-                            className={`sw2 ${
-                                alertPreferences.lowStock
-                                    ? "on"
-                                    : ""
-                            }`}
-                            onClick={() =>
-                                setAlertPreferences(
-                                    (previous) => ({
-                                        ...previous,
-                                        lowStock:
-                                            !previous.lowStock
-                                    })
-                                )
-                            }
-                        >
-                            {alertPreferences.lowStock
-                                ? "ON"
-                                : "OFF"}
-                        </div>
-
+                        {renderToggle(
+                            alertPreferences.lowStock,
+                            () => toggleAlert("lowStock"),
+                            "Toggle low cement stock alert"
+                        )}
                     </div>
 
-                    {/* OVERDUE DISPATCH */}
-
                     <div className="settings-row">
-
                         <div>
-
                             <div className="sr-label">
                                 Overdue dispatch alert
                             </div>
-
                             <div className="sr-sub">
                                 Notify after 1 day delay
                             </div>
-
                         </div>
-
-                        <div
-                            className={`sw2 ${
-                                alertPreferences.overdueDispatch
-                                    ? "on"
-                                    : ""
-                            }`}
-                            onClick={() =>
-                                setAlertPreferences(
-                                    (previous) => ({
-                                        ...previous,
-                                        overdueDispatch:
-                                            !previous.overdueDispatch
-                                    })
-                                )
-                            }
-                        >
-                            {alertPreferences.overdueDispatch
-                                ? "ON"
-                                : "OFF"}
-                        </div>
-
+                        {renderToggle(
+                            alertPreferences.overdueDispatch,
+                            () => toggleAlert("overdueDispatch"),
+                            "Toggle overdue dispatch alert"
+                        )}
                     </div>
 
-                    {/* PAYMENT OVERDUE */}
-
                     <div className="settings-row">
-
                         <div>
-
                             <div className="sr-label">
                                 Payment overdue reminder
                             </div>
-
                             <div className="sr-sub">
                                 Auto-alert after 30 days
                             </div>
-
                         </div>
-
-                        <div
-                            className={`sw2 ${
-                                alertPreferences.paymentOverdue
-                                    ? "on"
-                                    : ""
-                            }`}
-                            onClick={() =>
-                                setAlertPreferences(
-                                    (previous) => ({
-                                        ...previous,
-                                        paymentOverdue:
-                                            !previous.paymentOverdue
-                                    })
-                                )
-                            }
-                        >
-                            {alertPreferences.paymentOverdue
-                                ? "ON"
-                                : "OFF"}
-                        </div>
-
+                        {renderToggle(
+                            alertPreferences.paymentOverdue,
+                            () => toggleAlert("paymentOverdue"),
+                            "Toggle payment overdue reminder"
+                        )}
                     </div>
 
-                    {/* PRODUCTION SUMMARY */}
-
                     <div className="settings-row">
-
                         <div>
-
                             <div className="sr-label">
                                 Daily production summary email
                             </div>
-
                             <div className="sr-sub">
-                                Sent at 6 PM every day
+                                Intended for 6 PM daily; sending is not implemented.
                             </div>
-
                         </div>
-
-                        <div
-                            className={`sw2 ${
-                                alertPreferences.productionSummary
-                                    ? "on"
-                                    : ""
-                            }`}
-                            onClick={() =>
-                                setAlertPreferences(
-                                    (previous) => ({
-                                        ...previous,
-                                        productionSummary:
-                                            !previous.productionSummary
-                                    })
-                                )
-                            }
-                        >
-                            {alertPreferences.productionSummary
-                                ? "ON"
-                                : "OFF"}
-                        </div>
-
+                        {renderToggle(
+                            alertPreferences.productionSummary,
+                            () => toggleAlert("productionSummary"),
+                            "Toggle daily production summary"
+                        )}
                     </div>
 
-                    {/* DARK MODE */}
-
                     <div className="settings-row">
-
                         <div>
-
-                            <div className="sr-label">
-                                Dark mode
-                            </div>
-
+                            <div className="sr-label">Dark mode</div>
                             <div className="sr-sub">
                                 Switch application appearance
                             </div>
-
                         </div>
-
-                        <div
-                            className={`sw2 ${
-                                isDark ? "on" : ""
-                            }`}
-                            onClick={() =>
-                                setIsDark(
-                                    (previous) =>
-                                        !previous
-                                )
-                            }
-                        >
-                            {isDark
-                                ? "ON"
-                                : "OFF"}
-                        </div>
-
+                        {renderToggle(
+                            isDark,
+                            () => setIsDark((previous) => !previous),
+                            "Toggle dark mode"
+                        )}
                     </div>
-
                 </div>
-
             </section>
-
         </div>
     );
 }

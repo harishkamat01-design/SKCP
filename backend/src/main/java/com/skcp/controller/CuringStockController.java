@@ -1,8 +1,8 @@
 package com.skcp.controller;
 
+import com.skcp.common.ApiResponse;
 import com.skcp.dto.request.curingstock.CuringStockCreateRequest;
 import com.skcp.dto.request.curingstock.CuringStockUpdateRequest;
-import com.skcp.common.ApiResponse;
 import com.skcp.dto.response.curingstock.CuringStockResponse;
 import com.skcp.dto.response.curingstock.CuringStockSummaryResponse;
 import com.skcp.service.CuringStockService;
@@ -10,10 +10,11 @@ import com.skcp.service.CuringStockService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity; 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/curing-stock")
@@ -88,7 +89,7 @@ public class CuringStockController {
     }
 
     // ==========================================================
-    // UPDATE CURING STOCK
+    // UPDATE CURING STOCK REMARKS
     // ==========================================================
 
     @PutMapping("/{id}")
@@ -98,14 +99,47 @@ public class CuringStockController {
             @Valid @RequestBody CuringStockUpdateRequest request) {
 
         CuringStockResponse response =
-                curingStockService.updateCuringStock(
-                        id,
-                        request
-                );
+                curingStockService.updateCuringStock(id, request);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Curing stock updated successfully",
+                        response
+                )
+        );
+    }
+
+    // ==========================================================
+    // UPDATE CURING STATUS
+    //
+    // PATCH /api/curing-stock/{id}/status
+    //
+    // Request body:
+    // { "status": "READY" }
+    //
+    // Or:
+    // { "status": "MOVED" }
+    // ==========================================================
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<CuringStockResponse>>
+    updateCuringStockStatus(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> request) {
+
+        String status = request == null
+                ? null
+                : request.get("status");
+
+        CuringStockResponse response =
+                curingStockService.updateCuringStockStatus(
+                        id,
+                        status
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Curing stock status updated successfully",
                         response
                 )
         );

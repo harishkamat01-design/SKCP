@@ -6,6 +6,7 @@ import com.skcp.enums.RecordStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,46 +14,25 @@ import java.util.Optional;
 public interface RawMaterialStockRepository
         extends JpaRepository<RawMaterialStock, Integer> {
 
-    // ============================================================
-    // GET ALL ACTIVE STOCK RECORDS
-    // ============================================================
-
     List<RawMaterialStock> findByRecordStatus(
             RecordStatus recordStatus
     );
-
-
-    // ============================================================
-    // GET ACTIVE STOCK RECORD BY ID
-    // ============================================================
 
     Optional<RawMaterialStock> findByRawMaterialStockIdAndRecordStatus(
             Integer rawMaterialStockId,
             RecordStatus recordStatus
     );
 
-
-    // ============================================================
-    // CHECK WHETHER ACTIVE STOCK EXISTS FOR RAW MATERIAL
-    // ============================================================
-
-    boolean existsByRawMaterialRawMaterialIdAndRecordStatus(
+    // Check whether this material already has a record for this date.
+    boolean existsByRawMaterialRawMaterialIdAndStockDate(
             Integer rawMaterialId,
-            RecordStatus recordStatus
+            LocalDate stockDate
+    );
+
+    // Check for a duplicate while excluding the record being edited.
+    boolean existsByRawMaterialRawMaterialIdAndStockDateAndRawMaterialStockIdNot(
+            Integer rawMaterialId,
+            LocalDate stockDate,
+            Integer rawMaterialStockId
     );
 }
-
-
-/*
-package com.skcp.repository;
-
-import com.skcp.entity.RawMaterialStock;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface RawMaterialStockRepository extends JpaRepository<RawMaterialStock, Integer> {
-
-}
-
-*/

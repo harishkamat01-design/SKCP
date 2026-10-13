@@ -3129,7 +3129,7 @@ td.mu {
   animation: skcpModalFadeIn 0.18s ease;
 }
 
-.skcp-modal {
+/*.skcp-modal {
   position: relative;
   width: 100%;
   max-width: 680px;
@@ -3141,6 +3141,29 @@ td.mu {
   box-shadow:
     0 20px 50px rgba(9, 30, 66, 0.18),
     0 4px 12px rgba(9, 30, 66, 0.08);
+  animation: skcpModalSlideIn 0.2s ease;
+} */
+
+.skcp-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 680px;
+  max-height: calc(100vh - 40px);
+  min-height: 0;
+
+  overflow: hidden;
+
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  box-shadow:
+    0 20px 50px rgba(9, 30, 66, 0.18),
+    0 4px 12px rgba(9, 30, 66, 0.08);
+
   animation: skcpModalSlideIn 0.2s ease;
 }
 
@@ -3217,7 +3240,17 @@ td.mu {
   cursor: not-allowed;
 }
 
+/*.skcp-modal-body {
+  padding: 20px;
+}*/
+
 .skcp-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+
   padding: 20px;
 }
 

@@ -1,0 +1,1005 @@
+/* ============================================================
+   SKCP - ORDER MODULE
+   Theme: Blue
+   Reference: RawMaterialStock.css
+   File: Order.css
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. ORDER PAGE
+   ------------------------------------------------------------ */
+
+.order-page {
+    --order-accent: #3974c6;
+    --order-accent-hover: #2f63ab;
+    --order-accent-soft: #dceaff;
+    --order-accent-border: #cbdff8;
+
+    --order-text: #263247;
+    --order-muted: #68747c;
+
+    --order-card-bg: #edf5ff;
+    --order-card-border: #cbdff8;
+
+    --order-table-head: #dceaff;
+    --order-table-hover: #eaf3ff;
+
+    --order-input-bg: #ffffff;
+    --order-input-border: #cbd5e1;
+
+    --order-success: #18794e;
+    --order-success-bg: #dcfce7;
+
+    --order-warning: #92400e;
+    --order-warning-bg: #fef3c7;
+
+    --order-danger: #b42318;
+    --order-danger-bg: #fee4e2;
+
+    color: var(--order-text);
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.order-page *,
+.order-page *::before,
+.order-page *::after {
+    box-sizing: border-box;
+}
+
+.order-page .card {
+    background: var(--order-card-bg);
+    border: 1px solid var(--order-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-width: 0;
+    box-shadow: 0 2px 6px rgb(32 64 104 / 5%);
+}
+
+.order-page .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.order-page .card-title {
+    color: var(--order-text);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.order-page .kpi-sub {
+    color: var(--order-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* ------------------------------------------------------------
+   2. BUTTONS
+   ------------------------------------------------------------ */
+
+.order-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 9px 15px;
+    border: 1px solid var(--order-input-border);
+    border-radius: 7px;
+    background: #ffffff;
+    color: var(--order-text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.order-page .btn:hover:not(:disabled) {
+    background: var(--order-accent-soft);
+    border-color: var(--order-accent);
+    color: var(--order-accent-hover);
+}
+
+.order-page .btn.primary {
+    background: var(--order-accent);
+    border-color: var(--order-accent);
+    color: #ffffff;
+}
+
+.order-page .btn.primary:hover:not(:disabled) {
+    background: var(--order-accent-hover);
+    border-color: var(--order-accent-hover);
+    color: #ffffff;
+}
+
+.order-page .btn.secondary {
+    background: #ffffff;
+    border-color: var(--order-accent-border);
+    color: var(--order-accent);
+}
+
+.order-page .btn.secondary:hover:not(:disabled) {
+    background: var(--order-accent-soft);
+    border-color: var(--order-accent);
+}
+
+.order-page .btn.sm {
+    min-height: 30px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.order-page .btn:disabled,
+.order-page button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.order-page .btn:focus-visible,
+.order-page button:focus-visible,
+.order-page input:focus-visible,
+.order-page select:focus-visible,
+.order-page textarea:focus-visible {
+    outline: 2px solid var(--order-accent);
+    outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   3. SEARCH AND FILTER FIELDS
+   ------------------------------------------------------------ */
+
+.order-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.order-page .fld label {
+    color: var(--order-text);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.order-page .fld input,
+.order-page .fld select,
+.order-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid var(--order-input-border);
+    border-radius: 7px;
+    background: var(--order-input-bg);
+    color: var(--order-text);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.order-page .fld textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.order-page .fld input::placeholder,
+.order-page .fld textarea::placeholder {
+    color: var(--order-muted);
+    opacity: 0.85;
+}
+
+.order-page .fld input:focus,
+.order-page .fld select:focus,
+.order-page .fld textarea:focus {
+    border-color: var(--order-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 13%);
+}
+
+.order-page .fld input[readonly],
+.order-page .fld input:read-only {
+    background: #f1f5f9;
+    color: #526174;
+    cursor: default;
+}
+
+.order-page .fld input:disabled,
+.order-page .fld select:disabled,
+.order-page .fld textarea:disabled {
+    background: #f1f5f9;
+    color: #68747c;
+    cursor: not-allowed;
+}
+
+.order-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.order-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+/* ------------------------------------------------------------
+   4. ORDER LIST TABLE
+   ------------------------------------------------------------ */
+
+.order-page .tbl-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--order-card-border);
+    border-radius: 9px;
+    background: #ffffff;
+    scrollbar-width: thin;
+    scrollbar-color: #b7c9df transparent;
+}
+
+.order-page .tbl-wrap table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--order-text);
+    font-size: 13px;
+}
+
+.order-page .tbl-wrap thead th {
+    padding: 13px 12px;
+    background: var(--order-table-head);
+    color: var(--order-text);
+    border-bottom: 1px solid var(--order-card-border);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.order-page .tbl-wrap thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.order-page .tbl-wrap thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.order-page .tbl-wrap thead th[style*="cursor: pointer"] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.order-page .tbl-wrap thead th[style*="cursor: pointer"]:hover {
+    background: #cbdff8;
+    color: var(--order-accent-hover);
+}
+
+.order-page .tbl-wrap tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #e4ebf3;
+    background: #ffffff;
+    color: var(--order-text);
+    vertical-align: middle;
+    line-height: 1.5;
+}
+
+.order-page .tbl-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-page .tbl-wrap tbody tr:hover td {
+    background: var(--order-table-hover);
+}
+
+.order-page .tbl-wrap tbody td strong {
+    font-weight: 650;
+}
+
+.order-page .tbl-wrap tfoot td {
+    padding: 13px 12px;
+    background: var(--order-table-head);
+    border-top: 1px solid var(--order-card-border);
+    color: var(--order-text);
+}
+
+/* ------------------------------------------------------------
+   5. ORDER ITEM TABLE INPUTS
+   ------------------------------------------------------------ */
+
+.order-page .tbl-wrap tbody td input,
+.order-page .tbl-wrap tbody td select {
+    display: block;
+    width: 100%;
+    min-width: 75px;
+    min-height: 36px;
+    padding: 7px 8px;
+    border: 1px solid var(--order-input-border);
+    border-radius: 6px;
+    background: var(--order-input-bg);
+    color: var(--order-text);
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.order-page .tbl-wrap tbody td select {
+    min-width: 150px;
+}
+
+.order-page .tbl-wrap tbody td input:focus,
+.order-page .tbl-wrap tbody td select:focus {
+    border-color: var(--order-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(57 116 198 / 12%);
+}
+
+.order-page .tbl-wrap tbody td input[readonly] {
+    background: #f1f5f9;
+    color: #526174;
+}
+
+.order-page .tbl-wrap tbody td strong {
+    white-space: nowrap;
+}
+
+/* ------------------------------------------------------------
+   6. TABLE ACTION BUTTONS
+   ------------------------------------------------------------ */
+
+.order-page .table-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.order-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.order-page .view-btn {
+    /*background: #e6f0ff;
+    border-color: #c6dcff;
+    color: #245ca8;*/
+
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.order-page .view-btn:hover:not(:disabled) {
+    /*background: #d2e4ff;
+    border-color: #9fc3fb;*/
+
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+
+}
+
+
+.order-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+    /*background: #fff4d6;
+    border-color: #f5df9b;
+    color: #805b00;*/
+
+    }
+
+.order-page .edit-btn:hover:not(:disabled) {
+        background: #d7e7ff;
+    border-color: #a9c7f0;
+
+    /*
+    background: #ffebba;
+    border-color: #eacb69;
+    */
+}
+
+.order-page .delete-btn {
+    background: #fee4e2;
+    border-color: #f8c9c5;
+    color: #b42318;
+}
+
+.order-page .delete-btn:hover:not(:disabled) {
+    background: #ffd5d1;
+    border-color: #eea7a1;
+}
+
+/* ------------------------------------------------------------
+   7. STATUS BADGES
+   ------------------------------------------------------------ */
+
+.order-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 5px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.order-page .badge.bg {
+    background: var(--order-success-bg);
+    border-color: #bbf7d0;
+    color: var(--order-success);
+}
+
+.order-page .badge.br {
+    background: var(--order-warning-bg);
+    border-color: #fde68a;
+    color: var(--order-warning);
+}
+
+/* ------------------------------------------------------------
+   8. LOADING, EMPTY, AND VALIDATION STATES
+   ------------------------------------------------------------ */
+
+.order-page .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 110px;
+    padding: 24px 16px;
+    border: 1px dashed var(--order-card-border);
+    border-radius: 8px;
+    background: rgb(255 255 255 / 55%);
+    color: var(--order-muted);
+    text-align: center;
+}
+
+.order-page .empty-state p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.order-page .form-error {
+    padding: 10px 12px;
+    border: 1px solid #f8c9c5;
+    border-radius: 7px;
+    background: var(--order-danger-bg);
+    color: var(--order-danger);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.order-page .form-success {
+    padding: 10px 12px;
+    border: 1px solid #bbf7d0;
+    border-radius: 7px;
+    background: var(--order-success-bg);
+    color: var(--order-success);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ------------------------------------------------------------
+   9. ORDER MODAL SECTIONS
+   Applies to section elements rendered within Order page.
+   ------------------------------------------------------------ */
+
+.order-page .customer-modal-section {
+    min-width: 0;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid var(--order-card-border);
+    border-radius: 9px;
+    background: var(--order-card-bg);
+}
+
+.order-page .customer-modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.order-page .customer-modal-section-title {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--order-card-border);
+    color: var(--order-text);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.order-page .customer-modal-section-title > div {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.order-page .customer-modal-section .tbl-wrap {
+    margin-top: 4px;
+}
+
+.order-page .customer-modal-section .form-grid {
+    margin-top: 2px;
+}
+
+.order-page .customer-modal-section .fld {
+    min-width: 0;
+}
+
+/* ------------------------------------------------------------
+   10. DETAIL GRID / ORDER BILL
+   ------------------------------------------------------------ */
+
+.order-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.order-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--order-card-border);
+    border-radius: 7px;
+    background: #ffffff;
+    overflow-wrap: anywhere;
+}
+
+.order-page .detail-item label,
+.order-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--order-muted);
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.order-page .detail-item p,
+.order-page .detail-item .detail-value {
+    margin: 0;
+    color: var(--order-text);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------
+   11. PAGINATION
+   ------------------------------------------------------------ */
+
+.order-page .pagination,
+.order-page .pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 12px;
+    color: var(--order-muted);
+    font-size: 12px;
+}
+
+.order-page .pagination button,
+.order-page .pagination-container button {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 6px 9px;
+    border: 1px solid var(--order-card-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--order-text);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.order-page .pagination button:hover:not(:disabled),
+.order-page .pagination-container button:hover:not(:disabled) {
+    background: var(--order-accent-soft);
+    border-color: var(--order-accent);
+}
+
+.order-page .pagination button:disabled,
+.order-page .pagination-container button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.order-page .pagination select,
+.order-page .pagination-container select {
+    min-height: 32px;
+    padding: 5px 8px;
+    border: 1px solid var(--order-input-border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--order-text);
+    font-family: inherit;
+    font-size: 12px;
+}
+
+/* ------------------------------------------------------------
+   12. DARK THEME
+   Works with common theme attributes/classes.
+   ------------------------------------------------------------ */
+
+[data-theme="dark"] .order-page,
+.dark .order-page,
+body.dark .order-page,
+[data-bs-theme="dark"] .order-page {
+    --order-accent: #79aaf5;
+    --order-accent-hover: #9bc0ff;
+    --order-accent-soft: #293d59;
+    --order-accent-border: #405573;
+
+    --order-text: #e8edf2;
+    --order-muted: #aab5c0;
+
+    --order-card-bg: #202a35;
+    --order-card-border: #394653;
+
+    --order-table-head: #293d59;
+    --order-table-hover: #28374a;
+
+    --order-input-bg: #18212b;
+    --order-input-border: #465565;
+
+    --order-success: #86efac;
+    --order-success-bg: #173b2c;
+
+    --order-warning: #fcd34d;
+    --order-warning-bg: #473617;
+
+    --order-danger: #fca5a5;
+    --order-danger-bg: #482626;
+}
+
+[data-theme="dark"] .order-page .tbl-wrap,
+.dark .order-page .tbl-wrap,
+body.dark .order-page .tbl-wrap,
+[data-bs-theme="dark"] .order-page .tbl-wrap {
+    background: #18212b;
+    border-color: var(--order-card-border);
+}
+
+[data-theme="dark"] .order-page .tbl-wrap tbody td,
+.dark .order-page .tbl-wrap tbody td,
+body.dark .order-page .tbl-wrap tbody td,
+[data-bs-theme="dark"] .order-page .tbl-wrap tbody td {
+    background: #202a35;
+    border-bottom-color: #394653;
+    color: var(--order-text);
+}
+
+[data-theme="dark"] .order-page .tbl-wrap tbody tr:hover td,
+.dark .order-page .tbl-wrap tbody tr:hover td,
+body.dark .order-page .tbl-wrap tbody tr:hover td,
+[data-bs-theme="dark"] .order-page .tbl-wrap tbody tr:hover td {
+    background: var(--order-table-hover);
+}
+
+[data-theme="dark"] .order-page .tbl-wrap tfoot td,
+.dark .order-page .tbl-wrap tfoot td,
+body.dark .order-page .tbl-wrap tfoot td,
+[data-bs-theme="dark"] .order-page .tbl-wrap tfoot td {
+    background: var(--order-table-head);
+    border-top-color: var(--order-card-border);
+    color: var(--order-text);
+}
+
+[data-theme="dark"] .order-page .tbl-wrap tbody td input,
+[data-theme="dark"] .order-page .tbl-wrap tbody td select,
+.dark .order-page .tbl-wrap tbody td input,
+.dark .order-page .tbl-wrap tbody td select,
+body.dark .order-page .tbl-wrap tbody td input,
+body.dark .order-page .tbl-wrap tbody td select,
+[data-bs-theme="dark"] .order-page .tbl-wrap tbody td input,
+[data-bs-theme="dark"] .order-page .tbl-wrap tbody td select {
+    background: var(--order-input-bg);
+    border-color: var(--order-input-border);
+    color: var(--order-text);
+}
+
+[data-theme="dark"] .order-page .fld input[readonly],
+[data-theme="dark"] .order-page .fld input:read-only,
+.dark .order-page .fld input[readonly],
+.dark .order-page .fld input:read-only,
+body.dark .order-page .fld input[readonly],
+body.dark .order-page .fld input:read-only,
+[data-bs-theme="dark"] .order-page .fld input[readonly],
+[data-bs-theme="dark"] .order-page .fld input:read-only {
+    background: #26313d;
+    color: #b9c5d1;
+}
+
+[data-theme="dark"] .order-page .fld input:disabled,
+[data-theme="dark"] .order-page .fld select:disabled,
+[data-theme="dark"] .order-page .fld textarea:disabled,
+.dark .order-page .fld input:disabled,
+.dark .order-page .fld select:disabled,
+.dark .order-page .fld textarea:disabled,
+body.dark .order-page .fld input:disabled,
+body.dark .order-page .fld select:disabled,
+body.dark .order-page .fld textarea:disabled,
+[data-bs-theme="dark"] .order-page .fld input:disabled,
+[data-bs-theme="dark"] .order-page .fld select:disabled,
+[data-bs-theme="dark"] .order-page .fld textarea:disabled {
+    background: #26313d;
+    color: #aab5c0;
+}
+
+[data-theme="dark"] .order-page .btn,
+.dark .order-page .btn,
+body.dark .order-page .btn,
+[data-bs-theme="dark"] .order-page .btn {
+    background: #26313d;
+    border-color: #465565;
+    color: var(--order-text);
+}
+
+[data-theme="dark"] .order-page .btn.primary,
+.dark .order-page .btn.primary,
+body.dark .order-page .btn.primary,
+[data-bs-theme="dark"] .order-page .btn.primary {
+    background: var(--order-accent);
+    border-color: var(--order-accent);
+    color: #152235;
+}
+
+[data-theme="dark"] .order-page .btn.primary:hover:not(:disabled),
+.dark .order-page .btn.primary:hover:not(:disabled),
+body.dark .order-page .btn.primary:hover:not(:disabled),
+[data-bs-theme="dark"] .order-page .btn.primary:hover:not(:disabled) {
+    background: var(--order-accent-hover);
+    border-color: var(--order-accent-hover);
+    color: #152235;
+}
+
+[data-theme="dark"] .order-page .btn.secondary,
+.dark .order-page .btn.secondary,
+body.dark .order-page .btn.secondary,
+[data-bs-theme="dark"] .order-page .btn.secondary {
+    background: #26313d;
+    color: var(--order-accent);
+}
+
+[data-theme="dark"] .order-page .view-btn,
+.dark .order-page .view-btn,
+body.dark .order-page .view-btn,
+[data-bs-theme="dark"] .order-page .view-btn {
+    background: #223650;
+    border-color: #385a82;
+    color: #a9ccff;
+}
+
+[data-theme="dark"] .order-page .edit-btn,
+.dark .order-page .edit-btn,
+body.dark .order-page .edit-btn,
+[data-bs-theme="dark"] .order-page .edit-btn {
+    background: #45381e;
+    border-color: #66542c;
+    color: #fcd978;
+}
+
+[data-theme="dark"] .order-page .delete-btn,
+.dark .order-page .delete-btn,
+body.dark .order-page .delete-btn,
+[data-bs-theme="dark"] .order-page .delete-btn {
+    background: #482626;
+    border-color: #713a3a;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .order-page .empty-state,
+.dark .order-page .empty-state,
+body.dark .order-page .empty-state,
+[data-bs-theme="dark"] .order-page .empty-state {
+    background: rgb(24 33 43 / 60%);
+    border-color: var(--order-card-border);
+    color: var(--order-muted);
+}
+
+[data-theme="dark"] .order-page .detail-item,
+.dark .order-page .detail-item,
+body.dark .order-page .detail-item,
+[data-bs-theme="dark"] .order-page .detail-item {
+    background: #18212b;
+    border-color: var(--order-card-border);
+}
+
+[data-theme="dark"] .order-page .pagination button,
+[data-theme="dark"] .order-page .pagination-container button,
+[data-theme="dark"] .order-page .pagination select,
+[data-theme="dark"] .order-page .pagination-container select,
+.dark .order-page .pagination button,
+.dark .order-page .pagination-container button,
+.dark .order-page .pagination select,
+.dark .order-page .pagination-container select,
+body.dark .order-page .pagination button,
+body.dark .order-page .pagination-container button,
+body.dark .order-page .pagination select,
+body.dark .order-page .pagination-container select,
+[data-bs-theme="dark"] .order-page .pagination button,
+[data-bs-theme="dark"] .order-page .pagination-container button,
+[data-bs-theme="dark"] .order-page .pagination select,
+[data-bs-theme="dark"] .order-page .pagination-container select {
+    background: #202a35;
+    border-color: var(--order-card-border);
+    color: var(--order-text);
+}
+
+/* ------------------------------------------------------------
+   13. RESPONSIVE LAYOUT
+   ------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+    .order-page .card {
+        padding: 16px;
+    }
+
+    .order-page .card-title {
+        font-size: 17px;
+    }
+
+    .order-page .form-grid {
+        gap: 13px;
+    }
+
+    .order-page .customer-modal-section {
+        padding: 13px;
+    }
+
+    .order-page .tbl-wrap table {
+        min-width: 720px;
+    }
+
+    .order-page .table-actions {
+        min-width: 170px;
+    }
+}
+
+@media (max-width: 640px) {
+    .order-page .card {
+        padding: 13px;
+        margin-bottom: 14px;
+        border-radius: 9px;
+    }
+
+    .order-page .card-head {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .order-page .card-title {
+        font-size: 16px;
+    }
+
+    .order-page .kpi-sub {
+        font-size: 12px;
+    }
+
+    .order-page .card-head > .btn {
+        width: 100%;
+    }
+
+    .order-page .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .order-page .form-grid .f-full {
+        grid-column: auto;
+    }
+
+    .order-page .fld input,
+    .order-page .fld select,
+    .order-page .fld textarea {
+        font-size: 14px;
+    }
+
+    .order-page .btn {
+        min-height: 38px;
+    }
+
+    .order-page .customer-modal-section {
+        padding: 11px;
+        margin-bottom: 13px;
+    }
+
+    .order-page .customer-modal-section-title {
+        font-size: 13px;
+    }
+
+    .order-page .customer-modal-section-title > div {
+        align-items: flex-start !important;
+    }
+
+    .order-page .tbl-wrap {
+        border-radius: 7px;
+    }
+
+    .order-page .tbl-wrap table {
+        min-width: 690px;
+        font-size: 12px;
+    }
+
+    .order-page .tbl-wrap thead th,
+    .order-page .tbl-wrap tbody td,
+    .order-page .tbl-wrap tfoot td {
+        padding: 10px 9px;
+    }
+
+    .order-page .table-actions {
+        gap: 5px;
+        min-width: 165px;
+    }
+
+    .order-page .action-btn {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    .order-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .order-page .pagination,
+    .order-page .pagination-container {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* ------------------------------------------------------------
+   14. REDUCED MOTION
+   ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+    .order-page *,
+    .order-page *::before,
+    .order-page *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

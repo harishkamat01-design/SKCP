@@ -5,20 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class RawMaterialStockUpdateRequest {
-
-    // ============================================================
-    // RAW MATERIAL ID
-    // ============================================================
 
     @NotNull(message = "Raw material ID is required")
     private Integer rawMaterialId;
 
-
-    // ============================================================
-    // CURRENT STOCK LEVEL
-    // ============================================================
+    @NotNull(message = "Stock date is required")
+    private LocalDate stockDate;
 
     @NotNull(message = "Current stock level is required")
     @DecimalMin(
@@ -27,21 +22,11 @@ public class RawMaterialStockUpdateRequest {
     )
     private BigDecimal currentStockLevel;
 
-
-    // ============================================================
-    // MINIMUM STOCK LEVEL
-    // ============================================================
-
     @DecimalMin(
             value = "0.00",
             message = "Minimum stock level cannot be negative"
     )
     private BigDecimal minimumStockLevel;
-
-
-    // ============================================================
-    // NOTES
-    // ============================================================
 
     @Size(
             max = 1000,
@@ -49,18 +34,8 @@ public class RawMaterialStockUpdateRequest {
     )
     private String notes;
 
-
-    // ============================================================
-    // DEFAULT CONSTRUCTOR
-    // ============================================================
-
     public RawMaterialStockUpdateRequest() {
     }
-
-
-    // ============================================================
-    // GETTERS AND SETTERS
-    // ============================================================
 
     public Integer getRawMaterialId() {
         return rawMaterialId;
@@ -70,28 +45,29 @@ public class RawMaterialStockUpdateRequest {
         this.rawMaterialId = rawMaterialId;
     }
 
+    public LocalDate getStockDate() {
+        return stockDate;
+    }
+
+    public void setStockDate(LocalDate stockDate) {
+        this.stockDate = stockDate;
+    }
 
     public BigDecimal getCurrentStockLevel() {
         return currentStockLevel;
     }
 
-    public void setCurrentStockLevel(
-            BigDecimal currentStockLevel) {
-
+    public void setCurrentStockLevel(BigDecimal currentStockLevel) {
         this.currentStockLevel = currentStockLevel;
     }
-
 
     public BigDecimal getMinimumStockLevel() {
         return minimumStockLevel;
     }
 
-    public void setMinimumStockLevel(
-            BigDecimal minimumStockLevel) {
-
+    public void setMinimumStockLevel(BigDecimal minimumStockLevel) {
         this.minimumStockLevel = minimumStockLevel;
     }
-
 
     public String getNotes() {
         return notes;
@@ -101,21 +77,12 @@ public class RawMaterialStockUpdateRequest {
         this.notes = normalize(notes);
     }
 
-
-    // ============================================================
-    // NORMALIZATION
-    // ============================================================
-
     private String normalize(String value) {
-
         if (value == null) {
             return null;
         }
 
         String trimmedValue = value.trim();
-
-        return trimmedValue.isEmpty()
-                ? null
-                : trimmedValue;
+        return trimmedValue.isEmpty() ? null : trimmedValue;
     }
 }

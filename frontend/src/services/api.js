@@ -1,3 +1,4 @@
+
 const API_BASE_URL = "http://localhost:8080";
 
 const apiRequest = async (endpoint, options = {}) => {
@@ -51,6 +52,13 @@ export const apiPost = (endpoint, data) => {
 export const apiPut = (endpoint, data) => {
     return apiRequest(endpoint, {
         method: "PUT",
+        body: JSON.stringify(data),
+    });
+};
+
+export const apiPatch = (endpoint, data) => {
+    return apiRequest(endpoint, {
+        method: "PATCH",
         body: JSON.stringify(data),
     });
 };

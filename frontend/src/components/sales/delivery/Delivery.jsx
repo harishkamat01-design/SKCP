@@ -19,6 +19,8 @@ import useTableSort from "../../../hooks/useTableSort";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../ui/Pagination";
 
+import "./Delivery.css";
+
 const DELIVERY_STATUSES = [
     "PENDING",
     "IN_PROGRESS",
@@ -786,7 +788,7 @@ function Delivery() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page deliveries-page">
                 <section className="card">
                     <h2>Deliveries</h2>
                     <p>
@@ -802,7 +804,7 @@ function Delivery() {
     // ============================================================
 
     return (
-        <div className="page">
+        <div className="page deliveries-page">
             {/* ==================================================
                 HEADER + SEARCH + FILTERS
             ================================================== */}

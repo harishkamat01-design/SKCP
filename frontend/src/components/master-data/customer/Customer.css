@@ -1,0 +1,833 @@
+/* =========================================================
+   SKCP — CUSTOMER PAGE
+   File: Customer.css
+   Module: Master Data — Blue
+   Scope: Customer page and its own modals only
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CUSTOMER PAGE VARIABLES
+--------------------------------------------------------- */
+
+.customer-page {
+  --customer-accent: #3974c6;
+  --customer-accent-hover: #2f63ab;
+  --customer-accent-soft: #dceaff;
+  --customer-accent-border: #cbdff8;
+
+  --customer-text: #263247;
+  --customer-muted: #68747c;
+
+  /* Light-blue cards */
+  --customer-card: #edf5ff;
+  --customer-border: #cbdff8;
+
+  /* Light-blue tables */
+  --customer-table-header: #dceaff;
+  --customer-row-hover: #dceaff;
+
+  /* Light-blue modal surfaces */
+  --customer-modal: #eaf3ff;
+  --customer-modal-header: #dceaff;
+  --customer-modal-border: #cbdff8;
+
+  width: 100%;
+  min-width: 0;
+  color: var(--customer-text);
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------
+   DARK THEME
+--------------------------------------------------------- */
+
+.app.dark .customer-page,
+.dark .customer-page {
+  --customer-accent: #79aaf5;
+  --customer-accent-hover: #9bc0ff;
+  --customer-accent-soft: #293d59;
+  --customer-accent-border: #405573;
+
+  --customer-text: #e8edf2;
+  --customer-muted: #aab5c0;
+
+  --customer-card: #202a35;
+  --customer-border: #394653;
+
+  --customer-table-header: #293d59;
+  --customer-row-hover: #28374a;
+
+  --customer-modal: #202a35;
+  --customer-modal-header: #26384e;
+  --customer-modal-border: #405573;
+}
+
+/* ---------------------------------------------------------
+   PAGE CARDS
+   Customers and Customer List
+--------------------------------------------------------- */
+
+.customer-page > .card {
+  box-sizing: border-box;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding: 20px;
+  color: var(--customer-text);
+  background: var(--customer-card);
+  border: 1px solid var(--customer-border);
+  border-radius: 14px;
+  box-shadow: 0 2px 7px rgba(31, 45, 75, 0.035);
+}
+
+.customer-page > .card:last-child {
+  margin-bottom: 0;
+}
+
+.customer-page > .card h2 {
+  margin: 0 0 6px;
+  color: var(--customer-text);
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.35;
+}
+
+.customer-page > .card p {
+  margin: 5px 0 0;
+  color: var(--customer-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------
+   PRIMARY BUTTON
+--------------------------------------------------------- */
+
+.customer-page .action-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.customer-page > .card:first-child > div:first-child
+  > button.view-btn {
+  min-height: 38px;
+  padding: 9px 16px;
+  color: #ffffff;
+/*background: #3974c6;
+  border-color: #3974c6;*/
+  background: var(--customer-accent);
+  border-color: var(--customer-accent);
+  font-size: 12px;
+}
+
+.customer-page > .card:first-child > div:first-child
+  > button.view-btn:hover {
+
+  background: var(--customer-accent-hover);
+  border-color: var(--customer-accent-hover);
+  /*background: #2f63ab;
+  border-color: #2f63ab;*/
+}
+
+.customer-page .action-btn:focus-visible,
+.customer-page .btn:focus-visible {
+  outline: 3px solid rgba(57, 116, 198, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------
+   TABLE ACTION BUTTONS
+--------------------------------------------------------- */
+
+.customer-page .table-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.customer-page .table-actions .view-btn {
+  color: #2457a7;
+  background: #edf2fa;
+  border-color: #dce6f6;
+}
+
+.customer-page .table-actions .view-btn:hover {
+  background: #dfeafb;
+  border-color: #c7d8f3;
+}
+
+.customer-page .table-actions .edit-btn {
+  color: #936018;
+  background: #fff7eb;
+  border-color: #f1e2c8;
+}
+
+.customer-page .table-actions .edit-btn:hover {
+  background: #ffefd6;
+  border-color: #e9d3ad;
+}
+
+.customer-page .table-actions .delete-btn {
+  color: #a43f3a;
+  background: #fff1f0;
+  border-color: #f3d9d7;
+}
+
+.customer-page .table-actions .delete-btn:hover {
+  background: #fee5e3;
+  border-color: #edc5c2;
+}
+
+/* ---------------------------------------------------------
+   FILTERS AND FORM FIELDS
+--------------------------------------------------------- */
+
+.customer-page .fld {
+  min-width: 0;
+}
+
+.customer-page .fld label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--customer-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.customer-page .fld input,
+.customer-page .fld select,
+.customer-page .fld textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 9px 11px;
+  color: var(--customer-text);
+  background: #ffffff;
+  border: 1px solid var(--customer-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.customer-page .fld textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.customer-page .fld input::placeholder,
+.customer-page .fld textarea::placeholder {
+  color: #98a2b3;
+  opacity: 1;
+}
+
+.customer-page .fld input:focus,
+.customer-page .fld select:focus,
+.customer-page .fld textarea:focus {
+  outline: none;
+  border-color: var(--customer-accent);
+  box-shadow: 0 0 0 3px rgba(57, 116, 198, 0.12);
+}
+
+.customer-page .fld input:disabled,
+.customer-page .fld select:disabled,
+.customer-page .fld textarea:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Date and search filters */
+
+.customer-page input[type="date"] {
+  min-height: 38px;
+}
+
+.customer-page .btn.secondary {
+  min-height: 38px;
+  padding: 8px 14px;
+  color: var(--customer-text);
+  background: #ffffff;
+  border: 1px solid var(--customer-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.customer-page .btn.secondary:hover {
+  background: var(--customer-accent-soft);
+  border-color: var(--customer-accent-border);
+}
+
+/* ---------------------------------------------------------
+   CUSTOMER TABLE
+--------------------------------------------------------- */
+
+.customer-page .table-wrap {
+  width: 100%;
+  min-width: 0;
+  margin-top: 14px;
+  overflow-x: auto;
+  background: #eaf3ff;
+  border: 1px solid var(--customer-border);
+  border-radius: 10px;
+  scrollbar-width: thin;
+}
+
+.customer-page .table-wrap table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--customer-text);
+  background: #eaf3ff;
+  font-size: 12px;
+}
+
+.customer-page .table-wrap thead th {
+  padding: 12px 13px;
+  color: #44546a;
+  background: var(--customer-table-header);
+  border-bottom: 1px solid var(--customer-border);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  line-height: 1.45;
+  text-align: left;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.customer-page .table-wrap thead th:first-child {
+  padding-left: 15px;
+}
+
+.customer-page .table-wrap thead th[style*="cursor: pointer"] {
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+
+.customer-page .table-wrap thead th[style*="cursor: pointer"]:hover {
+  color: #2457a7;
+  background: #cfe2ff;
+}
+
+.customer-page .table-wrap tbody td {
+  padding: 12px 13px;
+  background: #edf5ff;
+  border-bottom: 1px solid var(--customer-border);
+  font-size: 12px;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.customer-page .table-wrap tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.customer-page .table-wrap tbody tr {
+  transition: background 140ms ease;
+}
+
+.customer-page .table-wrap tbody tr:hover td {
+  background: var(--customer-row-hover);
+}
+
+.customer-page .table-wrap tbody td:first-child {
+  padding-left: 15px;
+  color: var(--customer-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.customer-page .table-wrap tbody td:nth-child(3) {
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   ADD CUSTOMER MODAL SECTIONS
+--------------------------------------------------------- */
+
+.customer-page .form-section {
+  margin-bottom: 16px;
+  padding: 15px;
+  color: var(--customer-text);
+  background: var(--customer-modal);
+  border: 1px solid var(--customer-modal-border);
+  border-radius: 10px;
+}
+
+.customer-page .form-section:last-child {
+  margin-bottom: 0;
+}
+
+.customer-page .form-section h4 {
+  margin: 0 0 14px;
+  padding-bottom: 9px;
+  color: var(--customer-text);
+  border-bottom: 1px solid var(--customer-modal-border);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.customer-page .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.customer-page .form-grid .fld {
+  min-width: 0;
+}
+
+.customer-page .form-grid .full {
+  grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------
+   EDIT CUSTOMER MODAL FORM
+--------------------------------------------------------- */
+
+.customer-page .edit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.customer-page .edit-form-grid .edit-full {
+  grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------
+   CUSTOMER MODALS
+   These selectors are scoped to Customer only.
+   Covers Add, Edit and View modal panels.
+--------------------------------------------------------- */
+
+.customer-page .skcp-modal {
+  color: var(--customer-text);
+  background: var(--customer-modal);
+  border: 1px solid var(--customer-modal-border);
+  border-radius: 14px;
+  box-shadow: 0 18px 55px rgba(23, 43, 77, 0.22);
+}
+
+/* Modal header */
+
+.customer-page .skcp-modal .skcp-modal-header {
+  color: var(--customer-text);
+  background: var(--customer-modal-header);
+  border-bottom: 1px solid var(--customer-modal-border);
+  border-radius: 13px 13px 0 0;
+}
+
+/* Modal title */
+
+.customer-page .skcp-modal .skcp-modal-title {
+  color: var(--customer-text);
+  font-weight: 700;
+}
+
+/* Modal subtitle */
+
+.customer-page .skcp-modal .skcp-modal-subtitle {
+  color: var(--customer-muted);
+}
+
+/* Modal body */
+
+.customer-page .skcp-modal .skcp-modal-body {
+  color: var(--customer-text);
+  background: var(--customer-modal);
+}
+
+/* Modal footer */
+
+.customer-page .skcp-modal .skcp-modal-footer {
+  color: var(--customer-text);
+  background: var(--customer-modal-header);
+  border-top: 1px solid var(--customer-modal-border);
+  border-radius: 0 0 13px 13px;
+}
+
+/* Modal close button */
+
+.customer-page .skcp-modal .skcp-modal-close {
+  color: var(--customer-text);
+}
+
+.customer-page .skcp-modal .skcp-modal-close:hover {
+  color: var(--customer-accent);
+}
+
+/* Ensure modal content inherits Customer colors */
+
+.customer-page .skcp-modal .form-section,
+.customer-page .skcp-modal .edit-form-grid {
+  color: var(--customer-text);
+}
+
+/* Modal input backgrounds remain white for readability */
+
+.customer-page .skcp-modal .fld input,
+.customer-page .skcp-modal .fld select,
+.customer-page .skcp-modal .fld textarea {
+  color: var(--customer-text);
+  background: #ffffff;
+  border-color: var(--customer-modal-border);
+}
+
+/* ---------------------------------------------------------
+   VALIDATION AND STATUS MESSAGES
+--------------------------------------------------------- */
+
+.customer-page .form-error,
+.customer-page .alert.e.show {
+  margin-top: 10px;
+  padding: 10px 12px;
+  color: #a52828;
+  background: #fff4f4;
+  border: 1px solid #e6b8b8;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.customer-page .alert.s.show {
+  margin-top: 10px;
+  padding: 10px 12px;
+  color: #176b42;
+  background: #eaf8f0;
+  border: 1px solid #c6ead4;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.customer-page .empty-state {
+  padding: 18px;
+  color: var(--customer-muted);
+  text-align: center;
+}
+
+.customer-page .empty-state p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   DARK THEME — CARDS AND TABLE
+--------------------------------------------------------- */
+
+.app.dark .customer-page > .card,
+.dark .customer-page > .card {
+  color: var(--customer-text);
+  background: var(--customer-card);
+  border-color: var(--customer-border);
+  box-shadow: none;
+}
+
+.app.dark .customer-page > .card h2,
+.dark .customer-page > .card h2 {
+  color: var(--customer-text);
+}
+
+.app.dark .customer-page > .card p,
+.dark .customer-page > .card p {
+  color: var(--customer-muted);
+}
+
+.app.dark .customer-page .table-wrap,
+.dark .customer-page .table-wrap {
+  background: var(--customer-card);
+  border-color: var(--customer-border);
+}
+
+.app.dark .customer-page .table-wrap table,
+.dark .customer-page .table-wrap table {
+  color: var(--customer-text);
+  background: var(--customer-card);
+}
+
+.app.dark .customer-page .table-wrap thead th,
+.dark .customer-page .table-wrap thead th {
+  color: #d3dceb;
+  background: var(--customer-table-header);
+  border-bottom-color: var(--customer-border);
+}
+
+.app.dark .customer-page .table-wrap thead th[style*="cursor: pointer"]:hover,
+.dark .customer-page .table-wrap thead th[style*="cursor: pointer"]:hover {
+  color: #ffffff;
+  background: #30435c;
+}
+
+.app.dark .customer-page .table-wrap tbody td,
+.dark .customer-page .table-wrap tbody td {
+  color: var(--customer-text);
+  background: var(--customer-card);
+  border-bottom-color: var(--customer-border);
+}
+
+.app.dark .customer-page .table-wrap tbody tr:hover td,
+.dark .customer-page .table-wrap tbody tr:hover td {
+  background: var(--customer-row-hover);
+}
+
+/* ---------------------------------------------------------
+   DARK THEME — FORM FIELDS
+--------------------------------------------------------- */
+
+.app.dark .customer-page .fld input,
+.app.dark .customer-page .fld select,
+.app.dark .customer-page .fld textarea,
+.dark .customer-page .fld input,
+.dark .customer-page .fld select,
+.dark .customer-page .fld textarea {
+  color: var(--customer-text);
+  background: #1b2530;
+  border-color: #465361;
+}
+
+.app.dark .customer-page .fld input::placeholder,
+.app.dark .customer-page .fld textarea::placeholder,
+.dark .customer-page .fld input::placeholder,
+.dark .customer-page .fld textarea::placeholder {
+  color: #98a5b5;
+}
+
+.app.dark .customer-page .btn.secondary,
+.dark .customer-page .btn.secondary {
+  color: var(--customer-text);
+  background: #26323e;
+  border-color: #465361;
+}
+
+.app.dark .customer-page .btn.secondary:hover,
+.dark .customer-page .btn.secondary:hover {
+  background: var(--customer-accent-soft);
+  border-color: var(--customer-accent);
+}
+
+/* ---------------------------------------------------------
+   DARK THEME — MODALS
+--------------------------------------------------------- */
+
+.app.dark .customer-page .skcp-modal,
+.dark .customer-page .skcp-modal {
+  color: var(--customer-text);
+  background: var(--customer-modal);
+  border-color: var(--customer-modal-border);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.4);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-header,
+.dark .customer-page .skcp-modal .skcp-modal-header {
+  color: var(--customer-text);
+  background: var(--customer-modal-header);
+  border-bottom-color: var(--customer-modal-border);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-title,
+.dark .customer-page .skcp-modal .skcp-modal-title {
+  color: var(--customer-text);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-subtitle,
+.dark .customer-page .skcp-modal .skcp-modal-subtitle {
+  color: var(--customer-muted);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-body,
+.dark .customer-page .skcp-modal .skcp-modal-body {
+  color: var(--customer-text);
+  background: var(--customer-modal);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-footer,
+.dark .customer-page .skcp-modal .skcp-modal-footer {
+  color: var(--customer-text);
+  background: var(--customer-modal-header);
+  border-top-color: var(--customer-modal-border);
+}
+
+.app.dark .customer-page .skcp-modal .skcp-modal-close,
+.dark .customer-page .skcp-modal .skcp-modal-close {
+  color: var(--customer-text);
+}
+
+.app.dark .customer-page .form-section,
+.dark .customer-page .form-section {
+  color: var(--customer-text);
+  background: var(--customer-modal);
+  border-color: var(--customer-modal-border);
+}
+
+.app.dark .customer-page .form-section h4,
+.dark .customer-page .form-section h4 {
+  color: var(--customer-text);
+  border-bottom-color: var(--customer-modal-border);
+}
+
+/* Dark table action buttons */
+
+.app.dark .customer-page .table-actions .view-btn,
+.dark .customer-page .table-actions .view-btn {
+  color: #b9d2ff;
+  background: #263750;
+  border-color: #3a5273;
+}
+
+.app.dark .customer-page .table-actions .view-btn:hover,
+.dark .customer-page .table-actions .view-btn:hover {
+  background: #304563;
+}
+
+.app.dark .customer-page .table-actions .edit-btn,
+.dark .customer-page .table-actions .edit-btn {
+  color: #f5d39b;
+  background: #3b3226;
+  border-color: #5c4b33;
+}
+
+.app.dark .customer-page .table-actions .edit-btn:hover,
+.dark .customer-page .table-actions .edit-btn:hover {
+  background: #4a3b2a;
+}
+
+.app.dark .customer-page .table-actions .delete-btn,
+.dark .customer-page .table-actions .delete-btn {
+  color: #ffb6b0;
+  background: #382526;
+  border-color: #593536;
+}
+
+.app.dark .customer-page .table-actions .delete-btn:hover,
+.dark .customer-page .table-actions .delete-btn:hover {
+  background: #482d2e;
+}
+
+/* Dark validation messages */
+
+.app.dark .customer-page .form-error,
+.app.dark .customer-page .alert.e.show,
+.dark .customer-page .form-error,
+.dark .customer-page .alert.e.show {
+  color: #ffb6b6;
+  background: #392727;
+  border-color: #744848;
+}
+
+.app.dark .customer-page .alert.s.show,
+.dark .customer-page .alert.s.show {
+  color: #8fe0b3;
+  background: #1d3c30;
+  border-color: #315c48;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE LAYOUT
+--------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .customer-page > .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .customer-page .form-grid,
+  .customer-page .edit-form-grid {
+    gap: 13px;
+  }
+
+  .customer-page .table-actions {
+    min-width: 175px;
+  }
+
+  .customer-page .form-section {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .customer-page > .card {
+    padding: 13px;
+    margin-bottom: 14px;
+  }
+
+  .customer-page > .card h2 {
+    font-size: 16px;
+  }
+
+  .customer-page .form-grid,
+  .customer-page .edit-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .customer-page .form-grid .full,
+  .customer-page .edit-form-grid .edit-full {
+    grid-column: auto;
+  }
+
+  .customer-page .table-actions {
+    gap: 5px;
+  }
+
+  .customer-page .action-btn {
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+}
+
+/* ---------------------------------------------------------
+   ACCESSIBILITY
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-page *,
+  .customer-page *::before,
+  .customer-page *::after {
+    transition: none !important;
+  }
+}
+

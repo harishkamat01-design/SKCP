@@ -10,7 +10,7 @@ import {
     apiPut,
     apiDelete,
 } from "../../../services/api";
-
+import "./Attendance.css";
 import ViewModal from "../../../components/ui/common/ViewModal";
 import FormModal from "../../../components/ui/common/FormModal";
 import DeleteConfirmModal from "../../../components/ui/common/DeleteConfirmModal";
@@ -21,6 +21,70 @@ import {
 } from "../../../components/ui/common/DetailGrid";
 
 import { jsPDF } from "jspdf";
+
+// ============================================================
+// LOCAL DATE HELPERS — INDIA / LOCAL TIME SAFE
+// ============================================================
+
+const getLocalDateString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const getMondayDateString = (dateString) => {
+    if (!dateString) {
+        const today = new Date();
+        const dayOfWeek = (today.getDay() + 6) % 7;
+
+        today.setDate(today.getDate() - dayOfWeek);
+
+        return getLocalDateString(today);
+    }
+
+    const [year, month, day] = dateString
+        .substring(0, 10)
+        .split("-")
+        .map(Number);
+
+    const date = new Date(year, month - 1, day);
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    // Monday = 0, Tuesday = 1, ..., Sunday = 6
+    const dayOfWeek = (date.getDay() + 6) % 7;
+
+    date.setDate(date.getDate() - dayOfWeek);
+
+    return getLocalDateString(date);
+};
+
+const getSundayDateString = (mondayString) => {
+    if (!mondayString) {
+        return "";
+    }
+
+    const [year, month, day] = mondayString
+        .substring(0, 10)
+        .split("-")
+        .map(Number);
+
+    const sunday = new Date(year, month - 1, day);
+
+    if (Number.isNaN(sunday.getTime())) {
+        return "";
+    }
+
+    sunday.setDate(sunday.getDate() + 6);
+
+    return getLocalDateString(sunday);
+};
+
+
 
 function Attendance() {
     // ============================================================
@@ -97,7 +161,9 @@ function Attendance() {
     const [selectedLabourId, setSelectedLabourId] =
         useState("");
 
-    const [weekStartDate, setWeekStartDate] = useState("");
+    const [weekStartDate, setWeekStartDate] = useState(
+    () => getMondayDateString()
+     );
 
     const [showWeeklyAttendance, setShowWeeklyAttendance] =
         useState(false);
@@ -738,11 +804,17 @@ function Attendance() {
             endDate.getDate() + 6
         );
 
-        const startText =
-            startDate.toISOString().substring(0, 10);
+const startText = getMondayDateString(weekStartDate);
 
-        const endText =
-            endDate.toISOString().substring(0, 10);
+if (!startText) {
+    return [];
+}
+
+const endText = getSundayDateString(startText);
+
+if (!endText) {
+    return [];
+}
 
         return attendance
             .filter((record) => {
@@ -791,27 +863,14 @@ function Attendance() {
     // WEEKLY INFORMATION
     // ============================================================
 
-    const weeklyEndDate = useMemo(() => {
-        if (!weekStartDate) {
-            return "";
-        }
+const weeklyEndDate = useMemo(() => {
+    return getSundayDateString(
+        getMondayDateString(weekStartDate)
+    );
+}, [weekStartDate]);
 
-        const startDate = new Date(
-            `${weekStartDate}T00:00:00`
-        );
 
-        if (Number.isNaN(startDate.getTime())) {
-            return "";
-        }
 
-        startDate.setDate(
-            startDate.getDate() + 6
-        );
-
-        return startDate
-            .toISOString()
-            .substring(0, 10);
-    }, [weekStartDate]);
 
     const weeklyTotalAmount = useMemo(() => {
         return weeklyAttendanceRecords.reduce(
@@ -957,11 +1016,11 @@ function Attendance() {
     // ============================================================
 
     const clearWeeklyFilters = () => {
-        setSelectedLabourId("");
-        setWeekStartDate("");
-        setShowWeeklyAttendance(false);
-        setSummaryError("");
-    };
+    setSelectedLabourId("");
+    setWeekStartDate(getMondayDateString());
+    setShowWeeklyAttendance(false);
+    setSummaryError("");
+};
 
     // ============================================================
     // VIEW WEEKLY ATTENDANCE
@@ -2426,16 +2485,17 @@ function Attendance() {
                             type="date"
                             value={weekStartDate}
                             onChange={(event) => {
-                                setWeekStartDate(
-                                    event.target.value
-                                );
+    const selectedDate = event.target.value;
 
-                                setShowWeeklyAttendance(
-                                    false
-                                );
+    setWeekStartDate(
+        selectedDate
+            ? getMondayDateString(selectedDate)
+            : ""
+    );
 
-                                setSummaryError("");
-                            }}
+    setShowWeeklyAttendance(false);
+    setSummaryError("");
+}}
                         />
                     </div>
 

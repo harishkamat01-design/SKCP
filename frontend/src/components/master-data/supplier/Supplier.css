@@ -1,0 +1,600 @@
+/* ============================================================
+   SKCP — SUPPLIER PAGE
+   Module 1: Master Data
+   Theme: Blue
+   Scope: Supplier page only
+   ============================================================ */
+
+/* ---------- PAGE THEME ---------- */
+
+.supplier-page {
+    --supplier-primary: #3974c6;
+    --supplier-primary-hover: #2d61a7;
+    --supplier-primary-soft: #eaf3ff;
+    --supplier-primary-border: #cbdff8;
+
+    --supplier-text: #253247;
+    --supplier-muted: #687587;
+    --supplier-border: #d5e5fa;
+    --supplier-card: #edf5ff;
+    --supplier-surface: #eaf3ff;
+
+    font-family: Inter, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--supplier-text);
+}
+
+/* ---------- HEADINGS AND DESCRIPTION ---------- */
+
+.supplier-page h2 {
+    margin: 0 0 6px;
+    color: var(--supplier-text);
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.supplier-page p {
+    margin: 0;
+    color: var(--supplier-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ---------- CARDS: SUPPLIERS AND SUPPLIER LIST ---------- */
+
+.supplier-page .card {
+    margin-bottom: 18px;
+    padding: 20px;
+    background: var(--supplier-card);
+    border: 1px solid var(--supplier-border);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgb(20 35 55 / 3%);
+}
+
+.supplier-page .card:last-child {
+    margin-bottom: 0;
+}
+
+/* ---------- FORM FIELDS ---------- */
+
+.supplier-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.supplier-page .fld label {
+    color: var(--supplier-text);
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.supplier-page .fld input,
+.supplier-page .fld select,
+.supplier-page .fld textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 11px;
+    color: var(--supplier-text);
+    background: #ffffff;
+    border: 1px solid #d5dce5;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.supplier-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.supplier-page .fld input::placeholder,
+.supplier-page .fld textarea::placeholder {
+    color: #929dad;
+}
+
+.supplier-page .fld input:focus,
+.supplier-page .fld select:focus,
+.supplier-page .fld textarea:focus {
+    outline: none;
+    border-color: var(--supplier-primary);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 13%);
+}
+
+.supplier-page .fld input:disabled,
+.supplier-page .fld select:disabled,
+.supplier-page .fld textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* ---------- SEARCH ---------- */
+
+.supplier-page .production-search {
+    width: 100%;
+    max-width: 420px;
+}
+
+.supplier-page .fld input[type="text"] {
+    max-width: 100%;
+}
+
+/* ---------- BUTTONS ---------- */
+
+.supplier-page button {
+    font-family: inherit;
+}
+
+.supplier-page .btn,
+.supplier-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.supplier-page .btn:focus-visible,
+.supplier-page .action-btn:focus-visible {
+    outline: 2px solid var(--supplier-primary);
+    outline-offset: 2px;
+}
+
+.supplier-page .btn:disabled,
+.supplier-page .action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Add Supplier and View */
+
+.supplier-page .view-btn {
+    color: #ffffff;
+    background: var(--supplier-primary);
+    border: 1px solid var(--supplier-primary);
+}
+
+.supplier-page .view-btn:hover:not(:disabled) {
+    background: var(--supplier-primary-hover);
+    border-color: var(--supplier-primary-hover);
+}
+
+/* Clear */
+
+.supplier-page .btn.secondary {
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid #d5dce5;
+}
+
+.supplier-page .btn.secondary:hover:not(:disabled) {
+    color: var(--supplier-primary);
+    background: #e1edff;
+    border-color: #b9cdea;
+}
+
+/* Edit */
+
+.supplier-page .edit-btn {
+    color: #8a5a13;
+    background: #fff8e8;
+    border: 1px solid #f1dfb5;
+}
+
+.supplier-page .edit-btn:hover:not(:disabled) {
+    background: #fff0ce;
+    border-color: #e7cd91;
+}
+
+/* Delete */
+
+.supplier-page .delete-btn {
+    color: #b42318;
+    background: #fff1f0;
+    border: 1px solid #f2ceca;
+}
+
+.supplier-page .delete-btn:hover:not(:disabled) {
+    background: #ffe4e1;
+    border-color: #eab4ae;
+}
+
+/* ---------- SUPPLIER LIST TABLE ---------- */
+
+.supplier-page .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 14px;
+    background: #eaf3ff;
+    border: 1px solid var(--supplier-primary-border);
+    border-radius: 10px;
+}
+
+.supplier-page table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--supplier-text);
+    background: #eaf3ff;
+    font-size: 13px;
+}
+
+/* Light-blue table header */
+
+.supplier-page thead th {
+    padding: 12px 14px;
+    color: #294b78;
+    background: #dceaff;
+    border-bottom: 1px solid var(--supplier-primary-border);
+    font-size: 12px;
+    font-weight: 650;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.supplier-page thead th[style*="cursor: pointer"] {
+    user-select: none;
+}
+
+.supplier-page thead th[style*="cursor: pointer"]:hover {
+    color: var(--supplier-primary-hover);
+    background: #cfe2ff;
+}
+
+/* Light-blue supplier rows */
+
+.supplier-page tbody td {
+    padding: 12px 14px;
+    background: #edf5ff;
+    border-bottom: 1px solid #d8e7f8;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.supplier-page tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.supplier-page tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+/* Hover across the complete row */
+
+.supplier-page tbody tr:hover td {
+    background: #dceaff;
+}
+
+.supplier-page tbody td:first-child {
+    color: var(--supplier-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.supplier-page .action-buttons {
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ---------- STATUS BADGES ---------- */
+
+.supplier-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.supplier-page .badge.bg {
+    color: #187447;
+    background: #e7f7ee;
+    border: 1px solid #c4ead3;
+}
+
+.supplier-page .badge.br {
+    color: #a93226;
+    background: #fff0ee;
+    border: 1px solid #f1d0cb;
+}
+
+/* ---------- FORM GRID ---------- */
+
+.supplier-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.supplier-page .form-grid .fld {
+    min-width: 0;
+}
+
+/* Required field marker */
+
+.supplier-page .required {
+    color: #c0392b;
+    font-weight: 700;
+}
+
+/* ---------- ERROR AND SUCCESS MESSAGES ---------- */
+
+.supplier-page .form-error,
+.supplier-page .alert.e.show {
+    margin: 12px 0;
+    padding: 10px 12px;
+    color: #a12622;
+    background: #fff1f0;
+    border: 1px solid #f0cbc7;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.supplier-page .alert.s.show {
+    margin: 12px 0;
+    padding: 10px 12px;
+    color: #176b42;
+    background: #eaf8f0;
+    border: 1px solid #c6ead4;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ---------- EMPTY AND LOADING STATES ---------- */
+
+.supplier-page .empty-state {
+    padding: 24px 16px;
+    color: var(--supplier-muted);
+    text-align: center;
+    font-size: 13px;
+}
+
+/* ---------- MODAL FORM CONTENT ---------- */
+
+.supplier-page .form-grid textarea {
+    font-family: inherit;
+}
+
+.supplier-page .form-grid .fld label {
+    line-height: 1.4;
+}
+
+/* ---------- DARK THEME ---------- */
+
+.app.dark .supplier-page,
+.dark .supplier-page {
+    --supplier-primary: #79aaf5;
+    --supplier-primary-hover: #9bc0fb;
+    --supplier-primary-soft: #293d59;
+    --supplier-primary-border: #3c506d;
+
+    --supplier-text: #e8edf2;
+    --supplier-muted: #aab5c0;
+    --supplier-border: #394653;
+    --supplier-card: #202a35;
+    --supplier-surface: #26323e;
+
+    color: var(--supplier-text);
+}
+
+/* Dark cards */
+
+.app.dark .supplier-page .card,
+.dark .supplier-page .card {
+    background: var(--supplier-card);
+    border-color: var(--supplier-border);
+    box-shadow: none;
+}
+
+.app.dark .supplier-page h2,
+.dark .supplier-page h2,
+.app.dark .supplier-page .fld label,
+.dark .supplier-page .fld label {
+    color: var(--supplier-text);
+}
+
+.app.dark .supplier-page p,
+.dark .supplier-page p {
+    color: var(--supplier-muted);
+}
+
+/* Dark form fields */
+
+.app.dark .supplier-page .fld input,
+.app.dark .supplier-page .fld select,
+.app.dark .supplier-page .fld textarea,
+.dark .supplier-page .fld input,
+.dark .supplier-page .fld select,
+.dark .supplier-page .fld textarea {
+    color: var(--supplier-text);
+    background: #1b2530;
+    border-color: #465361;
+}
+
+.app.dark .supplier-page .fld input::placeholder,
+.app.dark .supplier-page .fld textarea::placeholder,
+.dark .supplier-page .fld input::placeholder,
+.dark .supplier-page .fld textarea::placeholder {
+    color: #8997a6;
+}
+
+/* Dark buttons */
+
+.app.dark .supplier-page .view-btn,
+.dark .supplier-page .view-btn {
+    color: #172437;
+    background: var(--supplier-primary);
+    border-color: var(--supplier-primary);
+}
+
+.app.dark .supplier-page .view-btn:hover:not(:disabled),
+.dark .supplier-page .view-btn:hover:not(:disabled) {
+    background: var(--supplier-primary-hover);
+    border-color: var(--supplier-primary-hover);
+}
+
+.app.dark .supplier-page .btn.secondary,
+.dark .supplier-page .btn.secondary {
+    color: var(--supplier-text);
+    background: #26323e;
+    border-color: #465361;
+}
+
+.app.dark .supplier-page .btn.secondary:hover:not(:disabled),
+.dark .supplier-page .btn.secondary:hover:not(:disabled) {
+    color: #ffffff;
+    background: var(--supplier-primary-soft);
+    border-color: var(--supplier-primary);
+}
+
+.app.dark .supplier-page .edit-btn,
+.dark .supplier-page .edit-btn {
+    color: #f4d18b;
+    background: #413722;
+    border-color: #665536;
+}
+
+.app.dark .supplier-page .delete-btn,
+.dark .supplier-page .delete-btn {
+    color: #ffaaa3;
+    background: #402a2b;
+    border-color: #654042;
+}
+
+/* Dark Supplier List table */
+
+.app.dark .supplier-page .table-wrap,
+.dark .supplier-page .table-wrap {
+    background: #202a35;
+    border-color: var(--supplier-border);
+}
+
+.app.dark .supplier-page table,
+.dark .supplier-page table {
+    color: var(--supplier-text);
+    background: #202a35;
+}
+
+.app.dark .supplier-page thead th,
+.dark .supplier-page thead th {
+    color: #dce8f7;
+    background: #293d59;
+    border-bottom-color: #3c506d;
+}
+
+.app.dark .supplier-page thead th[style*="cursor: pointer"]:hover,
+.dark .supplier-page thead th[style*="cursor: pointer"]:hover {
+    background: #334b6c;
+}
+
+.app.dark .supplier-page tbody td,
+.dark .supplier-page tbody td {
+    background: #202a35;
+    border-bottom-color: #34414e;
+}
+
+.app.dark .supplier-page tbody tr:hover td,
+.dark .supplier-page tbody tr:hover td {
+    background: #263543;
+}
+
+/* Dark status badges */
+
+.app.dark .supplier-page .badge.bg,
+.dark .supplier-page .badge.bg {
+    color: #8fe0b3;
+    background: #1d3c30;
+    border-color: #315c48;
+}
+
+.app.dark .supplier-page .badge.br,
+.dark .supplier-page .badge.br {
+    color: #ffaaa3;
+    background: #402a2b;
+    border-color: #654042;
+}
+
+/* Dark error and success messages */
+
+.app.dark .supplier-page .form-error,
+.app.dark .supplier-page .alert.e.show,
+.dark .supplier-page .form-error,
+.dark .supplier-page .alert.e.show {
+    color: #ffb4ad;
+    background: #402a2b;
+    border-color: #654042;
+}
+
+.app.dark .supplier-page .alert.s.show,
+.dark .supplier-page .alert.s.show {
+    color: #8fe0b3;
+    background: #1d3c30;
+    border-color: #315c48;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px) {
+    .supplier-page .card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .supplier-page .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .supplier-page .table-wrap {
+        margin-top: 12px;
+    }
+
+    .supplier-page .action-buttons {
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .supplier-page .card {
+        padding: 13px;
+    }
+
+    .supplier-page h2 {
+        font-size: 17px;
+    }
+
+    .supplier-page .btn,
+    .supplier-page .action-btn {
+        padding: 7px 9px;
+    }
+
+    .supplier-page .action-buttons {
+        gap: 5px !important;
+    }
+}

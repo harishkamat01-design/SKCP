@@ -1,0 +1,978 @@
+/* ============================================================
+   SKCP — ATTENDANCE MODULE
+   Theme: Blue — Master Data / Standard SKCP Blue UI
+   File: Attendance.css
+   ============================================================ */
+
+/* ============================================================
+   ROOT / LIGHT THEME
+   ============================================================ */
+
+.page {
+    --attendance-accent: #3974c6;
+    --attendance-accent-hover: #2f63ab;
+    --attendance-accent-soft: #dceaff;
+    --attendance-accent-border: #cbdff8;
+
+    --attendance-text: #263247;
+    --attendance-muted: #68747c;
+
+    --attendance-card: #edf5ff;
+    --attendance-card-border: #d5e5fa;
+
+    --attendance-table-header: #dceaff;
+    --attendance-table-row-hover: #e7f0ff;
+    --attendance-table-border: #d6e0ec;
+
+    --attendance-input-bg: #ffffff;
+    --attendance-input-border: #cbd5e1;
+    --attendance-input-focus: #3974c6;
+
+    --attendance-success: #18794e;
+    --attendance-success-bg: #dcfce7;
+
+    --attendance-warning: #92400e;
+    --attendance-warning-bg: #fef3c7;
+
+    --attendance-danger: #b42318;
+    --attendance-danger-bg: #fee4e2;
+
+    --attendance-radius: 12px;
+    --attendance-small-radius: 7px;
+
+    width: 100%;
+    min-width: 0;
+    color: var(--attendance-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    box-sizing: border-box;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   HEADINGS AND TEXT
+   ============================================================ */
+
+.page h2 {
+    margin: 0 0 8px;
+    color: var(--attendance-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.025em;
+}
+
+.page h3 {
+    margin: 0 0 8px;
+    color: var(--attendance-text);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.page p {
+    margin: 0 0 10px;
+    color: var(--attendance-muted);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.page strong {
+    color: inherit;
+    font-weight: 650;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.page .card {
+    width: 100%;
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    background: var(--attendance-card);
+    border: 1px solid var(--attendance-card-border);
+    border-radius: var(--attendance-radius);
+    box-shadow: 0 2px 7px rgb(35 65 105 / 4%);
+}
+
+.page .card:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================================
+   FORM FIELD LAYOUT
+   ============================================================ */
+
+.page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--attendance-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.page .form-grid > .fld {
+    min-width: 0;
+}
+
+.page .form-grid > .fld:has(textarea) {
+    grid-column: 1 / -1;
+}
+
+/* ============================================================
+   INPUTS, SELECTS AND TEXTAREAS
+   ============================================================ */
+
+.page input,
+.page select,
+.page textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+
+    color: var(--attendance-text);
+    background: var(--attendance-input-bg);
+
+    border: 1px solid var(--attendance-input-border);
+    border-radius: var(--attendance-small-radius);
+
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+
+    outline: none;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.page input::placeholder,
+.page textarea::placeholder {
+    color: #8995a3;
+    opacity: 1;
+}
+
+.page select {
+    cursor: pointer;
+}
+
+.page textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.page input:focus,
+.page select:focus,
+.page textarea:focus {
+    border-color: var(--attendance-input-focus);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 14%);
+}
+
+.page input[readonly],
+.page input:read-only {
+    color: var(--attendance-muted);
+    background: #f1f5f9;
+    border-color: #d7e0ea;
+    cursor: default;
+}
+
+.page input:disabled,
+.page select:disabled,
+.page textarea:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.page input[type="date"] {
+    min-height: 38px;
+}
+
+.page input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* ============================================================
+   BUTTON BASE STYLES
+   ============================================================ */
+
+.page button {
+    font-family: inherit;
+}
+
+.page button:focus-visible {
+    outline: 3px solid rgb(57 116 198 / 28%);
+    outline-offset: 2px;
+}
+
+.page button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Main action buttons */
+
+.page .action-btn,
+.page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    min-height: 36px;
+    padding: 8px 13px;
+
+    border: 1px solid transparent;
+    border-radius: var(--attendance-small-radius);
+
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.35;
+    text-align: center;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.page .action-btn:not(:disabled):hover,
+.page .btn:not(:disabled):hover {
+    box-shadow: 0 2px 5px rgb(35 65 105 / 10%);
+}
+
+/* Primary blue action */
+
+.page .view-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+   /* color: #ffffff;
+    background: var(--stock-accent);
+    border-color: var(--stock-accent);*/
+}
+
+.page .view-btn:not(:disabled):hover {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+
+    /*background: var(--stock-accent-hover);
+    border-color: var(--stock-accent-hover); */
+}
+
+/* Edit action */
+
+.page .edit-btn {
+    color: #245da7;
+    background: #e6efff;
+    border-color: #bfd5fa;
+}
+
+.page .edit-btn:not(:disabled):hover {
+    color: #174a8b;
+    background: #d5e5ff;
+    border-color: #a9c8f5;
+}
+
+/* Delete action */
+
+.page .delete-btn {
+    color: #b42318;
+    background: #fff0ef;
+    border-color: #f4c5c1;
+}
+
+.page .delete-btn:not(:disabled):hover {
+    color: #8f1d14;
+    background: #fee4e2;
+    border-color: #e9a9a3;
+}
+
+/* Secondary / clear button */
+
+.page .btn.secondary {
+    color: var(--attendance-text);
+    background: #ffffff;
+    border-color: var(--attendance-input-border);
+}
+
+.page .btn.secondary:not(:disabled):hover {
+    color: var(--attendance-accent-hover);
+    background: var(--attendance-accent-soft);
+    border-color: var(--attendance-accent-border);
+}
+
+/* ============================================================
+   SEARCH AND FILTER AREAS
+   ============================================================ */
+
+.page .attendance-summary-filters {
+    display: grid;
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        auto;
+    align-items: end;
+    gap: 14px;
+
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.page .attendance-summary-filters > .fld {
+    min-width: 0;
+}
+
+.page .attendance-summary-filters > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ============================================================
+   TABLE WRAPPER
+   ============================================================ */
+
+.page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-top: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    background: var(--attendance-input-bg);
+    border: 1px solid var(--attendance-table-border);
+    border-radius: 9px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #b8c8dc transparent;
+}
+
+.page .table-wrap::-webkit-scrollbar {
+    height: 8px;
+}
+
+.page .table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.page .table-wrap::-webkit-scrollbar-thumb {
+    background: #b8c8dc;
+    border-radius: 8px;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.page table {
+    width: 100%;
+    min-width: 1080px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--attendance-input-bg);
+    font-size: 12px;
+}
+
+.page thead th {
+    padding: 12px 11px;
+
+    color: var(--attendance-text);
+    background: var(--attendance-table-header);
+
+    border-bottom: 1px solid var(--attendance-table-border);
+
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.045em;
+    line-height: 1.4;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.page thead th:first-child {
+    padding-left: 14px;
+}
+
+.page tbody td,
+.page tfoot td {
+    padding: 11px;
+
+    color: var(--attendance-text);
+    border-bottom: 1px solid var(--attendance-table-border);
+
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.page tbody tr:last-child td {
+    border-bottom: 1px solid var(--attendance-table-border);
+}
+
+.page tbody tr {
+    background: var(--attendance-input-bg);
+    transition: background-color 0.15s ease;
+}
+
+.page tbody tr:hover {
+    background: var(--attendance-table-row-hover);
+}
+
+.page tbody td:first-child,
+.page tfoot td:first-child {
+    padding-left: 14px;
+}
+
+.page tbody td:nth-child(1) {
+    font-variant-numeric: tabular-nums;
+}
+
+.page tbody td:nth-child(2),
+.page tbody td:nth-child(6),
+.page tbody td:nth-child(7),
+.page tfoot td:nth-child(7) {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.page tbody td:nth-child(3) {
+    min-width: 120px;
+}
+
+.page tbody td:nth-child(8) {
+    min-width: 110px;
+    max-width: 220px;
+    overflow-wrap: anywhere;
+}
+
+.page tbody td:last-child {
+    white-space: nowrap;
+}
+
+.page tfoot td {
+    padding-top: 13px;
+    padding-bottom: 13px;
+
+    color: var(--attendance-text);
+    background: var(--attendance-accent-soft);
+
+    border-top: 1px solid var(--attendance-accent-border);
+    border-bottom: 0;
+
+    font-size: 12px;
+}
+
+.page tfoot td strong {
+    font-weight: 750;
+}
+
+/* ============================================================
+   SORTABLE TABLE HEADERS
+   ============================================================ */
+
+.page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    min-height: 22px;
+    padding: 0;
+
+    color: inherit;
+    background: transparent;
+    border: 0;
+
+    font: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    text-transform: inherit;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.page .table-sort-btn:hover {
+    color: var(--attendance-accent-hover);
+}
+
+.page .table-sort-btn:focus-visible {
+    outline: 2px solid var(--attendance-accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* ============================================================
+   TABLE ACTION BUTTONS
+   ============================================================ */
+
+.page .action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.page .action-buttons .action-btn {
+    min-height: 29px;
+    padding: 5px 9px;
+    font-size: 11px;
+}
+
+/* ============================================================
+   WEEKLY SUMMARY
+   ============================================================ */
+
+.page .attendance-summary-filters + .form-error {
+    margin-top: 12px;
+}
+
+.page .attendance-summary-filters ~ div h3 {
+    overflow-wrap: anywhere;
+}
+
+.page .attendance-summary-filters ~ div p {
+    line-height: 1.7;
+}
+
+/* Weekly summary heading and totals */
+
+.page .card h3 + p {
+    margin-bottom: 12px;
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.page .table-wrap > *:not(table) {
+    max-width: 100%;
+}
+
+/* Keep the shared Pagination component within its container. */
+
+.page .table-wrap nav,
+.page .table-wrap [class*="pagination"] {
+    max-width: 100%;
+}
+
+/* ============================================================
+   ERROR MESSAGES
+   ============================================================ */
+
+.page .form-error {
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 10px 12px;
+
+    color: var(--attendance-danger);
+    background: var(--attendance-danger-bg);
+
+    border: 1px solid #f3c0bc;
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   SHARED MODAL CONTENT
+   FormModal, ViewModal and DeleteConfirmModal provide their
+   own outer layout. These rules style the Attendance content.
+   ============================================================ */
+
+.page .form-grid {
+    align-items: start;
+}
+
+.page .form-grid .fld input[readonly] {
+    font-weight: 600;
+}
+
+.page .form-grid .fld textarea {
+    width: 100%;
+}
+
+/* Read-only daily rate and calculated amount */
+
+.page #add-daily-rate,
+.page #add-daily-amount,
+.page #edit-daily-rate,
+.page #edit-daily-amount {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   VIEW DETAILS
+   ============================================================ */
+
+.page dl,
+.page dt,
+.page dd {
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+
+.page .card > p:last-child {
+    overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   DARK THEME
+   Supports the application's common dark-mode selectors.
+   ============================================================ */
+
+.dark .page,
+[data-theme="dark"] .page,
+.dark-mode .page {
+    --attendance-accent: #79aaf5;
+    --attendance-accent-hover: #9bc0ff;
+    --attendance-accent-soft: #293d59;
+    --attendance-accent-border: #405573;
+
+    --attendance-text: #e8edf2;
+    --attendance-muted: #aab5c0;
+
+    --attendance-card: #202a35;
+    --attendance-card-border: #394653;
+
+    --attendance-table-header: #293d59;
+    --attendance-table-row-hover: #28374a;
+    --attendance-table-border: #394653;
+
+    --attendance-input-bg: #18212b;
+    --attendance-input-border: #465565;
+    --attendance-input-focus: #79aaf5;
+
+    --attendance-success: #86efac;
+    --attendance-success-bg: #173b2c;
+
+    --attendance-warning: #fcd34d;
+    --attendance-warning-bg: #473617;
+
+    --attendance-danger: #fca5a5;
+    --attendance-danger-bg: #482626;
+}
+
+.dark .page .card,
+[data-theme="dark"] .page .card,
+.dark-mode .page .card {
+    box-shadow: none;
+}
+
+.dark .page input[readonly],
+.dark .page input:read-only,
+[data-theme="dark"] .page input[readonly],
+[data-theme="dark"] .page input:read-only,
+.dark-mode .page input[readonly],
+.dark-mode .page input:read-only {
+    color: var(--attendance-muted);
+    background: #202c39;
+    border-color: #465565;
+}
+
+.dark .page input::placeholder,
+.dark .page textarea::placeholder,
+[data-theme="dark"] .page input::placeholder,
+[data-theme="dark"] .page textarea::placeholder,
+.dark-mode .page input::placeholder,
+.dark-mode .page textarea::placeholder {
+    color: #8998a8;
+}
+
+.dark .page .table-wrap,
+[data-theme="dark"] .page .table-wrap,
+.dark-mode .page .table-wrap {
+    background: var(--attendance-input-bg);
+    border-color: var(--attendance-table-border);
+}
+
+.dark .page table,
+[data-theme="dark"] .page table,
+.dark-mode .page table {
+    background: var(--attendance-input-bg);
+}
+
+.dark .page tbody tr,
+[data-theme="dark"] .page tbody tr,
+.dark-mode .page tbody tr {
+    background: var(--attendance-input-bg);
+}
+
+.dark .page tbody tr:hover,
+[data-theme="dark"] .page tbody tr:hover,
+.dark-mode .page tbody tr:hover {
+    background: var(--attendance-table-row-hover);
+}
+
+.dark .page .btn.secondary,
+[data-theme="dark"] .page .btn.secondary,
+.dark-mode .page .btn.secondary {
+    color: var(--attendance-text);
+    background: #263341;
+    border-color: #465565;
+}
+
+.dark .page .btn.secondary:not(:disabled):hover,
+[data-theme="dark"] .page .btn.secondary:not(:disabled):hover,
+.dark-mode .page .btn.secondary:not(:disabled):hover {
+    color: var(--attendance-accent-hover);
+    background: var(--attendance-accent-soft);
+    border-color: var(--attendance-accent-border);
+}
+
+.dark .page .view-btn,
+[data-theme="dark"] .page .view-btn,
+.dark-mode .page .view-btn {
+    color: #142338;
+    background: var(--attendance-accent);
+    border-color: var(--attendance-accent);
+}
+
+.dark .page .view-btn:not(:disabled):hover,
+[data-theme="dark"] .page .view-btn:not(:disabled):hover,
+.dark-mode .page .view-btn:not(:disabled):hover {
+    color: #142338;
+    background: var(--attendance-accent-hover);
+    border-color: var(--attendance-accent-hover);
+}
+
+.dark .page .edit-btn,
+[data-theme="dark"] .page .edit-btn,
+.dark-mode .page .edit-btn {
+    color: #c5dcff;
+    background: #263c57;
+    border-color: #405a7a;
+}
+
+.dark .page .edit-btn:not(:disabled):hover,
+[data-theme="dark"] .page .edit-btn:not(:disabled):hover,
+.dark-mode .page .edit-btn:not(:disabled):hover {
+    color: #e1ecff;
+    background: #304c6e;
+    border-color: #5879a1;
+}
+
+.dark .page .delete-btn,
+[data-theme="dark"] .page .delete-btn,
+.dark-mode .page .delete-btn {
+    color: #fca5a5;
+    background: #482626;
+    border-color: #704040;
+}
+
+.dark .page .delete-btn:not(:disabled):hover,
+[data-theme="dark"] .page .delete-btn:not(:disabled):hover,
+.dark-mode .page .delete-btn:not(:disabled):hover {
+    color: #fecaca;
+    background: #5b2b2b;
+    border-color: #874747;
+}
+
+.dark .page .form-error,
+[data-theme="dark"] .page .form-error,
+.dark-mode .page .form-error {
+    color: var(--attendance-danger);
+    background: var(--attendance-danger-bg);
+    border-color: #704040;
+}
+
+.dark .page .table-wrap::-webkit-scrollbar-thumb,
+[data-theme="dark"] .page .table-wrap::-webkit-scrollbar-thumb,
+.dark-mode .page .table-wrap::-webkit-scrollbar-thumb {
+    background: #53657a;
+}
+
+/* ============================================================
+   RESPONSIVE — TABLETS
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .page .card {
+        padding: 17px;
+    }
+
+    .page .attendance-summary-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .page .attendance-summary-filters > div:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .page table {
+        min-width: 1050px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .page {
+        font-size: 13px;
+    }
+
+    .page .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .page h2 {
+        font-size: 18px;
+    }
+
+    .page h3 {
+        font-size: 15px;
+    }
+
+    .page p {
+        font-size: 12px;
+    }
+
+    .page .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .page .form-grid > .fld:has(textarea) {
+        grid-column: auto;
+    }
+
+    .page .attendance-summary-filters {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .page .attendance-summary-filters > div:last-child {
+        grid-column: auto;
+        align-items: stretch;
+    }
+
+    .page .attendance-summary-filters > div:last-child .action-btn,
+    .page .attendance-summary-filters > div:last-child .btn {
+        flex: 1 1 auto;
+    }
+
+    .page .card > div[style*="justify-content: space-between"] {
+        align-items: flex-start !important;
+    }
+
+    .page .card > div[style*="align-items: flex-end"] {
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .page .card > div[style*="align-items: flex-end"] > .fld {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .page .card > div[style*="align-items: flex-end"] > .action-btn,
+    .page .card > div[style*="align-items: flex-end"] > .btn {
+        flex: 1 1 auto;
+    }
+
+    .page .action-btn,
+    .page .btn {
+        min-height: 36px;
+        padding: 8px 11px;
+    }
+
+    .page .table-wrap {
+        margin-top: 12px;
+        border-radius: 8px;
+    }
+
+    .page table {
+        min-width: 1020px;
+    }
+
+    .page thead th {
+        padding: 10px;
+        font-size: 10px;
+    }
+
+    .page tbody td,
+    .page tfoot td {
+        padding: 10px;
+        font-size: 11px;
+    }
+
+    .page .action-buttons {
+        gap: 5px;
+    }
+
+    .page .action-buttons .action-btn {
+        min-height: 29px;
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+}
+
+/* ============================================================
+   ACCESSIBILITY — REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .page *,
+    .page *::before,
+    .page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

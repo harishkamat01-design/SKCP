@@ -13,7 +13,7 @@ import {
     DetailGrid,
     DetailItem,
 } from "../../ui/common/DetailGrid";
-
+import "./Supplier.css";
 function Supplier() {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [suppliers, setSuppliers] = useState([]);
@@ -450,7 +450,7 @@ function Supplier() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page supplier-page">
                 <section className="card">
                     <h2>Suppliers</h2>
                     <p>Loading supplier records...</p>
@@ -460,7 +460,7 @@ function Supplier() {
     }
 
     return (
-        <div className="page">
+        <div className="page supplier-page">
             {/* ================================================== */}
             {/* HEADER + SEARCH */}
             {/* ================================================== */}

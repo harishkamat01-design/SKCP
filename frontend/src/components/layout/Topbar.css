@@ -1,0 +1,397 @@
+/* ============================================================
+   SKCP TOPBAR — ONE OUTER TILE WITH THREE INNER SECTIONS
+   ============================================================ */
+
+.topbar {
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 1.2fr)
+    minmax(150px, 0.65fr)
+    minmax(320px, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+  margin: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+  min-height: 100px;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   SECTION 1 — COMPANY BRAND TILE
+   ============================================================ */
+
+.topbar .topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+
+.topbar .brand-logo {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.topbar .brand-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.topbar .brand-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.topbar .brand-name {
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Admin Portal + language buttons on the same line */
+.topbar .brand-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  color: var(--text3);
+  font-size: 9px;
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.topbar .brand-sub-italic {
+  font-style: italic;
+}
+
+/* Admin Portal label */
+.topbar .brand-portal-label {
+  color: var(--text3);
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Language controls beside Admin Portal */
+.topbar .brand-language {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Language buttons */
+.topbar .lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+}
+
+.topbar .lang-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+/* Selected language — subtle blue */
+.topbar .lang-btn.active {
+  background: #eaf2ff;
+  border-color: #d6e5ff;
+  color: #315b96;
+  font-weight: 700;
+}
+
+/* ============================================================
+   SECTION 2 — CURRENT MODULE TILE
+   ============================================================ */
+
+.topbar .topbar-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+
+.topbar .topbar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text);
+  font-family:
+            Inter,
+            "Segoe UI",
+            Roboto,
+            -apple-system,
+            BlinkMacSystemFont,
+            sans-serif;
+            font-size: 14px;
+            line-height: 1.45;
+            letter-spacing: -0.01em;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.topbar .topbar-title > span {
+  overflow-wrap: anywhere;
+}
+
+.topbar .topbar-title > * {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SECTION 3 — USER PROFILE TILE
+   Profile information on the left; image on the right.
+   ============================================================ */
+
+.topbar .topbar-user {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+
+/* Profile image aligned to the right edge */
+.topbar .topbar-user-image {
+  display: block;
+  order: 2;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg3);
+}
+
+/* Profile information to the left of the image */
+.topbar .topbar-user-info {
+  display: flex;
+  order: 1;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+  text-align: right;
+}
+
+.topbar .topbar-user-name {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar .topbar-user-designation {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text3);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Admin role badge only — languages now belong to brand tile */
+.topbar .topbar-user-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 2px;
+}
+
+.topbar .topbar-user-role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--green-bg);
+  color: var(--green-t);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   RESPONSIVE LAYOUT
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .topbar .topbar-brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .topbar .topbar-user {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .topbar .topbar-navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+    min-height: 54px;
+  }
+
+  .topbar .topbar-title {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+    margin: 8px;
+  }
+
+  .topbar .topbar-brand,
+  .topbar .topbar-navigation,
+  .topbar .topbar-user {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .topbar .topbar-brand {
+    padding: 10px;
+  }
+
+  .topbar .brand-logo {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .topbar .brand-name {
+    font-size: 13px;
+  }
+
+  .topbar .brand-sub {
+    gap: 5px;
+  }
+
+  .topbar .brand-portal-label {
+    font-size: 9px;
+  }
+
+  .topbar .topbar-navigation {
+    min-height: 48px;
+    padding: 10px 12px;
+  }
+
+  .topbar .topbar-title {
+    justify-content: flex-start;
+    font-size: 14px;
+  }
+
+  .topbar .topbar-user {
+    justify-content: flex-end;
+    padding: 10px;
+  }
+
+  .topbar .topbar-user-image {
+    order: 2;
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+  }
+
+  .topbar .topbar-user-info {
+    order: 1;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .topbar .topbar-user-name,
+  .topbar .topbar-user-designation {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .topbar .topbar-user-bottom-row {
+    justify-content: flex-end;
+  }
+}

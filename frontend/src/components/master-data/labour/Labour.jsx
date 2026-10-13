@@ -15,7 +15,7 @@ import { DetailGrid, DetailItem } from "../../ui/common/DetailGrid";
 import Pagination from "../../ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
-
+import "./Labour.css";
 // =========================================================
 // SKILL TYPE OPTIONS
 // =========================================================
@@ -718,7 +718,7 @@ function Labour() {
 
   if (loading) {
     return (
-      <div className="page">
+      <div className="page labour-page">
         <section className="card">
           <h2>Labour</h2>
           <p>Loading labour records...</p>
@@ -732,7 +732,7 @@ function Labour() {
   // =========================================================
 
   return (
-    <div className="page">
+    <div className="page labour-page">
 
       {/* =====================================================
           PAGE HEADER + SEARCH

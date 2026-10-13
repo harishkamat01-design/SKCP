@@ -139,8 +139,45 @@ CREATE TABLE product
 -- Domain: Master Data / Procurement
 -- Purpose: Stores raw material master information
 -- ==========================================================
+CREATE TABLE raw_material_stock
+(
+    raw_material_stock_id SERIAL PRIMARY KEY,
 
-CREATE TABLE raw_material
+    raw_material_id INT NOT NULL
+        REFERENCES raw_material(raw_material_id),
+
+    stock_date DATE NOT NULL DEFAULT CURRENT_DATE,
+
+    current_stock_level DECIMAL(10,2)
+        NOT NULL DEFAULT 0,
+
+    minimum_stock_level DECIMAL(10,2),
+
+    last_updated_date DATE
+        NOT NULL DEFAULT CURRENT_DATE,
+
+    stock_status VARCHAR(20)
+        NOT NULL DEFAULT 'NORMAL'
+        CHECK (
+            stock_status IN
+            ('NORMAL', 'LOW_STOCK', 'OUT_OF_STOCK')
+        ),
+
+    record_status VARCHAR(20)
+        NOT NULL DEFAULT 'ACTIVE'
+        CHECK (
+            record_status IN ('ACTIVE', 'INACTIVE')
+        ),
+
+    notes TEXT,
+
+    created_at TIMESTAMP
+        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_raw_material_stock_date
+        UNIQUE (raw_material_id, stock_date)
+);
+/*CREATE TABLE raw_material
 (
     raw_material_id SERIAL PRIMARY KEY,
 
@@ -160,7 +197,7 @@ CREATE TABLE raw_material
     created_at TIMESTAMP
         NOT NULL
         DEFAULT CURRENT_TIMESTAMP
-);
+); */ 
 
 -- ==========================================================
 -- Table : labour

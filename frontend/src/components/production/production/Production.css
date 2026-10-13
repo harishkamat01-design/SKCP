@@ -1,0 +1,792 @@
+/* ============================================================
+   PRODUCTION
+   Standard: Customer.css / RawMaterialStock.css
+   Theme: Blue
+   Scope: Production module only
+   ============================================================ */
+
+
+/* ============================================================
+   1. PAGE THEME VARIABLES
+   ============================================================ */
+
+.production-page {
+    --production-accent: #3974c6;
+    --production-accent-hover: #2f63ab;
+    --production-accent-soft: #dceaff;
+    --production-accent-border: #cbdff8;
+
+    --production-text: #263247;
+    --production-muted: #68747c;
+
+    --production-card: #edf5ff;
+    --production-border: #cbdff8;
+    --production-table-header: #dceaff;
+    --production-row-hover: #dceaff;
+
+    --production-modal: #eaf3ff;
+    --production-modal-header: #dceaff;
+    --production-modal-border: #cbdff8;
+
+    --production-input-bg: #ffffff;
+    --production-input-border: #cbd5e1;
+    --production-input-focus: #3974c6;
+
+    --production-success: #18794e;
+    --production-success-bg: #dcfce7;
+    --production-warning: #92400e;
+    --production-warning-bg: #fef3c7;
+    --production-danger: #b42318;
+    --production-danger-bg: #fee4e2;
+
+    box-sizing: border-box;
+    color: var(--production-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.production-page *,
+.production-page *::before,
+.production-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   2. PAGE BASE & TYPOGRAPHY
+   ============================================================ */
+
+.production-page.page {
+    width: 100%;
+    min-width: 0;
+    color: var(--production-text);
+}
+
+.production-page h1,
+.production-page h2,
+.production-page h3,
+.production-page h4,
+.production-page p,
+.production-page label,
+.production-page button,
+.production-page input,
+.production-page select,
+.production-page textarea,
+.production-page table {
+    font-family: inherit;
+}
+
+.production-page h2 {
+    margin: 0 0 6px;
+    color: var(--production-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.production-page h3 {
+    margin: 0 0 6px;
+    color: var(--production-text);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.production-page p {
+    margin: 0 0 12px;
+    color: var(--production-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.production-page p:last-child {
+    margin-bottom: 0;
+}
+
+.production-page button {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.production-page button:focus-visible,
+.production-page input:focus-visible,
+.production-page select:focus-visible,
+.production-page textarea:focus-visible {
+    outline: 2px solid var(--production-accent);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. PAGE CARDS & HEADER
+   ============================================================ */
+
+.production-page > .card {
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    overflow: hidden;
+    color: var(--production-text);
+    background: var(--production-card);
+    border: 1px solid var(--production-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.production-page > .card:last-child {
+    margin-bottom: 0;
+}
+
+.production-page > .card > p:last-child {
+    margin-bottom: 0;
+}
+
+.production-page > .card > div[style] {
+    min-width: 0;
+}
+
+.production-page > .card > div[style] > div {
+    min-width: 0;
+}
+
+.production-page .production-search {
+    flex: 2 1 320px;
+}
+
+
+/* ============================================================
+   4. FILTERS, SEARCH & INPUTS
+   ============================================================ */
+
+.production-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.production-page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--production-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.production-page .fld label span {
+    color: var(--production-danger);
+}
+
+.production-page .fld input,
+.production-page .fld select,
+.production-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+    color: var(--production-text);
+    background: var(--production-input-bg);
+    border: 1px solid var(--production-input-border);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.production-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.production-page .fld input::placeholder,
+.production-page .fld textarea::placeholder {
+    color: #8a96a3;
+    opacity: 1;
+}
+
+.production-page .fld input:focus,
+.production-page .fld select:focus,
+.production-page .fld textarea:focus {
+    border-color: var(--production-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 12%);
+}
+
+.production-page .fld input:disabled,
+.production-page .fld select:disabled,
+.production-page .fld textarea:disabled,
+.production-page .fld input[readonly],
+.production-page .fld textarea[readonly] {
+    color: var(--production-muted);
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.production-page .fld input[type="date"] {
+    min-height: 38px;
+}
+
+.production-page .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+.production-page .fld select {
+    cursor: pointer;
+}
+
+.production-page .fld input:disabled,
+.production-page .fld textarea:disabled {
+    opacity: 1;
+}
+
+
+/* ============================================================
+   5. FORM GRID & MODAL SECTION HEADINGS
+   ============================================================ */
+
+.production-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.production-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+.production-page .form-grid .fld {
+    align-self: start;
+}
+
+.production-page .form-grid .fld input,
+.production-page .form-grid .fld select,
+.production-page .form-grid .fld textarea {
+    max-width: 100%;
+}
+
+.production-page .form-grid .fld textarea {
+    min-height: 84px;
+}
+
+.production-page .modal-section-title {
+    margin: 0 0 16px;
+    padding: 11px 13px;
+    color: var(--production-text);
+    background: var(--production-table-header);
+    border: 1px solid var(--production-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+
+/* ============================================================
+   6. TABLE & SORTING
+   ============================================================ */
+
+.production-page .table-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--production-border);
+    border-radius: 9px;
+    background: var(--production-input-bg);
+}
+
+.production-page .table-wrap table {
+    width: 100%;
+    min-width: 1150px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--production-text);
+    background: var(--production-input-bg);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.production-page .table-wrap thead th {
+    padding: 12px 11px;
+    color: var(--production-text);
+    background: var(--production-table-header);
+    border-bottom: 1px solid var(--production-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+}
+
+.production-page .table-wrap tbody td {
+    padding: 12px 11px;
+    border-bottom: 1px solid var(--production-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.production-page .table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.production-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.production-page .table-wrap tbody tr:hover {
+    background: var(--production-row-hover);
+}
+
+.production-page .table-wrap tbody td strong {
+    color: var(--production-text);
+    font-weight: 650;
+}
+
+.production-page .table-wrap tfoot td {
+    padding: 12px 11px;
+    color: var(--production-text);
+    background: var(--production-table-header);
+    border-top: 1px solid var(--production-border);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.production-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.production-page .table-sort-btn:hover {
+    color: var(--production-accent-hover);
+}
+
+.production-page .table-sort-btn:focus-visible {
+    outline-offset: 4px;
+}
+
+
+/* ============================================================
+   7. ACTION BUTTONS
+   ============================================================ */
+
+.production-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.production-page .action-btn,
+.production-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.production-page .action-btn:disabled,
+.production-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.production-page .view-btn,
+.production-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.production-page .view-btn:hover:not(:disabled),
+.production-page .edit-btn:hover:not(:disabled) {
+    color: #24589b;
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+.production-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.production-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+.production-page .btn {
+    color: #ffffff;
+    background: var(--production-accent);
+    border-color: var(--production-accent);
+}
+
+.production-page .btn:hover:not(:disabled) {
+    background: var(--production-accent-hover);
+    border-color: var(--production-accent-hover);
+}
+
+.production-page .btn.secondary {
+    color: var(--production-text);
+    background: var(--production-input-bg);
+    border-color: var(--production-border);
+}
+
+.production-page .btn.secondary:hover:not(:disabled) {
+    color: var(--production-accent-hover);
+    background: var(--production-accent-soft);
+    border-color: var(--production-accent-border);
+}
+
+
+/* ============================================================
+   8. STATUS BADGES
+   ============================================================ */
+
+.production-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.production-page .badge.bg {
+    color: var(--production-success);
+    background: var(--production-success-bg);
+    border-color: #bbf7d0;
+}
+
+.production-page .badge.br {
+    color: var(--production-warning);
+    background: var(--production-warning-bg);
+    border-color: #f3d58a;
+}
+
+
+/* ============================================================
+   9. PAGINATION
+   ============================================================ */
+
+.production-page .table-wrap > *:last-child {
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   10. VALIDATION, ERROR & EMPTY STATES
+   ============================================================ */
+
+.production-page .form-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    color: var(--production-danger);
+    background: var(--production-danger-bg);
+    border: 1px solid #f3c6c2;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.production-page .form-grid + .form-error {
+    margin-top: 12px;
+}
+
+.production-page .table-wrap + p {
+    margin-top: 12px;
+}
+
+.production-page .card > p {
+    overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   11. MODAL CONTENT
+   ============================================================ */
+
+/*
+   The shared ViewModal, FormModal and DeleteConfirmModal
+   components may render through a portal outside this page.
+   Page-scoped selectors style modal content only when it
+   remains inside .production-page. Global modal appearance
+   remains controlled by the shared modal components.
+*/
+
+.production-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.production-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    background: var(--production-input-bg);
+    border: 1px solid var(--production-border);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.production-page .detail-item label,
+.production-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--production-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.production-page .detail-item strong,
+.production-page .detail-item .detail-value {
+    color: var(--production-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.production-page .detail-item.f-full,
+.production-page .detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   12. DARK MODE
+   ============================================================ */
+
+.dark .production-page,
+[data-theme="dark"] .production-page,
+.dark-mode .production-page {
+    --production-accent: #79aaf5;
+    --production-accent-hover: #9bc0ff;
+    --production-accent-soft: #293d59;
+    --production-accent-border: #405573;
+
+    --production-text: #e8edf2;
+    --production-muted: #aab5c0;
+
+    --production-card: #202a35;
+    --production-border: #394653;
+    --production-table-header: #293d59;
+    --production-row-hover: #28374a;
+
+    --production-modal: #202a35;
+    --production-modal-header: #26384e;
+    --production-modal-border: #405573;
+
+    --production-input-bg: #18212b;
+    --production-input-border: #465565;
+    --production-input-focus: #79aaf5;
+
+    --production-success: #86efac;
+    --production-success-bg: #173b2c;
+    --production-warning: #fcd34d;
+    --production-warning-bg: #473617;
+    --production-danger: #fca5a5;
+    --production-danger-bg: #482626;
+}
+
+.dark .production-page .fld input::placeholder,
+.dark .production-page .fld textarea::placeholder,
+[data-theme="dark"] .production-page .fld input::placeholder,
+[data-theme="dark"] .production-page .fld textarea::placeholder,
+.dark-mode .production-page .fld input::placeholder,
+.dark-mode .production-page .fld textarea::placeholder {
+    color: #8997a5;
+}
+
+.dark .production-page .fld input:disabled,
+.dark .production-page .fld select:disabled,
+.dark .production-page .fld textarea:disabled,
+.dark .production-page .fld input[readonly],
+.dark .production-page .fld textarea[readonly],
+[data-theme="dark"] .production-page .fld input:disabled,
+[data-theme="dark"] .production-page .fld select:disabled,
+[data-theme="dark"] .production-page .fld textarea:disabled,
+[data-theme="dark"] .production-page .fld input[readonly],
+[data-theme="dark"] .production-page .fld textarea[readonly],
+.dark-mode .production-page .fld input:disabled,
+.dark-mode .production-page .fld select:disabled,
+.dark-mode .production-page .fld textarea:disabled,
+.dark-mode .production-page .fld input[readonly],
+.dark-mode .production-page .fld textarea[readonly] {
+    color: var(--production-muted);
+    background: #27323e;
+}
+
+.dark .production-page .view-btn,
+.dark .production-page .edit-btn,
+[data-theme="dark"] .production-page .view-btn,
+[data-theme="dark"] .production-page .edit-btn,
+.dark-mode .production-page .view-btn,
+.dark-mode .production-page .edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .production-page .view-btn:hover:not(:disabled),
+.dark .production-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .production-page .view-btn:hover:not(:disabled),
+[data-theme="dark"] .production-page .edit-btn:hover:not(:disabled),
+.dark-mode .production-page .view-btn:hover:not(:disabled),
+.dark-mode .production-page .edit-btn:hover:not(:disabled) {
+    background: #344d70;
+}
+
+.dark .production-page .delete-btn,
+[data-theme="dark"] .production-page .delete-btn,
+.dark-mode .production-page .delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .production-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .production-page .delete-btn:hover:not(:disabled),
+.dark-mode .production-page .delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+}
+
+.dark .production-page .badge.bg,
+[data-theme="dark"] .production-page .badge.bg,
+.dark-mode .production-page .badge.bg {
+    border-color: #28553e;
+}
+
+.dark .production-page .badge.br,
+[data-theme="dark"] .production-page .badge.br,
+.dark-mode .production-page .badge.br {
+    border-color: #73551c;
+}
+
+.dark .production-page .form-error,
+[data-theme="dark"] .production-page .form-error,
+.dark-mode .production-page .form-error {
+    border-color: #713737;
+}
+
+
+/* ============================================================
+   13. RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .production-page > .card {
+        padding: 16px;
+    }
+
+    .production-page .table-wrap table {
+        min-width: 1050px;
+    }
+}
+
+@media (max-width: 640px) {
+    .production-page {
+        font-size: 13px;
+    }
+
+    .production-page > .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .production-page h2 {
+        font-size: 18px;
+    }
+
+    .production-page .form-grid,
+    .production-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .production-page .form-grid .f-full,
+    .production-page .detail-item.f-full,
+    .production-page .detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .production-page .action-buttons {
+        gap: 5px;
+    }
+
+    .production-page .action-btn,
+    .production-page .btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    .production-page .table-wrap table {
+        min-width: 1000px;
+    }
+
+    .production-page .modal-section-title {
+        margin-bottom: 12px;
+    }
+}
+
+
+/* ============================================================
+   14. ACCESSIBILITY & REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .production-page *,
+    .production-page *::before,
+    .production-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

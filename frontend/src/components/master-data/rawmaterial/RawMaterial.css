@@ -1,0 +1,712 @@
+/* =========================================================
+   SKCP — RAW MATERIALS MODULE
+   Light-blue styling aligned with Customer.css
+   Includes page cards, table, forms, and modals
+   ========================================================= */
+
+/* =========================================================
+   PAGE THEME VARIABLES
+   ========================================================= */
+
+.page.raw-material-page {
+  --raw-accent: #3974c6;
+  --raw-accent-hover: #2f63ab;
+  --raw-accent-soft: #eaf3ff;
+  --raw-accent-border: #c7daf5;
+
+  --raw-text: #263247;
+  --raw-muted: #68747c;
+
+  --raw-card: #edf5ff;
+  --raw-border: #cbdcf3;
+
+  --raw-table-header: #dceaff;
+  --raw-row-hover: #e3efff;
+
+  color: var(--raw-text);
+  font-family: inherit;
+}
+
+/* =========================================================
+   MAIN PAGE CARDS
+   Raw Materials and Raw Material List
+   ========================================================= */
+
+.page.raw-material-page > .card {
+  background: var(--raw-card);
+  color: var(--raw-text);
+  border: 1px solid var(--raw-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgb(38 50 71 / 5%);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.page.raw-material-page > .card h2 {
+  color: var(--raw-text);
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.page.raw-material-page > .card p {
+  color: var(--raw-muted);
+}
+
+.page.raw-material-page > .card h2 + p {
+  margin-top: 4px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.page.raw-material-page .action-btn,
+.page.raw-material-page .btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 7px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.page.raw-material-page .action-btn {
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  cursor: pointer;
+font-size: 12px;
+}
+
+.page.raw-material-page .view-btn {
+
+      color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+  /*background: var(--raw-accent);
+  border-color: var(--raw-accent);
+  color: #ffffff;*/
+}
+
+.page.raw-material-page .view-btn:hover {
+  background: #d7e7ff;
+    border-color: #a9c7f0;
+
+  /*background: var(--raw-accent-hover);
+  border-color: var(--raw-accent-hover);*/
+}
+
+.page.raw-material-page .edit-btn {
+  background: #fff3d6;
+  border-color: #f0d28b;
+  color: #805600;
+}
+
+.page.raw-material-page .edit-btn:hover {
+  background: #ffe8b0;
+}
+
+.page.raw-material-page .delete-btn {
+  background: #fde8e8;
+  border-color: #f4bcbc;
+  color: #a52828;
+}
+
+.page.raw-material-page .delete-btn:hover {
+  background: #fbd5d5;
+}
+
+.page.raw-material-page .btn.secondary {
+  background: #ffffff;
+  border: 1px solid var(--raw-border);
+  color: var(--raw-text);
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.page.raw-material-page .btn.secondary:hover:not(:disabled) {
+  background: var(--raw-accent-soft);
+  border-color: var(--raw-accent);
+}
+
+.page.raw-material-page button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.page.raw-material-page button:focus-visible {
+  outline: 3px solid rgb(57 116 198 / 28%);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   SEARCH AND FORM FIELDS
+   ========================================================= */
+
+.page.raw-material-page .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.page.raw-material-page .fld label {
+  color: var(--raw-text);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.page.raw-material-page .fld label span {
+  color: #c62828;
+}
+
+.page.raw-material-page .fld input,
+.page.raw-material-page .fld select,
+.page.raw-material-page .fld textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #c7d3e2;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #263247;
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.page.raw-material-page .fld input,
+.page.raw-material-page .fld select {
+  min-height: 40px;
+}
+
+.page.raw-material-page .fld textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.page.raw-material-page .fld input:focus,
+.page.raw-material-page .fld select:focus,
+.page.raw-material-page .fld textarea:focus {
+  outline: none;
+  border-color: var(--raw-accent);
+  box-shadow: 0 0 0 3px rgb(57 116 198 / 13%);
+}
+
+.page.raw-material-page .fld input:disabled,
+.page.raw-material-page .fld select:disabled,
+.page.raw-material-page .fld textarea:disabled {
+  background: #e8eef7;
+  color: #596579;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.page.raw-material-page .fld input::placeholder,
+.page.raw-material-page .fld textarea::placeholder {
+  color: #8a96a8;
+}
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.page.raw-material-page .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.page.raw-material-page .form-grid .f-full,
+.page.raw-material-page .form-grid .full {
+  grid-column: 1 / -1;
+}
+
+/* =========================================================
+   RAW MATERIAL MODAL SECTIONS
+   Reuses the classes already present in RawMaterial.jsx
+   ========================================================= */
+
+.page.raw-material-page .customer-modal-section {
+  background: #eaf3ff;
+  border: 1px solid #d2e2f7;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.page.raw-material-page .customer-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.page.raw-material-page .customer-modal-section-title {
+  color: var(--raw-text);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.page.raw-material-page .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--raw-border);
+  border-radius: 9px;
+  background: var(--raw-card);
+}
+
+.page.raw-material-page table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--raw-text);
+  background: var(--raw-card);
+  font-size: 14px;
+}
+
+.page.raw-material-page thead {
+  background: var(--raw-table-header);
+}
+
+.page.raw-material-page thead th {
+  background: var(--raw-table-header);
+  color: var(--raw-text);
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--raw-border);
+}
+
+.page.raw-material-page thead th[style*="cursor: pointer"] {
+  user-select: none;
+}
+
+.page.raw-material-page thead th[style*="cursor: pointer"]:hover {
+  background: #cfe1fb;
+}
+
+.page.raw-material-page .sort-indicator {
+  color: var(--raw-accent);
+  font-size: 11px;
+  margin-left: 3px;
+}
+
+.page.raw-material-page tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--raw-border);
+  color: var(--raw-text);
+  vertical-align: middle;
+}
+
+.page.raw-material-page tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.page.raw-material-page tbody tr:hover {
+  background: var(--raw-row-hover);
+}
+
+.page.raw-material-page tbody td strong {
+  color: var(--raw-text);
+}
+
+/* Keep action buttons readable inside the table. */
+
+.page.raw-material-page .action-buttons {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.page.raw-material-page .action-buttons .action-btn {
+  white-space: nowrap;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.page.raw-material-page .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.page.raw-material-page .badge.bg {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.page.raw-material-page .badge.br {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* =========================================================
+   ERROR AND EMPTY STATES
+   ========================================================= */
+
+.page.raw-material-page .form-error {
+  padding: 10px 12px;
+  border: 1px solid #f2b8b8;
+  border-radius: 7px;
+  background: #fff0f0;
+  color: #a52828;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.page.raw-material-page .empty-state {
+  padding: 20px;
+  text-align: center;
+  color: var(--raw-muted);
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.page.raw-material-page .table-wrap > *:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   MODALS
+   Applies to View, Add, Edit and Delete modals rendered
+   inside the Raw Materials page.
+   ========================================================= */
+
+.page.raw-material-page .skcp-modal {
+  color: var(--raw-text);
+  background: var(--raw-card);
+  border: 1px solid var(--raw-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.page.raw-material-page .skcp-modal-header,
+.page.raw-material-page .skcp-modal-footer {
+  background: var(--raw-table-header);
+  border-color: var(--raw-border);
+}
+
+.page.raw-material-page .skcp-modal-header {
+  border-bottom: 1px solid var(--raw-border);
+}
+
+.page.raw-material-page .skcp-modal-footer {
+  border-top: 1px solid var(--raw-border);
+}
+
+.page.raw-material-page .skcp-modal-body {
+  background: var(--raw-card);
+  color: var(--raw-text);
+}
+
+.page.raw-material-page .skcp-modal-title,
+.page.raw-material-page .skcp-modal-heading {
+  color: var(--raw-text);
+}
+
+.page.raw-material-page .skcp-modal-subtitle {
+  color: var(--raw-muted);
+}
+
+.page.raw-material-page .skcp-modal-close {
+  color: var(--raw-text);
+}
+
+.page.raw-material-page .skcp-modal-close:hover {
+  background: var(--raw-accent-soft);
+}
+
+/* Modal details and content. */
+
+.page.raw-material-page .skcp-modal .detail-grid,
+.page.raw-material-page .skcp-modal .detail-item {
+  color: var(--raw-text);
+}
+
+.page.raw-material-page .skcp-modal .detail-item label,
+.page.raw-material-page .skcp-modal .detail-label {
+  color: var(--raw-muted);
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+.app.dark .page.raw-material-page,
+.dark .page.raw-material-page {
+  --raw-accent: #79aaf5;
+  --raw-accent-hover: #9bc0ff;
+  --raw-accent-soft: #1c293e;
+  --raw-accent-border: #405573;
+
+  --raw-text: #e8edf2;
+  --raw-muted: #aab5c0;
+
+  --raw-card: #202a35;
+  --raw-border: #394653;
+
+  --raw-table-header: #263447;
+  --raw-row-hover: #28374a;
+
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page > .card,
+.dark .page.raw-material-page > .card {
+  background: var(--raw-card);
+  color: var(--raw-text);
+  border-color: var(--raw-border);
+  box-shadow: none;
+}
+
+.app.dark .page.raw-material-page > .card h2,
+.dark .page.raw-material-page > .card h2,
+.app.dark .page.raw-material-page tbody td,
+.dark .page.raw-material-page tbody td,
+.app.dark .page.raw-material-page tbody td strong,
+.dark .page.raw-material-page tbody td strong {
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page .customer-modal-section,
+.dark .page.raw-material-page .customer-modal-section {
+  background: #263447;
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page .customer-modal-section-title,
+.dark .page.raw-material-page .customer-modal-section-title {
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page .fld label,
+.dark .page.raw-material-page .fld label {
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page .fld input,
+.app.dark .page.raw-material-page .fld select,
+.app.dark .page.raw-material-page .fld textarea,
+.dark .page.raw-material-page .fld input,
+.dark .page.raw-material-page .fld select,
+.dark .page.raw-material-page .fld textarea {
+  background: #17212c;
+  color: #e8edf2;
+  border-color: #465568;
+}
+
+.app.dark .page.raw-material-page .fld input:disabled,
+.app.dark .page.raw-material-page .fld select:disabled,
+.app.dark .page.raw-material-page .fld textarea:disabled,
+.dark .page.raw-material-page .fld input:disabled,
+.dark .page.raw-material-page .fld select:disabled,
+.dark .page.raw-material-page .fld textarea:disabled {
+  background: #2a3542;
+  color: #aab5c0;
+}
+
+.app.dark .page.raw-material-page .btn.secondary,
+.dark .page.raw-material-page .btn.secondary {
+  background: #263447;
+  color: var(--raw-text);
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page .btn.secondary:hover:not(:disabled),
+.dark .page.raw-material-page .btn.secondary:hover:not(:disabled) {
+  background: #334761;
+}
+
+.app.dark .page.raw-material-page .table-wrap,
+.dark .page.raw-material-page .table-wrap,
+.app.dark .page.raw-material-page table,
+.dark .page.raw-material-page table {
+  background: var(--raw-card);
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page thead th,
+.dark .page.raw-material-page thead th {
+  background: var(--raw-table-header);
+  color: var(--raw-text);
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page thead th[style*="cursor: pointer"]:hover,
+.dark .page.raw-material-page thead th[style*="cursor: pointer"]:hover {
+  background: #344963;
+}
+
+.app.dark .page.raw-material-page tbody td,
+.dark .page.raw-material-page tbody td {
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page tbody tr:hover,
+.dark .page.raw-material-page tbody tr:hover {
+  background: var(--raw-row-hover);
+}
+
+.app.dark .page.raw-material-page .skcp-modal,
+.dark .page.raw-material-page .skcp-modal {
+  background: var(--raw-card);
+  color: var(--raw-text);
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page .skcp-modal-header,
+.app.dark .page.raw-material-page .skcp-modal-footer,
+.dark .page.raw-material-page .skcp-modal-header,
+.dark .page.raw-material-page .skcp-modal-footer {
+  background: var(--raw-table-header);
+  border-color: var(--raw-border);
+}
+
+.app.dark .page.raw-material-page .skcp-modal-body,
+.dark .page.raw-material-page .skcp-modal-body {
+  background: var(--raw-card);
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page .skcp-modal-title,
+.app.dark .page.raw-material-page .skcp-modal-heading,
+.app.dark .page.raw-material-page .skcp-modal-close,
+.dark .page.raw-material-page .skcp-modal-title,
+.dark .page.raw-material-page .skcp-modal-heading,
+.dark .page.raw-material-page .skcp-modal-close {
+  color: var(--raw-text);
+}
+
+.app.dark .page.raw-material-page .skcp-modal-subtitle,
+.dark .page.raw-material-page .skcp-modal-subtitle {
+  color: var(--raw-muted);
+}
+
+.app.dark .page.raw-material-page .skcp-modal-close:hover,
+.dark .page.raw-material-page .skcp-modal-close:hover {
+  background: #334761;
+}
+
+.app.dark .page.raw-material-page .form-error,
+.dark .page.raw-material-page .form-error {
+  background: #3a2428;
+  border-color: #704047;
+  color: #ffb8b8;
+}
+
+.app.dark .page.raw-material-page .badge.bg,
+.dark .page.raw-material-page .badge.bg {
+  background: #173d2b;
+  color: #a7f3c5;
+}
+
+.app.dark .page.raw-material-page .badge.br,
+.dark .page.raw-material-page .badge.br {
+  background: #48272b;
+  color: #ffc1c1;
+}
+
+.app.dark .page.raw-material-page .edit-btn,
+.dark .page.raw-material-page .edit-btn {
+  background: #49391e;
+  border-color: #766039;
+  color: #ffdf9a;
+}
+
+.app.dark .page.raw-material-page .edit-btn:hover,
+.dark .page.raw-material-page .edit-btn:hover {
+  background: #5b4725;
+}
+
+.app.dark .page.raw-material-page .delete-btn,
+.dark .page.raw-material-page .delete-btn {
+  background: #48272b;
+  border-color: #704047;
+  color: #ffc1c1;
+}
+
+.app.dark .page.raw-material-page .delete-btn:hover,
+.dark .page.raw-material-page .delete-btn:hover {
+  background: #5a3036;
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .page.raw-material-page > .card {
+    padding: 15px;
+  }
+
+  .page.raw-material-page .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page.raw-material-page .form-grid .f-full,
+  .page.raw-material-page .form-grid .full {
+    grid-column: auto;
+  }
+
+  .page.raw-material-page .customer-modal-section {
+    padding: 12px;
+  }
+
+  .page.raw-material-page .table-wrap {
+    overflow-x: auto;
+  }
+
+  .page.raw-material-page table {
+    min-width: 680px;
+  }
+
+  .page.raw-material-page .action-buttons {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page.raw-material-page > .card {
+    padding: 12px;
+    border-radius: 9px;
+  }
+
+  .page.raw-material-page .action-buttons .action-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .page.raw-material-page *,
+  .page.raw-material-page *::before,
+  .page.raw-material-page *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

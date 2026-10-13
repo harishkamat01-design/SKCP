@@ -14,7 +14,7 @@ const initialForm = {
     gstNumber: "",
     remarks: "",
 };
-
+import "./Customer.css";
 function AddCustomerModal({
     isOpen,
     onClose,

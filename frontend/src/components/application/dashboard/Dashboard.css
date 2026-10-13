@@ -1,0 +1,638 @@
+/* ============================================================
+   SKCP DASHBOARD — BUSINESS CONTROL CENTRE
+   Complete final Dashboard.css
+   ============================================================ */
+
+
+/* ============================================================
+   01. THEME VARIABLES
+   ============================================================ */
+
+.skcp-control-centre {
+    --dcc-text: #253247;
+    --dcc-muted: #667085;
+
+    --dcc-card-bg: #ffffff;
+    --dcc-card-border: #d8dee8;
+
+    --dcc-neutral-bg: #ffffff;
+    --dcc-neutral-border: #d6dce5;
+
+    --dcc-blue-bg: #f0f6ff;
+    --dcc-blue-border: #b8d0f4;
+
+    --dcc-green-bg: #f0f8f0;
+    --dcc-green-border: #b9d8bb;
+
+    --dcc-cream-bg: #fff9ec;
+    --dcc-cream-border: #e8d5a8;
+
+    --dcc-lavender-bg: #f6f1ff;
+    --dcc-lavender-border: #d5c4f0;
+
+    --dcc-gold: #b8860b;
+
+    width: 100%;
+    color: var(--dcc-text);
+    box-sizing: border-box;
+}
+
+.skcp-control-centre *,
+.skcp-control-centre *::before,
+.skcp-control-centre *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   02. DASHBOARD HEADER
+   ============================================================ */
+
+.skcp-control-centre .dcc-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+
+    padding: 24px;
+    margin-bottom: 22px;
+
+    background: var(--dcc-card-bg);
+    border: 1px solid var(--dcc-card-border);
+    border-radius: 14px;
+
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.skcp-control-centre .dcc-header-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Business name — GOLD */
+
+.skcp-control-centre .dcc-eyebrow {
+    /* SHREE KUNDODARI CEMENT PRODUCTS */
+    margin: 0 0 8px;
+
+    color: var(--dcc-gold);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+
+.skcp-control-centre .dcc-header h1 {
+    margin: 0;
+
+    color: var(--dcc-text);
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.3;
+}
+
+.skcp-control-centre .dcc-subtitle {
+    margin: 8px 0 0;
+
+    color: var(--dcc-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+
+/* ============================================================
+   03. DATE DISPLA
+   ============================================================ */
+
+.skcp-control-centre .dcc-date {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    min-width: 160px;
+
+    padding: 12px 16px;
+
+    background: transparent;
+    border: none;
+    border-radius: 0;
+
+    text-align: right;
+}
+
+.skcp-control-centre .dcc-date-label {
+    display: block;
+    width: 100%;
+    margin-bottom: 4px;
+
+    color: var(--dcc-muted);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.7px;
+    text-transform: none;
+    text-align: right;
+}
+
+.skcp-control-centre .dcc-date strong {
+    display: block;
+    width: 100%;
+
+    color: var(--dcc-text);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: right;
+}
+
+.skcp-control-centre .dcc-date-note {
+    display: block;
+    width: 100%;
+
+    color: var(--dcc-muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: right;
+}
+
+
+/* ============================================================
+   04. COMMON SECTION CARDS
+   Main section borders are intentionally retained.
+   ============================================================ */
+
+.skcp-control-centre .dcc-section {
+    min-width: 0;
+    margin-bottom: 22px;
+    padding: 22px;
+
+    background: var(--dcc-card-bg);
+    border: 1px solid var(--dcc-card-border);
+    border-radius: 14px;
+
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
+    transition: border-color 0.2s ease;
+}
+
+.skcp-control-centre .dcc-section h2 {
+    margin: 0;
+
+    color: var(--dcc-text);
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.skcp-control-centre .dcc-section-kicker {
+    margin: 0 0 7px;
+
+    color: var(--dcc-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+.skcp-control-centre .dcc-section-description {
+    margin: 6px 0 0;
+
+    color: var(--dcc-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   05. DAILY WORK — LIGHT BLUE
+   ============================================================ */
+
+.skcp-control-centre .dcc-section-daily {
+    background: var(--dcc-blue-bg);
+    border: 1px solid var(--dcc-blue-border);
+}
+
+
+/* ============================================================
+   06. SALES & CUSTOMER ORDERS — LIGHT GREEN
+   ============================================================ */
+
+.skcp-control-centre .dcc-section-sales {
+    background: var(--dcc-green-bg);
+    border: 1px solid var(--dcc-green-border);
+}
+
+
+/* ============================================================
+   07. PURCHASE & STOCK — LIGHT CREAM
+   ============================================================ */
+
+.skcp-control-centre .dcc-section-stock {
+    background: var(--dcc-cream-bg);
+    border: 1px solid var(--dcc-cream-border);
+}
+
+
+/* ============================================================
+   08. QUICK ACCESS — LIGHT LAVENDER
+   ============================================================ */
+
+.skcp-control-centre .dcc-section-quick {
+    background: var(--dcc-lavender-bg);
+    border: 1px solid var(--dcc-lavender-border);
+}
+
+
+/* ============================================================
+   09. ACTION GRIDS
+   ============================================================ */
+
+.skcp-control-centre .dcc-daily-grid,
+.skcp-control-centre .dcc-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+
+    margin-top: 18px;
+}
+
+.skcp-control-centre .dcc-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+
+/* ============================================================
+   10. ACTION BUTTONS — NEUTRAL
+   Applies to Take Attendance, Add Production,
+   Add Customer, and all other dashboard actions.
+   ============================================================ */
+
+.skcp-control-centre .dcc-action,
+.skcp-control-centre button.dcc-action,
+.skcp-control-centre a.dcc-action {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 82px;
+    padding: 16px;
+
+    font-family: inherit;
+    color: var(--dcc-text);
+    background: var(--dcc-neutral-bg);
+
+    /* Remove individual action tile borders */
+    border: 0 !important;
+    outline: none;
+    border-radius: 11px;
+    box-shadow: none !important;
+
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.skcp-control-centre .dcc-action:hover,
+.skcp-control-centre button.dcc-action:hover,
+.skcp-control-centre a.dcc-action:hover {
+    color: var(--dcc-text);
+    background: var(--dcc-neutral-bg);
+
+    border: 0 !important;
+    box-shadow: none !important;
+
+    transform: translateY(-1px);
+}
+
+.skcp-control-centre .dcc-action:active {
+    border: 0 !important;
+    box-shadow: none !important;
+    transform: translateY(0);
+}
+
+/* Keep keyboard focus visible without adding a tile border */
+
+.skcp-control-centre .dcc-action:focus-visible {
+    border: 0 !important;
+    outline: 2px solid var(--dcc-gold);
+    outline-offset: 3px;
+    box-shadow: none !important;
+}
+
+
+/* ============================================================
+   11. OVERRIDE OLD GREEN/BLUE PRIMARY BUTTON STYLES
+   ============================================================ */
+
+.skcp-control-centre .dcc-action-primary,
+.skcp-control-centre .dcc-action-green,
+.skcp-control-centre .dcc-action-blue,
+.skcp-control-centre .dcc-action-primary:hover,
+.skcp-control-centre .dcc-action-green:hover,
+.skcp-control-centre .dcc-action-blue:hover {
+    font-family: inherit;
+    color: var(--dcc-text);
+    background: var(--dcc-neutral-bg);
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* ============================================================
+   12. ACTION ICONS — NO BORDERS
+   ============================================================ */
+
+.skcp-control-centre .dcc-action-icon,
+.skcp-control-centre .dcc-action-icon:hover,
+.skcp-control-centre .dcc-action-green .dcc-action-icon,
+.skcp-control-centre .dcc-action-blue .dcc-action-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    color: var(--dcc-text);
+    background: #f3f5f8;
+
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 21px;
+}
+
+
+/* ============================================================
+   13. ACTION CONTENT — VERTICAL LAYOUT
+   Title, description, and link each on separate lines.
+   Applies to ALL dashboard action buttons.
+   ============================================================ */
+
+.skcp-control-centre .dcc-action-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    flex: 1;
+    min-width: 0;
+    gap: 4px;
+
+    font-family: inherit;
+}
+
+.skcp-control-centre .dcc-action-content h3 {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    color: var(--dcc-text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.45;
+}
+
+.skcp-control-centre .dcc-action-content p {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    color: var(--dcc-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.skcp-control-centre .dcc-action-link {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    color: var(--dcc-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   14. ACTION ARROWS
+   ============================================================ */
+
+.skcp-control-centre .dcc-action-arrow {
+    flex-shrink: 0;
+    align-self: center;
+
+    margin-left: auto;
+
+    color: var(--dcc-muted);
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1;
+}
+
+
+/* ============================================================
+   15. DASHBOARD FOOTER
+   ============================================================ */
+
+.skcp-control-centre .dcc-footer {
+    margin: 8px 0 0;
+    padding: 12px 4px;
+
+    color: var(--dcc-muted);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.6;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    text-align: left;
+}
+
+
+/* ============================================================
+   16. DARK MODE
+   ============================================================ */
+
+.app.dark .skcp-control-centre {
+    --dcc-text: #e5eaf2;
+    --dcc-muted: #a7b1c2;
+
+    --dcc-card-bg: #202733;
+    --dcc-card-border: #3a4555;
+
+    --dcc-neutral-bg: #252e3b;
+    --dcc-neutral-border: #465366;
+
+    --dcc-blue-bg: #202d40;
+    --dcc-blue-border: #405b7e;
+
+    --dcc-green-bg: #20352e;
+    --dcc-green-border: #416b56;
+
+    --dcc-cream-bg: #383226;
+    --dcc-cream-border: #746344;
+
+    --dcc-lavender-bg: #302a40;
+    --dcc-lavender-border: #655582;
+
+    --dcc-gold: #e0b64f;
+}
+
+.app.dark .skcp-control-centre .dcc-header,
+.app.dark .skcp-control-centre .dcc-section {
+    box-shadow: none;
+}
+
+/* Dark-mode action buttons remain neutral and borderless */
+
+.app.dark .skcp-control-centre .dcc-action,
+.app.dark .skcp-control-centre .dcc-action:hover,
+.app.dark .skcp-control-centre .dcc-action:active,
+.app.dark .skcp-control-centre .dcc-action-primary,
+.app.dark .skcp-control-centre .dcc-action-green,
+.app.dark .skcp-control-centre .dcc-action-blue,
+.app.dark .skcp-control-centre .dcc-action-primary:hover,
+.app.dark .skcp-control-centre .dcc-action-green:hover,
+.app.dark .skcp-control-centre .dcc-action-blue:hover {
+    color: var(--dcc-text);
+    background: var(--dcc-neutral-bg);
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.app.dark .skcp-control-centre .dcc-action:focus-visible {
+    border: 0 !important;
+    outline: 2px solid var(--dcc-gold);
+    outline-offset: 3px;
+}
+
+.app.dark .skcp-control-centre .dcc-action-icon,
+.app.dark .skcp-control-centre .dcc-action-icon:hover,
+.app.dark .skcp-control-centre .dcc-action-green .dcc-action-icon,
+.app.dark .skcp-control-centre .dcc-action-blue .dcc-action-icon {
+    color: var(--dcc-text);
+    background: #303b4a;
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* ============================================================
+   17. RESPONSIVE — TABLET
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .skcp-control-centre .dcc-action-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .skcp-control-centre .dcc-header {
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .skcp-control-centre .dcc-section {
+        padding: 18px;
+    }
+}
+
+
+/* ============================================================
+   18. RESPONSIVE — MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+    .skcp-control-centre .dcc-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 18px;
+    }
+
+    .skcp-control-centre .dcc-header h1 {
+        font-size: 23px;
+    }
+
+    .skcp-control-centre .dcc-date {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .skcp-control-centre .dcc-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .skcp-control-centre .dcc-section h2 {
+        font-size: 17px;
+    }
+
+    .skcp-control-centre .dcc-daily-grid,
+    .skcp-control-centre .dcc-action-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .skcp-control-centre .dcc-action {
+        min-height: 72px;
+        padding: 12px;
+    }
+
+    .skcp-control-centre .dcc-action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 19px;
+    }
+}
+
+
+/* ============================================================
+   19. REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .skcp-control-centre .dcc-section,
+    .skcp-control-centre .dcc-action {
+        transition: none;
+    }
+
+    .skcp-control-centre .dcc-action:hover {
+        transform: none;
+    }
+}
+
+

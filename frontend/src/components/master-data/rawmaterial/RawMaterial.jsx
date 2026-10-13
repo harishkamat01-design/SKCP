@@ -15,6 +15,7 @@ import {
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
 import Pagination from "../../ui/Pagination";
+import "./RawMaterial.css";
 
 function RawMaterial() {
   // =========================================================
@@ -33,7 +34,7 @@ function RawMaterial() {
   const UNIT_OPTIONS = [
     "TON",
     "BAG",
-    "LITER",
+    "LITRE",
     "CUBIC_METER",
   ];
 
@@ -49,13 +50,13 @@ function RawMaterial() {
   // =========================================================
 
   const MATERIAL_UNIT_MAP = {
-    Cement: "BAG",
-    "Fly Ash": "TON",
-    Hardner: "LITER",
-    Jelly: "CUBIC_METER",
-    Sand: "CUBIC_METER",
-    Water: "LITER",
-  };
+  Cement: "BAG",
+  "Fly Ash": "TON",
+  Hardner: "LITRE",
+  Jelly: "CUBIC_METER",
+  Sand: "CUBIC_METER",
+  Water: "LITRE",
+};  
 
   // =========================================================
   // NORMALIZE MATERIAL NAME
@@ -197,10 +198,16 @@ function RawMaterial() {
       const result = await apiGet("/api/raw-materials");
 
       const records = Array.isArray(result?.data)
-        ? result.data.map(normalizeRawMaterialRecord)
-        : [];
+  ? result.data
+      .filter(
+        (material) =>
+          String(material?.status || "").toUpperCase() ===
+          "ACTIVE",
+      )
+      .map(normalizeRawMaterialRecord)
+  : [];
 
-      setRawMaterials(records);
+setRawMaterials(records);
     } catch (err) {
       console.error(
         "Error fetching raw materials:",
@@ -831,19 +838,12 @@ function RawMaterial() {
          * Keep the record in the table and change its
          * status to INACTIVE because SKCP uses soft delete.
          */
-        setRawMaterials(
-          (previousRawMaterials) =>
-            previousRawMaterials.map(
-              (material) =>
-                material.rawMaterialId ===
-                rawMaterialId
-                  ? {
-                      ...material,
-                      status: "INACTIVE",
-                    }
-                  : material,
-            ),
-        );
+        setRawMaterials((previousRawMaterials) =>
+  previousRawMaterials.filter(
+    (material) =>
+      material.rawMaterialId !== rawMaterialId,
+  ),
+);
 
         setDeletingRawMaterial(null);
       } catch (err) {
@@ -904,7 +904,7 @@ function RawMaterial() {
 
   if (loading) {
     return (
-      <div className="page">
+      <div className="page raw-material-page">
         <section className="card">
           <h2>Raw Materials</h2>
           <p>
@@ -916,7 +916,7 @@ function RawMaterial() {
   }
 
   return (
-    <div className="page">
+    <div className="page raw-material-page">
 
       {/* =====================================================
           PAGE HEADER + SEARCH

@@ -1,0 +1,1201 @@
+
+/* =========================================================
+   SKCP — PURCHASE MODULE
+   Theme: Blue | Responsive | Light Mode + Dark Mode
+   File: Purchase.css
+   ========================================================= */
+
+/* =========================================================
+   1. PURCHASE PAGE THEME VARIABLES
+   ========================================================= */
+
+.purchase-page {
+    --purchase-accent: #3974c6;
+    --purchase-accent-hover: #2f63ab;
+    --purchase-accent-soft: #dceaff;
+    --purchase-accent-border: #cbdff8;
+
+    --purchase-text: #263247;
+    --purchase-muted: #68747c;
+
+    --purchase-card: #edf5ff;
+    --purchase-border: #cbdff8;
+    --purchase-table-header: #dceaff;
+    --purchase-row-hover: #e8f1ff;
+
+    --purchase-modal: #eaf3ff;
+    --purchase-modal-header: #dceaff;
+    --purchase-modal-border: #cbdff8;
+
+    --purchase-input-bg: #ffffff;
+    --purchase-input-border: #cbd5e1;
+    --purchase-input-focus: #3974c6;
+
+    --purchase-success: #18794e;
+    --purchase-success-bg: #dcfce7;
+
+    --purchase-warning: #92400e;
+    --purchase-warning-bg: #fef3c7;
+
+    --purchase-danger: #b42318;
+    --purchase-danger-bg: #fee4e2;
+
+    box-sizing: border-box;
+    color: var(--purchase-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.purchase-page *,
+.purchase-page *::before,
+.purchase-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   2. PAGE HEADER AND CARDS
+   ========================================================= */
+
+.purchase-page > .card {
+    padding: 20px;
+    margin-bottom: 18px;
+    background: var(--purchase-card);
+    border: 1px solid var(--purchase-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.purchase-page h2 {
+    margin: 0 0 6px;
+    color: var(--purchase-text);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.purchase-page h3 {
+    margin: 0;
+    color: var(--purchase-text);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.purchase-page p {
+    color: var(--purchase-muted);
+}
+
+.purchase-page > .card > p {
+    margin: 0 0 16px;
+}
+
+.purchase-page button,
+.purchase-page input,
+.purchase-page select,
+.purchase-page textarea {
+    font: inherit;
+}
+
+.purchase-page button {
+    cursor: pointer;
+}
+
+.purchase-page button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* =========================================================
+   3. BUTTONS
+   ========================================================= */
+
+.purchase-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 9px 15px;
+
+    color: #ffffff;
+    background: var(--purchase-accent);
+    border: 1px solid var(--purchase-accent);
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.purchase-page .btn:hover:not(:disabled) {
+    background: var(--purchase-accent-hover);
+    border-color: var(--purchase-accent-hover);
+}
+
+.purchase-page .btn:focus-visible,
+.purchase-page .action-btn:focus-visible,
+.purchase-page .table-sort-btn:focus-visible {
+    outline: 3px solid rgb(57 116 198 / 25%);
+    outline-offset: 2px;
+}
+
+.purchase-page .btn.secondary {
+    color: var(--purchase-text);
+    background: var(--purchase-input-bg);
+    border-color: var(--purchase-input-border);
+}
+
+.purchase-page .btn.secondary:hover:not(:disabled) {
+    color: var(--purchase-accent);
+    background: var(--purchase-accent-soft);
+    border-color: var(--purchase-accent-border);
+}
+
+.purchase-page .btn.sm {
+    min-height: 32px;
+    padding: 6px 11px;
+    font-size: 12px;
+}
+
+/* =========================================================
+   4. VIEW, EDIT AND DELETE ACTION BUTTONS
+   ========================================================= */
+
+.purchase-page .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.purchase-page .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+    padding: 5px 10px;
+
+    border: 1px solid transparent;
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.purchase-page .action-btn.view-btn,
+.purchase-page .action-btn.edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.purchase-page .action-btn.view-btn:hover:not(:disabled),
+.purchase-page .action-btn.edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+.purchase-page .action-btn.delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.purchase-page .action-btn.delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+/* =========================================================
+   5. SEARCH AND DATE FILTERS
+   ========================================================= */
+
+.purchase-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.purchase-page .fld label {
+    display: block;
+    color: var(--purchase-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.purchase-page .fld input,
+.purchase-page .fld select,
+.purchase-page .fld textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+
+    color: var(--purchase-text);
+    background: var(--purchase-input-bg);
+    border: 1px solid var(--purchase-input-border);
+    border-radius: 7px;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.purchase-page .fld textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+.purchase-page .fld input::placeholder,
+.purchase-page .fld textarea::placeholder {
+    color: var(--purchase-muted);
+    opacity: 0.8;
+}
+
+.purchase-page .fld input:focus,
+.purchase-page .fld select:focus,
+.purchase-page .fld textarea:focus {
+    outline: none;
+    border-color: var(--purchase-input-focus);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 13%);
+}
+
+.purchase-page .fld input[readonly],
+.purchase-page .fld input:read-only {
+    color: var(--purchase-muted);
+    background: var(--purchase-accent-soft);
+    cursor: default;
+}
+
+.purchase-page .fld input:disabled,
+.purchase-page .fld select:disabled,
+.purchase-page .fld textarea:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.purchase-page .fld input[type="date"] {
+    min-width: 0;
+}
+
+.purchase-page .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   6. FILTER ACTIONS
+   JSX uses inline flex styles for the filter row.
+   ========================================================= */
+
+.purchase-page .card > div[style*="display: flex"] {
+    align-items: flex-end;
+}
+
+.purchase-page .card > div[style*="display: flex"] > .fld {
+    flex-shrink: 0;
+}
+
+.purchase-page .card > div[style*="display: flex"] > button {
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   7. PURCHASE LIST HEADER AND COUNTER
+   ========================================================= */
+
+.purchase-page .table-wrap + p {
+    margin-top: 12px;
+}
+
+.purchase-page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    border: 1px solid var(--purchase-border);
+    border-radius: 9px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--purchase-accent-border) transparent;
+}
+
+.purchase-page .table-wrap::-webkit-scrollbar {
+    height: 8px;
+}
+
+.purchase-page .table-wrap::-webkit-scrollbar-thumb {
+    background: var(--purchase-accent-border);
+    border-radius: 10px;
+}
+
+.purchase-page .table-wrap table {
+    width: 100%;
+    min-width: 1120px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--purchase-input-bg);
+    color: var(--purchase-text);
+    font-size: 13px;
+}
+
+.purchase-page .table-wrap thead {
+    background: var(--purchase-table-header);
+}
+
+.purchase-page .table-wrap th {
+    padding: 12px 13px;
+    color: var(--purchase-text);
+    background: var(--purchase-table-header);
+    border-bottom: 1px solid var(--purchase-border);
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.035em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.purchase-page .table-wrap td {
+    padding: 12px 13px;
+    color: var(--purchase-text);
+    border-bottom: 1px solid var(--purchase-border);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.purchase-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.purchase-page .table-wrap tbody tr:hover {
+    background: var(--purchase-row-hover);
+}
+
+.purchase-page .table-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.purchase-page .table-wrap td strong {
+    color: var(--purchase-text);
+    font-weight: 700;
+}
+
+.purchase-page .table-wrap td .badge {
+    white-space: nowrap;
+}
+
+/* =========================================================
+   8. SORTABLE TABLE HEADERS
+   ========================================================= */
+
+.purchase-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+
+    color: inherit;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: inherit;
+    text-align: left;
+    text-transform: inherit;
+    white-space: nowrap;
+}
+
+.purchase-page .table-sort-btn:hover {
+    color: var(--purchase-accent);
+}
+
+.purchase-page .table-sort-btn:focus-visible {
+    outline-offset: 4px;
+}
+
+/* =========================================================
+   9. STATUS AND PAYMENT BADGES
+   ========================================================= */
+
+.purchase-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 4px 9px;
+
+    border: 1px solid transparent;
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.purchase-page .badge.bg {
+    color: var(--purchase-success);
+    background: var(--purchase-success-bg);
+    border-color: rgb(24 121 78 / 16%);
+}
+
+.purchase-page .badge.br {
+    color: var(--purchase-warning);
+    background: var(--purchase-warning-bg);
+    border-color: rgb(146 64 14 / 16%);
+}
+
+/* =========================================================
+   10. EMPTY STATES AND ERRORS
+   ========================================================= */
+
+.purchase-page .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    padding: 24px;
+
+    color: var(--purchase-muted);
+    background: var(--purchase-input-bg);
+    border: 1px dashed var(--purchase-border);
+    border-radius: 9px;
+    text-align: center;
+}
+
+.purchase-page .empty-state p {
+    margin: 0;
+}
+
+.purchase-page .form-error {
+    margin: 10px 0;
+    padding: 10px 12px;
+
+    color: var(--purchase-danger);
+    background: var(--purchase-danger-bg);
+    border: 1px solid rgb(180 35 24 / 20%);
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   11. FORM GRID
+   ========================================================= */
+
+.purchase-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.purchase-page .form-grid .f-full {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.purchase-page .form-grid > * {
+    min-width: 0;
+}
+
+/* =========================================================
+   12. DETAIL GRID
+   ========================================================= */
+
+.purchase-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.purchase-page .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    padding: 12px;
+
+    background: var(--purchase-input-bg);
+    border: 1px solid var(--purchase-border);
+    border-radius: 8px;
+}
+
+.purchase-page .detail-item label,
+.purchase-page .detail-item .detail-label {
+    color: var(--purchase-muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.purchase-page .detail-item > span,
+.purchase-page .detail-item .detail-value {
+    color: var(--purchase-text);
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   13. PURCHASE MODAL CONTENT
+   The JSX wraps each shared modal in .purchase-modal-theme.
+   These rules apply when modal content remains inside the
+   wrapper. Shared modal layouts may also have their own CSS.
+   ========================================================= */
+
+.purchase-modal-theme {
+    color: var(--purchase-text, #263247);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.purchase-modal-theme *,
+.purchase-modal-theme *::before,
+.purchase-modal-theme *::after {
+    box-sizing: border-box;
+}
+
+.purchase-modal-theme .modal-section-title {
+    margin: 20px 0 12px;
+    padding: 0 0 9px;
+
+    color: var(--purchase-text, #263247);
+    border-bottom: 1px solid var(--purchase-border, #cbdff8);
+
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.purchase-modal-theme .modal-section-title:first-child {
+    margin-top: 0;
+}
+
+.purchase-modal-theme .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.purchase-modal-theme .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+.purchase-modal-theme .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.purchase-modal-theme .fld label {
+    color: var(--purchase-text, #263247);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.purchase-modal-theme .fld input,
+.purchase-modal-theme .fld select,
+.purchase-modal-theme .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+
+    color: var(--purchase-text, #263247);
+    background: var(--purchase-input-bg, #ffffff);
+    border: 1px solid var(--purchase-input-border, #cbd5e1);
+    border-radius: 7px;
+
+    font: inherit;
+    font-size: 13px;
+}
+
+.purchase-modal-theme .fld textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+.purchase-modal-theme .fld input:focus,
+.purchase-modal-theme .fld select:focus,
+.purchase-modal-theme .fld textarea:focus {
+    outline: none;
+    border-color: var(--purchase-input-focus, #3974c6);
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 13%);
+}
+
+.purchase-modal-theme .fld input[readonly],
+.purchase-modal-theme .fld input:read-only {
+    color: var(--purchase-muted, #68747c);
+    background: var(--purchase-accent-soft, #dceaff);
+}
+
+.purchase-modal-theme .card {
+    min-width: 0;
+    padding: 16px;
+    margin: 0 0 12px;
+
+    color: var(--purchase-text, #263247);
+    background: var(--purchase-card, #edf5ff);
+    border: 1px solid var(--purchase-border, #cbdff8);
+    border-radius: 10px;
+}
+
+.purchase-modal-theme .card .form-grid {
+    gap: 14px;
+}
+
+.purchase-modal-theme .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 9px 15px;
+
+    color: #ffffff;
+    background: var(--purchase-accent, #3974c6);
+    border: 1px solid var(--purchase-accent, #3974c6);
+    border-radius: 7px;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.purchase-modal-theme .btn:hover:not(:disabled) {
+    background: var(--purchase-accent-hover, #2f63ab);
+    border-color: var(--purchase-accent-hover, #2f63ab);
+}
+
+.purchase-modal-theme .btn.secondary {
+    color: var(--purchase-text, #263247);
+    background: var(--purchase-input-bg, #ffffff);
+    border-color: var(--purchase-input-border, #cbd5e1);
+}
+
+.purchase-modal-theme .btn.secondary:hover:not(:disabled) {
+    background: var(--purchase-accent-soft, #dceaff);
+    border-color: var(--purchase-accent-border, #cbdff8);
+}
+
+.purchase-modal-theme .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.purchase-modal-theme .badge.bg {
+    color: var(--purchase-success, #18794e);
+    background: var(--purchase-success-bg, #dcfce7);
+}
+
+.purchase-modal-theme .badge.br {
+    color: var(--purchase-warning, #92400e);
+    background: var(--purchase-warning-bg, #fef3c7);
+}
+
+.purchase-modal-theme .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 16px;
+    overflow-x: auto;
+    border: 1px solid var(--purchase-border, #cbdff8);
+    border-radius: 8px;
+}
+
+.purchase-modal-theme .table-wrap table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--purchase-input-bg, #ffffff);
+    color: var(--purchase-text, #263247);
+    font-size: 12px;
+}
+
+.purchase-modal-theme .table-wrap th {
+    padding: 10px;
+    color: var(--purchase-text, #263247);
+    background: var(--purchase-table-header, #dceaff);
+    border-bottom: 1px solid var(--purchase-border, #cbdff8);
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.purchase-modal-theme .table-wrap td {
+    padding: 10px;
+    color: var(--purchase-text, #263247);
+    border-bottom: 1px solid var(--purchase-border, #cbdff8);
+    vertical-align: middle;
+}
+
+.purchase-modal-theme .table-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.purchase-modal-theme .empty-state {
+    padding: 20px;
+    color: var(--purchase-muted, #68747c);
+    background: var(--purchase-input-bg, #ffffff);
+    border: 1px dashed var(--purchase-border, #cbdff8);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.purchase-modal-theme .empty-state p {
+    margin: 0;
+}
+
+.purchase-modal-theme .form-error {
+    margin: 10px 0;
+    padding: 10px 12px;
+    color: var(--purchase-danger, #b42318);
+    background: var(--purchase-danger-bg, #fee4e2);
+    border: 1px solid rgb(180 35 24 / 20%);
+    border-radius: 7px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   14. PAGINATION
+   ========================================================= */
+
+.purchase-page .table-wrap > nav,
+.purchase-page .pagination {
+    color: var(--purchase-text);
+}
+
+.purchase-page .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    background: var(--purchase-card);
+    border-top: 1px solid var(--purchase-border);
+}
+
+.purchase-page .pagination button {
+    min-height: 32px;
+    padding: 6px 10px;
+    color: var(--purchase-text);
+    background: var(--purchase-input-bg);
+    border: 1px solid var(--purchase-input-border);
+    border-radius: 6px;
+}
+
+.purchase-page .pagination button:hover:not(:disabled) {
+    background: var(--purchase-accent-soft);
+    border-color: var(--purchase-accent-border);
+}
+
+.purchase-page .pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* =========================================================
+   15. DARK MODE
+   Supports the application's common dark-theme selectors.
+   ========================================================= */
+
+.dark .purchase-page,
+[data-theme="dark"] .purchase-page,
+.dark-mode .purchase-page {
+    --purchase-accent: #79aaf5;
+    --purchase-accent-hover: #9bc0ff;
+    --purchase-accent-soft: #293d59;
+    --purchase-accent-border: #405573;
+
+    --purchase-text: #e8edf2;
+    --purchase-muted: #aab5c0;
+
+    --purchase-card: #202a35;
+    --purchase-border: #394653;
+    --purchase-table-header: #293d59;
+    --purchase-row-hover: #28374a;
+
+    --purchase-modal: #202a35;
+    --purchase-modal-header: #26384e;
+    --purchase-modal-border: #405573;
+
+    --purchase-input-bg: #18212b;
+    --purchase-input-border: #465565;
+    --purchase-input-focus: #79aaf5;
+
+    --purchase-success: #86efac;
+    --purchase-success-bg: #173b2c;
+
+    --purchase-warning: #fcd34d;
+    --purchase-warning-bg: #473617;
+
+    --purchase-danger: #fca5a5;
+    --purchase-danger-bg: #482626;
+}
+
+.dark .purchase-page > .card,
+[data-theme="dark"] .purchase-page > .card,
+.dark-mode .purchase-page > .card {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+.dark .purchase-page .action-btn.view-btn,
+.dark .purchase-page .action-btn.edit-btn,
+[data-theme="dark"] .purchase-page .action-btn.view-btn,
+[data-theme="dark"] .purchase-page .action-btn.edit-btn,
+.dark-mode .purchase-page .action-btn.view-btn,
+.dark-mode .purchase-page .action-btn.edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .purchase-page .action-btn.view-btn:hover:not(:disabled),
+.dark .purchase-page .action-btn.edit-btn:hover:not(:disabled),
+[data-theme="dark"] .purchase-page .action-btn.view-btn:hover:not(:disabled),
+[data-theme="dark"] .purchase-page .action-btn.edit-btn:hover:not(:disabled),
+.dark-mode .purchase-page .action-btn.view-btn:hover:not(:disabled),
+.dark-mode .purchase-page .action-btn.edit-btn:hover:not(:disabled) {
+    background: #344d70;
+    border-color: #5878a1;
+}
+
+.dark .purchase-page .action-btn.delete-btn,
+[data-theme="dark"] .purchase-page .action-btn.delete-btn,
+.dark-mode .purchase-page .action-btn.delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .purchase-page .action-btn.delete-btn:hover:not(:disabled),
+[data-theme="dark"] .purchase-page .action-btn.delete-btn:hover:not(:disabled),
+.dark-mode .purchase-page .action-btn.delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+    border-color: #874444;
+}
+
+.dark .purchase-page .btn.secondary,
+[data-theme="dark"] .purchase-page .btn.secondary,
+.dark-mode .purchase-page .btn.secondary {
+    color: var(--purchase-text);
+    background: var(--purchase-input-bg);
+    border-color: var(--purchase-input-border);
+}
+
+.dark .purchase-page .btn.secondary:hover:not(:disabled),
+[data-theme="dark"] .purchase-page .btn.secondary:hover:not(:disabled),
+.dark-mode .purchase-page .btn.secondary:hover:not(:disabled) {
+    background: var(--purchase-accent-soft);
+    border-color: var(--purchase-accent-border);
+}
+
+.dark .purchase-page .table-wrap,
+[data-theme="dark"] .purchase-page .table-wrap,
+.dark-mode .purchase-page .table-wrap {
+    border-color: var(--purchase-border);
+}
+
+.dark .purchase-page .table-wrap table,
+[data-theme="dark"] .purchase-page .table-wrap table,
+.dark-mode .purchase-page .table-wrap table {
+    background: var(--purchase-input-bg);
+    color: var(--purchase-text);
+}
+
+.dark .purchase-page .badge.bg,
+[data-theme="dark"] .purchase-page .badge.bg,
+.dark-mode .purchase-page .badge.bg {
+    border-color: #28583f;
+}
+
+.dark .purchase-page .badge.br,
+[data-theme="dark"] .purchase-page .badge.br,
+.dark-mode .purchase-page .badge.br {
+    border-color: #6b5122;
+}
+
+.dark .purchase-page .form-error,
+[data-theme="dark"] .purchase-page .form-error,
+.dark-mode .purchase-page .form-error {
+    border-color: #713737;
+}
+
+/* Dark mode modal content */
+
+.dark .purchase-modal-theme,
+[data-theme="dark"] .purchase-modal-theme,
+.dark-mode .purchase-modal-theme {
+    color: var(--purchase-text, #e8edf2);
+}
+
+.dark .purchase-modal-theme .modal-section-title,
+[data-theme="dark"] .purchase-modal-theme .modal-section-title,
+.dark-mode .purchase-modal-theme .modal-section-title {
+    color: var(--purchase-text, #e8edf2);
+    border-color: var(--purchase-border, #394653);
+}
+
+.dark .purchase-modal-theme .card,
+[data-theme="dark"] .purchase-modal-theme .card,
+.dark-mode .purchase-modal-theme .card {
+    color: var(--purchase-text, #e8edf2);
+    background: var(--purchase-card, #202a35);
+    border-color: var(--purchase-border, #394653);
+}
+
+.dark .purchase-modal-theme .fld label,
+[data-theme="dark"] .purchase-modal-theme .fld label,
+.dark-mode .purchase-modal-theme .fld label {
+    color: var(--purchase-text, #e8edf2);
+}
+
+.dark .purchase-modal-theme .fld input,
+.dark .purchase-modal-theme .fld select,
+.dark .purchase-modal-theme .fld textarea,
+[data-theme="dark"] .purchase-modal-theme .fld input,
+[data-theme="dark"] .purchase-modal-theme .fld select,
+[data-theme="dark"] .purchase-modal-theme .fld textarea,
+.dark-mode .purchase-modal-theme .fld input,
+.dark-mode .purchase-modal-theme .fld select,
+.dark-mode .purchase-modal-theme .fld textarea {
+    color: var(--purchase-text, #e8edf2);
+    background: var(--purchase-input-bg, #18212b);
+    border-color: var(--purchase-input-border, #465565);
+}
+
+.dark .purchase-modal-theme .fld input[readonly],
+.dark .purchase-modal-theme .fld input:read-only,
+[data-theme="dark"] .purchase-modal-theme .fld input[readonly],
+[data-theme="dark"] .purchase-modal-theme .fld input:read-only,
+.dark-mode .purchase-modal-theme .fld input[readonly],
+.dark-mode .purchase-modal-theme .fld input:read-only {
+    color: var(--purchase-muted, #aab5c0);
+    background: var(--purchase-accent-soft, #293d59);
+}
+
+.dark .purchase-modal-theme .table-wrap table,
+[data-theme="dark"] .purchase-modal-theme .table-wrap table,
+.dark-mode .purchase-modal-theme .table-wrap table {
+    color: var(--purchase-text, #e8edf2);
+    background: var(--purchase-input-bg, #18212b);
+}
+
+.dark .purchase-modal-theme .table-wrap th,
+[data-theme="dark"] .purchase-modal-theme .table-wrap th,
+.dark-mode .purchase-modal-theme .table-wrap th {
+    color: var(--purchase-text, #e8edf2);
+    background: var(--purchase-table-header, #293d59);
+    border-color: var(--purchase-border, #394653);
+}
+
+.dark .purchase-modal-theme .table-wrap td,
+[data-theme="dark"] .purchase-modal-theme .table-wrap td,
+.dark-mode .purchase-modal-theme .table-wrap td {
+    color: var(--purchase-text, #e8edf2);
+    border-color: var(--purchase-border, #394653);
+}
+
+.dark .purchase-modal-theme .empty-state,
+[data-theme="dark"] .purchase-modal-theme .empty-state,
+.dark-mode .purchase-modal-theme .empty-state {
+    color: var(--purchase-muted, #aab5c0);
+    background: var(--purchase-input-bg, #18212b);
+    border-color: var(--purchase-border, #394653);
+}
+
+.dark .purchase-modal-theme .form-error,
+[data-theme="dark"] .purchase-modal-theme .form-error,
+.dark-mode .purchase-modal-theme .form-error {
+    color: var(--purchase-danger, #fca5a5);
+    background: var(--purchase-danger-bg, #482626);
+    border-color: #713737;
+}
+
+/* =========================================================
+   16. RESPONSIVE — TABLETS
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .purchase-page > .card {
+        padding: 16px;
+    }
+
+    .purchase-page .table-wrap table {
+        min-width: 1050px;
+    }
+
+    .purchase-page .card > div[style*="display: flex"] {
+        flex-wrap: wrap;
+        gap: 12px !important;
+    }
+
+    .purchase-page .card > div[style*="display: flex"] > .fld {
+        max-width: 100%;
+    }
+
+    .purchase-modal-theme .form-grid {
+        gap: 13px;
+    }
+}
+
+/* =========================================================
+   17. RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+    .purchase-page {
+        font-size: 13px;
+    }
+
+    .purchase-page > .card {
+        padding: 14px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+    }
+
+    .purchase-page h2 {
+        font-size: 19px;
+    }
+
+    .purchase-page h3 {
+        font-size: 15px;
+    }
+
+    .purchase-page .card > div[style*="display: flex"] {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px !important;
+    }
+
+    .purchase-page .card > div[style*="display: flex"] > .fld {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .purchase-page .card > div[style*="display: flex"] > button {
+        width: 100%;
+    }
+
+    .purchase-page .form-grid,
+    .purchase-modal-theme .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .purchase-page .form-grid .f-full,
+    .purchase-modal-theme .form-grid .f-full {
+        grid-column: auto;
+    }
+
+    .purchase-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .purchase-page .table-wrap table {
+        min-width: 1000px;
+    }
+
+    .purchase-page .action-buttons {
+        gap: 5px;
+    }
+
+    .purchase-page .action-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .purchase-page .btn {
+        min-height: 38px;
+    }
+
+    .purchase-modal-theme .card {
+        padding: 12px !important;
+    }
+
+    .purchase-modal-theme .table-wrap table {
+        min-width: 700px;
+    }
+
+    .purchase-modal-theme .modal-section-title {
+        margin-top: 17px;
+        font-size: 13px;
+    }
+}
+
+/* =========================================================
+   18. REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .purchase-page *,
+    .purchase-page *::before,
+    .purchase-page *::after,
+    .purchase-modal-theme *,
+    .purchase-modal-theme *::before,
+    .purchase-modal-theme *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+    

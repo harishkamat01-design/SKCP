@@ -1,0 +1,584 @@
+/* =========================================================
+   SKCP REPORTS — Reports.css
+   Light Blue + Light Lavender
+   Headings: Oswald | Body: Inter
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
+
+/* ---------- Theme ---------- */
+
+.reports-page {
+  --reports-text: #263238;
+  --reports-muted: #68747c;
+  --reports-card: #ffffff;
+  --reports-border: #d7dfeb;
+  --reports-blue: #edf2fa;
+  --reports-blue-strong: #dce7f7;
+  --reports-lavender: #f1eaf5;
+  --reports-lavender-strong: #e5d9ef;
+  --reports-button: #456b9a;
+  --reports-button-hover: #35577f;
+  --reports-row-hover: #e5ebf6;
+  --reports-input: #ffffff;
+
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 24px;
+  color: var(--reports-text);
+  font-family: Inter, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  box-sizing: border-box;
+}
+
+.reports-page *,
+.reports-page *::before,
+.reports-page *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Headings ---------- */
+
+.reports-page h1,
+.reports-page h2,
+.reports-page h3,
+.reports-page h4 {
+  color: var(--reports-text);
+  font-family: Oswald, "Segoe UI", sans-serif;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  margin-top: 0;
+}
+
+.reports-page h1 {
+  font-size: 27px;
+  margin-bottom: 8px;
+}
+
+.reports-page h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.reports-page h3 {
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.reports-page p {
+  color: var(--reports-muted);
+}
+
+/* ---------- SKCP Reports header ---------- */
+
+.reports-page > section.card:first-child {
+  background: var(--reports-blue) !important;
+  border: 1px solid var(--reports-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 6px rgba(35, 52, 72, 0.04);
+}
+
+.reports-page > section.card:first-child h2 {
+  color: var(--reports-text);
+}
+
+/* ---------- Report Summary: LIGHT BLUE ---------- */
+/* Identify the summary by its actual KPI grid, not its position. */
+
+.reports-page .card:has(> .kpi-grid) {
+  background: var(--reports-blue) !important;
+  border: 1px solid var(--reports-border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 6px rgba(35, 52, 72, 0.04);
+}
+
+.reports-page .card:has(> .kpi-grid) > .section-header {
+  background: transparent !important;
+}
+
+.reports-page .card:has(> .kpi-grid) h2 {
+  color: var(--reports-text);
+}
+
+/* ---------- Other cards ---------- */
+
+.reports-page .card {
+  border: 1px solid var(--reports-border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 6px rgba(35, 52, 72, 0.04);
+  min-width: 0;
+}
+
+/* Keep report detail cards white, except Report Summary. */
+
+.reports-page .card:not(:has(> .kpi-grid)),
+.reports-page .module-card {
+  background: var(--reports-card);
+}
+
+/* ---------- Section headers ---------- */
+
+.reports-page .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.reports-page .section-header h2,
+.reports-page .section-header h3 {
+  margin-bottom: 6px;
+}
+
+.reports-page .section-header p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ---------- KPI cards ---------- */
+
+.reports-page .kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.reports-page .kpi {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--reports-border);
+  border-radius: 10px;
+  background: var(--reports-lavender);
+}
+
+.reports-page .kpi:nth-child(even),
+.reports-page .kpi.b {
+  background: var(--reports-blue);
+}
+
+.reports-page .kpi.g {
+  background: var(--reports-lavender);
+}
+
+.reports-page .kpi-label {
+  color: var(--reports-muted);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.reports-page .kpi-val {
+  color: var(--reports-text);
+  font-size: 23px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+/* ---------- Form fields ---------- */
+
+.reports-page .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reports-page label {
+  color: var(--reports-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reports-page input,
+.reports-page select,
+.reports-page textarea {
+  max-width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: var(--reports-input);
+  color: var(--reports-text);
+  font: inherit;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.reports-page input:focus,
+.reports-page select:focus,
+.reports-page textarea:focus {
+  border-color: #789ac5;
+  box-shadow: 0 0 0 3px rgba(120, 154, 197, 0.17);
+}
+
+/* ---------- Buttons ---------- */
+
+.reports-page button {
+  font-family: Inter, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.reports-page .btn,
+.reports-page .report-btn,
+.reports-page .download-btn,
+.reports-page .pdf-button,
+.reports-page .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: var(--reports-button);
+  color: #ffffff;
+}
+
+.reports-page .btn:hover,
+.reports-page .report-btn:hover,
+.reports-page .download-btn:hover,
+.reports-page .pdf-button:hover,
+.reports-page .action-btn:hover {
+  background: var(--reports-button-hover);
+  box-shadow: 0 2px 5px rgba(35, 52, 72, 0.12);
+}
+
+.reports-page .btn.secondary {
+  background: #ffffff;
+  color: var(--reports-text);
+  border-color: #cbd5e1;
+}
+
+.reports-page .btn.secondary:hover {
+  background: var(--reports-blue-strong);
+}
+
+.reports-page button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ---------- Tables ---------- */
+
+/* Table container */
+
+.reports-page .table-wrap,
+.reports-page .table-container,
+.reports-page .report-table-container,
+.reports-page .table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--reports-border);
+  border-radius: 10px;
+  background: var(--reports-blue);
+  margin-bottom: 18px;
+}
+
+/* Keep the report table body BLUE. */
+
+.reports-page table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: var(--reports-blue) !important;
+  color: var(--reports-text);
+  font-size: 13px;
+}
+
+/* Table heading row: LIGHT LAVENDER. */
+
+.reports-page table thead,
+.reports-page table thead tr,
+.reports-page table thead th {
+  background: var(--reports-lavender) !important;
+}
+
+.reports-page table th {
+  padding: 12px 14px;
+  color: var(--reports-text) !important;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--reports-border);
+}
+
+/* Table data cells: LIGHT BLUE. */
+
+.reports-page table tbody,
+.reports-page table tbody tr,
+.reports-page table tbody td {
+  background: var(--reports-blue) !important;
+  color: var(--reports-text);
+}
+
+.reports-page table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--reports-border);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.reports-page table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Slightly darker blue on hover, without changing the header. */
+
+.reports-page table tbody tr:hover td {
+  background: var(--reports-row-hover) !important;
+}
+
+.reports-page .table-sort-btn {
+  border: none;
+  background: transparent !important;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  text-align: inherit;
+}
+
+/* ---------- Status labels ---------- */
+
+.reports-page .status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reports-page .status.active {
+  background: #e6f4ea;
+  color: #24643b;
+}
+
+.reports-page .status.warning {
+  background: #fff0d6;
+  color: #8a5700;
+}
+
+/* ---------- Pagination ---------- */
+
+.reports-page .pagination,
+.reports-page .report-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+  color: var(--reports-muted);
+}
+
+.reports-page .pagination button,
+.reports-page .report-pagination button {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--reports-border);
+  border-radius: 6px;
+  background: var(--reports-card);
+  color: var(--reports-text);
+}
+
+.reports-page .pagination button:hover,
+.reports-page .report-pagination button:hover {
+  background: var(--reports-blue);
+}
+
+.reports-page .pagination button.active,
+.reports-page .report-pagination button.active {
+  background: var(--reports-lavender);
+  border-color: #cbb8df;
+  font-weight: 700;
+}
+
+/* ---------- Empty states and loading ---------- */
+
+.reports-page .card-body,
+.reports-page .dashboard-loading {
+  padding: 20px;
+  color: var(--reports-muted);
+}
+
+.reports-page .dashboard-loading {
+  text-align: center;
+}
+
+/* ---------- Dark theme ---------- */
+
+.dark .reports-page,
+[data-theme="dark"] .reports-page,
+body.dark .reports-page {
+  --reports-text: #e6edf5;
+  --reports-muted: #a8b4c2;
+  --reports-card: #202833;
+  --reports-border: #394554;
+  --reports-blue: #29384b;
+  --reports-blue-strong: #344760;
+  --reports-lavender: #393246;
+  --reports-lavender-strong: #4b3e59;
+  --reports-button: #526f98;
+  --reports-button-hover: #6685b0;
+  --reports-row-hover: #344153;
+  --reports-input: #1d2631;
+
+  color: var(--reports-text);
+}
+
+.dark .reports-page > section.card:first-child,
+[data-theme="dark"] .reports-page > section.card:first-child {
+  background: var(--reports-blue) !important;
+  color: var(--reports-text);
+}
+
+.dark .reports-page .card:has(> .kpi-grid),
+[data-theme="dark"] .reports-page .card:has(> .kpi-grid) {
+  background: var(--reports-blue) !important;
+}
+
+.dark .reports-page .card:not(:has(> .kpi-grid)),
+[data-theme="dark"] .reports-page .card:not(:has(> .kpi-grid)) {
+  background: var(--reports-card);
+}
+
+.dark .reports-page .kpi,
+[data-theme="dark"] .reports-page .kpi {
+  background: var(--reports-lavender);
+}
+
+.dark .reports-page .kpi:nth-child(even),
+.dark .reports-page .kpi.b,
+[data-theme="dark"] .reports-page .kpi:nth-child(even),
+[data-theme="dark"] .reports-page .kpi.b {
+  background: var(--reports-blue);
+}
+
+.dark .reports-page .kpi.g,
+[data-theme="dark"] .reports-page .kpi.g {
+  background: var(--reports-lavender);
+}
+
+/* Dark theme table: lavender header, blue body. */
+
+.dark .reports-page table,
+.dark .reports-page table tbody,
+.dark .reports-page table tbody tr,
+.dark .reports-page table tbody td,
+[data-theme="dark"] .reports-page table,
+[data-theme="dark"] .reports-page table tbody,
+[data-theme="dark"] .reports-page table tbody tr,
+[data-theme="dark"] .reports-page table tbody td {
+  background: var(--reports-blue) !important;
+  color: var(--reports-text);
+  border-color: var(--reports-border);
+}
+
+.dark .reports-page table thead,
+.dark .reports-page table thead tr,
+.dark .reports-page table thead th,
+[data-theme="dark"] .reports-page table thead,
+[data-theme="dark"] .reports-page table thead tr,
+[data-theme="dark"] .reports-page table thead th {
+  background: var(--reports-lavender) !important;
+  color: var(--reports-text) !important;
+}
+
+.dark .reports-page table tbody tr:hover td,
+[data-theme="dark"] .reports-page table tbody tr:hover td {
+  background: var(--reports-row-hover) !important;
+}
+
+.dark .reports-page input,
+.dark .reports-page select,
+.dark .reports-page textarea,
+[data-theme="dark"] .reports-page input,
+[data-theme="dark"] .reports-page select,
+[data-theme="dark"] .reports-page textarea {
+  background: var(--reports-input);
+  color: var(--reports-text);
+  border-color: var(--reports-border);
+}
+
+.dark .reports-page .btn.secondary,
+[data-theme="dark"] .reports-page .btn.secondary {
+  background: var(--reports-card);
+  color: var(--reports-text);
+  border-color: var(--reports-border);
+}
+
+.dark .reports-page .status.active,
+[data-theme="dark"] .reports-page .status.active {
+  background: #244b37;
+  color: #bce8cb;
+}
+
+.dark .reports-page .status.warning,
+[data-theme="dark"] .reports-page .status.warning {
+  background: #574323;
+  color: #ffdda0;
+}
+
+/* ---------- Responsive layout ---------- */
+
+@media (max-width: 768px) {
+  .reports-page {
+    font-size: 13px;
+  }
+
+  .reports-page h1 {
+    font-size: 24px;
+  }
+
+  .reports-page h2 {
+    font-size: 20px;
+  }
+
+  .reports-page > section.card:first-child,
+  .reports-page .card {
+    padding: 14px;
+  }
+
+  .reports-page .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .reports-page th,
+  .reports-page td {
+    padding: 9px 10px;
+  }
+
+  .reports-page .pagination,
+  .reports-page .report-pagination {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .reports-page .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}

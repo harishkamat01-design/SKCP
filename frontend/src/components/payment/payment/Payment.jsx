@@ -903,7 +903,7 @@ function Payment({ paymentContext }) {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page payment-page">
                 <section className="card">
                     <h2>Payments</h2>
                     <p>
@@ -919,7 +919,7 @@ function Payment({ paymentContext }) {
     // ============================================================
 
     return (
-        <div className="page">
+        <div className="page payment-page">
             {/* ==================================================
                 PAYMENT HEADER + SEARCH
             ================================================== */}

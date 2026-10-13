@@ -19,6 +19,7 @@ import {
 import Pagination from "../../../components/ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
+import "./Production.css";
 
 import { jsPDF } from "jspdf";
 
@@ -1847,7 +1848,7 @@ function Production() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page production-page">
                 <section className="card">
                     <h2>Production</h2>
 
@@ -1864,7 +1865,7 @@ function Production() {
     // ============================================================
 
     return (
-        <div className="page">
+        <div className="page production-page">
             <section className="card">
                 <div
                     style={{

@@ -1,0 +1,865 @@
+/* ============================================================
+   LABOUR
+   Standard: RawMaterialStock.css
+   Theme: Blue — Master Data visual standard
+   Scope: Labour module only
+   ============================================================ */
+
+
+/* ============================================================
+   1. PAGE THEME VARIABLES
+   ============================================================ */
+
+.labour-page {
+    --labour-accent: #3974c6;
+    --labour-accent-hover: #2f63ab;
+    --labour-accent-soft: #dceaff;
+    --labour-accent-border: #cbdff8;
+
+    --labour-text: #263247;
+    --labour-muted: #68747c;
+
+    --labour-card: #edf5ff;
+    --labour-border: #cbdff8;
+    --labour-table-header: #dceaff;
+    --labour-row-hover: #dceaff;
+
+    --labour-modal: #eaf3ff;
+    --labour-modal-header: #dceaff;
+    --labour-modal-border: #cbdff8;
+
+    --labour-input-bg: #ffffff;
+    --labour-input-border: #cbd5e1;
+    --labour-input-focus: #3974c6;
+
+    --labour-success: #18794e;
+    --labour-success-bg: #dcfce7;
+    --labour-warning: #92400e;
+    --labour-warning-bg: #fef3c7;
+    --labour-danger: #b42318;
+    --labour-danger-bg: #fee4e2;
+
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    color: var(--labour-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.labour-page *,
+.labour-page *::before,
+.labour-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   2. PAGE BASE & TYPOGRAPHY
+   ============================================================ */
+
+.labour-page.page {
+    width: 100%;
+    min-width: 0;
+    color: var(--labour-text);
+}
+
+.labour-page h1,
+.labour-page h2,
+.labour-page h3,
+.labour-page h4,
+.labour-page p,
+.labour-page label,
+.labour-page button,
+.labour-page input,
+.labour-page select,
+.labour-page textarea,
+.labour-page table {
+    font-family: inherit;
+}
+
+.labour-page h2 {
+    margin: 0 0 6px;
+    color: var(--labour-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.labour-page h3 {
+    margin: 0 0 6px;
+    color: var(--labour-text);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.labour-page p {
+    margin: 0 0 12px;
+    color: var(--labour-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.labour-page button {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.labour-page button:focus-visible,
+.labour-page input:focus-visible,
+.labour-page select:focus-visible,
+.labour-page textarea:focus-visible {
+    outline: 2px solid var(--labour-accent);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. PAGE CARDS & HEADER
+   ============================================================ */
+
+.labour-page > .card {
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    overflow: hidden;
+    color: var(--labour-text);
+    background: var(--labour-card);
+    border: 1px solid var(--labour-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.labour-page > .card:last-child {
+    margin-bottom: 0;
+}
+
+.labour-page > .card > p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. SEARCH & FILTERS
+   ============================================================ */
+
+.labour-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.labour-page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--labour-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.labour-page .fld label span {
+    color: var(--labour-danger);
+}
+
+.labour-page .fld input,
+.labour-page .fld select,
+.labour-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+    color: var(--labour-text);
+    background: var(--labour-input-bg);
+    border: 1px solid var(--labour-input-border);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.labour-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.labour-page .fld input::placeholder,
+.labour-page .fld textarea::placeholder {
+    color: #8a96a3;
+    opacity: 1;
+}
+
+.labour-page .fld input:focus,
+.labour-page .fld select:focus,
+.labour-page .fld textarea:focus {
+    border-color: var(--labour-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 12%);
+}
+
+.labour-page .fld input:disabled,
+.labour-page .fld select:disabled,
+.labour-page .fld textarea:disabled,
+.labour-page .fld input[readonly] {
+    color: var(--labour-muted);
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.labour-page .fld input[type="date"],
+.labour-page .fld input[type="number"] {
+    min-height: 38px;
+}
+
+.labour-page .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Search field */
+
+.labour-page #labour-search {
+    width: 100%;
+    min-height: 38px;
+}
+
+
+/* ============================================================
+   5. FORM GRID & MODAL SECTIONS
+   ============================================================ */
+
+.labour-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.labour-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+.labour-page .form-grid .fld {
+    align-self: start;
+}
+
+.labour-page .form-grid .fld input,
+.labour-page .form-grid .fld select,
+.labour-page .form-grid .fld textarea {
+    max-width: 100%;
+}
+
+
+/* Labour form section headings */
+
+.labour-page .customer-modal-section {
+    min-width: 0;
+    margin-bottom: 20px;
+}
+
+.labour-page .customer-modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.labour-page .customer-modal-section-title {
+    margin: 0 0 14px;
+    padding-bottom: 9px;
+    color: var(--labour-text);
+    border-bottom: 1px solid var(--labour-border);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+
+/* Calculated weekly/monthly rates */
+
+.labour-page #labour-weekly-rate,
+.labour-page #labour-monthly-rate {
+    color: var(--labour-accent-hover);
+    background: #f1f6ff;
+    border-color: var(--labour-accent-border);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   6. TABLE & SORTING
+   ============================================================ */
+
+.labour-page .table-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--labour-border);
+    border-radius: 9px;
+    background: var(--labour-input-bg);
+}
+
+.labour-page .table-wrap table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--labour-text);
+    background: var(--labour-input-bg);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.labour-page .table-wrap thead th {
+    padding: 12px 11px;
+    color: var(--labour-text);
+    background: var(--labour-table-header);
+    border-bottom: 1px solid var(--labour-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+}
+
+.labour-page .table-wrap thead th[onclick] {
+    cursor: pointer;
+    user-select: none;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.labour-page .table-wrap thead th[onclick]:hover {
+    color: var(--labour-accent-hover);
+    background: var(--labour-accent-soft);
+}
+
+.labour-page .sort-indicator {
+    display: inline-block;
+    margin-left: 3px;
+    color: var(--labour-accent);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.labour-page .table-wrap tbody td {
+    padding: 12px 11px;
+    border-bottom: 1px solid var(--labour-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.labour-page .table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.labour-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.labour-page .table-wrap tbody tr:hover {
+    background: var(--labour-row-hover);
+}
+
+.labour-page .table-wrap tbody td strong {
+    color: var(--labour-text);
+    font-weight: 650;
+}
+
+
+/* Keep numeric fields visually consistent */
+
+.labour-page .table-wrap tbody td:first-child,
+.labour-page .table-wrap tbody td:nth-child(4) {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   7. ACTION BUTTONS
+   ============================================================ */
+
+.labour-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.labour-page .action-btn,
+.labour-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.labour-page .action-btn:disabled,
+.labour-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+
+/* View button */
+
+.labour-page .view-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.labour-page .view-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+
+/* Edit button */
+
+.labour-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.labour-page .edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+
+/* Delete button */
+
+.labour-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.labour-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+
+/* Primary button */
+
+.labour-page .btn {
+    color: #ffffff;
+    background: var(--labour-accent);
+    border-color: var(--labour-accent);
+}
+
+.labour-page .btn:hover:not(:disabled) {
+    background: var(--labour-accent-hover);
+    border-color: var(--labour-accent-hover);
+}
+
+
+/* Secondary button */
+
+.labour-page .btn.secondary {
+    color: var(--labour-text);
+    background: var(--labour-input-bg);
+    border-color: var(--labour-border);
+}
+
+.labour-page .btn.secondary:hover:not(:disabled) {
+    color: var(--labour-accent-hover);
+    background: var(--labour-accent-soft);
+    border-color: var(--labour-accent-border);
+}
+
+
+/* ============================================================
+   8. STATUS BADGES
+   ============================================================ */
+
+.labour-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.labour-page .badge.bg {
+    color: var(--labour-success);
+    background: var(--labour-success-bg);
+    border-color: #bbf7d0;
+}
+
+.labour-page .badge.br {
+    color: var(--labour-danger);
+    background: var(--labour-danger-bg);
+    border-color: #f3c6c2;
+}
+
+
+/* ============================================================
+   9. PAGINATION
+   ============================================================ */
+
+.labour-page .table-wrap > *:last-child {
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   10. VALIDATION, ERROR & SUCCESS STATES
+   ============================================================ */
+
+.labour-page .form-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    color: var(--labour-danger);
+    background: var(--labour-danger-bg);
+    border: 1px solid #f3c6c2;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.labour-page .form-grid + .form-error {
+    margin-top: 12px;
+}
+
+.labour-page .form-success {
+    padding: 11px 14px;
+    color: var(--labour-success);
+    background: var(--labour-success-bg);
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.labour-page .table-wrap + p {
+    margin-top: 12px;
+}
+
+
+/* ============================================================
+   11. MODALS — SHARED FORM & DETAIL STYLING
+   ============================================================ */
+
+/*
+   ViewModal, FormModal and DeleteConfirmModal are shared
+   components. These rules style their contents when the modal
+   is rendered inside this page's DOM subtree.
+
+   If the shared components render through a portal outside
+   .labour-page, their outer containers are styled by the
+   shared modal CSS.
+*/
+
+.labour-page .form-grid .fld textarea {
+    min-height: 84px;
+}
+
+.labour-page .form-grid .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   12. VIEW MODAL — DETAIL GRID
+   ============================================================ */
+
+.labour-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.labour-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    background: var(--labour-input-bg);
+    border: 1px solid var(--labour-border);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.labour-page .detail-item label,
+.labour-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--labour-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.labour-page .detail-item strong,
+.labour-page .detail-item .detail-value {
+    color: var(--labour-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.labour-page .detail-item.f-full,
+.labour-page .detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   13. DARK MODE
+   ============================================================ */
+
+.dark .labour-page,
+[data-theme="dark"] .labour-page,
+.dark-mode .labour-page {
+    --labour-accent: #79aaf5;
+    --labour-accent-hover: #9bc0ff;
+    --labour-accent-soft: #293d59;
+    --labour-accent-border: #405573;
+
+    --labour-text: #e8edf2;
+    --labour-muted: #aab5c0;
+
+    --labour-card: #202a35;
+    --labour-border: #394653;
+    --labour-table-header: #293d59;
+    --labour-row-hover: #28374a;
+
+    --labour-modal: #202a35;
+    --labour-modal-header: #26384e;
+    --labour-modal-border: #405573;
+
+    --labour-input-bg: #18212b;
+    --labour-input-border: #465565;
+    --labour-input-focus: #79aaf5;
+
+    --labour-success: #86efac;
+    --labour-success-bg: #173b2c;
+    --labour-warning: #fcd34d;
+    --labour-warning-bg: #473617;
+    --labour-danger: #fca5a5;
+    --labour-danger-bg: #482626;
+}
+
+
+/* Dark-mode placeholders */
+
+.dark .labour-page .fld input::placeholder,
+.dark .labour-page .fld textarea::placeholder,
+[data-theme="dark"] .labour-page .fld input::placeholder,
+[data-theme="dark"] .labour-page .fld textarea::placeholder,
+.dark-mode .labour-page .fld input::placeholder,
+.dark-mode .labour-page .fld textarea::placeholder {
+    color: #8997a5;
+}
+
+
+/* Dark-mode read-only and disabled fields */
+
+.dark .labour-page .fld input:disabled,
+.dark .labour-page .fld select:disabled,
+.dark .labour-page .fld textarea:disabled,
+.dark .labour-page .fld input[readonly],
+[data-theme="dark"] .labour-page .fld input:disabled,
+[data-theme="dark"] .labour-page .fld select:disabled,
+[data-theme="dark"] .labour-page .fld textarea:disabled,
+[data-theme="dark"] .labour-page .fld input[readonly],
+.dark-mode .labour-page .fld input:disabled,
+.dark-mode .labour-page .fld select:disabled,
+.dark-mode .labour-page .fld textarea:disabled,
+.dark-mode .labour-page .fld input[readonly] {
+    color: var(--labour-muted);
+    background: #27323e;
+}
+
+
+/* Dark-mode calculated rates */
+
+.dark .labour-page #labour-weekly-rate,
+.dark .labour-page #labour-monthly-rate,
+[data-theme="dark"] .labour-page #labour-weekly-rate,
+[data-theme="dark"] .labour-page #labour-monthly-rate,
+.dark-mode .labour-page #labour-weekly-rate,
+.dark-mode .labour-page #labour-monthly-rate {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+
+/* Dark-mode action buttons */
+
+.dark .labour-page .view-btn,
+.dark .labour-page .edit-btn,
+[data-theme="dark"] .labour-page .view-btn,
+[data-theme="dark"] .labour-page .edit-btn,
+.dark-mode .labour-page .view-btn,
+.dark-mode .labour-page .edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .labour-page .view-btn:hover:not(:disabled),
+.dark .labour-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .labour-page .view-btn:hover:not(:disabled),
+[data-theme="dark"] .labour-page .edit-btn:hover:not(:disabled),
+.dark-mode .labour-page .view-btn:hover:not(:disabled),
+.dark-mode .labour-page .edit-btn:hover:not(:disabled) {
+    background: #344d70;
+}
+
+.dark .labour-page .delete-btn,
+[data-theme="dark"] .labour-page .delete-btn,
+.dark-mode .labour-page .delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .labour-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .labour-page .delete-btn:hover:not(:disabled),
+.dark-mode .labour-page .delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+}
+
+
+/* Dark-mode status badges and messages */
+
+.dark .labour-page .badge.bg,
+[data-theme="dark"] .labour-page .badge.bg,
+.dark-mode .labour-page .badge.bg {
+    border-color: #28553e;
+}
+
+.dark .labour-page .badge.br,
+[data-theme="dark"] .labour-page .badge.br,
+.dark-mode .labour-page .badge.br {
+    border-color: #713737;
+}
+
+.dark .labour-page .form-error,
+[data-theme="dark"] .labour-page .form-error,
+.dark-mode .labour-page .form-error {
+    border-color: #713737;
+}
+
+.dark .labour-page .form-success,
+[data-theme="dark"] .labour-page .form-success,
+.dark-mode .labour-page .form-success {
+    border-color: #28553e;
+}
+
+
+/* ============================================================
+   14. RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .labour-page > .card {
+        padding: 16px;
+    }
+
+    .labour-page .table-wrap table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 640px) {
+    .labour-page {
+        font-size: 13px;
+    }
+
+    .labour-page > .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .labour-page h2 {
+        font-size: 18px;
+    }
+
+    .labour-page .form-grid,
+    .labour-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .labour-page .form-grid .f-full,
+    .labour-page .detail-item.f-full,
+    .labour-page .detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .labour-page .action-buttons {
+        gap: 5px;
+    }
+
+    .labour-page .action-btn,
+    .labour-page .btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    .labour-page .table-wrap table {
+        min-width: 850px;
+    }
+
+    .labour-page .customer-modal-section {
+        margin-bottom: 16px;
+    }
+}
+
+
+/* ============================================================
+   15. ACCESSIBILITY & REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .labour-page *,
+    .labour-page *::before,
+    .labour-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

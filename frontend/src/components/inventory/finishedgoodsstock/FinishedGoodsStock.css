@@ -1,0 +1,734 @@
+/* ============================================================
+   FINISHED GOODS STOCK
+   Standard: Customer.css + RawMaterialStock.css
+   Theme: Blue
+   Scope: Finished Goods Stock module only
+   ============================================================ */
+
+
+/* ============================================================
+   1. PAGE THEME VARIABLES
+   ============================================================ */
+
+.finished-goods-stock-page {
+    --stock-accent: #3974c6;
+    --stock-accent-hover: #2f63ab;
+    --stock-accent-soft: #dceaff;
+    --stock-accent-border: #cbdff8;
+
+    --stock-text: #263247;
+    --stock-muted: #68747c;
+
+    --stock-card: #edf5ff;
+    --stock-border: #cbdff8;
+    --stock-table-header: #dceaff;
+    --stock-row-hover: #dceaff;
+
+    --stock-modal: #eaf3ff;
+    --stock-modal-header: #dceaff;
+    --stock-modal-border: #cbdff8;
+
+    --stock-input-bg: #ffffff;
+    --stock-input-border: #cbd5e1;
+    --stock-input-focus: #3974c6;
+
+    --stock-success: #18794e;
+    --stock-success-bg: #dcfce7;
+    --stock-warning: #92400e;
+    --stock-warning-bg: #fef3c7;
+    --stock-danger: #b42318;
+    --stock-danger-bg: #fee4e2;
+
+    box-sizing: border-box;
+    color: var(--stock-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.finished-goods-stock-page *,
+.finished-goods-stock-page *::before,
+.finished-goods-stock-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   2. PAGE BASE & TYPOGRAPHY
+   ============================================================ */
+
+.finished-goods-stock-page.page {
+    width: 100%;
+    min-width: 0;
+    color: var(--stock-text);
+}
+
+.finished-goods-stock-page h1,
+.finished-goods-stock-page h2,
+.finished-goods-stock-page h3,
+.finished-goods-stock-page h4,
+.finished-goods-stock-page p,
+.finished-goods-stock-page label,
+.finished-goods-stock-page button,
+.finished-goods-stock-page input,
+.finished-goods-stock-page select,
+.finished-goods-stock-page textarea,
+.finished-goods-stock-page table {
+    font-family: inherit;
+}
+
+.finished-goods-stock-page h2 {
+    margin: 0 0 6px;
+    color: var(--stock-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.finished-goods-stock-page h3 {
+    margin: 0 0 6px;
+    color: var(--stock-text);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.finished-goods-stock-page p {
+    margin: 0 0 12px;
+    color: var(--stock-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.finished-goods-stock-page button {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.finished-goods-stock-page button:focus-visible,
+.finished-goods-stock-page input:focus-visible,
+.finished-goods-stock-page select:focus-visible,
+.finished-goods-stock-page textarea:focus-visible {
+    outline: 2px solid var(--stock-accent);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. PAGE CARDS & HEADER
+   ============================================================ */
+
+.finished-goods-stock-page > .card {
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    overflow: hidden;
+    color: var(--stock-text);
+    background: var(--stock-card);
+    border: 1px solid var(--stock-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.finished-goods-stock-page > .card:last-child {
+    margin-bottom: 0;
+}
+
+.finished-goods-stock-page > .card > p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. FILTERS & SEARCH
+   ============================================================ */
+
+.finished-goods-stock-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.finished-goods-stock-page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--stock-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.finished-goods-stock-page .fld label span {
+    color: var(--stock-danger);
+}
+
+.finished-goods-stock-page .fld input,
+.finished-goods-stock-page .fld select,
+.finished-goods-stock-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    border: 1px solid var(--stock-input-border);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.finished-goods-stock-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.finished-goods-stock-page .fld input::placeholder,
+.finished-goods-stock-page .fld textarea::placeholder {
+    color: #8a96a3;
+    opacity: 1;
+}
+
+.finished-goods-stock-page .fld input:focus,
+.finished-goods-stock-page .fld select:focus,
+.finished-goods-stock-page .fld textarea:focus {
+    border-color: var(--stock-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 12%);
+}
+
+.finished-goods-stock-page .fld input:disabled,
+.finished-goods-stock-page .fld select:disabled,
+.finished-goods-stock-page .fld textarea:disabled,
+.finished-goods-stock-page .fld input[readonly] {
+    color: var(--stock-muted);
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.finished-goods-stock-page .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   5. FORM GRID
+   ============================================================ */
+
+.finished-goods-stock-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.finished-goods-stock-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   6. TABLE & SORTING
+   ============================================================ */
+
+.finished-goods-stock-page .table-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--stock-border);
+    border-radius: 9px;
+    background: var(--stock-input-bg);
+}
+
+.finished-goods-stock-page .table-wrap table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.finished-goods-stock-page .table-wrap thead th {
+    padding: 12px 11px;
+    color: var(--stock-text);
+    background: var(--stock-table-header);
+    border-bottom: 1px solid var(--stock-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+}
+
+.finished-goods-stock-page .table-wrap tbody td {
+    padding: 12px 11px;
+    color: var(--stock-text);
+    border-bottom: 1px solid var(--stock-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.finished-goods-stock-page .table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.finished-goods-stock-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.finished-goods-stock-page .table-wrap tbody tr:hover {
+    background: var(--stock-row-hover);
+}
+
+.finished-goods-stock-page .table-wrap tbody td strong {
+    color: var(--stock-text);
+    font-weight: 650;
+}
+
+.finished-goods-stock-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.finished-goods-stock-page .table-sort-btn:hover {
+    color: var(--stock-accent-hover);
+}
+
+.finished-goods-stock-page .table-sort-btn:focus-visible {
+    outline-offset: 4px;
+}
+
+
+/* ============================================================
+   7. ACTION BUTTONS
+   ============================================================ */
+
+.finished-goods-stock-page .table-actions,
+.finished-goods-stock-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.finished-goods-stock-page .action-btn,
+.finished-goods-stock-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.finished-goods-stock-page .action-btn:disabled,
+.finished-goods-stock-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* View */
+
+.finished-goods-stock-page .view-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.finished-goods-stock-page .view-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+/* Edit */
+
+.finished-goods-stock-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.finished-goods-stock-page .edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+/* Delete */
+
+.finished-goods-stock-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.finished-goods-stock-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+/* Primary buttons */
+
+.finished-goods-stock-page .btn {
+    color: #ffffff;
+    background: var(--stock-accent);
+    border-color: var(--stock-accent);
+}
+
+.finished-goods-stock-page .btn:hover:not(:disabled) {
+    background: var(--stock-accent-hover);
+    border-color: var(--stock-accent-hover);
+}
+
+/* Secondary buttons */
+
+.finished-goods-stock-page .btn.secondary {
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    border-color: var(--stock-border);
+}
+
+.finished-goods-stock-page .btn.secondary:hover:not(:disabled) {
+    color: var(--stock-accent-hover);
+    background: var(--stock-accent-soft);
+    border-color: var(--stock-accent-border);
+}
+
+/* Compact table actions */
+
+.finished-goods-stock-page .table-actions .action-btn {
+    min-height: 32px;
+    padding: 7px 10px;
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   8. STATUS BADGES
+   ============================================================ */
+
+.finished-goods-stock-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.finished-goods-stock-page .badge.bg {
+    color: var(--stock-success);
+    background: var(--stock-success-bg);
+    border-color: #bbf7d0;
+}
+
+
+/* ============================================================
+   9. PAGINATION
+   ============================================================ */
+
+.finished-goods-stock-page .table-wrap > *:last-child {
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   10. VALIDATION, ERROR & EMPTY STATES
+   ============================================================ */
+
+.finished-goods-stock-page .form-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    color: var(--stock-danger);
+    background: var(--stock-danger-bg);
+    border: 1px solid #f3c6c2;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.finished-goods-stock-page .form-grid + .form-error {
+    margin-top: 12px;
+}
+
+.finished-goods-stock-page .table-wrap + p {
+    margin-top: 12px;
+}
+
+
+/* ============================================================
+   11. FORM MODALS & DETAIL GRID
+   ============================================================ */
+
+.finished-goods-stock-page .form-grid .fld {
+    align-self: start;
+}
+
+.finished-goods-stock-page .form-grid .fld input,
+.finished-goods-stock-page .form-grid .fld select,
+.finished-goods-stock-page .form-grid .fld textarea {
+    max-width: 100%;
+}
+
+.finished-goods-stock-page .form-grid .fld textarea {
+    min-height: 84px;
+}
+
+.finished-goods-stock-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.finished-goods-stock-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    border: 1px solid var(--stock-border);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.finished-goods-stock-page .detail-item label,
+.finished-goods-stock-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--stock-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.finished-goods-stock-page .detail-item strong,
+.finished-goods-stock-page .detail-item .detail-value {
+    color: var(--stock-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.finished-goods-stock-page .detail-item.f-full,
+.finished-goods-stock-page .detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   12. DARK MODE
+   ============================================================ */
+
+.dark .finished-goods-stock-page,
+[data-theme="dark"] .finished-goods-stock-page,
+.dark-mode .finished-goods-stock-page {
+    --stock-accent: #79aaf5;
+    --stock-accent-hover: #9bc0ff;
+    --stock-accent-soft: #293d59;
+    --stock-accent-border: #405573;
+
+    --stock-text: #e8edf2;
+    --stock-muted: #aab5c0;
+
+    --stock-card: #202a35;
+    --stock-border: #394653;
+    --stock-table-header: #293d59;
+    --stock-row-hover: #28374a;
+
+    --stock-modal: #202a35;
+    --stock-modal-header: #26384e;
+    --stock-modal-border: #405573;
+
+    --stock-input-bg: #18212b;
+    --stock-input-border: #465565;
+    --stock-input-focus: #79aaf5;
+
+    --stock-success: #86efac;
+    --stock-success-bg: #173b2c;
+    --stock-warning: #fcd34d;
+    --stock-warning-bg: #473617;
+    --stock-danger: #fca5a5;
+    --stock-danger-bg: #482626;
+}
+
+.dark .finished-goods-stock-page .fld input::placeholder,
+.dark .finished-goods-stock-page .fld textarea::placeholder,
+[data-theme="dark"] .finished-goods-stock-page .fld input::placeholder,
+[data-theme="dark"] .finished-goods-stock-page .fld textarea::placeholder,
+.dark-mode .finished-goods-stock-page .fld input::placeholder,
+.dark-mode .finished-goods-stock-page .fld textarea::placeholder {
+    color: #8997a5;
+}
+
+.dark .finished-goods-stock-page .fld input:disabled,
+.dark .finished-goods-stock-page .fld select:disabled,
+.dark .finished-goods-stock-page .fld textarea:disabled,
+.dark .finished-goods-stock-page .fld input[readonly],
+[data-theme="dark"] .finished-goods-stock-page .fld input:disabled,
+[data-theme="dark"] .finished-goods-stock-page .fld select:disabled,
+[data-theme="dark"] .finished-goods-stock-page .fld textarea:disabled,
+[data-theme="dark"] .finished-goods-stock-page .fld input[readonly],
+.dark-mode .finished-goods-stock-page .fld input:disabled,
+.dark-mode .finished-goods-stock-page .fld select:disabled,
+.dark-mode .finished-goods-stock-page .fld textarea:disabled,
+.dark-mode .finished-goods-stock-page .fld input[readonly] {
+    color: var(--stock-muted);
+    background: #27323e;
+}
+
+.dark .finished-goods-stock-page .view-btn,
+[data-theme="dark"] .finished-goods-stock-page .view-btn,
+.dark-mode .finished-goods-stock-page .view-btn,
+.dark .finished-goods-stock-page .edit-btn,
+[data-theme="dark"] .finished-goods-stock-page .edit-btn,
+.dark-mode .finished-goods-stock-page .edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .finished-goods-stock-page .view-btn:hover:not(:disabled),
+[data-theme="dark"] .finished-goods-stock-page .view-btn:hover:not(:disabled),
+.dark-mode .finished-goods-stock-page .view-btn:hover:not(:disabled),
+.dark .finished-goods-stock-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .finished-goods-stock-page .edit-btn:hover:not(:disabled),
+.dark-mode .finished-goods-stock-page .edit-btn:hover:not(:disabled) {
+    background: #344d70;
+}
+
+.dark .finished-goods-stock-page .delete-btn,
+[data-theme="dark"] .finished-goods-stock-page .delete-btn,
+.dark-mode .finished-goods-stock-page .delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .finished-goods-stock-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .finished-goods-stock-page .delete-btn:hover:not(:disabled),
+.dark-mode .finished-goods-stock-page .delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+}
+
+.dark .finished-goods-stock-page .badge.bg,
+[data-theme="dark"] .finished-goods-stock-page .badge.bg,
+.dark-mode .finished-goods-stock-page .badge.bg {
+    border-color: #28553e;
+}
+
+.dark .finished-goods-stock-page .form-error,
+[data-theme="dark"] .finished-goods-stock-page .form-error,
+.dark-mode .finished-goods-stock-page .form-error {
+    border-color: #713737;
+}
+
+
+/* ============================================================
+   13. RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .finished-goods-stock-page > .card {
+        padding: 16px;
+    }
+
+    .finished-goods-stock-page .table-wrap table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 640px) {
+    .finished-goods-stock-page {
+        font-size: 13px;
+    }
+
+    .finished-goods-stock-page > .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .finished-goods-stock-page h2 {
+        font-size: 18px;
+    }
+
+    .finished-goods-stock-page .form-grid,
+    .finished-goods-stock-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .finished-goods-stock-page .form-grid .f-full,
+    .finished-goods-stock-page .detail-item.f-full,
+    .finished-goods-stock-page .detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .finished-goods-stock-page .action-buttons,
+    .finished-goods-stock-page .table-actions {
+        gap: 5px;
+    }
+
+    .finished-goods-stock-page .action-btn,
+    .finished-goods-stock-page .btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    .finished-goods-stock-page .table-wrap table {
+        min-width: 850px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .finished-goods-stock-page *,
+    .finished-goods-stock-page *::before,
+    .finished-goods-stock-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

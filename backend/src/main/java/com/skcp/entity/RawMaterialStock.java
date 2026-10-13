@@ -19,14 +19,14 @@ public class RawMaterialStock {
 
     // ============================================================
     // PARENT RELATIONSHIP
-    // RawMaterialStock : RawMaterial = 1 : 1
+    // RawMaterialStock : RawMaterial = Many : 1
+    // Multiple dated stock records can belong to one raw material
     // ============================================================
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "raw_material_id",
-            nullable = false,
-            unique = true
+            nullable = false
     )
     private RawMaterial rawMaterial;
 
@@ -49,6 +49,13 @@ public class RawMaterialStock {
             scale = 2
     )
     private BigDecimal minimumStockLevel;
+
+    // ============================================================
+    // STOCK DATE — BUSINESS DATE OF THIS STOCK ENTRY
+    // ============================================================
+
+    @Column(name = "stock_date", nullable = false)
+    private LocalDate stockDate;
 
     // ============================================================
     // LAST UPDATED
@@ -113,6 +120,10 @@ public class RawMaterialStock {
             createdAt = LocalDateTime.now();
         }
 
+        if (stockDate == null) {
+            stockDate = LocalDate.now();
+        }
+
         if (lastUpdatedDate == null) {
             lastUpdatedDate = LocalDate.now();
         }
@@ -172,6 +183,15 @@ public class RawMaterialStock {
     public void setMinimumStockLevel(BigDecimal minimumStockLevel) {
         this.minimumStockLevel = minimumStockLevel;
     }
+
+    public LocalDate getStockDate() {
+        return stockDate;
+    }
+
+    public void setStockDate(LocalDate stockDate) {
+        this.stockDate = stockDate;
+    }
+
 
     public LocalDate getLastUpdatedDate() {
         return lastUpdatedDate;

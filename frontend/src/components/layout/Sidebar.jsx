@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import NavIcon from "../ui/NavIcon";
+import "./Sidebar.css";
 
 export default function Sidebar({
   isDark,
@@ -11,286 +12,103 @@ export default function Sidebar({
   onLogout,
 }) {
   const isActive = (section) => activeSection === section;
-
   const isKannada = currentLang === "kn";
+
+  const renderNavItem = (section, icon, englishLabel, kannadaLabel) => (
+    <button
+      key={section}
+      type="button"
+      className={`nav-item ${isActive(section) ? "active" : ""}`}
+      onClick={() => setActiveSection(section)}
+      aria-current={isActive(section) ? "page" : undefined}
+    >
+      <NavIcon type={icon} />
+      <span>{isKannada ? kannadaLabel : englishLabel}</span>
+    </button>
+  );
+
+  const renderNavSection = (title, kannadaTitle, items) => (
+    <div className="nav-section" key={title}>
+      <div className="nav-section-title">
+        {isKannada ? kannadaTitle : title}
+      </div>
+
+      {items.map(([section, icon, englishLabel, kannadaLabel]) =>
+        renderNavItem(section, icon, englishLabel, kannadaLabel)
+      )}
+    </div>
+  );
 
   return (
     <aside className="sidebar">
+      <nav className="sidebar-nav" aria-label="Main navigation">
+        {renderNavSection("1. MASTER DATA", "1. ಮಾಸ್ಟರ್ ಡೇಟಾ", [
+          ["customer", "customer", "Customers", "ಗ್ರಾಹಕರು"],
+          ["supplier", "supplier", "Suppliers", "ಪೂರೈಕೆದಾರರು"],
+          ["product", "product", "Products", "ಉತ್ಪನ್ನಗಳು"],
+          ["raw-material", "raw-material", "Raw Materials", "ಕಚ್ಚಾ ವಸ್ತುಗಳು"],
+          ["labour", "labour", "Labour", "ಕಾರ್ಮಿಕರು"],
+          ["asset", "asset", "Assets", "ಆಸ್ತಿಗಳು"],
+        ])}
 
-      <nav className="sidebar-nav">
-        {/* MASTER DATA */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "1. ಮಾಸ್ಟರ್ ಡೇಟಾ" : "1. MASTER DATA"}
-          </div>
+        {renderNavSection("2. OPERATIONS", "2. ಕಾರ್ಯಾಚರಣೆಗಳು", [
+          ["attendance", "attendance", "Attendance", "ಹಾಜರಾತಿ"],
+          ["purchase", "purchase", "Purchases", "ಖರೀದಿಗಳು"],
+          ["production", "production", "Production", "ಉತ್ಪಾದನೆ"],
+        ])}
 
-          <button
-            className={`nav-item ${
-              isActive("customer") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("customer")}
-          >
-            <NavIcon type="customer" />
-            {isKannada ? "ಗ್ರಾಹಕರು" : "Customers"}
-          </button>
+        {renderNavSection("3. INVENTORY", "3. ದಾಸ್ತಾನು", [
+          [
+            "raw-material-stock",
+            "raw-material",
+            "Raw Material Stock",
+            "ಕಚ್ಚಾ ವಸ್ತುಗಳ ದಾಸ್ತಾನು",
+          ],
+          ["curing-stock", "curing-stock", "Curing Stock", "ಕ್ಯೂರಿಂಗ್ ದಾಸ್ತಾನು"],
+          [
+            "finished-goods-stock",
+            "finished-goods-stock",
+            "Finished Goods Stock",
+            "ಸಿದ್ಧ ಸರಕುಗಳ ದಾಸ್ತಾನು",
+          ],
+        ])}
 
-          <button
-            className={`nav-item ${
-              isActive("supplier") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("supplier")}
-          >
-             <NavIcon type="supplier" />
-            {isKannada ? "ಪೂರೈಕೆದಾರರು" : "Suppliers"}
-          </button>
+        {renderNavSection("4. SALES", "4. ಮಾರಾಟ", [
+          ["order", "order", "Orders", "ಆರ್ಡರ್‌ಗಳು"],
+          ["delivery", "delivery", "Deliveries", "ವಿತರಣೆಗಳು"],
+        ])}
 
-          <button
-            className={`nav-item ${
-              isActive("product") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("product")}
-          >
-            <NavIcon type="product" />
-            {isKannada ? "ಉತ್ಪನ್ನಗಳು" : "Products"}
-          </button>
+        {renderNavSection("5. FINANCE", "5. ಹಣಕಾಸು", [
+          ["payment", "payment", "Payments", "ಪಾವತಿಗಳು"],
+          [
+            "payment-allocation",
+            "payment-allocation",
+            "Payment Allocation",
+            "ಪಾವತಿ ಹಂಚಿಕೆ",
+          ],
+        ])}
 
-          <button
-            className={`nav-item ${
-              isActive("raw-material") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("raw-material")}
-          >
-            <NavIcon type="raw-material" />
-            {isKannada ? "ಕಚ್ಚಾ ವಸ್ತುಗಳು" : "Raw Materials"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("labour") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("labour")}
-          >
-            <NavIcon type="labour" />
-            {isKannada ? "ಕಾರ್ಮಿಕರು" : "Labour"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("asset") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("asset")}
-          >
-            <NavIcon type="asset" />
-            {isKannada ? "ಆಸ್ತಿಗಳು" : "Assets"}
-          </button>
-        </div>
-
-        {/* OPERATIONS */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "2. ಕಾರ್ಯಾಚರಣೆಗಳು" : "2. OPERATIONS"}
-          </div>
-
-          <button
-            className={`nav-item ${
-              isActive("attendance") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("attendance")}
-          >
-            <NavIcon type="attendance" />
-            {isKannada ? "ಹಾಜರಾತಿ" : "Attendance"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("purchase") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("purchase")}
-          >
-            <NavIcon type="purchase" />
-            {isKannada ? "ಖರೀದಿಗಳು" : "Purchases"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("production") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("production")}
-          >
-            <NavIcon type="production" />
-            {isKannada ? "ಉತ್ಪಾದನೆ" : "Production"}
-          </button>
-        </div>
-
-        {/* INVENTORY */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "3. ದಾಸ್ತಾನು" : "3. INVENTORY"}
-          </div>
-
-          <button
-            className={`nav-item ${
-              isActive("raw-material-stock") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("raw-material-stock")}
-          >
-            <NavIcon type="raw-material" />
-            {isKannada
-              ? "ಕಚ್ಚಾ ವಸ್ತುಗಳ ದಾಸ್ತಾನು"
-              : "Raw Material Stock"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("curing-stock") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("curing-stock")}
-          >
-            <NavIcon type="curing-stock" />
-            {isKannada ? "ಕ್ಯೂರಿಂಗ್ ದಾಸ್ತಾನು" : "Curing Stock"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("finished-goods-stock") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("finished-goods-stock")}
-          >
-            <NavIcon type="finished-goods-stock" />
-            {isKannada
-              ? "ಸಿದ್ಧ ಸರಕುಗಳ ದಾಸ್ತಾನು"
-              : "Finished Goods Stock"}
-          </button>
-        </div>
-
-        {/* SALES */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "4. ಮಾರಾಟ" : "4. SALES"}
-          </div>
-
-          <button
-            className={`nav-item ${
-              isActive("order") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("order")}
-          >
-            <NavIcon type="order" />
-            {isKannada ? "ಆರ್ಡರ್‌ಗಳು" : "Orders"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("delivery") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("delivery")}
-          >
-            <NavIcon type="delivery" />
-            {isKannada ? "ವಿತರಣೆಗಳು" : "Deliveries"}
-          </button>
-        </div>
-
-        {/* FINANCE */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "5. ಹಣಕಾಸು" : "5. FINANCE"}
-          </div>
-
-          <button
-            className={`nav-item ${
-              isActive("payment") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("payment")}
-          >
-            <NavIcon type="payment" />
-            {isKannada ? "ಪಾವತಿಗಳು" : "Payments"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("payment-allocation")
-                ? "active"
-                : ""
-            }`}
-            onClick={() => setActiveSection("payment-allocation")}
-          >
-            <NavIcon type="payment-allocation" />
-            {isKannada
-              ? "ಪಾವತಿ ಹಂಚಿಕೆ"
-              : "Payment Allocation"}
-          </button>
-        </div>
-
-        {/* APPLICATION */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            {isKannada ? "6. ಅಪ್ಲಿಕೇಶನ್" : "6. APPLICATION"}
-          </div>
-
-          <button
-            className={`nav-item ${
-              isActive("dashboard") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("dashboard")}
-          >
-            <NavIcon type="dashboard" />
-            {isKannada ? "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್" : "Dashboard"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("reports") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("reports")}
-          >
-            <NavIcon type="reports" />
-            {isKannada ? "SKCP ವರದಿಗಳು" : "SKCP Reports"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("statements") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("statements")}
-          >
-            <NavIcon type="statements" />
-            {isKannada ? "ಹೇಳಿಕೆಗಳು" : "Statements"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("settings") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("settings")}
-          >
-            <NavIcon type="settings" />
-            {isKannada ? "ಸೆಟ್ಟಿಂಗ್ಸ್" : "Settings"}
-          </button>
-
-          <button
-            className={`nav-item ${
-              isActive("about") ? "active" : ""
-            }`}
-            onClick={() => setActiveSection("about")}
-          >
-            <NavIcon type="about" />
-            {isKannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"}
-          </button>
-        </div>
+        {renderNavSection("6. APPLICATION", "6. ಅಪ್ಲಿಕೇಶನ್", [
+          ["dashboard", "dashboard", "Dashboard", "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್"],
+          ["reports", "reports", "SKCP Reports", "SKCP ವರದಿಗಳು"],
+          ["statements", "statements", "Statements", "ಹೇಳಿಕೆಗಳು"],
+          ["settings", "settings", "Settings", "ಸೆಟ್ಟಿಂಗ್ಸ್"],
+          ["about", "about", "About Us", "ನಮ್ಮ ಬಗ್ಗೆ"],
+        ])}
       </nav>
 
-      {/* THEME + LOGOUT */}
       <div className="sidebar-footer">
         <button
           type="button"
           className="theme-toggle"
           onClick={() => setIsDark(!isDark)}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
           <span className="tt-label">
             {isDark ? "Light Mode" : "Dark Mode"}
           </span>
 
-          <span className={`sw ${isDark ? "on" : ""}`}>
+          <span className={`sw ${isDark ? "on" : ""}`} aria-hidden="true">
             <span />
           </span>
         </button>

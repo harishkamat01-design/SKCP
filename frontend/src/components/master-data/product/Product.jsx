@@ -18,7 +18,7 @@ import {
     DetailGrid,
     DetailItem,
 } from "../../ui/common/DetailGrid";
-
+import "./Product.css";
 // ============================================================
 // PRODUCT MASTER OPTIONS
 // ============================================================
@@ -844,7 +844,7 @@ function Product() {
 
     if (loading) {
         return (
-            <div className="page">
+            <div className="page product-page">
                 <section className="card">
                     <h2>Products</h2>
                     <p>Loading product records...</p>
@@ -854,7 +854,7 @@ function Product() {
     }
 
     return (
-        <div className="page">
+        <div className="page product-page">
             {/* ================================================== */}
             {/* HEADER + SEARCH */}
             {/* ================================================== */}

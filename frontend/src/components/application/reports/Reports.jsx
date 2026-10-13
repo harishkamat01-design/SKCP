@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import jsPDF from "jspdf";
-
+import "./Reports.css";
 import Pagination from "../../../components/ui/Pagination";
 import usePagination from "../../../hooks/usePagination";
 import useTableSort from "../../../hooks/useTableSort";
@@ -4036,7 +4036,7 @@ const handleDownloadInventoryPdf = () => {
   }[reportType];
 
   return (
-    <div className="page">
+    <div className="reports-page">
 
       {/* ========================================================
           REPORT HEADER + FILTERS

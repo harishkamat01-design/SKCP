@@ -19,6 +19,7 @@ import AddCustomerModal from "../../master-data/customer/AddCustomerModal";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../ui/Pagination";
 import useTableSort from "../../../hooks/useTableSort";
+import "./Order.css";
 
 const initialOrderForm = {
     customerId: "",
@@ -1056,144 +1057,144 @@ function Order({ onOpenPayment }) {
         );
     };
 
-    // ============================================================
-    // EDIT ORDER
-    // ============================================================
+        // ============================================================
+        // EDIT ORDER
+        // ============================================================
 
-    const handleEditOrder = async (orderId) => {
-        setEditingOrder(null);
-        setEditError("");
-        setEditSuccess("");
-        setEditLoading(true);
+        const handleEditOrder = async (orderId) => {
+            setEditingOrder(null);
+            setEditError("");
+            setEditSuccess("");
+            setEditLoading(true);
 
-        try {
-            if (
-                customers.length === 0 ||
-                products.length === 0
-            ) {
-                await fetchMasterData();
-            }
+            try {
+                if (
+                    customers.length === 0 ||
+                    products.length === 0
+                ) {
+                    await fetchMasterData();
+                }
 
-            const orderResult = await apiGet(
-                `/api/orders/${orderId}`
-            );
-
-            const order =
-                orderResult?.data;
-
-            if (!order) {
-                throw new Error(
-                    "Order details not found."
-                );
-            }
-
-            const orderItemsResult =
-                await apiGet(
-                    "/api/order-items"
+                const orderResult = await apiGet(
+                    `/api/orders/${orderId}`
                 );
 
-            const allOrderItems =
-                Array.isArray(
-                    orderItemsResult?.data
-                )
-                    ? orderItemsResult.data
-                    : [];
+                const order =
+                    orderResult?.data;
 
-            const existingItems =
-                allOrderItems
-                    .filter(
-                        (item) =>
-                            Number(item.orderId) ===
-                            Number(orderId)
+                if (!order) {
+                    throw new Error(
+                        "Order details not found."
+                    );
+                }
+
+                const orderItemsResult =
+                    await apiGet(
+                        "/api/order-items"
+                    );
+
+                const allOrderItems =
+                    Array.isArray(
+                        orderItemsResult?.data
                     )
-                    .map((item) => ({
-                        orderItemId:
-                            item.orderItemId,
-                        productId:
-                            item.productId || "",
-                        orderedQuantity:
-                            item.orderedQuantity ??
-                            "",
-                        unitSellingPrice:
-                            item.unitSellingPrice ??
-                            "",
-                        remarks:
-                            item.remarks || "",
-                        isExisting: true,
-                    }));
+                        ? orderItemsResult.data
+                        : [];
 
-            setEditingOrder(order);
+                const existingItems =
+                    allOrderItems
+                        .filter(
+                            (item) =>
+                                Number(item.orderId) ===
+                                Number(orderId)
+                        )
+                        .map((item) => ({
+                            orderItemId:
+                                item.orderItemId,
+                            productId:
+                                item.productId || "",
+                            orderedQuantity:
+                                item.orderedQuantity ??
+                                "",
+                            unitSellingPrice:
+                                item.unitSellingPrice ??
+                                "",
+                            remarks:
+                                item.remarks || "",
+                            isExisting: true,
+                        }));
 
-            setEditForm({
-                customerId:
-                    order.customerId || "",
-                orderDate:
-                    order.orderDate || "",
-                expectedDeliveryDate:
-                    order.expectedDeliveryDate ||
-                    "",
-                remarks:
-                    order.remarks || "",
-            });
+                setEditingOrder(order);
 
-            setEditOrderStatus(
-                order.orderStatus ||
-                    "PENDING"
+                setEditForm({
+                    customerId:
+                        order.customerId || "",
+                    orderDate:
+                        order.orderDate || "",
+                    expectedDeliveryDate:
+                        order.expectedDeliveryDate ||
+                        "",
+                    remarks:
+                        order.remarks || "",
+                });
+
+                setEditOrderStatus(
+                    order.orderStatus ||
+                        "PENDING"
+                );
+
+                setEditItems(
+                    existingItems.length > 0
+                        ? existingItems
+                        : [createEmptyItem()]
+                );
+            } catch (err) {
+                console.error(
+                    "Error loading order for edit:",
+                    err
+                );
+
+                setEditError(
+                    err.message ||
+                        "Unable to load order details."
+                );
+            } finally {
+                setEditLoading(false);
+            }
+        };
+
+        // ============================================================
+        // EDIT ORDER HEADER CHANGE
+        // ============================================================
+
+        const handleEditFormChange = (event) => {
+            const { name, value } = event.target;
+
+            setEditForm((previous) => ({
+                ...previous,
+                [name]: value,
+            }));
+        };
+
+        // ============================================================
+        // EDIT ITEM
+        // ============================================================
+
+        const handleEditItemChange = (
+            index,
+            field,
+            value
+        ) => {
+            setEditItems((previous) =>
+                previous.map((item, itemIndex) =>
+                    itemIndex === index
+                        ? {
+                            ...item,
+                            [field]: value,
+                        }
+                        : item
+                )
             );
-
-            setEditItems(
-                existingItems.length > 0
-                    ? existingItems
-                    : [createEmptyItem()]
-            );
-        } catch (err) {
-            console.error(
-                "Error loading order for edit:",
-                err
-            );
-
-            setEditError(
-                err.message ||
-                    "Unable to load order details."
-            );
-        } finally {
-            setEditLoading(false);
-        }
-    };
-
-    // ============================================================
-    // EDIT ORDER HEADER CHANGE
-    // ============================================================
-
-    const handleEditFormChange = (event) => {
-        const { name, value } = event.target;
-
-        setEditForm((previous) => ({
-            ...previous,
-            [name]: value,
-        }));
-    };
-
-    // ============================================================
-    // EDIT ITEM
-    // ============================================================
-
-    const handleEditItemChange = (
-        index,
-        field,
-        value
-    ) => {
-        setEditItems((previous) =>
-            previous.map((item, itemIndex) =>
-                itemIndex === index
-                    ? {
-                          ...item,
-                          [field]: value,
-                      }
-                    : item
-            )
-        );
-    };
+        };
 
     // ============================================================
     // ADD NEW ITEM TO EDIT
@@ -1676,7 +1677,7 @@ function Order({ onOpenPayment }) {
     // ============================================================
 
     return (
-        <section className="section active">
+        <section className="section active order-page">
             {/* ==================================================
                 PAGE HEADER
             ================================================== */}

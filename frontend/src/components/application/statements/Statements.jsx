@@ -5,7 +5,7 @@ import React, {
 } from "react";
 
 import jsPDF from "jspdf";
-
+import "./Statements.css";
 import { apiGet } from "../../../services/api";
 import useTableSort from "../../../hooks/useTableSort";
 
@@ -1379,7 +1379,7 @@ const Statements = () => {
     // ============================================================
 
     return (
-        <div className="page">
+        <div className="page skcp-statements">                  
 
             {/* =====================================================
                 HEADER

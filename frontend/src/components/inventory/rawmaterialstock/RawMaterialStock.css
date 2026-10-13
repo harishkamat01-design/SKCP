@@ -1,0 +1,731 @@
+/* ============================================================
+   RAW MATERIAL STOCK
+   Standard: Customer.css
+   Theme: Blue — Master Data visual standard
+   Scope: Raw Material Stock module only
+   ============================================================ */
+
+
+/* ============================================================
+   1. PAGE THEME VARIABLES
+   ============================================================ */
+
+.raw-material-stock-page {
+    --stock-accent: #3974c6;
+    --stock-accent-hover: #2f63ab;
+    --stock-accent-soft: #dceaff;
+    --stock-accent-border: #cbdff8;
+
+    --stock-text: #263247;
+    --stock-muted: #68747c;
+
+    --stock-card: #edf5ff;
+    --stock-border: #cbdff8;
+    --stock-table-header: #dceaff;
+    --stock-row-hover: #dceaff;
+
+    --stock-modal: #eaf3ff;
+    --stock-modal-header: #dceaff;
+    --stock-modal-border: #cbdff8;
+
+    --stock-input-bg: #ffffff;
+    --stock-input-border: #cbd5e1;
+    --stock-input-focus: #3974c6;
+
+    --stock-success: #18794e;
+    --stock-success-bg: #dcfce7;
+    --stock-warning: #92400e;
+    --stock-warning-bg: #fef3c7;
+    --stock-danger: #b42318;
+    --stock-danger-bg: #fee4e2;
+
+    box-sizing: border-box;
+    color: var(--stock-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.raw-material-stock-page *,
+.raw-material-stock-page *::before,
+.raw-material-stock-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   2. PAGE BASE & TYPOGRAPHY
+   ============================================================ */
+
+.raw-material-stock-page.page {
+    width: 100%;
+    min-width: 0;
+    color: var(--stock-text);
+}
+
+.raw-material-stock-page h1,
+.raw-material-stock-page h2,
+.raw-material-stock-page h3,
+.raw-material-stock-page h4,
+.raw-material-stock-page p,
+.raw-material-stock-page label,
+.raw-material-stock-page button,
+.raw-material-stock-page input,
+.raw-material-stock-page select,
+.raw-material-stock-page textarea,
+.raw-material-stock-page table {
+    font-family: inherit;
+}
+
+.raw-material-stock-page h2 {
+    margin: 0 0 6px;
+    color: var(--stock-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.raw-material-stock-page h3 {
+    margin: 0 0 6px;
+    color: var(--stock-text);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.raw-material-stock-page p {
+    margin: 0 0 12px;
+    color: var(--stock-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.raw-material-stock-page button {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: Segoe UI;
+}
+
+.raw-material-stock-page button:focus-visible,
+.raw-material-stock-page input:focus-visible,
+.raw-material-stock-page select:focus-visible,
+.raw-material-stock-page textarea:focus-visible {
+    outline: 2px solid var(--stock-accent);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. PAGE CARDS & HEADER
+   ============================================================ */
+
+.raw-material-stock-page > .card {
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    overflow: hidden;
+    color: var(--stock-text);
+    background: var(--stock-card);
+    border: 1px solid var(--stock-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.raw-material-stock-page > .card:last-child {
+    margin-bottom: 0;
+}
+
+.raw-material-stock-page > .card > p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. FILTERS & SEARCH
+   ============================================================ */
+
+.raw-material-stock-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.raw-material-stock-page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--stock-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.raw-material-stock-page .fld label span {
+    color: var(--stock-danger);
+}
+
+.raw-material-stock-page .fld input,
+.raw-material-stock-page .fld select,
+.raw-material-stock-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    border: 1px solid var(--stock-input-border);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.raw-material-stock-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.raw-material-stock-page .fld input::placeholder,
+.raw-material-stock-page .fld textarea::placeholder {
+    color: #8a96a3;
+    opacity: 1;
+}
+
+.raw-material-stock-page .fld input:focus,
+.raw-material-stock-page .fld select:focus,
+.raw-material-stock-page .fld textarea:focus {
+    border-color: var(--stock-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 12%);
+}
+
+.raw-material-stock-page .fld input:disabled,
+.raw-material-stock-page .fld select:disabled,
+.raw-material-stock-page .fld textarea:disabled,
+.raw-material-stock-page .fld input[readonly] {
+    color: var(--stock-muted);
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.raw-material-stock-page .fld input[type="date"] {
+    min-height: 38px;
+}
+
+.raw-material-stock-page .fld input[type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   5. FORM GRID
+   ============================================================ */
+
+.raw-material-stock-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.raw-material-stock-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   6. TABLE & SORTING
+   ============================================================ */
+
+.raw-material-stock-page .table-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--stock-border);
+    border-radius: 9px;
+    background: var(--stock-input-bg);
+}
+
+.raw-material-stock-page .table-wrap table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.raw-material-stock-page .table-wrap thead th {
+    padding: 12px 11px;
+    color: var(--stock-text);
+    background: var(--stock-table-header);
+    border-bottom: 1px solid var(--stock-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+}
+
+.raw-material-stock-page .table-wrap tbody td {
+    padding: 12px 11px;
+    border-bottom: 1px solid var(--stock-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.raw-material-stock-page .table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.raw-material-stock-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.raw-material-stock-page .table-wrap tbody tr:hover {
+    background: var(--stock-row-hover);
+}
+
+.raw-material-stock-page .table-wrap tbody td strong {
+    color: var(--stock-text);
+    font-weight: 650;
+}
+
+.raw-material-stock-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.raw-material-stock-page .table-sort-btn:hover {
+    color: var(--stock-accent-hover);
+}
+
+.raw-material-stock-page .table-sort-btn:focus-visible {
+    outline-offset: 4px;
+}
+
+
+/* ============================================================
+   7. ACTION BUTTONS
+   ============================================================ */
+
+.raw-material-stock-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.raw-material-stock-page .action-btn,
+.raw-material-stock-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.raw-material-stock-page .action-btn:disabled,
+.raw-material-stock-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.raw-material-stock-page .view-btn {
+
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+   /* color: #ffffff;
+    background: var(--stock-accent);
+    border-color: var(--stock-accent);*/
+}
+
+.raw-material-stock-page .view-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+
+    /*background: var(--stock-accent-hover);
+    border-color: var(--stock-accent-hover); */
+}
+
+.raw-material-stock-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.raw-material-stock-page .edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+.raw-material-stock-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.raw-material-stock-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+.raw-material-stock-page .btn {
+    color: #ffffff;
+    background: var(--stock-accent);
+    border-color: var(--stock-accent);
+}
+
+.raw-material-stock-page .btn:hover:not(:disabled) {
+    background: var(--stock-accent-hover);
+    border-color: var(--stock-accent-hover);
+}
+
+.raw-material-stock-page .btn.secondary {
+    color: var(--stock-text);
+    background: var(--stock-input-bg);
+    border-color: var(--stock-border);
+}
+
+.raw-material-stock-page .btn.secondary:hover:not(:disabled) {
+    color: var(--stock-accent-hover);
+    background: var(--stock-accent-soft);
+    border-color: var(--stock-accent-border);
+}
+
+
+/* ============================================================
+   8. STATUS BADGES
+   ============================================================ */
+
+.raw-material-stock-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.raw-material-stock-page .badge.bg {
+    color: var(--stock-success);
+    background: var(--stock-success-bg);
+    border-color: #bbf7d0;
+}
+
+
+/* ============================================================
+   9. PAGINATION
+   ============================================================ */
+
+.raw-material-stock-page .table-wrap > *:last-child {
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   10. VALIDATION, ERROR & EMPTY STATES
+   ============================================================ */
+
+.raw-material-stock-page .form-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    color: var(--stock-danger);
+    background: var(--stock-danger-bg);
+    border: 1px solid #f3c6c2;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.raw-material-stock-page .form-grid + .form-error {
+    margin-top: 12px;
+}
+
+.raw-material-stock-page .table-wrap + p {
+    margin-top: 12px;
+}
+
+
+/* ============================================================
+   11. MODALS — SHARED FORM & DETAIL STYLING
+   ============================================================ */
+
+/*
+   ViewModal, FormModal and DeleteConfirmModal are shared
+   components. Keep their internals scoped to this module.
+   These rules apply when the modal is rendered inside this
+   page's DOM subtree. Portal-rendered modals may require a
+   module-specific class on the modal root component.
+*/
+
+.raw-material-stock-page .form-grid .fld {
+    align-self: start;
+}
+
+.raw-material-stock-page .form-grid .fld input,
+.raw-material-stock-page .form-grid .fld select,
+.raw-material-stock-page .form-grid .fld textarea {
+    max-width: 100%;
+}
+
+.raw-material-stock-page .form-grid .fld textarea {
+    min-height: 84px;
+}
+
+
+/* ============================================================
+   12. VIEW MODAL — DETAIL GRID
+   ============================================================ */
+
+.raw-material-stock-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.raw-material-stock-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    background: var(--stock-input-bg);
+    border: 1px solid var(--stock-border);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.raw-material-stock-page .detail-item label,
+.raw-material-stock-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--stock-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.raw-material-stock-page .detail-item strong,
+.raw-material-stock-page .detail-item .detail-value {
+    color: var(--stock-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.raw-material-stock-page .detail-item.f-full,
+.raw-material-stock-page .detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   13. DARK MODE
+   ============================================================ */
+
+.dark .raw-material-stock-page,
+[data-theme="dark"] .raw-material-stock-page,
+.dark-mode .raw-material-stock-page {
+    --stock-accent: #79aaf5;
+    --stock-accent-hover: #9bc0ff;
+    --stock-accent-soft: #293d59;
+    --stock-accent-border: #405573;
+
+    --stock-text: #e8edf2;
+    --stock-muted: #aab5c0;
+
+    --stock-card: #202a35;
+    --stock-border: #394653;
+    --stock-table-header: #293d59;
+    --stock-row-hover: #28374a;
+
+    --stock-modal: #202a35;
+    --stock-modal-header: #26384e;
+    --stock-modal-border: #405573;
+
+    --stock-input-bg: #18212b;
+    --stock-input-border: #465565;
+    --stock-input-focus: #79aaf5;
+
+    --stock-success: #86efac;
+    --stock-success-bg: #173b2c;
+    --stock-warning: #fcd34d;
+    --stock-warning-bg: #473617;
+    --stock-danger: #fca5a5;
+    --stock-danger-bg: #482626;
+}
+
+.dark .raw-material-stock-page .fld input::placeholder,
+.dark .raw-material-stock-page .fld textarea::placeholder,
+[data-theme="dark"] .raw-material-stock-page .fld input::placeholder,
+[data-theme="dark"] .raw-material-stock-page .fld textarea::placeholder,
+.dark-mode .raw-material-stock-page .fld input::placeholder,
+.dark-mode .raw-material-stock-page .fld textarea::placeholder {
+    color: #8997a5;
+}
+
+.dark .raw-material-stock-page .fld input:disabled,
+.dark .raw-material-stock-page .fld select:disabled,
+.dark .raw-material-stock-page .fld textarea:disabled,
+.dark .raw-material-stock-page .fld input[readonly],
+[data-theme="dark"] .raw-material-stock-page .fld input:disabled,
+[data-theme="dark"] .raw-material-stock-page .fld select:disabled,
+[data-theme="dark"] .raw-material-stock-page .fld textarea:disabled,
+[data-theme="dark"] .raw-material-stock-page .fld input[readonly],
+.dark-mode .raw-material-stock-page .fld input:disabled,
+.dark-mode .raw-material-stock-page .fld select:disabled,
+.dark-mode .raw-material-stock-page .fld textarea:disabled,
+.dark-mode .raw-material-stock-page .fld input[readonly] {
+    color: var(--stock-muted);
+    background: #27323e;
+}
+
+.dark .raw-material-stock-page .edit-btn,
+[data-theme="dark"] .raw-material-stock-page .edit-btn,
+.dark-mode .raw-material-stock-page .edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .raw-material-stock-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .raw-material-stock-page .edit-btn:hover:not(:disabled),
+.dark-mode .raw-material-stock-page .edit-btn:hover:not(:disabled) {
+    background: #344d70;
+}
+
+.dark .raw-material-stock-page .delete-btn,
+[data-theme="dark"] .raw-material-stock-page .delete-btn,
+.dark-mode .raw-material-stock-page .delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .raw-material-stock-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .raw-material-stock-page .delete-btn:hover:not(:disabled),
+.dark-mode .raw-material-stock-page .delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+}
+
+.dark .raw-material-stock-page .badge.bg,
+[data-theme="dark"] .raw-material-stock-page .badge.bg,
+.dark-mode .raw-material-stock-page .badge.bg {
+    border-color: #28553e;
+}
+
+.dark .raw-material-stock-page .form-error,
+[data-theme="dark"] .raw-material-stock-page .form-error,
+.dark-mode .raw-material-stock-page .form-error {
+    border-color: #713737;
+}
+
+
+/* ============================================================
+   14. RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .raw-material-stock-page > .card {
+        padding: 16px;
+    }
+
+    .raw-material-stock-page .table-wrap table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 640px) {
+    .raw-material-stock-page {
+        font-size: 13px;
+    }
+
+    .raw-material-stock-page > .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .raw-material-stock-page h2 {
+        font-size: 18px;
+    }
+
+    .raw-material-stock-page .form-grid,
+    .raw-material-stock-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .raw-material-stock-page .form-grid .f-full,
+    .raw-material-stock-page .detail-item.f-full,
+    .raw-material-stock-page .detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .raw-material-stock-page .action-buttons {
+        gap: 5px;
+    }
+
+    .raw-material-stock-page .action-btn,
+    .raw-material-stock-page .btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    .raw-material-stock-page .table-wrap table {
+        min-width: 850px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .raw-material-stock-page *,
+    .raw-material-stock-page *::before,
+    .raw-material-stock-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

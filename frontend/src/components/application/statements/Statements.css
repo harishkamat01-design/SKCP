@@ -1,0 +1,595 @@
+/* =========================================================
+   SKCP STATEMENTS
+   Dashboard-aligned typography and colours.
+   Oswald: Headings and table headers
+   Inter: Body text, forms, and table data
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
+
+.skcp-statements {
+  --statements-text: #263238;
+  --statements-muted: #68747C;
+  --statements-green-tint: #EAF3EC;
+
+  width: 100%;
+  min-width: 0;
+  color: var(--statements-text);
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+/* Oswald for headings */
+.skcp-statements h1,
+.skcp-statements h2,
+.skcp-statements h3,
+.skcp-statements h4,
+.skcp-statements .page-title,
+.skcp-statements .section-title,
+.skcp-statements .card-title {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Inter for regular content and controls */
+.skcp-statements p,
+.skcp-statements label,
+.skcp-statements input,
+.skcp-statements select,
+.skcp-statements textarea,
+.skcp-statements button,
+.skcp-statements table,
+.skcp-statements td {
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.skcp-statements h2 {
+  font-weight: 500;
+}
+
+.skcp-statements p {
+  color: var(--statements-muted);
+}
+
+.skcp-statements button,
+.skcp-statements input,
+.skcp-statements select {
+  font-size: inherit;
+}
+
+/* =========================================================
+   MAIN TILES — LIGHT GREEN BACKGROUND, BLACK TEXT
+========================================================= */
+
+/* Statements heading tile */
+.skcp-statements > section.card:first-child {
+  background-color: #EAF4ED;
+  color: #000000;
+}
+
+.skcp-statements > section.card:first-child h2,
+.skcp-statements > section.card:first-child p {
+  color: #000000;
+}
+
+/* Customer Statement tile */
+.skcp-statements > section.card:nth-child(2) {
+  background-color: #EAF4ED;
+  color: #000000;
+}
+
+.skcp-statements > section.card:nth-child(2) h2,
+.skcp-statements > section.card:nth-child(2) p,
+.skcp-statements > section.card:nth-child(2) label,
+.skcp-statements > section.card:nth-child(2) .fld label {
+  color: #000000;
+}
+
+/* Keep input and dropdown text black */
+.skcp-statements .fld input,
+.skcp-statements .fld select {
+  color: #000000;
+}
+
+/* Form labels */
+.skcp-statements .fld label {
+  font-weight: 600;
+}
+
+/* =========================================================
+   TABLE TYPOGRAPHY
+========================================================= */
+
+.skcp-statements .table-wrap table {
+  font-size: 13px;
+}
+
+/* Oswald for table headers */
+.skcp-statements .table-wrap th {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.skcp-statements .table-wrap td {
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+}
+
+.skcp-statements .table-sort-btn {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* =========================================================
+   TABLE HEADER COLOURS
+========================================================= */
+
+/* Orders — soft blue */
+.skcp-statements > section.card:nth-child(6) .table-wrap th {
+  background-color: #EAF1FB;
+  color: #355783;
+}
+
+.skcp-statements > section.card:nth-child(6) .table-wrap {
+  border-top: 2px solid #B9CCE8;
+}
+
+/* Payments — soft green */
+.skcp-statements > section.card:nth-child(7) .table-wrap th {
+  background-color: #E8F3EB;
+  color: #326747;
+}
+
+.skcp-statements > section.card:nth-child(7) .table-wrap {
+  border-top: 2px solid #B9D9C2;
+}
+
+/* Payment Allocations — soft lavender */
+.skcp-statements > section.card:nth-child(8) .table-wrap th {
+  background-color: #F0EBF8;
+  color: #665087;
+}
+
+.skcp-statements > section.card:nth-child(8) .table-wrap {
+  border-top: 2px solid #D0C2E6;
+}
+
+/* Outstanding Balance — soft amber */
+.skcp-statements > section.card:nth-child(9) .table-wrap th {
+  background-color: #FBF0DF;
+  color: #855E29;
+}
+
+.skcp-statements > section.card:nth-child(9) .table-wrap {
+  border-top: 2px solid #E8D1A6;
+}
+
+/* Sorting buttons */
+.skcp-statements .table-wrap th .table-sort-btn {
+  color: inherit;
+}
+
+/* Emphasize final rows */
+.skcp-statements .table-wrap tbody tr:last-child td {
+  font-weight: 650;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.skcp-statements .kpi-grid > .card:nth-child(1) {
+  background-color: #EDF3FB;
+  color: #355783;
+}
+
+.skcp-statements .kpi-grid > .card:nth-child(2) {
+  background-color: #EAF4ED;
+  color: #326747;
+}
+
+.skcp-statements .kpi-grid > .card:nth-child(3) {
+  background-color: #F8EAEC;
+  color: #914A55;
+}
+
+/* =========================================================
+   PAYMENT SUMMARY
+========================================================= */
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(1) {
+  background-color: #E7F3F3;
+  color: #326E70;
+}
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(2) {
+  background-color: #F0EBF8;
+  color: #665087;
+}
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(3) {
+  background-color: #FBF0DF;
+  color: #855E29;
+}
+
+/* KPI labels and values */
+.skcp-statements .kpi-grid > .card > div {
+  color: inherit;
+}
+
+/* =========================================================
+   DARK THEME
+========================================================= */
+
+/* Both main tiles: muted green background, black text */
+.app.dark .skcp-statements > section.card:first-child,
+.app.dark .skcp-statements > section.card:nth-child(2) {
+  background-color: #263B31;
+  color: #000000;
+}
+
+.app.dark .skcp-statements > section.card:first-child h2,
+.app.dark .skcp-statements > section.card:first-child p,
+.app.dark .skcp-statements > section.card:nth-child(2) h2,
+.app.dark .skcp-statements > section.card:nth-child(2) p,
+.app.dark .skcp-statements > section.card:nth-child(2) label {
+  color: #000000;
+}
+
+/* Table headers */
+.app.dark .skcp-statements
+  > section.card:nth-child(6) .table-wrap th {
+  background-color: #26364B;
+  color: #C6D9F4;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(7) .table-wrap th {
+  background-color: #263B31;
+  color: #C5E6D0;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(8) .table-wrap th {
+  background-color: #342D43;
+  color: #D8C9F0;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(9) .table-wrap th {
+  background-color: #413626;
+  color: #F0D7A8;
+}
+
+/* Account Summary cards */
+.app.dark .skcp-statements .kpi-grid > .card {
+  color: var(--text);
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(1) {
+  background-color: #26364B;
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(2) {
+  background-color: #263B31;
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(3) {
+  background-color: #402D32;
+}
+
+/* Payment Summary cards */
+.app.dark .skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(1) {
+  background-color: #253D40;
+}
+
+.app.dark .skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(2) {
+  background-color: #342D43;
+}
+
+.app.dark .skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(3) {
+  background-color: #413626;
+}
+
+
+
+/* =========================================================
+   We can change the font size of the statements page to match the dashboard, with below code 
+
+
+
+
+.skcp-statements { 
+
+  --statements-text: #263238;
+  --statements-muted: #68747C;
+  --statements-green-tint: #EAF3EC;
+
+  width: 100%;
+  min-width: 0;
+  color: var(--statements-text);
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+{}
+.skcp-statements h2,
+.skcp-statements p,
+.skcp-statements label,
+.skcp-statements input,
+.skcp-statements select,
+.skcp-statements button,
+.skcp-statements table,
+.skcp-statements th,
+.skcp-statements td { 
+  font-family:
+    Inter,
+    "Segoe UI",
+    Roboto,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.skcp-statements h2 {
+  font-weight: 650;
+}
+
+.skcp-statements p {
+  color: var(--statements-muted);
+}
+
+.skcp-statements button,
+.skcp-statements input,
+.skcp-statements select {
+  font-size: inherit;
+}
+
+
+
+
+.skcp-statements > section.card:first-child {        
+  background-color: #EAF4ED;
+  color: #000000;
+}
+
+.skcp-statements > section.card:first-child h2,
+.skcp-statements > section.card:first-child p {
+  color: #000000;
+}
+
+
+.skcp-statements > section.card:nth-child(2) {     
+  background-color: #EAF4ED;
+  color: #000000;
+}
+
+.skcp-statements > section.card:nth-child(2) h2,
+.skcp-statements > section.card:nth-child(2) p,
+.skcp-statements > section.card:nth-child(2) label,
+.skcp-statements > section.card:nth-child(2) .fld label {
+  color: #000000;
+}
+
+
+.skcp-statements .fld input,
+.skcp-statements .fld select {  
+  color: #000000;
+}
+
+
+.skcp-statements .fld label {      
+  font-weight: 600;
+}
+
+
+
+.skcp-statements .table-wrap table {  
+  font-size: 13px;
+}
+
+.skcp-statements .table-wrap th {
+  font-weight: 650;
+}
+
+.skcp-statements .table-wrap td {
+  font-weight: 400;
+}
+
+.skcp-statements .table-sort-btn {
+  font-weight: 650;
+}
+
+
+
+.skcp-statements > section.card:nth-child(6) .table-wrap th {     
+  background-color: #EAF1FB;
+  color: #355783;
+}
+
+.skcp-statements > section.card:nth-child(6) .table-wrap {
+  border-top: 2px solid #B9CCE8;
+}
+
+
+.skcp-statements > section.card:nth-child(7) .table-wrap th {  
+  color: #326747;
+}
+
+.skcp-statements > section.card:nth-child(7) .table-wrap {
+  border-top: 2px solid #B9D9C2;
+}
+
+
+.skcp-statements > section.card:nth-child(8) .table-wrap th {  
+  background-color: #F0EBF8;
+  color: #665087;
+}
+
+.skcp-statements > section.card:nth-child(8) .table-wrap {
+  border-top: 2px solid #D0C2E6;
+}
+
+
+.skcp-statements > section.card:nth-child(9) .table-wrap th {    
+  background-color: #FBF0DF;
+  color: #855E29;
+}
+
+.skcp-statements > section.card:nth-child(9) .table-wrap {
+  border-top: 2px solid #E8D1A6;
+}
+
+
+.skcp-statements .table-wrap th .table-sort-btn {   
+  color: inherit;
+}
+
+
+.skcp-statements .table-wrap tbody tr:last-child td { 
+  font-weight: 650;
+}
+
+
+
+.skcp-statements .kpi-grid > .card:nth-child(1) {    
+  background-color: #EDF3FB;
+  color: #355783;
+}
+
+.skcp-statements .kpi-grid > .card:nth-child(2) {
+  background-color: #EAF4ED;
+  color: #326747;
+}
+
+.skcp-statements .kpi-grid > .card:nth-child(3) {
+  background-color: #F8EAEC;
+  color: #914A55;
+}
+
+
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(1) {                            
+  background-color: #E7F3F3;
+  color: #326E70;
+}
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(2) {
+  background-color: #F0EBF8;
+  color: #665087;
+}
+
+.skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(3) {
+  background-color: #FBF0DF;
+  color: #855E29;
+}
+
+
+.skcp-statements .kpi-grid > .card > div { 
+  color: inherit;
+}
+
+
+
+
+.app.dark .skcp-statements > section.card:first-child,    
+.app.dark .skcp-statements > section.card:nth-child(2) {    
+  background-color: #263B31;
+  color: #000000;
+}
+
+.app.dark .skcp-statements > section.card:first-child h2,
+.app.dark .skcp-statements > section.card:first-child p,
+.app.dark .skcp-statements > section.card:nth-child(2) h2,
+.app.dark .skcp-statements > section.card:nth-child(2) p,
+.app.dark .skcp-statements > section.card:nth-child(2) label {
+  color: #000000;
+}
+
+
+.app.dark .skcp-statements
+  > section.card:nth-child(6) .table-wrap th { 
+  background-color: #26364B;
+  color: #C6D9F4;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(7) .table-wrap th {
+  background-color: #263B31;
+  color: #C5E6D0;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(8) .table-wrap th {
+  background-color: #342D43;
+  color: #D8C9F0;
+}
+
+.app.dark .skcp-statements
+  > section.card:nth-child(9) .table-wrap th {
+  background-color: #413626;
+  color: #F0D7A8;
+}
+
+
+.app.dark .skcp-statements .kpi-grid > .card { 
+  color: var(--text);
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(1) {
+  background-color: #26364B;
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(2) {
+  background-color: #263B31;
+}
+
+.app.dark .skcp-statements .kpi-grid > .card:nth-child(3) {
+  background-color: #402D32;
+}
+
+
+.app.dark .skcp-statements section.card:nth-child(5) 
+  .kpi-grid > .card:nth-child(1) {
+  background-color: #253D40;
+}
+
+.app.dark .skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(2) {
+  background-color: #342D43;
+}
+
+.app.dark .skcp-statements section.card:nth-child(5)
+  .kpi-grid > .card:nth-child(3) {
+  background-color: #413626;
+}
+   
+========================================================= */

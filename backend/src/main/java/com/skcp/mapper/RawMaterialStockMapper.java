@@ -11,7 +11,6 @@ public final class RawMaterialStockMapper {
     private RawMaterialStockMapper() {
     }
 
-
     // ============================================================
     // CREATE REQUEST → ENTITY
     // ============================================================
@@ -21,6 +20,8 @@ public final class RawMaterialStockMapper {
 
         RawMaterialStock stock = new RawMaterialStock();
 
+        stock.setStockDate(request.getStockDate());
+
         stock.setCurrentStockLevel(
                 request.getCurrentStockLevel()
         );
@@ -29,29 +30,10 @@ public final class RawMaterialStockMapper {
                 request.getMinimumStockLevel()
         );
 
-        stock.setNotes(
-                request.getNotes()
-        );
-
-        /*
-         * rawMaterial is NOT mapped here.
-         *
-         * Service will retrieve RawMaterial using:
-         *
-         * request.getRawMaterialId()
-         *
-         * System-managed fields are NOT mapped:
-         *
-         * - rawMaterialStockId
-         * - lastUpdatedDate
-         * - stockStatus
-         * - recordStatus
-         * - createdAt
-         */
+        stock.setNotes(request.getNotes());
 
         return stock;
     }
-
 
     // ============================================================
     // UPDATE REQUEST → EXISTING ENTITY
@@ -61,6 +43,8 @@ public final class RawMaterialStockMapper {
             RawMaterialStock stock,
             RawMaterialStockUpdateRequest request) {
 
+        stock.setStockDate(request.getStockDate());
+
         stock.setCurrentStockLevel(
                 request.getCurrentStockLevel()
         );
@@ -69,24 +53,8 @@ public final class RawMaterialStockMapper {
                 request.getMinimumStockLevel()
         );
 
-        stock.setNotes(
-                request.getNotes()
-        );
-
-        /*
-         * Do NOT update:
-         *
-         * - rawMaterialStockId
-         * - rawMaterial
-         * - lastUpdatedDate
-         * - stockStatus
-         * - recordStatus
-         * - createdAt
-         *
-         * These are controlled by the backend.
-         */
+        stock.setNotes(request.getNotes());
     }
-
 
     // ============================================================
     // ENTITY → FULL RESPONSE
@@ -98,35 +66,21 @@ public final class RawMaterialStockMapper {
         RawMaterialStockResponse response =
                 new RawMaterialStockResponse();
 
-
-        // --------------------------------------------------------
-        // STOCK ID
-        // --------------------------------------------------------
-
         response.setRawMaterialStockId(
                 stock.getRawMaterialStockId()
         );
 
-
-        // --------------------------------------------------------
-        // RAW MATERIAL
-        // --------------------------------------------------------
-
         if (stock.getRawMaterial() != null) {
-
             response.setRawMaterialId(
-                    stock.getRawMaterial()
-                            .getRawMaterialId()
+                    stock.getRawMaterial().getRawMaterialId()
             );
 
             response.setRawMaterialName(
-                    stock.getRawMaterial()
-                            .getMaterialName()
+                    stock.getRawMaterial().getMaterialName()
             );
 
             response.setRawMaterialUnit(
-                    stock.getRawMaterial()
-                            .getUnit() == null
+                    stock.getRawMaterial().getUnit() == null
                             ? null
                             : stock.getRawMaterial()
                                     .getUnit()
@@ -134,10 +88,7 @@ public final class RawMaterialStockMapper {
             );
         }
 
-
-        // --------------------------------------------------------
-        // STOCK DETAILS
-        // --------------------------------------------------------
+        response.setStockDate(stock.getStockDate());
 
         response.setCurrentStockLevel(
                 stock.getCurrentStockLevel()
@@ -151,21 +102,11 @@ public final class RawMaterialStockMapper {
                 stock.getLastUpdatedDate()
         );
 
-
-        // --------------------------------------------------------
-        // STOCK STATUS
-        // --------------------------------------------------------
-
         response.setStockStatus(
                 stock.getStockStatus() == null
                         ? null
                         : stock.getStockStatus().name()
         );
-
-
-        // --------------------------------------------------------
-        // RECORD STATUS
-        // --------------------------------------------------------
 
         response.setRecordStatus(
                 stock.getRecordStatus() == null
@@ -173,64 +114,37 @@ public final class RawMaterialStockMapper {
                         : stock.getRecordStatus().name()
         );
 
-
-        // --------------------------------------------------------
-        // OTHER DETAILS
-        // --------------------------------------------------------
-
-        response.setNotes(
-                stock.getNotes()
-        );
-
-        response.setCreatedAt(
-                stock.getCreatedAt()
-        );
-
+        response.setNotes(stock.getNotes());
+        response.setCreatedAt(stock.getCreatedAt());
 
         return response;
     }
-
 
     // ============================================================
     // ENTITY → SUMMARY RESPONSE
     // ============================================================
 
-    public static RawMaterialStockSummaryResponse
-    toSummaryResponse(
+    public static RawMaterialStockSummaryResponse toSummaryResponse(
             RawMaterialStock stock) {
 
         RawMaterialStockSummaryResponse response =
                 new RawMaterialStockSummaryResponse();
 
-
-        // --------------------------------------------------------
-        // STOCK ID
-        // --------------------------------------------------------
-
         response.setRawMaterialStockId(
                 stock.getRawMaterialStockId()
         );
 
-
-        // --------------------------------------------------------
-        // RAW MATERIAL
-        // --------------------------------------------------------
-
         if (stock.getRawMaterial() != null) {
-
             response.setRawMaterialId(
-                    stock.getRawMaterial()
-                            .getRawMaterialId()
+                    stock.getRawMaterial().getRawMaterialId()
             );
 
             response.setRawMaterialName(
-                    stock.getRawMaterial()
-                            .getMaterialName()
+                    stock.getRawMaterial().getMaterialName()
             );
 
             response.setRawMaterialUnit(
-                    stock.getRawMaterial()
-                            .getUnit() == null
+                    stock.getRawMaterial().getUnit() == null
                             ? null
                             : stock.getRawMaterial()
                                     .getUnit()
@@ -238,10 +152,11 @@ public final class RawMaterialStockMapper {
             );
         }
 
+        response.setStockDate(stock.getStockDate());
 
-        // --------------------------------------------------------
-        // STOCK
-        // --------------------------------------------------------
+        response.setLastUpdatedDate(
+                stock.getLastUpdatedDate()
+        );
 
         response.setCurrentStockLevel(
                 stock.getCurrentStockLevel()
@@ -251,28 +166,17 @@ public final class RawMaterialStockMapper {
                 stock.getMinimumStockLevel()
         );
 
-
-        // --------------------------------------------------------
-        // STOCK STATUS
-        // --------------------------------------------------------
-
         response.setStockStatus(
                 stock.getStockStatus() == null
                         ? null
                         : stock.getStockStatus().name()
         );
 
-
-        // --------------------------------------------------------
-        // RECORD STATUS
-        // --------------------------------------------------------
-
         response.setRecordStatus(
                 stock.getRecordStatus() == null
                         ? null
                         : stock.getRecordStatus().name()
         );
-
 
         return response;
     }

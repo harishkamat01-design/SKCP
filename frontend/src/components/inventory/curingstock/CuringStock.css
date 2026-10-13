@@ -1,0 +1,779 @@
+/* ============================================================
+   CURING STOCK
+   Standard: Customer.css
+   Theme: Blue
+   Scope: Curing Stock module only
+   ============================================================ */
+
+
+/* ============================================================
+   1. PAGE THEME VARIABLES
+   ============================================================ */
+
+.curing-stock-page {
+    --curing-accent: #3974c6;
+    --curing-accent-hover: #2f63ab;
+    --curing-accent-soft: #dceaff;
+    --curing-accent-border: #cbdff8;
+
+    --curing-text: #263247;
+    --curing-muted: #68747c;
+
+    --curing-card: #edf5ff;
+    --curing-border: #cbdff8;
+    --curing-table-header: #dceaff;
+    --curing-row-hover: #dceaff;
+
+    --curing-modal: #eaf3ff;
+    --curing-modal-header: #dceaff;
+    --curing-modal-border: #cbdff8;
+
+    --curing-input-bg: #ffffff;
+    --curing-input-border: #cbd5e1;
+    --curing-input-focus: #3974c6;
+
+    --curing-success: #18794e;
+    --curing-success-bg: #dcfce7;
+    --curing-warning: #92400e;
+    --curing-warning-bg: #fef3c7;
+    --curing-danger: #b42318;
+    --curing-danger-bg: #fee4e2;
+
+    --curing-due-bg: #fff3cd;
+    --curing-due-text: #664d03;
+    --curing-due-border: #ffecb5;
+
+    box-sizing: border-box;
+    color: var(--curing-text);
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+.curing-stock-page *,
+.curing-stock-page *::before,
+.curing-stock-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   2. PAGE BASE & TYPOGRAPHY
+   ============================================================ */
+
+.curing-stock-page.page {
+    width: 100%;
+    min-width: 0;
+    color: var(--curing-text);
+}
+
+.curing-stock-page h1,
+.curing-stock-page h2,
+.curing-stock-page h3,
+.curing-stock-page h4,
+.curing-stock-page p,
+.curing-stock-page label,
+.curing-stock-page button,
+.curing-stock-page input,
+.curing-stock-page select,
+.curing-stock-page textarea,
+.curing-stock-page table {
+    font-family: inherit;
+}
+
+.curing-stock-page h2 {
+    margin: 0 0 6px;
+    color: var(--curing-text);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.curing-stock-page h3 {
+    margin: 0 0 6px;
+    color: var(--curing-text);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.curing-stock-page p {
+    margin: 0 0 12px;
+    color: var(--curing-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.curing-stock-page button {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: inherit;
+}
+
+.curing-stock-page button:focus-visible,
+.curing-stock-page input:focus-visible,
+.curing-stock-page select:focus-visible,
+.curing-stock-page textarea:focus-visible {
+    outline: 2px solid var(--curing-accent);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. PAGE CARDS & HEADER
+   ============================================================ */
+
+.curing-stock-page > .card {
+    min-width: 0;
+    margin: 0 0 18px;
+    padding: 20px;
+    overflow: hidden;
+    color: var(--curing-text);
+    background: var(--curing-card);
+    border: 1px solid var(--curing-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(38 50 71 / 4%);
+}
+
+.curing-stock-page > .card:last-child {
+    margin-bottom: 0;
+}
+
+.curing-stock-page > .card > p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. SEARCH & FILTER FIELDS
+   ============================================================ */
+
+.curing-stock-page .fld {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.curing-stock-page .fld label {
+    display: block;
+    margin: 0;
+    color: var(--curing-text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.curing-stock-page .fld label span {
+    color: var(--curing-danger);
+}
+
+.curing-stock-page .fld input,
+.curing-stock-page .fld select,
+.curing-stock-page .fld textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 11px;
+    color: var(--curing-text);
+    background: var(--curing-input-bg);
+    border: 1px solid var(--curing-input-border);
+    border-radius: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.curing-stock-page .fld textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.curing-stock-page .fld input::placeholder,
+.curing-stock-page .fld textarea::placeholder {
+    color: #8a96a3;
+    opacity: 1;
+}
+
+.curing-stock-page .fld input:focus,
+.curing-stock-page .fld select:focus,
+.curing-stock-page .fld textarea:focus {
+    border-color: var(--curing-input-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(57 116 198 / 12%);
+}
+
+.curing-stock-page .fld input:disabled,
+.curing-stock-page .fld select:disabled,
+.curing-stock-page .fld textarea:disabled,
+.curing-stock-page .fld input[readonly] {
+    color: var(--curing-muted);
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.curing-stock-page .fld input[type="date"],
+.curing-stock-page .fld input[type="number"] {
+    min-height: 38px;
+    font-variant-numeric: tabular-nums;
+}
+
+.curing-stock-page .fld small {
+    display: block;
+    margin-top: 2px;
+    color: var(--curing-muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   5. FORM GRID
+   ============================================================ */
+
+.curing-stock-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.curing-stock-page .form-grid .fld {
+    align-self: start;
+}
+
+.curing-stock-page .form-grid .f-full {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   6. TABLE & SORTING
+   ============================================================ */
+
+.curing-stock-page .table-wrap {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    background: var(--curing-input-bg);
+    border: 1px solid var(--curing-border);
+    border-radius: 9px;
+}
+
+.curing-stock-page .table-wrap table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--curing-text);
+    background: var(--curing-input-bg);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.curing-stock-page .table-wrap thead th {
+    padding: 12px 11px;
+    color: var(--curing-text);
+    background: var(--curing-table-header);
+    border-bottom: 1px solid var(--curing-border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+}
+
+.curing-stock-page .table-wrap tbody td {
+    padding: 12px 11px;
+    color: var(--curing-text);
+    border-bottom: 1px solid var(--curing-border);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.curing-stock-page .table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.curing-stock-page .table-wrap tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.curing-stock-page .table-wrap tbody tr:hover {
+    background: var(--curing-row-hover);
+}
+
+.curing-stock-page .table-wrap tbody td strong {
+    color: var(--curing-text);
+    font-weight: 650;
+}
+
+.curing-stock-page .table-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.curing-stock-page .table-sort-btn:hover {
+    color: var(--curing-accent-hover);
+}
+
+.curing-stock-page .table-sort-btn:focus-visible {
+    outline-offset: 4px;
+}
+
+
+/* ============================================================
+   7. CURING READINESS INDICATOR
+   ============================================================ */
+
+/*
+   Add the class "curing-ready-date-due" to the Expected Ready
+   Date cell when the three-day curing period has completed.
+   This is a visual indicator only; it does not change status.
+*/
+
+.curing-stock-page .curing-ready-date-due {
+    color: var(--curing-due-text);
+    background: var(--curing-due-bg);
+    border-bottom-color: var(--curing-due-border);
+    font-weight: 650;
+}
+
+.curing-stock-page .curing-ready-date-due:hover {
+    background: var(--curing-due-bg);
+}
+
+
+/* ============================================================
+   8. ACTION BUTTONS
+   ============================================================ */
+
+.curing-stock-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.curing-stock-page .action-btn,
+.curing-stock-page .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.curing-stock-page .action-btn:disabled,
+.curing-stock-page .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.curing-stock-page .view-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+   /* color: #ffffff;
+    background: var(--stock-accent);
+    border-color: var(--stock-accent);*/
+}
+
+.curing-stock-page .view-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+
+    /*background: var(--stock-accent-hover);
+    border-color: var(--stock-accent-hover); */
+}
+
+.curing-stock-page .edit-btn {
+    color: #24589b;
+    background: #e8f1ff;
+    border-color: #c3d8f7;
+}
+
+.curing-stock-page .edit-btn:hover:not(:disabled) {
+    background: #d7e7ff;
+    border-color: #a9c7f0;
+}
+
+.curing-stock-page .delete-btn {
+    color: #a61b1b;
+    background: #fff0ef;
+    border-color: #f3c6c2;
+}
+
+.curing-stock-page .delete-btn:hover:not(:disabled) {
+    background: #fee2e0;
+    border-color: #e9aaa5;
+}
+
+.curing-stock-page .btn {
+    color: #ffffff;
+    background: var(--curing-accent);
+    border-color: var(--curing-accent);
+}
+
+.curing-stock-page .btn:hover:not(:disabled) {
+    background: var(--curing-accent-hover);
+    border-color: var(--curing-accent-hover);
+}
+
+.curing-stock-page .btn.secondary {
+    color: var(--curing-text);
+    background: var(--curing-input-bg);
+    border-color: var(--curing-border);
+}
+
+.curing-stock-page .btn.secondary:hover:not(:disabled) {
+    color: var(--curing-accent-hover);
+    background: var(--curing-accent-soft);
+    border-color: var(--curing-accent-border);
+}
+
+
+/* ============================================================
+   9. STATUS BADGES
+   ============================================================ */
+
+.curing-stock-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.curing-stock-page .curing-status-curing {
+    color: #92400e;
+    background: #fef3c7;
+    border-color: #fde68a;
+}
+
+.curing-stock-page .curing-status-ready {
+    color: #166534;
+    background: #dcfce7;
+    border-color: #bbf7d0;
+}
+
+.curing-stock-page .curing-status-moved {
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-color: #bfdbfe;
+}
+
+
+/* ============================================================
+   10. VALIDATION, ERROR & EMPTY STATES
+   ============================================================ */
+
+.curing-stock-page .form-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    color: var(--curing-danger);
+    background: var(--curing-danger-bg);
+    border: 1px solid #f3c6c2;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.curing-stock-page .form-grid + .form-error {
+    margin-top: 12px;
+}
+
+
+/* ============================================================
+   11. MODALS — SHARED FORM & DETAIL STYLING
+   ============================================================ */
+
+/*
+   Shared modal components may render through a React portal.
+   Page-scoped rules cannot style elements outside this page's
+   DOM subtree. If required, add a curing-specific class to the
+   shared modal root rather than using global modal selectors.
+*/
+
+.curing-stock-page .form-grid .fld input,
+.curing-stock-page .form-grid .fld select,
+.curing-stock-page .form-grid .fld textarea {
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   12. VIEW MODAL — DETAIL GRID
+   ============================================================ */
+
+.curing-stock-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.curing-stock-page .detail-item {
+    min-width: 0;
+    padding: 12px;
+    background: var(--curing-input-bg);
+    border: 1px solid var(--curing-border);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.curing-stock-page .detail-item label,
+.curing-stock-page .detail-item .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--curing-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.curing-stock-page .detail-item strong,
+.curing-stock-page .detail-item .detail-value {
+    color: var(--curing-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.curing-stock-page .detail-item.f-full,
+.curing-stock-page .detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   13. DARK MODE
+   ============================================================ */
+
+.dark .curing-stock-page,
+[data-theme="dark"] .curing-stock-page,
+.dark-mode .curing-stock-page {
+    --curing-accent: #79aaf5;
+    --curing-accent-hover: #9bc0ff;
+    --curing-accent-soft: #293d59;
+    --curing-accent-border: #405573;
+
+    --curing-text: #e8edf2;
+    --curing-muted: #aab5c0;
+
+    --curing-card: #202a35;
+    --curing-border: #394653;
+    --curing-table-header: #293d59;
+    --curing-row-hover: #28374a;
+
+    --curing-modal: #202a35;
+    --curing-modal-header: #26384e;
+    --curing-modal-border: #405573;
+
+    --curing-input-bg: #18212b;
+    --curing-input-border: #465565;
+    --curing-input-focus: #79aaf5;
+
+    --curing-success: #86efac;
+    --curing-success-bg: #173b2c;
+    --curing-warning: #fcd34d;
+    --curing-warning-bg: #473617;
+    --curing-danger: #fca5a5;
+    --curing-danger-bg: #482626;
+
+    --curing-due-bg: #473617;
+    --curing-due-text: #fcd34d;
+    --curing-due-border: #725a25;
+}
+
+.dark .curing-stock-page .fld input::placeholder,
+.dark .curing-stock-page .fld textarea::placeholder,
+[data-theme="dark"] .curing-stock-page .fld input::placeholder,
+[data-theme="dark"] .curing-stock-page .fld textarea::placeholder,
+.dark-mode .curing-stock-page .fld input::placeholder,
+.dark-mode .curing-stock-page .fld textarea::placeholder {
+    color: #8997a5;
+}
+
+.dark .curing-stock-page .fld input:disabled,
+.dark .curing-stock-page .fld select:disabled,
+.dark .curing-stock-page .fld textarea:disabled,
+.dark .curing-stock-page .fld input[readonly],
+[data-theme="dark"] .curing-stock-page .fld input:disabled,
+[data-theme="dark"] .curing-stock-page .fld select:disabled,
+[data-theme="dark"] .curing-stock-page .fld textarea:disabled,
+[data-theme="dark"] .curing-stock-page .fld input[readonly],
+.dark-mode .curing-stock-page .fld input:disabled,
+.dark-mode .curing-stock-page .fld select:disabled,
+.dark-mode .curing-stock-page .fld textarea:disabled,
+.dark-mode .curing-stock-page .fld input[readonly] {
+    color: var(--curing-muted);
+    background: #27323e;
+}
+
+.dark .curing-stock-page .edit-btn,
+[data-theme="dark"] .curing-stock-page .edit-btn,
+.dark-mode .curing-stock-page .edit-btn {
+    color: #c5dcff;
+    background: #293d59;
+    border-color: #405573;
+}
+
+.dark .curing-stock-page .edit-btn:hover:not(:disabled),
+[data-theme="dark"] .curing-stock-page .edit-btn:hover:not(:disabled),
+.dark-mode .curing-stock-page .edit-btn:hover:not(:disabled) {
+    background: #344d70;
+}
+
+.dark .curing-stock-page .delete-btn,
+[data-theme="dark"] .curing-stock-page .delete-btn,
+.dark-mode .curing-stock-page .delete-btn {
+    color: #fecaca;
+    background: #482626;
+    border-color: #713737;
+}
+
+.dark .curing-stock-page .delete-btn:hover:not(:disabled),
+[data-theme="dark"] .curing-stock-page .delete-btn:hover:not(:disabled),
+.dark-mode .curing-stock-page .delete-btn:hover:not(:disabled) {
+    background: #5a2c2c;
+}
+
+.dark .curing-stock-page .curing-status-curing,
+[data-theme="dark"] .curing-stock-page .curing-status-curing,
+.dark-mode .curing-stock-page .curing-status-curing {
+    color: #fcd34d;
+    background: #473617;
+    border-color: #725a25;
+}
+
+.dark .curing-stock-page .curing-status-ready,
+[data-theme="dark"] .curing-stock-page .curing-status-ready,
+.dark-mode .curing-stock-page .curing-status-ready {
+    color: #86efac;
+    background: #173b2c;
+    border-color: #28553e;
+}
+
+.dark .curing-stock-page .curing-status-moved,
+[data-theme="dark"] .curing-stock-page .curing-status-moved,
+.dark-mode .curing-stock-page .curing-status-moved {
+    color: #bfdbfe;
+    background: #1e3a5f;
+    border-color: #345987;
+}
+
+.dark .curing-stock-page .form-error,
+[data-theme="dark"] .curing-stock-page .form-error,
+.dark-mode .curing-stock-page .form-error {
+    border-color: #713737;
+}
+
+
+/* ============================================================
+   14. RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .curing-stock-page > .card {
+        padding: 16px;
+    }
+
+    .curing-stock-page .table-wrap table {
+        min-width: 1000px;
+    }
+}
+
+@media (max-width: 640px) {
+    .curing-stock-page {
+        font-size: 13px;
+    }
+
+    .curing-stock-page > .card {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .curing-stock-page h2 {
+        font-size: 18px;
+    }
+
+    .curing-stock-page .form-grid,
+    .curing-stock-page .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .curing-stock-page .form-grid .f-full,
+    .curing-stock-page .detail-item.f-full,
+    .curing-stock-page .detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .curing-stock-page .action-buttons {
+        gap: 5px;
+    }
+
+    .curing-stock-page .action-btn,
+    .curing-stock-page .btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+
+    .curing-stock-page .table-wrap table {
+        min-width: 950px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .curing-stock-page *,
+    .curing-stock-page *::before,
+    .curing-stock-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
